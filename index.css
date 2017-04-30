@@ -1,0 +1,107 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#content, #desktop {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+#desktop {
+    background-color: #EEEEEE;
+}
+
+.winWrapper {
+    position: absolute;
+    background-color: #111111;
+    border: 2px solid black;
+    border-radius: 2px;
+}
+
+.winTitleBar {
+    width: 100%;
+    display: flex;
+    color: white;
+    font-size: 10px;
+    line-height: 16px;
+}
+
+.winTitleBarText {
+    display: inline-block;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.winWrapper.focused .winTitleBarText {
+    font-weight: bold;
+}
+
+.winTitleBarCloseBtn {
+    display: inline-block;
+    width: 12px;
+    cursor: pointer;
+    text-align: center;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.winTitleBarCloseBtn:hover {
+    font-weight: bold;
+}
+
+.winBox {
+    position: relative;
+}
+
+.taskbar {
+    display: flex;
+    height: 20px;
+    font-size: 10px;
+    background-color: #CCCCCC;
+}
+
+.tasklist {
+    white-space: nowrap;
+    vertical-align: middle;
+    display: flex;
+    flex-grow: 1;
+}
+
+.tasklistentry {
+    display: inline-block;
+    flex-grow: 1;
+    vertical-align: middle;
+    min-width: 100px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 15px;
+    line-height: 16px;
+    padding: 0 0.5em;
+    margin: 1px 0 0 1px;
+    border: 1px solid #999999;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.tasklistentry.focused {
+    font-weight: bold;
+    background-color: #AAAAAA;
+}
+.tasklistentry:not(.focused):hover {
+    background-color: #DDDDDD;
+}
+
+.clock {
+    flex-grow: 0;
+    line-height: 20px;
+    padding: 0 0.5em;
+}
