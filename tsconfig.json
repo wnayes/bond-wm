@@ -6,6 +6,6 @@
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node"
     },
-    "include": ["**/*.ts", "components/Titlebar.tsx", "components/WindowWrapper.tsx"],
+    "include": ["**/*.ts", "**/*.tsx"],
     "exclude": ["node_modules"]
 }

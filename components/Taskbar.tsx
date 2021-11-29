@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 
 import { Clock } from "./Clock";
 import { connect } from "react-redux";
@@ -83,7 +83,7 @@ class TaskListEntry extends React.Component<ITaskListEntryProps> {
 const RunField: any = connect(mapStateToProps)(class RunField extends React.Component<any> {
   field: any;
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.onChange = this.onChange.bind(this);
@@ -104,11 +104,11 @@ const RunField: any = connect(mapStateToProps)(class RunField extends React.Comp
     );
   }
 
-  onChange(event) {
+  onChange(event: any) {
     this.props.dispatch(actions.setTaskbarRunFieldText(event.target.value));
   }
 
-  onKeyPress(event) {
+  onKeyPress(event: React.KeyboardEvent) {
     const command = this.props.runCommand;
     if (command && event.key === "Enter") {
       (window as any).commands.exec(this.props.runCommand);
@@ -117,7 +117,7 @@ const RunField: any = connect(mapStateToProps)(class RunField extends React.Comp
     }
   }
 
-  onKeyDown(event) {
+  onKeyDown(event: React.KeyboardEvent) {
     if (event.keyCode === 27 /*esc*/) {
       this.reset();
     }
@@ -137,7 +137,7 @@ const RunField: any = connect(mapStateToProps)(class RunField extends React.Comp
   }
 });
 
-function mapStateToProps(state) {
+function mapStateToProps(state: any) {
   return Object.assign({}, state.taskbar);
 }
 

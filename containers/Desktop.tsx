@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 
 import { connect } from "react-redux";
 
@@ -9,7 +9,7 @@ interface IDesktopProps {
   windows: any[];
 }
 
-class DesktopComp extends React.Component<IDesktopProps> {
+class DesktopComp extends React.Component<any> {
   render() {
     //console.log(this.props);
     return (
@@ -21,7 +21,7 @@ class DesktopComp extends React.Component<IDesktopProps> {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: any) {
   return Object.assign({}, state);
 }
 
