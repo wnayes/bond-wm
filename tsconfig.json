@@ -4,7 +4,8 @@
         "noImplicitAny": true,
         "jsx": "react",
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "isolatedModules": true
     },
     "include": ["**/*.ts", "**/*.tsx"],
     "exclude": ["node_modules"]
