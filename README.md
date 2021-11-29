@@ -2,6 +2,16 @@
 
 A web window manager experiment.
 
+## Development
+
+To start a test X server:
+
+    npm run startx
+
+To start the window manager:
+
+    npm run start
+
 ## License
 
-[CC0 1.0 (Public Domain)](LICENSE.md)
+[MIT License](LICENSE.md)

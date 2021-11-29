@@ -1,37 +1,17 @@
-const { createStore, applyMiddleware, compose } = require("redux");
-const { forwardToMain, forwardToRenderer, triggerAlias, replayActionMain, replayActionRenderer, getInitialStateRenderer } = require("electron-redux");
+const { createStore, applyMiddleware } = require("redux");
 
-module.exports = function configureStore(scope, initialState = {}) {
+exports.configureStore = function configureStore(scope, initialState = {}) {
   const rootReducer = require("./reducers.js");
-  let otherMiddleware = [];
 
   let store;
   if (scope === "main") {
-    store = createStore(
-      rootReducer,
-      initialState,
-      applyMiddleware(
-        triggerAlias,
-        //...otherMiddleware,
-        forwardToRenderer
-      )
-    );
+    const { stateSyncEnhancer } = require("electron-redux/main");
+    store = createStore(rootReducer, stateSyncEnhancer());
   }
   else {
-    store = createStore(
-      rootReducer,
-      getInitialStateRenderer(),
-      applyMiddleware(
-        forwardToMain,
-        ...otherMiddleware
-      )
-    );
+    const { stateSyncEnhancer } = require("electron-redux/renderer");
+    store = createStore(rootReducer, stateSyncEnhancer());
   }
 
-  if (scope === "main")
-    replayActionMain(store);
-  else
-    replayActionRenderer(store);
-
   return store;
-}
+};

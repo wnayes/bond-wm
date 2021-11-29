@@ -5,6 +5,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 const path = require("path");
 const url = require("url");
+const os = require("os");
 
 let backBrowsers = [];
 let backBrowserHandles = {};
@@ -12,7 +13,7 @@ let backBrowserHandles = {};
 let frames = {};
 let frameFromWin = {};
 
-const configureStore = require("./configureStore.js");
+const configureStore = require("./configureStore.js").configureStore;
 let store = configureStore("main", {
   screens: [],
   windows: {}
@@ -101,6 +102,11 @@ function createBackBrowser(props) {
     fullscreen: true,
     width: props.width,
     height: props.height,
+    webPreferences: {
+      preload: `${__dirname}/preload.js`,
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
   });
 
   win.loadURL(url.format({
@@ -115,7 +121,7 @@ function createBackBrowser(props) {
   let index = backBrowsers.length;
   backBrowsers[index] = win;
 
-  let handle = win.getNativeWindowHandle().readUIntLE(0, 8);
+  let handle = getNativeWindowHandleInt(win);
   if (!handle) {
     console.error("Browser handle was null");
   }
@@ -140,6 +146,11 @@ function createBackBrowser(props) {
 
   // https://github.com/electron/electron/blob/master/docs/api/web-contents.md#contentscapturepagerect-callback
   return handle;
+}
+
+function getNativeWindowHandleInt(win) {
+    const hbuf = win.getNativeWindowHandle();
+    return os.endianness() === "LE" ? hbuf.readInt32LE() : hbuf.readInt32BE();
 }
 
 module.exports = function startX() {

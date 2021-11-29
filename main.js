@@ -6,9 +6,10 @@ dialog.showErrorBox = function(title, content) {
   console.error(`${title}\n${content}`);
 };
 
-require("electron-reload")(__dirname, {
-  electron: "electron"
-});
+try {
+	require("electron-reloader")(module);
+}
+catch {}
 
 const app = electron.app;
 
@@ -28,6 +29,7 @@ app.on("activate", function() {
 const startX = require("./wm.js");
 
 app.on("ready", function() {
+  console.log("test");
   startX();
 });
 
