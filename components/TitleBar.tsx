@@ -1,7 +1,10 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
 
-class TitleBar extends React.Component {
+interface ITitleBarProps {
+  window: any;
+}
+
+export class TitleBar extends React.Component<ITitleBarProps> {
   render() {
     const window = this.props.window;
     return (
@@ -13,7 +16,11 @@ class TitleBar extends React.Component {
   }
 }
 
-class TitleBarCloseButton extends React.Component {
+interface ITitleBarCloseButtonProps {
+  window: any;
+}
+
+class TitleBarCloseButton extends React.Component<ITitleBarCloseButtonProps> {
   render() {
     const window = this.props.window;
     return (
@@ -22,8 +29,6 @@ class TitleBarCloseButton extends React.Component {
   }
 
   onClick() {
-    window.commands.closeWindow(this.props.window.id);
+    (window as any).commands.closeWindow(this.props.window.id);
   }
 }
-
-module.exports = TitleBar;

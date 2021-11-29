@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "jsx": "react",
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node"
+    },
+    "include": ["**/*.ts", "components/Titlebar.tsx", "components/WindowWrapper.tsx"],
+    "exclude": ["node_modules"]
+}

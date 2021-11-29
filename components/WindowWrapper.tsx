@@ -1,9 +1,17 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
+import ReactDOM from "react-dom";
 
-const TitleBar = require("./titlebar.js");
+import { TitleBar } from "./TitleBar";
 
-class WindowWrapper extends React.Component {
+interface IWindowWrapperProps {
+  window: any;
+}
+
+export class WindowWrapper extends React.Component<any> {
+  private winBox: HTMLElement;
+  private __leftAdjust: number | undefined;
+  private __topAdjust: number | undefined;
+
   render() {
     const window = this.props.window;
     const divStyle = {
@@ -43,7 +51,7 @@ class WindowWrapper extends React.Component {
     this.adjustPosition();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: IWindowWrapperProps, nextState: unknown) {
     const oldWindow = this.props.window;
     const newWindow = nextProps.window;
 
@@ -73,7 +81,7 @@ class WindowWrapper extends React.Component {
   }
 
   adjustPosition(window = this.props.window) {
-    let wrapper = ReactDOM.findDOMNode(this);
+    let wrapper = ReactDOM.findDOMNode(this) as HTMLElement;
     let box = this.winBox;
 
     if (this.__leftAdjust === undefined) {

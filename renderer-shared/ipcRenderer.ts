@@ -1,24 +1,22 @@
-const { ipcRenderer } = require("electron");
+import { ipcRenderer } from "electron";
+import { X11_KEY_MODIFIER } from "../shared/X";
+import * as actions from "../shared/actions";
 
-const { X11_KEY_MODIFIER } = require("../shared/X.js");
-
-const actions = require("../shared/actions.js");
-
-module.exports = function setupIpc(store) {
-  window.commands = {
-    raiseWindow: function(wid) {
+export function setupIpc(store: any) {
+  (window as any).commands = {
+    raiseWindow: function(wid: number) {
       ipcRenderer.send("raise-window", wid);
     },
 
-    minimizeWindow: function(wid) {
+    minimizeWindow: function(wid: number) {
       ipcRenderer.send("minimize-window", wid);
     },
 
-    closeWindow: function(wid) {
+    closeWindow: function(wid: number) {
       ipcRenderer.send("close-window", wid);
     },
 
-    exec: function(executable, args) {
+    exec: function(executable: string, args: string) {
       ipcRenderer.send("exec", {
         executable,
         args

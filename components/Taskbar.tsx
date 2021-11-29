@@ -1,13 +1,15 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
 
-const Clock = require("./clock.js");
+import { Clock } from "./Clock";
+import { connect } from "react-redux";
+import * as actions from "../shared/actions";
 
-const { connect } = require("react-redux");
+interface ITaskbarProps {
+  windows: any[];
+  showingRun: boolean;
+}
 
-const actions = require("../shared/actions.js");
-
-class Taskbar extends React.Component {
+class TaskbarComp extends React.Component<any> {
   render() {
     const windows = this.props.windows;
 
@@ -28,7 +30,11 @@ class Taskbar extends React.Component {
   }
 }
 
-class TaskList extends React.Component {
+interface ITaskListProps {
+  windows: any[];
+}
+
+class TaskList extends React.Component<ITaskListProps> {
   render() {
     const windows = this.props.windows;
     const entries = [];
@@ -47,7 +53,11 @@ class TaskList extends React.Component {
   }
 }
 
-class TaskListEntry extends React.Component {
+interface ITaskListEntryProps {
+  window: any;
+}
+
+class TaskListEntry extends React.Component<ITaskListEntryProps> {
   render() {
     const window = this.props.window;
 
@@ -64,13 +74,15 @@ class TaskListEntry extends React.Component {
   onClick() {
     const win = this.props.window;
     if (win.focused)
-      window.commands.minimizeWindow(win.id);
+      (window as any).commands.minimizeWindow(win.id);
     else
-      window.commands.raiseWindow(win.id);
+      (window as any).commands.raiseWindow(win.id);
   }
 }
 
-const RunField = connect(mapStateToProps)(class RunField extends React.Component {
+const RunField: any = connect(mapStateToProps)(class RunField extends React.Component<any> {
+  field: any;
+
   constructor(props) {
     super(props);
 
@@ -99,7 +111,7 @@ const RunField = connect(mapStateToProps)(class RunField extends React.Component
   onKeyPress(event) {
     const command = this.props.runCommand;
     if (command && event.key === "Enter") {
-      window.commands.exec(this.props.runCommand);
+      (window as any).commands.exec(this.props.runCommand);
       this.reset();
       event.preventDefault();
     }
@@ -129,4 +141,4 @@ function mapStateToProps(state) {
   return Object.assign({}, state.taskbar);
 }
 
-module.exports = connect(mapStateToProps)(Taskbar);
+export const Taskbar: any = connect(mapStateToProps)(TaskbarComp);

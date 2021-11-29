@@ -1,4 +1,4 @@
-module.exports.addScreen = function addScreen(screen) {
+export function addScreen(screen: { width: number, height: number }) {
   return {
     type: "ADD_SCREEN",
     payload: {
@@ -8,21 +8,21 @@ module.exports.addScreen = function addScreen(screen) {
   };
 }
 
-module.exports.addWindow = function addWindow(window) {
+export function addWindow(window: any) {
   return {
     type: "ADD_WINDOW",
     payload: window,
   };
 }
 
-module.exports.removeWindow = function removeWindow(wid) {
+export function removeWindow(wid: any) {
   return {
     type: "REMOVE_WINDOW",
     payload: wid
   };
 }
 
-module.exports.configureWindow = function configureWindow(wid, config) {
+export function configureWindow(wid: number, config: any) {
   return {
     type: "CONFIGURE_WINDOW",
     payload: Object.assign({
@@ -31,21 +31,21 @@ module.exports.configureWindow = function configureWindow(wid, config) {
   };
 }
 
-module.exports.focusWindow = function focusWindow(wid) {
+export function focusWindow(wid: number) {
   return {
     type: "FOCUS_WINDOW",
     payload: wid
   };
 }
 
-module.exports.unfocusWindow = function unfocusWindow(wid) {
+export function unfocusWindow(wid: number) {
   return {
     type: "UNFOCUS_WINDOW",
     payload: wid
   };
 }
 
-module.exports.setWindowTitle = function setWindowTitle(wid, title) {
+export function setWindowTitle(wid: number, title: string) {
   return {
     type: "SET_WINDOW_TITLE",
     payload: {
@@ -55,7 +55,7 @@ module.exports.setWindowTitle = function setWindowTitle(wid, title) {
   };
 }
 
-module.exports.setWindowVisible = function setWindowVisible(wid, visible) {
+export function setWindowVisible(wid: number, visible: boolean) {
   return {
     type: "SET_WINDOW_VISIBLE",
     payload: {
@@ -65,7 +65,7 @@ module.exports.setWindowVisible = function setWindowVisible(wid, visible) {
   };
 }
 
-module.exports.setWindowDecorated = function setWindowDecorated(wid, decorated) {
+export function setWindowDecorated(wid: number, decorated: boolean) {
   return {
     type: "SET_WINDOW_DECORATED",
     payload: {
@@ -75,7 +75,7 @@ module.exports.setWindowDecorated = function setWindowDecorated(wid, decorated) 
   };
 }
 
-module.exports.toggleTaskbarRunField = function toggleTaskbarRunField(visible) {
+export function toggleTaskbarRunField(visible: boolean) {
   return {
     type: visible ? "SHOW_RUN_FIELD" : "HIDE_RUN_FIELD",
     payload: visible,
@@ -85,7 +85,7 @@ module.exports.toggleTaskbarRunField = function toggleTaskbarRunField(visible) {
   };
 }
 
-module.exports.setTaskbarRunFieldText = function setTaskbarRunFieldText(text) {
+export function setTaskbarRunFieldText(text: string) {
   return {
     type: "SET_RUN_FIELD_TEXT",
     payload: text,

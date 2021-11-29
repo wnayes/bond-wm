@@ -1,9 +1,8 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
 
-const WindowWrapper = require("./windowwrapper.js");
+import { WindowWrapper } from "./WindowWrapper";
 
-class WindowArea extends React.Component {
+export class WindowArea extends React.Component<any> {
   render() {
     const windows = this.props.windows;
     const divWins = [];
@@ -21,5 +20,3 @@ class WindowArea extends React.Component {
     </div>;
   }
 }
-
-module.exports = WindowArea;

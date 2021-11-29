@@ -1,6 +1,11 @@
-const { combineReducers } = require("redux");
+import { combineReducers } from "redux";
 
-function screens(state = [], action) {
+interface IScreen {
+  width: number;
+  height: number;
+}
+
+function screens(state: IScreen[] = [], action: any) {
   switch (action.type) {
     case "ADD_SCREEN":
       let newState = state.slice();
@@ -14,8 +19,8 @@ function screens(state = [], action) {
   }
 }
 
-function windows(state = {}, action) {
-  let newState, window;
+function windows(state = {}, action: any) {
+  let newState: any, window;
   switch (action.type) {
     case "ADD_WINDOW":
       window = action.payload;
@@ -75,7 +80,7 @@ const initialTaskbarState = {
   showingRun: false,
   runCommand: "",
 };
-function taskbar(state = initialTaskbarState, action) {
+function taskbar(state = initialTaskbarState, action: any) {
   let newState;
   switch (action.type) {
     case "SHOW_RUN_FIELD":
@@ -95,12 +100,12 @@ function taskbar(state = initialTaskbarState, action) {
   }
 }
 
-module.exports.mainReducer = combineReducers({
+export const mainReducer = combineReducers({
   screens,
   windows,
 });
 
-module.exports.rendererReducer = combineReducers({
+export const rendererReducer = combineReducers({
   screens,
   windows,
   taskbar,
