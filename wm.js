@@ -6,6 +6,7 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require("path");
 const url = require("url");
 const os = require("os");
+const spawn = require("child_process").spawn;
 
 let backBrowsers = [];
 let backBrowserHandles = {};
@@ -24,69 +25,7 @@ const actions = require("./actions.js");
 const WIN_MINWIDTH = 140;
 const WIN_MINHEIGHT = 140;
 
-const X11_EVENT_TYPE = {
-  KeyPress: 2,
-  KeyRelease: 3,
-  ButtonPress: 4,
-  ButtonRelease: 5,
-  MotionNotify: 6,
-  EnterNotify: 7,
-  LeaveNotify: 8,
-  FocusIn: 9,
-  FocusOut: 10,
-  KeymapNotify: 11,
-  Expose: 12,
-  GraphicsExpose: 13,
-  NoExpose: 14,
-  VisibilityNotify: 15,
-  CreateNotify: 16,
-  DestroyNotify: 17,
-  UnmapNotify: 18,
-  MapNotify: 19,
-  MapRequest: 20,
-  ReparentNotify: 21,
-  ConfigureNotify: 22,
-  ConfigureRequest: 23,
-  GravityNotify: 24,
-  ResizeRequest: 25,
-  CirculateNotify: 26,
-  CirculateRequest: 27,
-  PropertyNotify: 28,
-  SelectionClear: 29,
-  SelectionRequest: 30,
-  SelectionNotify: 31,
-  ColormapNotify: 32,
-  ClientMessage: 33,
-  MappingNotify: 34,
-  GenericEvent: 35
-};
-
-// Event masks
-//  KeyPress: 1,
-//   KeyRelease: 2,
-//   ButtonPress: 4,
-//   ButtonRelease: 8,
-//   EnterWindow: 16,
-//   LeaveWindow: 32,
-//   PointerMotion: 64,
-//   PointerMotionHint: 128,
-//   Button1Motion: 256,
-//   Button2Motion: 512,
-//   Button3Motion: 1024,
-//   Button4Motion: 2048,
-//   Button5Motion: 4096,
-//   ButtonMotion: 8192,
-//   KeymapState: 16384,
-//   Exposure: 32768,
-//   VisibilityChange: 65536,
-//   StructureNotify: 131072,
-//   ResizeRedirect: 262144,
-//   SubstructureNotify: 524288,
-//   SubstructureRedirect: 1048576,
-//   FocusChange: 2097152,
-//   PropertyChange: 4194304,
-//   ColormapChange: 8388608,
-//   OwnerGrabButton: 16777216
+const { X11_EVENT_TYPE, X11_KEY_MODIFIER } = require("./X.js");
 
 function isBrowserWin(win) {
   return backBrowserHandles.hasOwnProperty(win);
@@ -162,6 +101,18 @@ module.exports = function startX() {
 
   let initializingWins = {};
 
+  const registeredKeys = {
+    [X11_KEY_MODIFIER.Mod4Mask]: {
+      27: true // Win + R
+    },
+    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
+      24: true // Win + Shift + Q
+    },
+    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
+      27: true // Win + Ctrl + R
+    }
+  };
+
   x11.createClient(function(err, display) {
     if (err) {
       console.error(err);
@@ -205,7 +156,6 @@ module.exports = function startX() {
       root = screen.root;
       console.log("Root wid", root);
       white = screen.white_pixel;
-      console.log("white", white);
       const rootEvents =
         //x11.eventMask.Button1Motion
         x11.eventMask.ButtonPress // | 4
@@ -227,15 +177,33 @@ module.exports = function startX() {
         tree.children.forEach(ManageWindow);
       });
 
-      var child = require("child_process").spawn;
-      child("xterm");
-      child("evince");
+      for (let modifier in registeredKeys) {
+        if (!registeredKeys.hasOwnProperty(modifier))
+          continue;
+
+        for (let key in registeredKeys[modifier]) {
+          if (!registeredKeys[modifier].hasOwnProperty(key))
+            continue;
+
+          // function GrabKey(wid, ownerEvents, modifiers, key, pointerMode, keybMode) {
+          X.GrabKey(root, true, parseInt(modifier), parseInt(key), 1 /* Async */, 1 /* Async */);
+        }
+      }
+
+      // function GrabButton(wid, ownerEvents, mask, pointerMode, keybMode, confineTo, cursor, button, modifiers)
+      // X.GrabButton(root, true, x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.PointerMotion, 1 /* Async */, 1 /* Async */, 0, 0, 0, 1 << 3 /* Mod1 */);
+      // X.GrabButton( display.screen[0].root, true, x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.PointerMotion,
+      //                1 /* Async */, 1 /* Async */, 0 /* None */, 0 /* None */, 1 << 3 /* Mod1 */, 1 );
+
+      //launchProcess("xterm");
     });
 
   }).on("error", function(err) {
     console.error(err);
   }).on("event", function(ev) {
-    if (ev.type === X11_EVENT_TYPE.ButtonPress) onButtonPress(ev);
+    if (ev.type === X11_EVENT_TYPE.KeyPress) onKeyPress(ev);
+    else if (ev.type === X11_EVENT_TYPE.KeyRelease) { /* ignore */ }
+    else if (ev.type === X11_EVENT_TYPE.ButtonPress) onButtonPress(ev);
     else if (ev.type === X11_EVENT_TYPE.MotionNotify) { /* ignore */ }
     else if (ev.type === X11_EVENT_TYPE.EnterNotify) onEnterNotify(ev);
     else if (ev.type === X11_EVENT_TYPE.LeaveNotify) onLeaveNotify(ev);
@@ -299,7 +267,7 @@ module.exports = function startX() {
           return;
         }
 
-        console.log("Window geometry ", wid, clientGeom);
+        //console.log("Window geometry ", wid, clientGeom);
         var width = Math.max(clientGeom.width, WIN_MINWIDTH);
         var height = Math.max(clientGeom.height, WIN_MINHEIGHT);
 
@@ -308,7 +276,7 @@ module.exports = function startX() {
         let winX = browserWin ? 0 : 10;
         let winY = browserWin ? 0 : 50;
 
-        console.log(frameFromWin);
+        //console.log(frameFromWin);
         X.CreateWindow(fid, root, winX, winY, width, height, 0, 0, 0, 0, {
           backgroundPixel: white,
           eventMask: events
@@ -344,9 +312,6 @@ module.exports = function startX() {
             height: height,
             //borderWidth: 0
           });
-
-          // function(wid, ownerEvents, mask, pointerMode, keybMode, confineTo, cursor, button, modifiers)
-          // X.GrabButton(wid, true, x11.eventMask.ButtonPress, 0, 0, 0, 0, 1, 1);
         }
 
     const ee = new EventEmitter();
@@ -502,11 +467,42 @@ module.exports = function startX() {
     // }
   }
 
+  function onKeyPress(ev) {
+    console.log("onKeyPress", ev);
+
+    const kb = registeredKeys;
+    if (kb[ev.buttons] && kb[ev.buttons][ev.keycode]) {
+      const browser = backBrowsers[0];
+      if (browser) {
+        browser.webContents.send("x-keypress", {
+          buttons: ev.buttons,
+          keycode: ev.keycode,
+        });
+      }
+    }
+
+    switch (ev.buttons) {
+      case (X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask):
+        // Win + Shift + Q
+        if (ev.keycode === 24) {
+          electron.app.quit();
+        }
+        break;
+      case (X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask):
+        // Win + Ctrl + R
+        if (ev.keycode === 27) {
+          electron.app.relaunch();
+          electron.app.exit(0);
+        }
+        break;
+    }
+  }
+
   function onButtonPress(ev) {
+    console.log("onButtonPress", ev);
     if (isBrowserWin(ev.wid))
       return;
-    X.RaiseWindow(ev.wid);
-    console.log("onButtonPress RaiseWindow");
+    // X.RaiseWindow(ev.wid);
   }
 
   function onClientMessage(ev) {
@@ -520,6 +516,14 @@ module.exports = function startX() {
   //   message_type: 468,
   //   data: [ 3, 0, 0, 0, 0 ],
   //   rawData: <Buffer a1 20 3c 00 08 00 e0 00 d4 01 00 00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00> }
+  }
+
+  function launchProcess(name) {
+    const child = spawn(name, [], {
+      detached: true,
+      stdio: "ignore"
+    });
+    child.unref(); // Allow electron to close before this child
   }
 
   function determineWindowTitle(wid) {
@@ -694,7 +698,15 @@ module.exports = function startX() {
     minimize(wid);
   });
 
+  ipcMain.on("focus-window", (event, wid) => {
+    changeFocus(wid);
+  });
+
   ipcMain.on("close-window", (event, wid) => {
     closeWindow(wid);
+  });
+
+  ipcMain.on("exec", (event, args) => {
+    launchProcess(args.executable);
   });
 }

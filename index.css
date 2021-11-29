@@ -100,6 +100,12 @@ html, body {
     background-color: #DDDDDD;
 }
 
+.taskbarRunField {
+    height: 11px;
+    font-size: 10px;
+    margin-top: 1px;
+}
+
 .clock {
     flex-grow: 0;
     line-height: 20px;

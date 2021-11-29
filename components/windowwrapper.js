@@ -51,6 +51,10 @@ class WindowWrapper extends React.Component {
       return true;
     if (oldWindow.focused !== newWindow.focused)
       return true;
+    if (oldWindow.decorated !== newWindow.decorated) {
+      this.resetAdjustments();
+      return true;
+    }
 
     if (oldWindow.width !== newWindow.width || oldWindow.height !== newWindow.height)
       this.adjustSize(newWindow);
@@ -81,6 +85,11 @@ class WindowWrapper extends React.Component {
     // Adjust the positioning of the wrapper to account for titlebar, borders, etc.
     wrapper.style.left = (window.x - this.__leftAdjust) + "px";
     wrapper.style.top = (window.y - this.__topAdjust) + "px";
+  }
+
+  resetAdjustments() {
+    delete this.__leftAdjust;
+    delete this.__topAdjust;
   }
 }
 

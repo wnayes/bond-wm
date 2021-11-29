@@ -1,16 +1,16 @@
 const { createStore, applyMiddleware } = require("redux");
 
 exports.configureStore = function configureStore(scope, initialState = {}) {
-  const rootReducer = require("./reducers.js");
-
   let store;
   if (scope === "main") {
     const { stateSyncEnhancer } = require("electron-redux/main");
-    store = createStore(rootReducer, stateSyncEnhancer());
+    const reducer = require("./reducers.js").mainReducer;
+    store = createStore(reducer, stateSyncEnhancer());
   }
   else {
     const { stateSyncEnhancer } = require("electron-redux/renderer");
-    store = createStore(rootReducer, stateSyncEnhancer());
+    const reducer = require("./reducers.js").rendererReducer;
+    store = createStore(reducer, stateSyncEnhancer());
   }
 
   return store;

@@ -71,9 +71,37 @@ function windows(state = {}, action) {
   }
 }
 
-const rootReducer = combineReducers({
+const initialTaskbarState = {
+  showingRun: false,
+  runCommand: "",
+};
+function taskbar(state = initialTaskbarState, action) {
+  let newState;
+  switch (action.type) {
+    case "SHOW_RUN_FIELD":
+      newState = Object.assign({}, state);
+      newState.showingRun = true;
+      return newState;
+    case "HIDE_RUN_FIELD":
+      newState = Object.assign({}, state);
+      newState.showingRun = false;
+      return newState;
+    case "SET_RUN_FIELD_TEXT":
+      newState = Object.assign({}, state);
+      newState.runCommand = action.payload;
+      return newState;
+    default:
+      return state;
+  }
+}
+
+module.exports.mainReducer = combineReducers({
   screens,
   windows,
 });
 
-module.exports = rootReducer;
+module.exports.rendererReducer = combineReducers({
+  screens,
+  windows,
+  taskbar,
+});

@@ -16,18 +16,4 @@ ReactDOM.render(
   document.getElementById("content")
 );
 
-const { ipcRenderer } = require("electron");
-
-window.commands = {
-  raiseWindow: function(wid) {
-    ipcRenderer.send("raise-window", wid);
-  },
-
-  minimizeWindow: function(wid) {
-    ipcRenderer.send("minimize-window", wid);
-  },
-
-  closeWindow: function(wid) {
-    ipcRenderer.send("close-window", wid);
-  },
-};
+require("./ipcRenderer.js")(store);

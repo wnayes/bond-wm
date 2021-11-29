@@ -74,3 +74,23 @@ module.exports.setWindowDecorated = function setWindowDecorated(wid, decorated) 
     }
   };
 }
+
+module.exports.toggleTaskbarRunField = function toggleTaskbarRunField(visible) {
+  return {
+    type: visible ? "SHOW_RUN_FIELD" : "HIDE_RUN_FIELD",
+    payload: visible,
+    meta: {
+      scope: "local",
+    },
+  };
+}
+
+module.exports.setTaskbarRunFieldText = function setTaskbarRunFieldText(text) {
+  return {
+    type: "SET_RUN_FIELD_TEXT",
+    payload: text,
+    meta: {
+      scope: "local",
+    },
+  };
+}
