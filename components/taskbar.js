@@ -5,7 +5,7 @@ const Clock = require("./clock.js");
 
 const { connect } = require("react-redux");
 
-const actions = require("./../actions.js");
+const actions = require("../shared/actions.js");
 
 class Taskbar extends React.Component {
   render() {

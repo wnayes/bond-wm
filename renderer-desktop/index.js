@@ -1,13 +1,13 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
 
-const configureStore = require("./configureStore.js").configureStore;
-let store = configureStore("renderer");
+const configureStore = require("../renderer-shared/configureStore.js").configureStore;
+let store = configureStore();
 window.store = store;
 
 const { Provider } = require("react-redux");
 
-const Desktop = require("./containers/desktop.js");
+const Desktop = require("../containers/desktop.js");
 
 ReactDOM.render(
   <Provider store={store}>
@@ -16,4 +16,4 @@ ReactDOM.render(
   document.getElementById("content")
 );
 
-require("./ipcRenderer.js")(store);
+require("../renderer-shared/ipcRenderer.js")(store);

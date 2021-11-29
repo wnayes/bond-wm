@@ -1,4 +1,5 @@
 const electron = require("electron");
+const startX = require("./wm.js");
 
 // Disable error dialogs by override
 const dialog = electron.dialog;
@@ -25,8 +26,6 @@ app.on("activate", function() {
   //   createWindow();
   // }
 });
-
-const startX = require("./wm.js");
 
 app.on("ready", function() {
   console.log("test");

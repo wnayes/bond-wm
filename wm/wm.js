@@ -8,24 +8,20 @@ const url = require("url");
 const os = require("os");
 const spawn = require("child_process").spawn;
 
+const configureStore = require("./configureStore.js").configureStore;
+const { X11_EVENT_TYPE, X11_KEY_MODIFIER } = require("../shared/X.js");
+const actions = require("../shared/actions.js");
+
 let backBrowsers = [];
 let backBrowserHandles = {};
 
 let frames = {};
 let frameFromWin = {};
 
-const configureStore = require("./configureStore.js").configureStore;
-let store = configureStore("main", {
-  screens: [],
-  windows: {}
-});
-
-const actions = require("./actions.js");
+let store = configureStore();
 
 const WIN_MINWIDTH = 140;
 const WIN_MINHEIGHT = 140;
-
-const { X11_EVENT_TYPE, X11_KEY_MODIFIER } = require("./X.js");
 
 function isBrowserWin(win) {
   return backBrowserHandles.hasOwnProperty(win);
@@ -42,14 +38,14 @@ function createBackBrowser(props) {
     width: props.width,
     height: props.height,
     webPreferences: {
-      preload: `${__dirname}/preload.js`,
+      preload: `${__dirname}/../renderer-shared/preload.js`,
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
   win.loadURL(url.format({
-    pathname: path.join(__dirname, "index.html"),
+    pathname: path.join(__dirname, "../renderer-desktop/index.html"),
     protocol: "file:",
     slashes: true
   }));

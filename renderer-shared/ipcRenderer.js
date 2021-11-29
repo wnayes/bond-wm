@@ -1,6 +1,8 @@
 const { ipcRenderer } = require("electron");
 
-const { X11_KEY_MODIFIER } = require("./X.js");
+const { X11_KEY_MODIFIER } = require("../shared/X.js");
+
+const actions = require("../shared/actions.js");
 
 module.exports = function setupIpc(store) {
   window.commands = {
@@ -23,8 +25,6 @@ module.exports = function setupIpc(store) {
       });
     },
   };
-
-  const actions = require("./actions.js");
 
   ipcRenderer.on("x-keypress", (event, args) => {
     console.log(args);

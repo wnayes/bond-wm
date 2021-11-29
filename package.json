@@ -2,7 +2,7 @@
   "name": "electronwm",
   "version": "1.0.0",
   "description": "A Electron X11 window manager",
-  "main": "main.js",
+  "main": "./wm/main.js",
   "scripts": {
     "startx": "Xephyr -br -ac -noreset -screen 1600x900 :1",
     "start": "DISPLAY=:1 electron ."
