@@ -13,13 +13,6 @@
   "author": "Will Nayes",
   "license": "MIT",
   "dependencies": {
-    "babel": "^6.23.0",
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
-    "babel-loader": "^6.4.1",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.3.3",
-    "babel-register": "^6.24.1",
     "electron": "^16.0.2",
     "electron-redux": "2.0.0-alpha.9",
     "moment": "^2.18.1",
