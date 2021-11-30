@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 
-interface IScreen {
+export interface IScreen {
   width: number;
   height: number;
 }

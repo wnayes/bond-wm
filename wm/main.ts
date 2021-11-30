@@ -1,5 +1,6 @@
-const electron = require("electron");
-const startX = require("./wm.js");
+import electron from "electron";
+const app = electron.app;
+import { startX } from "./wm";
 
 // Disable error dialogs by override
 const dialog = electron.dialog;
@@ -11,8 +12,6 @@ try {
 	require("electron-reloader")(module);
 }
 catch {}
-
-const app = electron.app;
 
 // Quit when all windows are closed.
 app.on("window-all-closed", function() {
@@ -31,4 +30,3 @@ app.on("ready", function() {
   console.log("test");
   startX();
 });
-

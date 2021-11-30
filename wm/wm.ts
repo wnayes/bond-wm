@@ -1,7 +1,8 @@
 // This file is pretty messy, it is just a prototype for now!
 
-const electron = require("electron");
-const BrowserWindow = electron.BrowserWindow;
+import electron from "electron";
+import type { IScreen } from "../shared/reducers";
+import BrowserWindow = electron.BrowserWindow;
 
 const path = require("path");
 const url = require("url");
@@ -9,29 +10,29 @@ const os = require("os");
 const spawn = require("child_process").spawn;
 
 const configureStore = require("./configureStore.js").configureStore;
-const { X11_EVENT_TYPE, X11_KEY_MODIFIER } = require("../shared/X.js");
+import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient, IXKeyEvent, XCbWithErr } from "../shared/X";
 const actions = require("../shared/actions.js");
 
-let backBrowsers = [];
-let backBrowserHandles = {};
+let backBrowsers: BrowserWindow[] = [];
+let backBrowserHandles: { [handle: number]: any } = {};
 
-let frames = {};
-let frameFromWin = {};
+let frames: { [handle: number]: any } = {};
+let frameFromWin: { [win: number]: any } = {};
 
 let store = configureStore();
 
 const WIN_MINWIDTH = 140;
 const WIN_MINHEIGHT = 140;
 
-function isBrowserWin(win) {
+function isBrowserWin(win: number): boolean {
   return backBrowserHandles.hasOwnProperty(win);
 }
 
-function isFrameWin(win) {
+function isFrameWin(win: number) {
   return !!frames[win];
 }
 
-function createBackBrowser(props) {
+function createBackBrowser(props: IScreen) {
   let win = new BrowserWindow({
     frame: false,
     fullscreen: true,
@@ -83,40 +84,42 @@ function createBackBrowser(props) {
   return handle;
 }
 
-function getNativeWindowHandleInt(win) {
+function getNativeWindowHandleInt(win: BrowserWindow): number {
     const hbuf = win.getNativeWindowHandle();
     return os.endianness() === "LE" ? hbuf.readInt32LE() : hbuf.readInt32BE();
 }
 
-module.exports = function startX() {
+const registeredKeys: { [keyModifiers: number]: { [keyCode: number]: boolean } } = {
+  [X11_KEY_MODIFIER.Mod4Mask]: {
+    27: true // Win + R
+  },
+  [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
+    24: true // Win + Shift + Q
+  },
+  [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
+    27: true // Win + Ctrl + R
+  }
+};
+
+export function startX() {
   var x11 = require("x11");
   var EventEmitter = require("events").EventEmitter;
 
-  var X, root, white;
+  var root: number;
+  let white: unknown;
   var dragStart = null;
 
-  let initializingWins = {};
+  let initializingWins: { [win: number]: any } = {};
 
-  const registeredKeys = {
-    [X11_KEY_MODIFIER.Mod4Mask]: {
-      27: true // Win + R
-    },
-    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
-      24: true // Win + Shift + Q
-    },
-    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
-      27: true // Win + Ctrl + R
-    }
-  };
-
-  x11.createClient(function(err, display) {
+  let X: IXClient;
+  x11.createClient(function(err: unknown, display: IXDisplay) {
     if (err) {
       console.error(err);
       process.exit(1);
     }
     X = display.client;
 
-    display.screen.forEach((screen, index) => {
+    display.screen.forEach((screen: IXScreen, index: number) => {
       const props = {
         width: screen.pixel_width,
         height: screen.pixel_height
@@ -161,15 +164,15 @@ module.exports = function startX() {
         | x11.eventMask.SubstructureNotify
         |x11.eventMask.SubstructureRedirect //|x11.eventMask.PointerMotion|x11.eventMask.KeyPress
         | x11.eventMask.Exposure;
-      X.ChangeWindowAttributes(root, { eventMask: rootEvents }, function(err) {
-        if (err.error == 10) {
+      X.ChangeWindowAttributes(root, { eventMask: rootEvents }, function(err: { error: number }) {
+        if (err && err.error === 10) {
           console.error('Error: Another window manager already running.');
           process.exit(1);
         }
         console.error('Error: Error in root event masking');
       });
 
-      X.QueryTree(root, function(err, tree) {
+      X.QueryTree(root, function(err: unknown, tree) {
         tree.children.forEach(ManageWindow);
       });
 
@@ -194,9 +197,9 @@ module.exports = function startX() {
       //launchProcess("xterm");
     });
 
-  }).on("error", function(err) {
+  }).on("error", function(err: unknown) {
     console.error(err);
-  }).on("event", function(ev) {
+  }).on("event", function(ev: any) {
     if (ev.type === X11_EVENT_TYPE.KeyPress) onKeyPress(ev);
     else if (ev.type === X11_EVENT_TYPE.KeyRelease) { /* ignore */ }
     else if (ev.type === X11_EVENT_TYPE.ButtonPress) onButtonPress(ev);
@@ -222,7 +225,7 @@ module.exports = function startX() {
     }
   });
 
-  function ManageWindow(wid) {
+  function ManageWindow(wid: number) {
     console.log("MANAGE WINDOW: " + wid);
 
     const events = x11.eventMask.Button1Motion
@@ -243,7 +246,7 @@ module.exports = function startX() {
     initializingWins[wid] = true;
     initializingWins[fid] = true;
 
-    X.GetWindowAttributes(wid, function(err, attrs) {
+    X.GetWindowAttributes(wid, function(err: unknown, attrs) {
       if (err) {
         console.error("Couldn't GetWindowAttributes", wid, err);
         X.MapWindow(wid);
@@ -257,7 +260,7 @@ module.exports = function startX() {
         return;
       }
 
-      X.GetGeometry(wid, function(err, clientGeom) {
+      X.GetGeometry(wid, function(err: unknown, clientGeom: { width: number, height: number}) {
         if (err) {
           console.error("Couldn't read geometry", err);
           return;
@@ -312,7 +315,7 @@ module.exports = function startX() {
 
     const ee = new EventEmitter();
     X.event_consumers[wid] = ee;
-    ee.on("event", function(ev) {
+    ee.on("event", function(ev: IXEvent) {
       //console.log("event", ev);
       if (ev.type === X11_EVENT_TYPE.DestroyNotify) {
         X.DestroyWindow(fid);
@@ -350,13 +353,13 @@ module.exports = function startX() {
     });
   }
 
-  function onDestroyNotify(ev) {
+  function onDestroyNotify(ev: IXEvent) {
     if (!isFrameWin(ev.wid)) {
       store.dispatch(actions.removeWindow(ev.wid));
     }
   }
 
-  function onMapRequest(ev) {
+  function onMapRequest(ev: IXEvent) {
     const wid = ev.wid;
     console.log("onMapRequest", wid);
     if (initializingWins[wid])
@@ -365,7 +368,7 @@ module.exports = function startX() {
     showWindow(wid);
   }
 
-  function showWindow(wid) {
+  function showWindow(wid: number) {
     const isFrame = isFrameWin(wid);
     if (!isFrame) {
       if (!frameFromWin[wid]) {
@@ -384,7 +387,7 @@ module.exports = function startX() {
         //   X.MapWindow(frameFromWin[ev.wid]);
         //   X.MapWindow(ev.wid);
         // }
-        
+
         store.dispatch(actions.setWindowVisible(wid, true));
       }
     }
@@ -392,7 +395,7 @@ module.exports = function startX() {
     X.MapWindow(wid);
   }
 
-  function onUnmapNotify(ev) {
+  function onUnmapNotify(ev: IXEvent) {
     const wid = ev.wid;
     console.log("onUnmapNotify", wid);
     if (!isFrameWin(wid) && !isBrowserWin(wid)) {
@@ -400,7 +403,7 @@ module.exports = function startX() {
     }
   }
 
-  function onConfigureRequest(ev) {
+  function onConfigureRequest(ev: IXConfigureEvent) {
     // console.log("onConfigureRequest", ev.wid);
     if (isBrowserWin(ev.wid)
       || initializingWins[ev.wid]
@@ -431,17 +434,17 @@ module.exports = function startX() {
     store.dispatch(actions.configureWindow(ev.wid, config));
   }
 
-  function onEnterNotify(ev) {
-    isFrame = isFrameWin(ev.wid);
+  function onEnterNotify(ev: IXEvent) {
+    const isFrame = isFrameWin(ev.wid);
     let window = isFrame ? frames[ev.wid] : ev.wid;
 
     changeFocus(window);
   }
 
-  function changeFocus(window) {
-    X.SetInputFocus(window, 0);
+  function changeFocus(wid: number) {
+    X.SetInputFocus(wid, 0);
 
-    if (!isBrowserWin(window) && window !== root) {
+    if (!isBrowserWin(wid) && wid !== root) {
       unsetFocus();
       store.dispatch(actions.focusWindow(window));
     }
@@ -454,7 +457,7 @@ module.exports = function startX() {
     }
   }
 
-  function onLeaveNotify(ev) {
+  function onLeaveNotify(ev: IXEvent) {
     // console.log("onLeaveNotify", ev.wid);
     // if (!isBrowserWin(ev.wid)) {
     //   const isFrame = !!frames[ev.wid];
@@ -463,7 +466,7 @@ module.exports = function startX() {
     // }
   }
 
-  function onKeyPress(ev) {
+  function onKeyPress(ev: IXKeyEvent) {
     console.log("onKeyPress", ev);
 
     const kb = registeredKeys;
@@ -494,14 +497,14 @@ module.exports = function startX() {
     }
   }
 
-  function onButtonPress(ev) {
+  function onButtonPress(ev: IXEvent) {
     console.log("onButtonPress", ev);
     if (isBrowserWin(ev.wid))
       return;
     // X.RaiseWindow(ev.wid);
   }
 
-  function onClientMessage(ev) {
+  function onClientMessage(ev: IXEvent) {
     // ClientMessage
   // minimize
   // { type: 33,
@@ -514,7 +517,7 @@ module.exports = function startX() {
   //   rawData: <Buffer a1 20 3c 00 08 00 e0 00 d4 01 00 00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00> }
   }
 
-  function launchProcess(name) {
+  function launchProcess(name: string) {
     const child = spawn(name, [], {
       detached: true,
       stdio: "ignore"
@@ -522,17 +525,17 @@ module.exports = function startX() {
     child.unref(); // Allow electron to close before this child
   }
 
-  function determineWindowTitle(wid) {
+  function determineWindowTitle(wid: number) {
     X.GetProperty(0, wid, X.atoms.WM_NAME, X.atoms.STRING, 0, 10000000, function(err, prop) {
       if (prop.type == X.atoms.STRING) {
-        prop.data = prop.data.toString();
-        if (prop.data)
-          store.dispatch(actions.setWindowTitle(wid, prop.data));
+        const dataString = prop.data.toString();
+        if (dataString)
+          store.dispatch(actions.setWindowTitle(wid, dataString));
       }
     });
   }
 
-  function determineWindowDecorated(wid) {
+  function determineWindowDecorated(wid: number) {
     X.InternAtom(true, "_MOTIF_WM_HINTS", function(err, atom) {
       X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
         if (err) {
@@ -552,7 +555,7 @@ module.exports = function startX() {
     });
   }
 
-  function determineWindowHidden(wid) {
+  function determineWindowHidden(wid: number) {
     // X.InternAtom(true, "_NET_WM_ICON", function(err, atom) {
     //   X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
     //     if (err) {
@@ -581,7 +584,7 @@ module.exports = function startX() {
     return null;
   }
 
-  function XGetWMProtocols(wid, callback) {
+  function XGetWMProtocols(wid: number, callback: XCbWithErr<[number[] | void]>) {
     X.InternAtom(true, "WM_PROTOCOLS", function(err, atom) {
       if (err) {
         callback(err);
@@ -602,7 +605,6 @@ module.exports = function startX() {
             return;
           }
 
-          
           for (let i = 0; i < len; i += 4) {
             protocols.push(prop.data.readUInt32LE(i));
           }
@@ -613,17 +615,17 @@ module.exports = function startX() {
     });
   }
 
-  function closeWindow(wid) {
+  function closeWindow(wid: number) {
     supportsGracefulDestroy(wid, function(err, args) {
       if (err) {
         console.log("Error in supportsGracefulDestroy", err);
       }
-      if (args.supported) {
-        const eventData = new Buffer(32);
+      if (args && args.supported) {
+        const eventData = Buffer.alloc(32);
         eventData.writeUInt8(33, 0); // Event Type 33 = ClientMessage
         eventData.writeUInt8(32, 1); // Format
         eventData.writeUInt32LE(wid, 4); // Window ID
-        eventData.writeUInt32LE(args.atom, 8); // Message Type
+        eventData.writeUInt32LE(args.atom as number, 8); // Message Type
         console.log("Sending graceful kill", wid, eventData);
         X.SendEvent(wid, false, 0, eventData);
 
@@ -636,7 +638,7 @@ module.exports = function startX() {
     });
   }
 
-  function supportsGracefulDestroy(wid, callback) {
+  function supportsGracefulDestroy(wid: number, callback: XCbWithErr<[{ atom: unknown, supported: boolean } | void]>) {
     XGetWMProtocols(wid, function(err, protocols) {
       if (err) {
         console.error("XGetWMProtocols error", err);
@@ -644,7 +646,7 @@ module.exports = function startX() {
         return;
       }
 
-      X.InternAtom(true, "WM_DELETE_WINDOW", function(err, atom) {
+      X.InternAtom(true, "WM_DELETE_WINDOW", function(err: unknown, atom) {
         if (err) {
           callback(err);
           return;
@@ -652,13 +654,13 @@ module.exports = function startX() {
 
         callback(null, {
           atom: atom,
-          supported: protocols.indexOf(atom) >= 0
+          supported: !!protocols && protocols.indexOf(atom as number) >= 0
         });
       });
     });
   }
 
-  function raiseWindow(wid) {
+  function raiseWindow(wid: number) {
     let windows = store.getState().windows;
     let window = windows[wid];
 
@@ -674,7 +676,7 @@ module.exports = function startX() {
     }
   }
 
-  function minimize(wid) {
+  function minimize(wid: number) {
     let fid = frameFromWin[wid];
     if (fid)
       X.UnmapWindow(fid);
