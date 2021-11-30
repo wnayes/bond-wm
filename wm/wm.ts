@@ -1,8 +1,7 @@
 // This file is pretty messy, it is just a prototype for now!
 
-import electron from "electron";
+import { app, ipcMain, BrowserWindow } from "electron";
 import type { IScreen } from "../shared/reducers";
-import BrowserWindow = electron.BrowserWindow;
 
 const path = require("path");
 const url = require("url");
@@ -484,14 +483,14 @@ export function startX() {
       case (X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask):
         // Win + Shift + Q
         if (ev.keycode === 24) {
-          electron.app.quit();
+          app.quit();
         }
         break;
       case (X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask):
         // Win + Ctrl + R
         if (ev.keycode === 27) {
-          electron.app.relaunch();
-          electron.app.exit(0);
+          app.relaunch();
+          app.exit(0);
         }
         break;
     }
@@ -686,7 +685,6 @@ export function startX() {
     unsetFocus();
   }
 
-  const { ipcMain } = require("electron");
   ipcMain.on("raise-window", (event, wid) => {
     raiseWindow(wid);
     changeFocus(wid);
