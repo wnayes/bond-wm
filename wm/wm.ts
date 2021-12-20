@@ -926,11 +926,14 @@ export function createServer(): XServer {
 
         switch (action.type) {
           case "CONFIGURE_INNER_WINDOW":
+            const state = getState();
+            const win = state.windows[action.payload.wid];
+            const { width, height } = win.outer;
             X.ConfigureWindow(action.payload.wid, {
-              x: action.payload.x,
-              y: action.payload.y,
-              width: action.payload.width,
-              height: action.payload.height,
+              x: action.payload.left,
+              y: action.payload.top,
+              width: width - action.payload.left - action.payload.right,
+              height: height - action.payload.top - action.payload.bottom,
             });
             break;
         }

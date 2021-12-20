@@ -32,19 +32,18 @@ export function WindowWrapper(props: IWindowWrapperProps) {
 
   useLayoutEffect(() => {
     const box = winBox.current!;
-    const { x, y, width, height } = box.getBoundingClientRect();
+    let { top, left, right, bottom } = box.getBoundingClientRect();
+
+    const { right: bodyRight, bottom: bodyBottom } = document.body.getBoundingClientRect();
+    right = bodyRight - right;
+    bottom = bodyBottom - bottom;
 
     if (window) {
-      if (window.inner.x !== x
-        || window.inner.y !== y
-        || window.inner.width !== width
-        || window.inner.height !== height) {
-          store.dispatch(actions.configureInnerWindow(wid, {
-            x,
-            y,
-            width,
-            height,
-          }));
+      if (window.inner.top !== top
+        || window.inner.left !== left
+        || window.inner.right !== right
+        || window.inner.bottom !== bottom) {
+          store.dispatch(actions.configureInnerWindow(wid, { top, left, right, bottom }));
       }
     }
   });

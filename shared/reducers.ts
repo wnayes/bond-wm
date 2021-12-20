@@ -34,10 +34,10 @@ function windows(state = {}, action: any) {
               height: window.height,
             },
             inner: {
-              x: window.x,
-              y: window.y,
-              width: window.width,
-              height: window.height,
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
             },
             visible: window.visible,
             decorated: window.decorated,
@@ -64,10 +64,10 @@ function windows(state = {}, action: any) {
       newState = Object.assign({}, state);
       newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
         inner: {
-          x: action.payload.x,
-          y: action.payload.y,
-          width: action.payload.width,
-          height: action.payload.height,
+          top: action.payload.top,
+          left: action.payload.left,
+          right: action.payload.right,
+          bottom: action.payload.bottom,
         }
       });
       return newState;
