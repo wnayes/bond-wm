@@ -536,6 +536,11 @@ export function createServer(): XServer {
     log(wid, "onUnmapNotify", ev);
     if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
       store.dispatch(actions.setWindowVisible(wid, false));
+
+      const fid = getFrameIdFromWindowId(wid);
+      if (typeof fid === "number" && fid !== wid) {
+        X.UnmapWindow(fid);
+      }
     }
   }
 
