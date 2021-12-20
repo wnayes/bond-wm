@@ -6,3 +6,5 @@ import { rendererReducer as reducer } from "../shared/reducers";
 export function configureStore() {
   return createStore(reducer, stateSyncEnhancer());
 };
+
+export type Store = ReturnType<typeof configureStore>;

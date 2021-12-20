@@ -1,0 +1,65 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: pink;
+}
+
+#content {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.winWrapper {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    position: absolute;
+    background-color: #333333;
+    border: 2px solid black;
+    border-radius: 2px;
+}
+
+.winTitleBar {
+    width: 100%;
+    display: flex;
+    color: white;
+    font-size: 10px;
+    line-height: 16px;
+}
+
+.winTitleBarText {
+    display: inline-block;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.winWrapper.focused .winTitleBarText {
+    font-weight: bold;
+}
+
+.winTitleBarCloseBtn {
+    display: inline-block;
+    width: 12px;
+    cursor: pointer;
+    text-align: center;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.winTitleBarCloseBtn:hover {
+    font-weight: bold;
+}
+
+.winBox {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    background-color: limegreen;
+}

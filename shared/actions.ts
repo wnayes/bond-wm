@@ -31,6 +31,15 @@ export function configureWindow(wid: number, config: any) {
   };
 }
 
+export function configureInnerWindow(wid: number, config: any) {
+  return {
+    type: "CONFIGURE_INNER_WINDOW",
+    payload: Object.assign({
+      wid
+    }, config)
+  };
+}
+
 export function focusWindow(wid: number) {
   return {
     type: "FOCUS_WINDOW",

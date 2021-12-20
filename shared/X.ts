@@ -143,6 +143,34 @@ interface XQueryTreeResult {
   children: number[];
 }
 
+export interface XGeometry {
+  windowid: number;
+  width: number;
+  height: number;
+  xPos: number;
+  yPos: number;
+  borderWidth: number;
+  depth: number;
+}
+
+export interface XWindowAttrs {
+  backingStore: number;
+  visual: number;
+  klass: number;
+  bitGravity: number;
+  winGravity: number;
+  backingPlanes: number;
+  backingPixel: number;
+  saveUnder: number;
+  mapIsInstalled: number;
+  mapState: number;
+  overrideRedirect: number;
+  colormap: number;
+  allEventMasks: number;
+  myEventMasks: number;
+  doNotPropogateMask: number;
+}
+
 export type XCbWithErr<TArgs extends any[]> = (err: unknown, ...args: TArgs) => void;
 
 // https://github.com/sidorares/node-x11/wiki/Core-requests
@@ -153,40 +181,77 @@ export interface IXClient {
   }
   event_consumers: { [wid: number]: any };
 
+  AllocColor(...args: unknown[]): unknown;
   AllocID(): number;
+  AllowEvents(...args: unknown[]): unknown;
   CreateWindow(winId: number, parentId: number, x: number, y: number, width: number, height: number, borderWidth: number, depth: number, _class: unknown, visual: unknown, createWindowAdditionalValues: unknown): void;
+  ChangeActivePointerGrab(...args: unknown[]): unknown;
+  ChangeGC(...args: unknown[]): unknown;
   // replace mode: 0 replace, 1 prepend, 2 append
   // unitSize = 8/16/32 TODO: remove, use depending on buffer size
   ChangeProperty(replaceMode: XReplaceMode, winId: number, propNameAtom: unknown, typeNameAtom: unknown, units: unknown, data: unknown): void;
   ChangeSaveSet(a: number, wid: number): void;
   ChangeWindowAttributes(wid: number, values: { eventMask: unknown }, callback: XCbWithErr<[void]>): void;
+  ClearArea(...args: unknown[]): unknown;
   ConfigureWindow(wid: number, info: Partial<IXConfigureInfo>): void;
+  ConvertSelection(...args: unknown[]): unknown;
+  CopyArea(...args: unknown[]): unknown;
+  CreateColormap(...args: unknown[]): unknown;
+  CreateCursor(...args: unknown[]): unknown;
   CreateGC(gcId: unknown, drawableId: unknown, createGCAdditionalValues: unknown): void;
+  CreatePixmap(...args: unknown[]): unknown;
   DeleteProperty(winId: number, propNameAtom: unknown): void;
   DestroyWindow(winId: number): void;
+  ForceScreenSaver(...args: unknown[]): unknown;
+  FreePixmap(...args: unknown[]): unknown;
   GetAtomName(atomId: unknown, callback: (str: string) => void): void;
-  GetGeometry(winId: number, callback: XCbWithErr<[drawable: unknown]>): void;
+  GetGeometry(winId: number, callback: XCbWithErr<[drawable: XGeometry]>): void;
+  GetImage(...args: unknown[]): unknown;
+  GetInputFocus(...args: unknown[]): unknown;
+  GetKeyboardMapping(...args: unknown[]): unknown;
   GetProperty(deleteAfterGet: unknown, wid: number, propNameAtom: unknown, typeNameAtom: unknown, offset: number, maxLen: number, callback: XCbWithErr<[XGetPropertyCallbackProps]>): void;
-  GetWindowAttributes(wid: number, callback: XCbWithErr<[unknown[]]>): void;
+  GetSelectionOwner(...args: unknown[]): unknown;
+  GetWindowAttributes(wid: number, callback: XCbWithErr<[attrs: XWindowAttrs]>): void;
+  GrabButton(...args: unknown[]): unknown;
   GrabKey(wid: number, ownerEvents: boolean, modifiers: number, key: number, pointerMode: number, keybMode: number): void;
+  GrabKeyboard(...args: unknown[]): unknown;
+  GrabPointer(...args: unknown[]): unknown;
+  GrabServer(...args: unknown[]): unknown;
   InternAtom(returnOnlyIfExist: boolean, str: string, callback: XCbWithErr<[atomId: unknown]>): void;
   KillClient(resource: number): void;
+  KillKlient(...args: unknown[]): unknown;
   // typeNameAtom: 0 = AnyType
   // offset and maxLen in 4-byte units
   ListExtensions(callback: (stringArray: string[]) => void): void;
+  ListFonts(...args: unknown[]): unknown;
+  ListProperties(...args: unknown[]): unknown;
   LowerWindow(winId: number): void;
   MapWindow(winId: number): void;
-  PolyFillRectangle(): void;
-  PolyPoint(): void;
-  PolyLine(): void;
+  MoveWindow(...args: unknown[]): unknown;
+  MoveResizeWindow(...args: unknown[]): unknown;
+  PolyFillArc(...args: unknown[]): unknown;
+  PolyFillRectangle(...args: unknown[]): unknown;
+  PolyPoint(...args: unknown[]): unknown;
+  PolyLine(...args: unknown[]): unknown;
   PolyText8(drawable: unknown, gc: unknown, x: number, y: number, items: unknown): void;
+  PutImage(format: unknown, drawable: unknown, gc: unknown, width: number, height: number, dstX: number, dstY: number, leftPad: unknown, depth: unknown, dataBuffer: Buffer): void;
   QueryExtension(callback: (extDescription: unknown) => void): void;
   QueryPointer(winId: number): void;
   QueryTree(winId: number, callback: XCbWithErr<[result: XQueryTreeResult]>): void;
   RaiseWindow(winId: number): void;
+  ReleaseID(id: number): void;
   ReparentWindow(winId: number, newParentId: number, x: number, y: number): void;
+  ResizeWindow(...args: unknown[]): unknown;
   SendEvent(destination: number, propagate: boolean, eventMask: number, eventRawData: unknown): void;
   SetInputFocus(winId: number, val: number): void;
-  PutImage(format: unknown, drawable: unknown, gc: unknown, width: number, height: number, dstX: number, dstY: number, leftPad: unknown, depth: unknown, dataBuffer: Buffer): void;
+  SetScreenSaver(...args: unknown[]): unknown;
+  SetSelectionOwner(...args: unknown[]): unknown;
+  TranslateCoordinates(...args: unknown[]): unknown;
+  UngrabButton(...args: unknown[]): unknown;
+  UngrabKey(...args: unknown[]): unknown;
+  UngrabKeyboard(...args: unknown[]): unknown;
+  UngrabPointer(...args: unknown[]): unknown;
+  UngrabServer(...args: unknown[]): unknown;
   UnmapWindow(winId: number): void;
+  WarpPointer(...args: unknown[]): unknown;
 }

@@ -10,8 +10,8 @@ export class WindowArea extends React.Component<any> {
       const window = windows[wid];
       if (!window.visible)
         continue;
-      divWins.push(
-        <WindowWrapper key={wid} window={window} />
+      divWins.push(<></>
+        // <WindowWrapper key={wid} window={window} />
       );
     }
 

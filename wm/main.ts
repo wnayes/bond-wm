@@ -1,6 +1,8 @@
 import * as electron from "electron";
 const app = electron.app;
-import { startX } from "./wm";
+import { startX, XServer } from "./wm";
+
+let server: XServer;
 
 // Disable error dialogs by override
 const dialog = electron.dialog;
@@ -8,10 +10,10 @@ dialog.showErrorBox = function(title, content) {
   console.error(`${title}\n${content}`);
 };
 
-try {
-	require("electron-reloader")(module);
-}
-catch {}
+// try {
+// 	require("electron-reloader")(module);
+// }
+// catch {}
 
 // Quit when all windows are closed.
 app.on("window-all-closed", function() {
@@ -28,5 +30,5 @@ app.on("activate", function() {
 
 app.on("ready", function() {
   console.log("test");
-  startX();
+  server = startX();
 });

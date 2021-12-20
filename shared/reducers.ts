@@ -27,12 +27,21 @@ function windows(state = {}, action: any) {
       return Object.assign({}, state, {
         [window.wid]: {
             id: window.wid,
-            x: window.x,
-            y: window.y,
-            width: window.width,
-            height: window.height,
+            outer: {
+              x: window.x,
+              y: window.y,
+              width: window.width,
+              height: window.height,
+            },
+            inner: {
+              x: window.x,
+              y: window.y,
+              width: window.width,
+              height: window.height,
+            },
             visible: window.visible,
             decorated: window.decorated,
+            title: window.title,
         }
       });
     case "REMOVE_WINDOW":
@@ -43,10 +52,23 @@ function windows(state = {}, action: any) {
     case "CONFIGURE_WINDOW":
       newState = Object.assign({}, state);
       newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
-        x: action.payload.x,
-        y: action.payload.y,
-        width: action.payload.width,
-        height: action.payload.height,
+        outer: {
+          x: action.payload.x,
+          y: action.payload.y,
+          width: action.payload.width,
+          height: action.payload.height,
+        }
+      });
+      return newState;
+    case "CONFIGURE_INNER_WINDOW":
+      newState = Object.assign({}, state);
+      newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
+        inner: {
+          x: action.payload.x,
+          y: action.payload.y,
+          width: action.payload.width,
+          height: action.payload.height,
+        }
       });
       return newState;
     case "FOCUS_WINDOW":

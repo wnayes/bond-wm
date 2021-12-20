@@ -5,6 +5,10 @@ import { setupWindowComponent } from "./Window"
 
 const store = configureStore();
 setupIpc(store);
+(window as any).store = store;
+store.subscribe(() => {
+    console.log(store.getState());
+})
 
 const container = document.getElementById("content");
 setupWindowComponent(container, store);

@@ -1,104 +1,63 @@
 import * as React from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";
+import { useSelector, useStore } from "react-redux";
+import * as actions from "../shared/actions";
 
 import { TitleBar } from "./TitleBar";
 
 interface IWindowWrapperProps {
-  window: any;
+  wid: number;
 }
 
-export class WindowWrapper extends React.Component<any> {
-  private winBox: HTMLElement;
-  private __leftAdjust: number | undefined;
-  private __topAdjust: number | undefined;
+export function WindowWrapper(props: IWindowWrapperProps) {
+  const { wid } = props;
 
-  render() {
-    const window = this.props.window;
-    const divStyle = {
-      //left: (window.x - 5) + "px",
-      //top: (window.y - 15) + "px",
-      width: (window.width) + "px",
-      height: (window.height) + "px",
-    };
+  const rootDiv = useRef<HTMLDivElement>();
+  const winBox = useRef<HTMLDivElement>();
+  const __leftAdjust = useRef<number | undefined>(undefined);
+  const __topAdjust = useRef<number | undefined>(undefined);
 
-    let className = "winWrapper";
-    if (window.focused) {
-      className += " focused";
-    }
+  const store = useStore();
+  const window = useSelector((state: any) => state.windows[wid]);
 
-    let titlebar;
-    if (window.decorated) {
-      titlebar = (
-        <TitleBar window={window} />
-      );
-    }
+  let className = "winWrapper";
+  if (window?.focused) {
+    className += " focused";
+  }
 
-    return (
-      <div className={className}>
-        {titlebar}
-        <div className="winBox" style={divStyle} ref={(div) => { this.winBox = div; }}></div>
-      </div>
+  let titlebar;
+  if (window?.decorated) {
+    titlebar = (
+      <TitleBar window={window} />
     );
   }
 
-  componentDidMount() {
-    //console.log("WindowWrapper.componentDidMount");
-    this.adjustPosition();
-  }
+  useLayoutEffect(() => {
+    const box = winBox.current!;
+    const { x, y, width, height } = box.getBoundingClientRect();
 
-  componentDidUpdate() {
-    //console.log("WindowWrapper.componentDidUpdate");
-    this.adjustPosition();
-  }
-
-  shouldComponentUpdate(nextProps: IWindowWrapperProps, nextState: unknown) {
-    const oldWindow = this.props.window;
-    const newWindow = nextProps.window;
-
-    if (oldWindow.title !== newWindow.title)
-      return true;
-    if (oldWindow.focused !== newWindow.focused)
-      return true;
-    if (oldWindow.decorated !== newWindow.decorated) {
-      this.resetAdjustments();
-      return true;
+    if (window) {
+      if (window.inner.x !== x
+        || window.inner.y !== y
+        || window.inner.width !== width
+        || window.inner.height !== height) {
+          store.dispatch(actions.configureInnerWindow(wid, {
+            x,
+            y,
+            width,
+            height,
+          }));
+      }
     }
+  });
 
-    if (oldWindow.width !== newWindow.width || oldWindow.height !== newWindow.height)
-      this.adjustSize(newWindow);
-
-    if (oldWindow.x !== newWindow.x || oldWindow.y !== newWindow.y)
-      this.adjustPosition(newWindow);
-
-    return false;
-  }
-
-  adjustSize(window = this.props.window) {
-    let box = this.winBox;
-
-    box.style.width = (window.width) + "px";
-    box.style.height = (window.height) + "px";
-  }
-
-  adjustPosition(window = this.props.window) {
-    let wrapper = ReactDOM.findDOMNode(this) as HTMLElement;
-    let box = this.winBox;
-
-    if (this.__leftAdjust === undefined) {
-      let wrapperStyle = getComputedStyle(wrapper);
-      this.__leftAdjust = box.offsetLeft + parseInt(wrapperStyle.borderLeftWidth);
-      this.__topAdjust = box.offsetTop + parseInt(wrapperStyle.borderTopWidth);
-    }
-
-    // Adjust the positioning of the wrapper to account for titlebar, borders, etc.
-    wrapper.style.left = (window.x - this.__leftAdjust) + "px";
-    wrapper.style.top = (window.y - this.__topAdjust) + "px";
-  }
-
-  resetAdjustments() {
-    delete this.__leftAdjust;
-    delete this.__topAdjust;
-  }
+  return (
+    <div className={className} ref={rootDiv}>
+      {titlebar}
+      <div className="winBox" ref={winBox}></div>
+    </div>
+  );
 }
 
 module.exports = WindowWrapper;
