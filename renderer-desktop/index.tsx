@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { Desktop } from "../containers/Desktop";
+import { Desktop } from "./components/Desktop";
 import { configureStore } from "../renderer-shared/configureStore";
 import { setupIpc } from "../renderer-shared/ipcRenderer";
 

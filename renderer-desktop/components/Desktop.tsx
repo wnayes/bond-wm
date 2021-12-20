@@ -2,8 +2,7 @@ import * as React from "react";
 
 import { connect } from "react-redux";
 
-import { Taskbar } from "../components/Taskbar";
-//const { WindowArea } from "../components/windowarea";
+import { Taskbar } from "./Taskbar";
 
 interface IDesktopProps {
   windows: any[];
@@ -11,11 +10,9 @@ interface IDesktopProps {
 
 class DesktopComp extends React.Component<any> {
   render() {
-    //console.log(this.props);
     return (
       <div id="desktop">
         <Taskbar windows={this.props.windows} />
-        {/* <WindowArea windows={this.props.windows} /> */}
       </div>
     );
   }

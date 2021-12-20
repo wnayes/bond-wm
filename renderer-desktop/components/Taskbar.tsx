@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Clock } from "./Clock";
 import { connect } from "react-redux";
-import * as actions from "../shared/actions";
+import * as actions from "../../shared/actions";
 
 interface ITaskbarProps {
   windows: any[];

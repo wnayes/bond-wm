@@ -1,8 +1,7 @@
 import * as React from "react";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
-import * as ReactDOM from "react-dom";
+import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import * as actions from "../shared/actions";
+import * as actions from "../../shared/actions";
 
 import { TitleBar } from "./TitleBar";
 
@@ -15,8 +14,6 @@ export function WindowWrapper(props: IWindowWrapperProps) {
 
   const rootDiv = useRef<HTMLDivElement>();
   const winBox = useRef<HTMLDivElement>();
-  const __leftAdjust = useRef<number | undefined>(undefined);
-  const __topAdjust = useRef<number | undefined>(undefined);
 
   const store = useStore();
   const window = useSelector((state: any) => state.windows[wid]);
