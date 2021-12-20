@@ -476,15 +476,19 @@ export function createServer(): XServer {
   function onCreateNotify(ev: IXEvent) {
     const wid = ev.wid;
     log(wid, "onCreateNotify", ev);
-
-    // if (!knownWids.has(wid)) {
-    //   manageWindow(wid);
-    // }
   }
 
   function onDestroyNotify(ev: IXEvent) {
+    const wid = ev.wid;
+    log(wid, "onDestroyNotify", ev);
+
     if (!isFrameBrowserWin(ev.wid)) {
       store.dispatch(actions.removeWindow(ev.wid));
+    }
+
+    const fid = getFrameIdFromWindowId(wid);
+    if (typeof fid === "number" && fid !== wid) {
+      X.DestroyWindow(fid);
     }
   }
 
@@ -504,17 +508,23 @@ export function createServer(): XServer {
   }
 
   function showWindow(wid: number) {
+    let fid;
     const isFrame = isFrameBrowserWin(wid);
-    if (!isFrame) {
-      const fid = getFrameIdFromWindowId(wid);
-      if (typeof fid === "number") {
-        console.log("showWindow frame id", fid);
-        X.MapWindow(fid);
-      }
+    if (isFrame) {
+      fid = wid;
+      wid = getWindowIdFromFrameId(wid);
+    }
+    else {
+      fid = getFrameIdFromWindowId(wid);
+    }
 
-      if (!isDesktopBrowserWin(wid)) {
-        store.dispatch(actions.setWindowVisible(wid, true));
-      }
+    if (typeof fid === "number") {
+      console.log("showWindow frame id", fid);
+      X.MapWindow(fid);
+    }
+
+    if (!isDesktopBrowserWin(wid)) {
+      store.dispatch(actions.setWindowVisible(wid, true));
     }
 
     console.log("showWindow id", wid);
@@ -926,10 +936,6 @@ export function createServer(): XServer {
 
     const store = configureStore([loggerMiddleware, x11Middleware]);
     return store;
-  }
-
-  function __onStoreChange(): void {
-    const state = store.getState();
   }
 
   return server;
