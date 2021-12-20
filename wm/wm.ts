@@ -1,7 +1,7 @@
 // This file is pretty messy, it is just a prototype for now!
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import type { IScreen } from "../shared/reducers";
+import type { IScreen, IWindow } from "../shared/reducers";
 
 import * as path from "path";
 import * as url from "url";
@@ -927,7 +927,7 @@ export function createServer(): XServer {
         switch (action.type) {
           case "CONFIGURE_INNER_WINDOW":
             const state = getState();
-            const win = state.windows[action.payload.wid];
+            const win = state.windows[action.payload.wid] as IWindow;
             const { width, height } = win.outer;
             X.ConfigureWindow(action.payload.wid, {
               x: action.payload.left,

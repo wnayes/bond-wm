@@ -19,7 +19,26 @@ function screens(state: IScreen[] = [], action: any) {
   }
 }
 
-function windows(state = {}, action: any) {
+export interface IWindow {
+  id: number;
+  outer: {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  };
+  inner: {
+    top: number,
+    left: number,
+    right: number,
+    bottom: number,
+  };
+  visible: boolean;
+  decorated: boolean;
+  title: string | undefined;
+}
+
+function windows(state: { [wid: number]: IWindow } = {}, action: any) {
   let newState: any, window;
   switch (action.type) {
     case "ADD_WINDOW":
