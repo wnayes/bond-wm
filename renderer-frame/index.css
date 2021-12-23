@@ -21,8 +21,7 @@ html, body {
     flex-direction: column;
     position: absolute;
     background-color: #333333;
-    border: 2px solid black;
-    border-radius: 2px;
+    border: 1px solid black;
 }
 
 .winTitleBar {

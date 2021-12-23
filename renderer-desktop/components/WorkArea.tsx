@@ -5,6 +5,7 @@ import * as actions from "../../shared/actions";
 import { RootState } from "../../renderer-shared/configureStore";
 import { Layout } from "./layout/Layout";
 import { useWindowSize } from "../../renderer-shared/hooks";
+import { Wallpaper } from "./Wallpaper";
 
 export interface IWorkAreaProps {
     screenIndex: number;
@@ -37,6 +38,7 @@ export function WorkArea({ screenIndex }: IWorkAreaProps) {
 
   return (
     <div id="workarea" ref={workAreaDiv}>
+        <Wallpaper />
         <Layout screen={screen} windows={windows} />
     </div>
   );

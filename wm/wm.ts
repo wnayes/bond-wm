@@ -119,9 +119,12 @@ export function createServer(): XServer {
       width: screen.pixel_width,
       height: screen.pixel_height
     };
+
+    console.log("Adding screen", props);
+
     store.dispatch(actions.addScreen(props));
 
-    const browserHandle = createDesktopBrowser(props);
+    createDesktopBrowser(props);
 
     root = screen.root;
     console.log("Root wid", root);

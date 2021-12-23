@@ -6,7 +6,7 @@ import { Window } from "../Window";
 export function Boxes({ windows }: ILayoutProps) {
     let winComponents = [];
     for (const win of windows) {
-        winComponents.push(<Window window={win} />);
+        winComponents.push(<Window window={win} key={win.id} />);
     }
 
     return (
