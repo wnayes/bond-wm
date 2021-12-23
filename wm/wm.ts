@@ -538,7 +538,9 @@ export function createServer(): XServer {
     const wid = ev.wid;
     log(wid, "onUnmapNotify", ev);
     if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
-      store.dispatch(actions.setWindowVisible(wid, false));
+      if (store.getState().windows.hasOwnProperty(wid)) {
+        store.dispatch(actions.setWindowVisible(wid, false));
+      }
 
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number" && fid !== wid) {

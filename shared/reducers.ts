@@ -125,24 +125,49 @@ function windows(state: { [wid: number]: IWindow } = {}, action: any) {
     case "FOCUS_WINDOW":
       window = action.payload;
       newState = Object.assign({}, state);
-      newState[window] = Object.assign({}, newState[window], { focused: true });
+      if (newState[window]) {
+        newState[window] = Object.assign({}, newState[window], { focused: true });
+      }
+      else {
+        console.error("Action on unknown window", action);
+      }
       return newState;
     case "UNFOCUS_WINDOW":
       window = action.payload;
       newState = Object.assign({}, state);
-      newState[window] = Object.assign({}, newState[window], { focused: false });
+      if (newState[window]) {
+        newState[window] = Object.assign({}, newState[window], { focused: false });
+      }
+      else {
+        console.error("Action on unknown window", action);
+      }
       return newState;
     case "SET_WINDOW_TITLE":
       newState = Object.assign({}, state);
-      newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { title: action.payload.title });
+      if (newState[action.payload.wid]) {
+        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { title: action.payload.title });
+      }
+      else {
+        console.error("Action on unknown window", action);
+      }
       return newState;
     case "SET_WINDOW_VISIBLE":
       newState = Object.assign({}, state);
-      newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { visible: !!action.payload.visible });
+      if (newState[action.payload.wid]) {
+        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { visible: !!action.payload.visible });
+      }
+      else {
+        console.error("Action on unknown window", action);
+      }
       return newState;
     case "SET_WINDOW_DECORATED":
       newState = Object.assign({}, state);
-      newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { decorated: !!action.payload.decorated });
+      if (newState[action.payload.wid]) {
+        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { decorated: !!action.payload.decorated });
+      }
+      else {
+        console.error("Action on unknown window", action);
+      }
       return newState;
     default:
       return state;

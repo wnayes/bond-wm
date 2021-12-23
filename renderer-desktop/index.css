@@ -4,6 +4,8 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 #content, #desktop {
@@ -79,6 +81,7 @@ html, body {
 
 .clock {
     flex-grow: 0;
+    font-size: 12px;
     line-height: 20px;
     padding: 0 0.5em;
 }
