@@ -3,6 +3,7 @@ import * as React from "react";
 import { Clock } from "./Clock";
 import { connect } from "react-redux";
 import * as actions from "../../shared/actions";
+import { exec, minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
 
 interface ITaskbarProps {
   windows: any[];
@@ -74,9 +75,9 @@ class TaskListEntry extends React.Component<ITaskListEntryProps> {
   onClick() {
     const win = this.props.window;
     if (win.focused)
-      (window as any).commands.minimizeWindow(win.id);
+      minimizeWindow(win.id);
     else
-      (window as any).commands.raiseWindow(win.id);
+      raiseWindow(win.id);
   }
 }
 
@@ -111,7 +112,7 @@ const RunField: any = connect(mapStateToProps)(class RunField extends React.Comp
   onKeyPress(event: React.KeyboardEvent) {
     const command = this.props.runCommand;
     if (command && event.key === "Enter") {
-      (window as any).commands.exec(this.props.runCommand);
+      exec(this.props.runCommand);
       this.reset();
       event.preventDefault();
     }

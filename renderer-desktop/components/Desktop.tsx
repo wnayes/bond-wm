@@ -1,25 +1,23 @@
 import * as React from "react";
 
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { RootState } from "../../renderer-shared/configureStore";
 
 import { Taskbar } from "./Taskbar";
+import { WorkArea } from "./WorkArea";
 
-interface IDesktopProps {
-  windows: any[];
+export interface IDesktopProps {
+  screenIndex: number;
 }
 
-class DesktopComp extends React.Component<any> {
-  render() {
-    return (
-      <div id="desktop">
-        <Taskbar windows={this.props.windows} />
-      </div>
-    );
-  }
-}
+export function Desktop({ screenIndex }: IDesktopProps) {
+  // TODO: Windows should only be ones from the current screen.
+  const windows = useSelector((state: RootState) => state.windows);
 
-function mapStateToProps(state: any) {
-  return Object.assign({}, state);
+  return (
+    <div id="desktop">
+      <Taskbar windows={windows} />
+      <WorkArea screenIndex={screenIndex} />
+    </div>
+  );
 }
-
-export const Desktop: any = connect(mapStateToProps)(DesktopComp);

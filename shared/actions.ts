@@ -1,3 +1,5 @@
+import { IGeometry } from "./reducers";
+
 export function addScreen(screen: { width: number, height: number }) {
   return {
     type: "ADD_SCREEN",
@@ -5,6 +7,15 @@ export function addScreen(screen: { width: number, height: number }) {
       width: screen.width,
       height: screen.height,
     }
+  };
+}
+
+export function configureScreenWorkArea(screenIndex: number, config: IGeometry) {
+  return {
+    type: "CONFIGURE_SCREEN_WORK_AREA",
+    payload: Object.assign({
+      screenIndex
+    }, config)
   };
 }
 
@@ -22,7 +33,7 @@ export function removeWindow(wid: any) {
   };
 }
 
-export function configureWindow(wid: number, config: any) {
+export function configureWindow(wid: number, config: IGeometry) {
   return {
     type: "CONFIGURE_WINDOW",
     payload: Object.assign({

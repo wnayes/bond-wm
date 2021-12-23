@@ -1,19 +1,49 @@
 import { combineReducers } from "redux";
 
+export interface IGeometry {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+}
+
 export interface IScreen {
   width: number;
   height: number;
+  workArea: IGeometry;
 }
 
 function screens(state: IScreen[] = [], action: any) {
   switch (action.type) {
     case "ADD_SCREEN":
-      let newState = state.slice();
-      newState.push({
-        width: action.payload.width,
-        height: action.payload.height
-      });
-      return newState;
+      {
+        let newState = state.slice();
+        newState.push({
+          width: action.payload.width,
+          height: action.payload.height,
+
+          // Work area is initially the same as screen area. Adjusts later based on Desktop render.
+          workArea: {
+            x: 0,
+            y: 0,
+            width: action.payload.width,
+            height: action.payload.height,
+          },
+        });
+        return newState;
+      }
+    case "SET_WORK_AREA":
+      {
+        let newState = state.slice();
+        newState[action.payload.screenIndex] = { ...newState[action.payload.screenIndex] };
+        newState[action.payload.screenIndex].workArea = {
+          x: action.payload.x,
+          y: action.payload.y,
+          width: action.payload.width,
+          height: action.payload.height,
+        };
+        return newState;
+      }
     default:
       return state;
   }
@@ -34,12 +64,13 @@ export interface IWindow {
     bottom: number,
   };
   visible: boolean;
+  focused: boolean;
   decorated: boolean;
   title: string | undefined;
 }
 
 function windows(state: { [wid: number]: IWindow } = {}, action: any) {
-  let newState: any, window;
+  let newState, window;
   switch (action.type) {
     case "ADD_WINDOW":
       window = action.payload;
@@ -60,6 +91,7 @@ function windows(state: { [wid: number]: IWindow } = {}, action: any) {
             },
             visible: window.visible,
             decorated: window.decorated,
+            focused: false,
             title: window.title,
         }
       });

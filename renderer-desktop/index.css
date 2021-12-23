@@ -13,57 +13,22 @@ html, body {
 }
 
 #desktop {
-    background-color: #EEEEEE;
-}
-
-.winWrapper {
-    position: absolute;
-    background-color: #111111;
-    border: 2px solid black;
-    border-radius: 2px;
-}
-
-.winTitleBar {
-    width: 100%;
     display: flex;
-    color: white;
-    font-size: 10px;
-    line-height: 16px;
+    flex-direction: column;
 }
 
-.winTitleBarText {
-    display: inline-block;
-    flex-grow: 1;
-    white-space: nowrap;
+#workarea {
+    height: 100%;
+    width: 100%;
+    flex: 1;
     overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: default;
-    -webkit-user-select: none;
-    user-select: none;
-}
-.winWrapper.focused .winTitleBarText {
-    font-weight: bold;
-}
-
-.winTitleBarCloseBtn {
-    display: inline-block;
-    width: 12px;
-    cursor: pointer;
-    text-align: center;
-    -webkit-user-select: none;
-    user-select: none;
-}
-.winTitleBarCloseBtn:hover {
-    font-weight: bold;
-}
-
-.winBox {
-    position: relative;
+    background-color: #EEEEEE;
 }
 
 .taskbar {
     display: flex;
     height: 20px;
+    flex-shrink: 0;
     font-size: 10px;
     background-color: #CCCCCC;
 }

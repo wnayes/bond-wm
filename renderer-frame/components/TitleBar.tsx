@@ -1,4 +1,5 @@
 import * as React from "react";
+import { closeWindow } from "../../renderer-shared/commands";
 
 interface ITitleBarProps {
   window: any;
@@ -29,6 +30,6 @@ class TitleBarCloseButton extends React.Component<ITitleBarCloseButtonProps> {
   }
 
   onClick() {
-    (window as any).commands.closeWindow(this.props.window.id);
+    closeWindow(this.props.window.id);
   }
 }

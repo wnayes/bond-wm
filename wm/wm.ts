@@ -1,7 +1,7 @@
 // This file is pretty messy, it is just a prototype for now!
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import type { IScreen, IWindow } from "../shared/reducers";
+import type { IWindow } from "../shared/reducers";
 
 import * as path from "path";
 import * as url from "url";
@@ -10,7 +10,7 @@ import { spawn } from "child_process";
 import { EventEmitter } from "events";
 const x11 = require("x11");
 
-import { configureStore } from "./configureStore";
+import { configureStore, ServerStore } from "./configureStore";
 import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient, IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
@@ -175,7 +175,7 @@ export function createServer(): XServer {
     return frameBrowserFrameIdToWinId[wid];
   }
 
-  function createDesktopBrowser(props: IScreen) {
+  function createDesktopBrowser(props: { width: number, height: number }) {
     const win = new BrowserWindow({
       frame: false,
       fullscreen: true,
@@ -188,14 +188,11 @@ export function createServer(): XServer {
       },
     });
 
-    win.loadURL(url.format({
-      pathname: path.join(__dirname, "../renderer-desktop/index.html"),
-      protocol: "file:",
-      slashes: true
-    }));
-
     let index = desktopBrowsers.length;
     desktopBrowsers[index] = win;
+
+    const url = path.join(__dirname, "../renderer-desktop/index.html") + "?screen=" + index;
+    win.loadURL("file://" + url);
 
     const handle = getNativeWindowHandleInt(win);
     if (!handle) {
@@ -355,6 +352,9 @@ export function createServer(): XServer {
     if (shouldCreateFrame(wid, clientGeom)) {
       const effectiveGeometry = getGeometryForWindow(clientGeom, title);
 
+      const fid = createFrameBrowser(wid, effectiveGeometry);
+      knownWids.add(fid);
+
       store.dispatch(actions.addWindow({
         wid,
         x: effectiveGeometry.x,
@@ -365,9 +365,6 @@ export function createServer(): XServer {
         decorated,
         title,
       }));
-
-      const fid = createFrameBrowser(wid, effectiveGeometry);
-      knownWids.add(fid);
 
       X.GrabServer();
 
@@ -391,17 +388,20 @@ export function createServer(): XServer {
       X.ReparentWindow(fid, root, effectiveGeometry.x, effectiveGeometry.y);
       X.ReparentWindow(wid, fid, 0, 0);
 
-      X.ConfigureWindow(fid, {
-        x: effectiveGeometry.x,
-        y: effectiveGeometry.y,
-        width: effectiveGeometry.width,
-        height: effectiveGeometry.height,
-      });
+      // X.ConfigureWindow(fid, {
+      //   x: effectiveGeometry.x,
+      //   y: effectiveGeometry.y,
+      //   width: effectiveGeometry.width,
+      //   height: effectiveGeometry.height,
+      // });
+      // X.ConfigureWindow(wid, {
+      //   x: 0,
+      //   y: 0,
+      //   width: effectiveGeometry.width,
+      //   height: effectiveGeometry.height,
+      //   borderWidth: 0,
+      // });
       X.ConfigureWindow(wid, {
-        x: 0,
-        y: 0,
-        width: effectiveGeometry.width,
-        height: effectiveGeometry.height,
         borderWidth: 0,
       });
 
@@ -904,7 +904,7 @@ export function createServer(): XServer {
     console.log(...logArgs);
   }
 
-  function __setupStore() {
+  function __setupStore(): ServerStore {
     const loggerMiddleware: Middleware = function ({ getState }) {
       return next => action => {
         console.log("will dispatch", action);
@@ -925,16 +925,37 @@ export function createServer(): XServer {
         const returnValue = next(action);
 
         switch (action.type) {
+          case "CONFIGURE_WINDOW":
+            {
+              const fid = getFrameIdFromWindowId(action.payload.wid) ?? action.payload.wid;
+              X.ConfigureWindow(fid, {
+                x: action.payload.x,
+                y: action.payload.y,
+                width: action.payload.width,
+                height: action.payload.height,
+              });
+              if (fid !== action.payload.wid) {
+                const state = getState();
+                const win = state.windows[action.payload.wid] as IWindow;
+                X.ConfigureWindow(action.payload.wid, {
+                  width: action.payload.width - win.inner.left - win.inner.right,
+                  height: action.payload.height - win.inner.top - win.inner.bottom,
+                });
+              }
+            }
+            break;
           case "CONFIGURE_INNER_WINDOW":
-            const state = getState();
-            const win = state.windows[action.payload.wid] as IWindow;
-            const { width, height } = win.outer;
-            X.ConfigureWindow(action.payload.wid, {
-              x: action.payload.left,
-              y: action.payload.top,
-              width: width - action.payload.left - action.payload.right,
-              height: height - action.payload.top - action.payload.bottom,
-            });
+            {
+              const state = getState();
+              const win = state.windows[action.payload.wid] as IWindow;
+              const { width, height } = win.outer;
+              X.ConfigureWindow(action.payload.wid, {
+                x: action.payload.left,
+                y: action.payload.top,
+                width: width - action.payload.left - action.payload.right,
+                height: height - action.payload.top - action.payload.bottom,
+              });
+            }
             break;
         }
 

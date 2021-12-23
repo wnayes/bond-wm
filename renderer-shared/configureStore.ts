@@ -8,3 +8,4 @@ export function configureStore() {
 };
 
 export type Store = ReturnType<typeof configureStore>;
+export type RootState = ReturnType<Store["getState"]>;

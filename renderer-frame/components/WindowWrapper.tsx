@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
+import { useWindowSize } from "../../renderer-shared/hooks";
 import * as actions from "../../shared/actions";
 
 import { TitleBar } from "./TitleBar";
@@ -29,6 +30,8 @@ export function WindowWrapper(props: IWindowWrapperProps) {
       <TitleBar window={window} />
     );
   }
+
+  useWindowSize(); // Triggers re-renders on resize.
 
   useLayoutEffect(() => {
     const box = winBox.current!;
