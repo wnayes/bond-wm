@@ -171,6 +171,12 @@ export interface XWindowAttrs {
   doNotPropogateMask: number;
 }
 
+enum XFocusRevertTo {
+  None = 0,
+  PointerRoot = 1,
+  Parent = 2,
+}
+
 export type XCbWithErr<TArgs extends any[]> = (err: unknown, ...args: TArgs) => void;
 
 // https://github.com/sidorares/node-x11/wiki/Core-requests
@@ -207,7 +213,7 @@ export interface IXClient {
   GetAtomName(atomId: unknown, callback: (str: string) => void): void;
   GetGeometry(winId: number, callback: XCbWithErr<[drawable: XGeometry]>): void;
   GetImage(...args: unknown[]): unknown;
-  GetInputFocus(...args: unknown[]): unknown;
+  GetInputFocus(): { focus: number, revertTo: XFocusRevertTo };
   GetKeyboardMapping(...args: unknown[]): unknown;
   GetProperty(deleteAfterGet: unknown, wid: number, propNameAtom: unknown, typeNameAtom: unknown, offset: number, maxLen: number, callback: XCbWithErr<[XGetPropertyCallbackProps]>): void;
   GetSelectionOwner(...args: unknown[]): unknown;
@@ -243,7 +249,7 @@ export interface IXClient {
   ReparentWindow(winId: number, newParentId: number, x: number, y: number): void;
   ResizeWindow(...args: unknown[]): unknown;
   SendEvent(destination: number, propagate: boolean, eventMask: number, eventRawData: unknown): void;
-  SetInputFocus(winId: number, val: number): void;
+  SetInputFocus(winId: number, revertTo: XFocusRevertTo): void;
   SetScreenSaver(...args: unknown[]): unknown;
   SetSelectionOwner(...args: unknown[]): unknown;
   TranslateCoordinates(...args: unknown[]): unknown;

@@ -54,7 +54,6 @@ export function createServer(): XServer {
   const desktopBrowsers: BrowserWindow[] = [];
   const desktopBrowserHandles: { [did: number]: any } = {};
 
-  const frameBrowsers: BrowserWindow[] = [];
   const frameBrowserWindows: { [wid: number]: BrowserWindow | undefined } = {};
   const frameBrowserWinIdToFrameId: { [wid: number]: number | undefined } = {};
   const frameBrowserFrameIdToWinId: { [fid: number]: number | undefined } = {};
@@ -232,8 +231,6 @@ export function createServer(): XServer {
     const url = path.join(__dirname, "../renderer-frame/index.html") + "?wid=" + wid;
     win.loadURL("file://" + url);
 
-    let index = frameBrowsers.length;
-    frameBrowsers[index] = win;
     frameBrowserWindows[wid] = win;
 
     const fid = getNativeWindowHandleInt(win);
@@ -244,10 +241,6 @@ export function createServer(): XServer {
     frameBrowserFrameIdToWinId[fid] = wid;
 
     console.log("Created frame window", fid, url);
-
-    win.on("closed", function () {
-      frameBrowsers[index] = null;
-    });
 
     // Open the DevTools.
     //win.webContents.openDevTools({ mode: "undocked" });
@@ -485,14 +478,25 @@ export function createServer(): XServer {
     const wid = ev.wid;
     log(wid, "onDestroyNotify", ev);
 
-    if (!isFrameBrowserWin(ev.wid)) {
-      store.dispatch(actions.removeWindow(ev.wid));
+    if (isFrameBrowserWin(wid)) {
+      const innerWid = frameBrowserFrameIdToWinId[wid];
+      delete frameBrowserFrameIdToWinId[wid];
+      delete frameBrowserWinIdToFrameId[innerWid];
+      delete frameBrowserWindows[innerWid];
+    }
+    else {
+      if (store.getState().windows.hasOwnProperty(wid)) {
+        store.dispatch(actions.removeWindow(wid));
+      }
+
+      const fid = getFrameIdFromWindowId(wid);
+      if (typeof fid === "number" && fid !== wid) {
+        console.log("Calling DestroyWindow for frame " + fid);
+        X.DestroyWindow(fid);
+      }
     }
 
-    const fid = getFrameIdFromWindowId(wid);
-    if (typeof fid === "number" && fid !== wid) {
-      X.DestroyWindow(fid);
-    }
+    knownWids.delete(wid);
   }
 
   function onMapRequest(ev: IXEvent) {
