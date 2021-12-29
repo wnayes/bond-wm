@@ -79,8 +79,8 @@ export interface IXEvent {
   name: string,
   format: number,
   wid: number,
-  message_type: number,
-  data: number[],
+  //message_type: number,
+  //data: number[],
   rawData: Buffer,
 }
 
@@ -99,6 +99,12 @@ export interface IXConfigureEvent extends IXEvent, IXConfigureInfo { }
 export interface IXKeyEvent extends IXEvent {
   buttons: number;
   keycode: number;
+}
+
+export interface IXPropertyNotifyEvent extends IXEvent {
+  atom: Atom;
+  time: number;
+  state: number;
 }
 
 export interface IXScreen {
@@ -131,7 +137,7 @@ enum XReplaceMode {
 }
 
 interface XGetPropertyCallbackProps {
-  type: unknown; // atom
+  type: Atom;
   data: Buffer;
   /** remaining data. property length on the server is offset*4 + prop.data.length + prop.bytesAfter */
   bytesAfter: number;
@@ -179,12 +185,83 @@ enum XFocusRevertTo {
 
 export type XCbWithErr<TArgs extends any[]> = (err: unknown, ...args: TArgs) => void;
 
+export type Atom = number;
+
+export interface XStandardAtoms {
+  PRIMARY: 1,
+  SECONDARY: 2,
+  ARC: 3,
+  ATOM: 4,
+  BITMAP: 5,
+  CARDINAL: 6,
+  COLORMAP: 7,
+  CURSOR: 8,
+  CUT_BUFFER0: 9,
+  CUT_BUFFER1: 10,
+  CUT_BUFFER2: 11,
+  CUT_BUFFER3: 12,
+  CUT_BUFFER4: 13,
+  CUT_BUFFER5: 14,
+  CUT_BUFFER6: 15,
+  CUT_BUFFER7: 16,
+  DRAWABLE: 17,
+  FONT: 18,
+  INTEGER: 19,
+  PIXMAP: 20,
+  POINT: 21,
+  RECTANGLE: 22,
+  RESOURCE_MANAGER: 23,
+  RGB_COLOR_MAP: 24,
+  RGB_BEST_MAP: 25,
+  RGB_BLUE_MAP: 26,
+  RGB_DEFAULT_MAP: 27,
+  RGB_GRAY_MAP: 28,
+  RGB_GREEN_MAP: 29,
+  RGB_RED_MAP: 30,
+  STRING: 31,
+  VISUALID: 32,
+  WINDOW: 33,
+  WM_COMMAND: 34,
+  WM_HINTS: 35,
+  WM_CLIENT_MACHINE: 36,
+  WM_ICON_NAME: 37,
+  WM_ICON_SIZE: 38,
+  WM_NAME: 39,
+  WM_NORMAL_HINTS: 40,
+  WM_SIZE_HINTS: 41,
+  WM_ZOOM_HINTS: 42,
+  MIN_SPACE: 43,
+  NORM_SPACE: 44,
+  MAX_SPACE: 45,
+  END_SPACE: 46,
+  SUPERSCRIPT_X: 47,
+  SUPERSCRIPT_Y: 48,
+  SUBSCRIPT_X: 49,
+  SUBSCRIPT_Y: 50,
+  UNDERLINE_POSITION: 51,
+  UNDERLINE_THICKNESS: 52,
+  STRIKEOUT_ASCENT: 53,
+  STRIKEOUT_DESCENT: 54,
+  ITALIC_ANGLE: 55,
+  X_HEIGHT: 56,
+  QUAD_WIDTH: 57,
+  WEIGHT: 58,
+  POINT_SIZE: 59,
+  RESOLUTION: 60,
+  COPYRIGHT: 61,
+  NOTICE: 62,
+  FONT_NAME: 63,
+  FAMILY_NAME: 64,
+  FULL_NAME: 65,
+  CAP_HEIGHT: 66,
+  WM_CLASS: 67,
+  WM_TRANSIENT_FOR: 68,
+}
+
 // https://github.com/sidorares/node-x11/wiki/Core-requests
 export interface IXClient {
-  atoms: {
-    WM_NAME: unknown;
-    STRING: unknown;
-  }
+  atoms: XStandardAtoms;
+
   event_consumers: { [wid: number]: any };
 
   AllocColor(...args: unknown[]): unknown;
@@ -206,16 +283,16 @@ export interface IXClient {
   CreateCursor(...args: unknown[]): unknown;
   CreateGC(gcId: unknown, drawableId: unknown, createGCAdditionalValues: unknown): void;
   CreatePixmap(...args: unknown[]): unknown;
-  DeleteProperty(winId: number, propNameAtom: unknown): void;
+  DeleteProperty(winId: number, propNameAtom: Atom): void;
   DestroyWindow(winId: number): void;
   ForceScreenSaver(...args: unknown[]): unknown;
   FreePixmap(...args: unknown[]): unknown;
-  GetAtomName(atomId: unknown, callback: (str: string) => void): void;
+  GetAtomName(atomId: Atom, callback: XCbWithErr<[atomName: string]>): void;
   GetGeometry(winId: number, callback: XCbWithErr<[drawable: XGeometry]>): void;
   GetImage(...args: unknown[]): unknown;
   GetInputFocus(): { focus: number, revertTo: XFocusRevertTo };
   GetKeyboardMapping(...args: unknown[]): unknown;
-  GetProperty(deleteAfterGet: unknown, wid: number, propNameAtom: unknown, typeNameAtom: unknown, offset: number, maxLen: number, callback: XCbWithErr<[XGetPropertyCallbackProps]>): void;
+  GetProperty(deleteAfterGet: unknown, wid: number, propNameAtom: Atom, typeNameAtom: Atom, offset: number, maxLen: number, callback: XCbWithErr<[XGetPropertyCallbackProps]>): void;
   GetSelectionOwner(...args: unknown[]): unknown;
   GetWindowAttributes(wid: number, callback: XCbWithErr<[attrs: XWindowAttrs]>): void;
   GrabButton(...args: unknown[]): unknown;
@@ -223,7 +300,7 @@ export interface IXClient {
   GrabKeyboard(...args: unknown[]): unknown;
   GrabPointer(...args: unknown[]): unknown;
   GrabServer(...args: unknown[]): unknown;
-  InternAtom(returnOnlyIfExist: boolean, str: string, callback: XCbWithErr<[atomId: unknown]>): void;
+  InternAtom(returnOnlyIfExist: boolean, str: string, callback: XCbWithErr<[atomId: Atom]>): void;
   KillClient(resource: number): void;
   KillKlient(...args: unknown[]): unknown;
   // typeNameAtom: 0 = AnyType

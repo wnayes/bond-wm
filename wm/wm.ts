@@ -4,14 +4,14 @@ import { app, ipcMain, BrowserWindow } from "electron";
 import type { IWindow } from "../shared/reducers";
 
 import * as path from "path";
-import * as url from "url";
 import * as os from "os";
 import { spawn } from "child_process";
-import { EventEmitter } from "events";
+import { Mutable } from "type-fest";
 const x11 = require("x11");
 
 import { configureStore, ServerStore } from "./configureStore";
-import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient, IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs } from "../shared/X";
+import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient,
+  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
 
@@ -65,6 +65,17 @@ export function createServer(): XServer {
 
   const store = __setupStore();
 
+  // The values here are arbitrary; we call InternAtom to get the true constants.
+  const ExtraAtoms = {
+    UTF8_STRING: -1,
+
+    _NET_WM_NAME: 340,
+  } as const;
+
+  type AtomToType<TAtom> = TAtom extends XStandardAtoms["STRING"] ? string
+    : TAtom extends typeof ExtraAtoms["UTF8_STRING"] ? string
+    : unknown;
+
   // Initialization.
   (() => {
     client = x11.createClient(async (err: unknown, display: IXDisplay) => {
@@ -76,6 +87,7 @@ export function createServer(): XServer {
       XDisplay = display;
       X = display.client;
 
+      await __setupAtoms();
       await __initDesktop();
     });
 
@@ -106,6 +118,28 @@ export function createServer(): XServer {
       launchProcess(args.executable);
     });
   })();
+
+  async function __setupAtoms(): Promise<void> {
+    // TODO: Typings are a little awkward here.
+    const extraAtoms = (ExtraAtoms as Mutable<typeof ExtraAtoms>);
+    extraAtoms.UTF8_STRING = await internAtomAsync("UTF8_STRING") as any;
+
+    extraAtoms._NET_WM_NAME = await internAtomAsync("_NET_WM_NAME") as any;
+
+    console.log("ExtraAtoms", extraAtoms);
+  }
+
+  function internAtomAsync(name: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      X.InternAtom(false, name, (err, atom) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(atom);
+      });
+    })
+  }
 
   async function __initDesktop(): Promise<void> {
     for (const screen of XDisplay.screen) {
@@ -300,9 +334,11 @@ export function createServer(): XServer {
       case X11_EVENT_TYPE.ClientMessage:
         onClientMessage(ev);
         break;
+      case X11_EVENT_TYPE.PropertyNotify:
+        onPropertyNotify(ev as IXPropertyNotifyEvent);
+        break;
       default:
         console.log("Unhandled event", ev);
-        if (!ev.name) console.log(ev);
         break;
     }
   }
@@ -330,7 +366,7 @@ export function createServer(): XServer {
     const values = await Promise.all([
       determineWindowAttributes(wid),
       determineWindowGeometry(wid),
-      determineWindowTitle(wid),
+      getWindowTitle(wid),
       determineWindowDecorated(wid)
     ]);
 
@@ -680,6 +716,29 @@ export function createServer(): XServer {
     //   rawData: <Buffer a1 20 3c 00 08 00 e0 00 d4 01 00 00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00> }
   }
 
+  async function onPropertyNotify(ev: IXPropertyNotifyEvent): Promise<void> {
+    const { wid, atom } = ev;
+    log(wid, "onPropertyNotify", ev);
+
+    if (isFrameBrowserWin(wid) || isDesktopBrowserWin(wid)) {
+      return;
+    }
+
+    switch (atom) {
+      case X.atoms.WM_NAME:
+      case ExtraAtoms._NET_WM_NAME:
+        {
+          const newTitle = await getWindowTitle(wid);
+          store.dispatch(actions.setWindowTitle(wid, newTitle));
+        }
+        break;
+
+      default:
+        X.GetAtomName(atom, (err, name) => console.info(`Atom ${atom} (${name}) for property change is unhandled.`));
+        break;
+    }
+  }
+
   function launchProcess(name: string) {
     const child = spawn(name, [], {
       detached: true,
@@ -716,23 +775,13 @@ export function createServer(): XServer {
     });
   }
 
-  function determineWindowTitle(wid: number): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
-      X.GetProperty(0, wid, X.atoms.WM_NAME, X.atoms.STRING, 0, 10000000, function (err, prop) {
-        if (err) {
-          reject(err);
-          return;
-        }
+  async function getWindowTitle(wid: number): Promise<string | undefined> {
+    const [name, utf8name] = await Promise.all([
+      getPropertyValue(wid, X.atoms.WM_NAME, X.atoms.STRING),
+      getPropertyValue(wid, ExtraAtoms._NET_WM_NAME, ExtraAtoms.UTF8_STRING),
+    ]);
 
-        if (prop.type == X.atoms.STRING) {
-          const dataString = prop.data.toString();
-          if (dataString) {
-            resolve(dataString);
-          }
-        }
-        resolve(undefined);
-      });
-    });
+    return utf8name || name;
   }
 
   function determineWindowDecorated(wid: number): Promise<boolean> {
@@ -761,6 +810,34 @@ export function createServer(): XServer {
           }
           resolve(true);
         });
+      });
+    });
+  }
+
+  function getPropertyValue<TTypeAtom extends Atom, TValue = AtomToType<TTypeAtom>>(wid: number, nameAtom: Atom, typeAtom: TTypeAtom): Promise<TValue> {
+    return new Promise((resolve, reject) => {
+      X.GetProperty(0, wid, nameAtom, typeAtom, 0, 10000000, function (err, prop) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        console.log("Got property value response", prop);
+
+        switch (prop.type) {
+          case X.atoms.STRING:
+            resolve(prop.data.toString() as unknown as TValue);
+            break;
+
+          case ExtraAtoms.UTF8_STRING:
+            resolve(prop.data.toString() as unknown as TValue);
+            break;
+
+          default:
+            console.log("Unhandled atom property type", prop);
+            resolve(undefined);
+            break;
+        }
       });
     });
   }
