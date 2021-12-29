@@ -9,11 +9,14 @@ import { spawn } from "child_process";
 import { Mutable } from "type-fest";
 const x11 = require("x11");
 
-import { configureStore, ServerStore } from "./configureStore";
+import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient,
   IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
+import { getFirstTagName } from "../shared/tags";
+import { batch } from "react-redux";
+import { anyIntersect } from "../shared/utils";
 
 const registeredKeys: { [keyModifiers: number]: { [keyCode: number]: boolean } } = {
   [X11_KEY_MODIFIER.Mod4Mask]: {
@@ -397,15 +400,20 @@ export function createServer(): XServer {
       const fid = createFrameBrowser(wid, effectiveGeometry);
       knownWids.add(fid);
 
-      store.dispatch(actions.addWindow({
-        wid,
-        x: effectiveGeometry.x,
-        y: effectiveGeometry.y,
-        width: effectiveGeometry.width,
-        height: effectiveGeometry.height,
+      const state = store.getState();
+
+      store.dispatch(actions.addWindow(wid, {
+        outer: {
+          x: effectiveGeometry.x,
+          y: effectiveGeometry.y,
+          width: effectiveGeometry.width,
+          height: effectiveGeometry.height,
+        },
         visible: true,
         decorated,
         title,
+        screenIndex: 0,
+        tags: [state.screens[0].currentTags[0]],
       }));
 
       X.GrabServer();
@@ -576,7 +584,8 @@ export function createServer(): XServer {
       X.MapWindow(fid);
     }
 
-    if (!isDesktopBrowserWin(wid)) {
+    const state = store.getState();
+    if (state.windows[wid]?.visible === false) {
       store.dispatch(actions.setWindowVisible(wid, true));
     }
 
@@ -584,11 +593,25 @@ export function createServer(): XServer {
     X.MapWindow(wid);
   }
 
+  function hideWindow(wid: number) {
+    const fid = getFrameIdFromWindowId(wid);
+    if (fid)
+      X.UnmapWindow(fid);
+    if (wid)
+      X.UnmapWindow(wid);
+
+    const state = store.getState();
+    if (state.windows[wid]?.visible === true) {
+      store.dispatch(actions.setWindowVisible(wid, false));
+    }
+  }
+
   function onUnmapNotify(ev: IXEvent) {
     const wid = ev.wid;
     log(wid, "onUnmapNotify", ev);
     if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
-      if (store.getState().windows.hasOwnProperty(wid)) {
+      const state = store.getState();
+      if (state.windows[wid]?.visible === true) {
         store.dispatch(actions.setWindowVisible(wid, false));
       }
 
@@ -974,12 +997,7 @@ export function createServer(): XServer {
   }
 
   function minimize(wid: number) {
-    const fid = getFrameIdFromWindowId(wid);
-    if (fid)
-      X.UnmapWindow(fid);
-    if (wid)
-      X.UnmapWindow(wid);
-
+    hideWindow(wid);
     unsetFocus();
   }
 
@@ -1016,7 +1034,7 @@ export function createServer(): XServer {
       }
     }
 
-    const x11Middleware: Middleware = function ({ getState }) {
+    const x11Middleware: Middleware<{}, ServerRootState> = function ({ getState }) {
       return next => action => {
         const returnValue = next(action);
 
@@ -1050,6 +1068,24 @@ export function createServer(): XServer {
                 y: action.payload.top,
                 width: width - action.payload.left - action.payload.right,
                 height: height - action.payload.top - action.payload.bottom,
+              });
+            }
+            break;
+          case "SET_CURRENT_TAGS":
+            {
+              const state = getState();
+              const { currentTags } = action.payload as { currentTags: string[], screenIndex: number };
+              batch(() => {
+                for (const widStr in state.windows) {
+                  const wid = parseInt(widStr, 10);
+                  const win = state.windows[widStr];
+                  if (anyIntersect(win.tags, currentTags)) {
+                    showWindow(wid);
+                  }
+                  else {
+                    hideWindow(wid);
+                  }
+                }
               });
             }
             break;

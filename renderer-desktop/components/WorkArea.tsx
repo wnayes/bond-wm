@@ -6,19 +6,18 @@ import { RootState } from "../../renderer-shared/configureStore";
 import { Layout } from "./layout/Layout";
 import { useWindowSize } from "../../renderer-shared/hooks";
 import { Wallpaper } from "./Wallpaper";
+import { IWindow } from "../../shared/reducers";
 
 export interface IWorkAreaProps {
-    screenIndex: number;
-  }
+  screenIndex: number;
+  windows: IWindow[];
+}
 
-export function WorkArea({ screenIndex }: IWorkAreaProps) {
+export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
   const workAreaDiv = useRef<HTMLDivElement>();
 
   const store = useStore();
   const screen = useSelector((state: RootState) => state.screens[screenIndex]);
-
-  // TODO: windows should be scoped to the current screen.
-  const windows = Object.values(useSelector((state: RootState) => state.windows));
 
   useWindowSize(); // To trigger size recalculations.
 

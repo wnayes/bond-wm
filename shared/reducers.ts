@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { getFirstTagName, getTagNames } from "./tags";
 
 export interface IGeometry {
   x: number,
@@ -11,6 +12,9 @@ export interface IScreen {
   width: number;
   height: number;
   workArea: IGeometry;
+
+  tags: string[];
+  currentTags: string[];
 }
 
 function screens(state: IScreen[] = [], action: any) {
@@ -29,6 +33,9 @@ function screens(state: IScreen[] = [], action: any) {
             width: action.payload.width,
             height: action.payload.height,
           },
+
+          tags: getTagNames(),
+          currentTags: [getFirstTagName()]
         });
         return newState;
       }
@@ -44,6 +51,12 @@ function screens(state: IScreen[] = [], action: any) {
         };
         return newState;
       }
+
+    case "SET_CURRENT_TAGS":
+      let newState = state.slice();
+      newState[action.payload.screenIndex].currentTags = action.payload.currentTags;
+      return newState;
+
     default:
       return state;
   }
@@ -67,108 +80,135 @@ export interface IWindow {
   focused: boolean;
   decorated: boolean;
   title: string | undefined;
+  screenIndex: number;
+  tags: string[];
 }
 
-function windows(state: { [wid: number]: IWindow } = {}, action: any) {
-  let newState, window;
+type WindowsState = { [wid: number]: IWindow };
+
+function windows(state: WindowsState = {}, action: any) {
+  let newState;
   switch (action.type) {
     case "ADD_WINDOW":
-      window = action.payload;
-      return Object.assign({}, state, {
-        [window.wid]: {
-            id: window.wid,
-            outer: {
-              x: window.x,
-              y: window.y,
-              width: window.width,
-              height: window.height,
-            },
+      {
+        const win = action.payload as Partial<IWindow> & { wid: number };
+        return Object.assign<WindowsState, WindowsState, WindowsState>({}, state, {
+          [win.wid]: {
+            id: win.wid,
+            outer: win.outer,
             inner: {
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
             },
-            visible: window.visible,
-            decorated: window.decorated,
+            visible: win.visible,
+            decorated: win.decorated,
             focused: false,
-            title: window.title,
-        }
-      });
+            title: win.title,
+            screenIndex: win.screenIndex,
+            tags: win.tags,
+          }
+        });
+      }
     case "REMOVE_WINDOW":
-      window = action.payload;
-      newState = Object.assign({}, state);
-      delete newState[window];
-      return newState;
+      {
+        const window = action.payload;
+        newState = Object.assign({}, state);
+        delete newState[window];
+        return newState;
+      }
     case "CONFIGURE_WINDOW":
       newState = Object.assign({}, state);
-      newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
-        outer: {
-          x: action.payload.x,
-          y: action.payload.y,
-          width: action.payload.width,
-          height: action.payload.height,
-        }
-      });
-      return newState;
+      if (newState[action.payload.wid]) {
+        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
+          outer: {
+            x: action.payload.x,
+            y: action.payload.y,
+            width: action.payload.width,
+            height: action.payload.height,
+          }
+        });
+        return newState;
+      }
+      else {
+        console.error("Action on unknown window", action);
+        return state;
+      }
     case "CONFIGURE_INNER_WINDOW":
       newState = Object.assign({}, state);
-      newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
-        inner: {
-          top: action.payload.top,
-          left: action.payload.left,
-          right: action.payload.right,
-          bottom: action.payload.bottom,
-        }
-      });
-      return newState;
+      if (newState[action.payload.wid]) {
+        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
+          inner: {
+            top: action.payload.top,
+            left: action.payload.left,
+            right: action.payload.right,
+            bottom: action.payload.bottom,
+          }
+        });
+        return newState;
+      }
+      else {
+        console.error("Action on unknown window", action);
+        return state;
+      }
     case "FOCUS_WINDOW":
-      window = action.payload;
-      newState = Object.assign({}, state);
-      if (newState[window]) {
-        newState[window] = Object.assign({}, newState[window], { focused: true });
+      {
+        const wid = action.payload;
+        newState = Object.assign({}, state);
+        if (newState[wid]) {
+          newState[wid] = Object.assign({}, newState[wid], { focused: true });
+          return newState;
+        }
+        else {
+          console.error("Action on unknown window", action);
+          return state;
+        }
       }
-      else {
-        console.error("Action on unknown window", action);
-      }
-      return newState;
     case "UNFOCUS_WINDOW":
-      window = action.payload;
-      newState = Object.assign({}, state);
-      if (newState[window]) {
-        newState[window] = Object.assign({}, newState[window], { focused: false });
+      {
+        const wid = action.payload;
+        newState = Object.assign({}, state);
+        if (newState[wid]) {
+          newState[wid] = Object.assign({}, newState[wid], { focused: false });
+          return newState;
+        }
+        else {
+          console.error("Action on unknown window", action);
+          return state;
+        }
       }
-      else {
-        console.error("Action on unknown window", action);
-      }
-      return newState;
     case "SET_WINDOW_TITLE":
       newState = Object.assign({}, state);
       if (newState[action.payload.wid]) {
         newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { title: action.payload.title });
+        return newState;
       }
       else {
         console.error("Action on unknown window", action);
+        return state;
       }
-      return newState;
     case "SET_WINDOW_VISIBLE":
       newState = Object.assign({}, state);
       if (newState[action.payload.wid]) {
         newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { visible: !!action.payload.visible });
+        return newState;
       }
       else {
         console.error("Action on unknown window", action);
+        return state;
       }
-      return newState;
     case "SET_WINDOW_DECORATED":
       newState = Object.assign({}, state);
       if (newState[action.payload.wid]) {
         newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], { decorated: !!action.payload.decorated });
+        return newState;
       }
       else {
         console.error("Action on unknown window", action);
+        return state;
       }
-      return newState;
+
     default:
       return state;
   }
@@ -176,7 +216,6 @@ function windows(state: { [wid: number]: IWindow } = {}, action: any) {
 
 const initialTaskbarState = {
   showingRun: false,
-  runCommand: "",
 };
 function taskbar(state = initialTaskbarState, action: any) {
   let newState;
@@ -188,10 +227,6 @@ function taskbar(state = initialTaskbarState, action: any) {
     case "HIDE_RUN_FIELD":
       newState = Object.assign({}, state);
       newState.showingRun = false;
-      return newState;
-    case "SET_RUN_FIELD_TEXT":
-      newState = Object.assign({}, state);
-      newState.runCommand = action.payload;
       return newState;
     default:
       return state;

@@ -1,145 +1,172 @@
 import * as React from "react";
 
 import { Clock } from "./Clock";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../shared/actions";
 import { exec, minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { RootState } from "../../renderer-shared/configureStore";
+import { IWindow } from "../../shared/reducers";
 
 interface ITaskbarProps {
-  windows: any[];
-  showingRun: boolean;
+  screenIndex: number;
+  windows: IWindow[];
 }
 
-class TaskbarComp extends React.Component<any> {
-  render() {
-    const windows = this.props.windows;
+export function Taskbar(props: ITaskbarProps) {
+  const windows = props.windows;
 
-    let runField;
-    if (this.props.showingRun) {
-      runField = (
-        <RunField />
-      );
-    }
+  const showingRun = useSelector<RootState>(state => state.taskbar.showingRun);
 
-    return (
-      <div className="taskbar">
-        {runField}
-        <TaskList windows={windows} />
-        <Clock />
-      </div>
-    );
-  }
+  return (
+    <div className="taskbar">
+      <TagList screenIndex={props.screenIndex} />
+      {showingRun && <RunField />}
+      <TaskList windows={windows} />
+      <Clock />
+    </div>
+  );
 }
 
 interface ITaskListProps {
-  windows: any[];
+  windows: IWindow[];
 }
 
-class TaskList extends React.Component<ITaskListProps> {
-  render() {
-    const windows = this.props.windows;
-    const entries = [];
-    for (let wid in windows) {
-      const window = windows[wid];
-
-      entries.push(
-        <TaskListEntry key={wid} window={window} />
-      );
-    }
-    return (
-      <div className="tasklist">
-        {entries}
-      </div>
+function TaskList(props: ITaskListProps) {
+  const windows = props.windows;
+  const entries = [];
+  for (let win of windows) {
+    entries.push(
+      <TaskListEntry key={win.id} window={win} />
     );
   }
+  return (
+    <div className="tasklist">
+      {entries}
+    </div>
+  );
 }
 
 interface ITaskListEntryProps {
-  window: any;
+  window: IWindow;
 }
 
-class TaskListEntry extends React.Component<ITaskListEntryProps> {
-  render() {
-    const window = this.props.window;
+function TaskListEntry(props: ITaskListEntryProps) {
+  const win = props.window;
 
-    let className = "tasklistentry";
-    if (window.focused)
-      className += " focused";
-    return (
-      <div className={className} onClick={this.onClick.bind(this)}>
-        {window.title}
-      </div>
-    );
-  }
+  let className = "tasklistentry";
+  if (win.focused)
+    className += " focused";
 
-  onClick() {
-    const win = this.props.window;
+  const onClick = useCallback(() =>{
     if (win.focused)
       minimizeWindow(win.id);
     else
       raiseWindow(win.id);
-  }
+  }, [win]);
+
+  return (
+    <div className={className} onClick={onClick}>
+      {win.title}
+    </div>
+  );
 }
 
-const RunField: any = connect(mapStateToProps)(class RunField extends React.Component<any> {
-  field: any;
+interface IRunFieldProps {
+}
 
-  constructor(props: any) {
-    super(props);
+function RunField(props: IRunFieldProps) {
+  const field = useRef<HTMLInputElement>();
 
-    this.onChange = this.onChange.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onBlur = this.onBlur.bind(this);
+  const [text, setText] = useState("");
+
+  const dispatch = useDispatch();
+
+  const reset = () => {
+    setText("");
+    dispatch(actions.toggleTaskbarRunField(false));
   }
 
-  render() {
-    return (
-      <input type="text" value={this.props.runCommand}
-        className="taskbarRunField"
-        ref={(input) => { this.field = input; }}
-        onChange={this.onChange}
-        onKeyPress={this.onKeyPress}
-        onKeyDown={this.onKeyDown}
-        onBlur={this.onBlur} />
-    );
+  const onChange = (event: any) => {
+    setText(event.target.value);
   }
 
-  onChange(event: any) {
-    this.props.dispatch(actions.setTaskbarRunFieldText(event.target.value));
-  }
-
-  onKeyPress(event: React.KeyboardEvent) {
-    const command = this.props.runCommand;
-    if (command && event.key === "Enter") {
-      exec(this.props.runCommand);
-      this.reset();
+  const onKeyPress = (event: React.KeyboardEvent) => {
+    if (text && event.key === "Enter") {
+      exec(text);
+      reset();
       event.preventDefault();
     }
   }
 
-  onKeyDown(event: React.KeyboardEvent) {
+  const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.keyCode === 27 /*esc*/) {
-      this.reset();
+      reset();
     }
   }
 
-  onBlur() {
-    this.reset();
+  const onBlur = () => {
+    reset();
   }
 
-  reset() {
-    this.props.dispatch(actions.setTaskbarRunFieldText(""));
-    this.props.dispatch(actions.toggleTaskbarRunField(false));
-  }
+  useEffect(() => {
+    field.current!.focus();
+  }, []);
 
-  componentDidMount() {
-    this.field.focus();
-  }
-});
-
-function mapStateToProps(state: any) {
-  return Object.assign({}, state.taskbar);
+  return (
+    <input type="text" value={text}
+      className="taskbarRunField"
+      ref={field}
+      onChange={onChange}
+      onKeyPress={onKeyPress}
+      onKeyDown={onKeyDown}
+      onBlur={onBlur} />
+  );
 }
 
-export const Taskbar: any = connect(mapStateToProps)(TaskbarComp);
+interface ITagListProps {
+  screenIndex: number;
+}
+
+function TagList(props: ITagListProps) {
+  const tags = useSelector<RootState>(state => state.screens[props.screenIndex].tags) as string[];
+  const currentTags = useSelector<RootState>(state => state.screens[props.screenIndex].currentTags) as string[];
+
+  const dispatch = useDispatch();
+
+  const entries = tags.map(tag => {
+    return (
+      <TagListEntry tag={tag} key={tag}
+        selected={currentTags.indexOf(tag) >= 0}
+        onClick={() => {
+          dispatch(actions.setScreenCurrentTags(props.screenIndex, [tag]));
+        }} />
+    );
+  });
+
+  return (
+    <div className="taglist">
+      {entries}
+    </div>
+  );
+}
+
+interface ITagListEntryProps {
+  tag: string;
+  selected: boolean;
+  onClick(): void;
+}
+
+function TagListEntry({ tag, selected, onClick }: ITagListEntryProps) {
+  let className = "taglistentry";
+  if (selected) {
+    className += " selected";
+    onClick = undefined;
+  }
+
+  return (
+    <div className={className} onClick={onClick}>
+      {tag}
+    </div>
+  );
+}

@@ -1,4 +1,4 @@
-import { IGeometry } from "./reducers";
+import { IGeometry, IWindow } from "./reducers";
 
 export function addScreen(screen: { width: number, height: number }) {
   return {
@@ -19,14 +19,21 @@ export function configureScreenWorkArea(screenIndex: number, config: IGeometry) 
   };
 }
 
-export function addWindow(window: any) {
+export function setScreenCurrentTags(screenIndex: number, currentTags: string[]) {
   return {
-    type: "ADD_WINDOW",
-    payload: window,
+    type: "SET_CURRENT_TAGS",
+    payload: { screenIndex, currentTags }
   };
 }
 
-export function removeWindow(wid: any) {
+export function addWindow(wid: number, win: Partial<IWindow>) {
+  return {
+    type: "ADD_WINDOW",
+    payload: Object.assign({ wid }, win),
+  };
+}
+
+export function removeWindow(wid: number) {
   return {
     type: "REMOVE_WINDOW",
     payload: wid
@@ -99,16 +106,6 @@ export function toggleTaskbarRunField(visible: boolean) {
   return {
     type: visible ? "SHOW_RUN_FIELD" : "HIDE_RUN_FIELD",
     payload: visible,
-    meta: {
-      scope: "local",
-    },
-  };
-}
-
-export function setTaskbarRunFieldText(text: string) {
-  return {
-    type: "SET_RUN_FIELD_TEXT",
-    payload: text,
     meta: {
       scope: "local",
     },

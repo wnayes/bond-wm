@@ -37,7 +37,7 @@ html, body {
     display: flex;
     height: 20px;
     flex-shrink: 0;
-    font-size: 10px;
+    font-size: 11px;
     background-color: #CCCCCC;
 }
 
@@ -46,6 +46,7 @@ html, body {
     vertical-align: middle;
     display: flex;
     flex-grow: 1;
+    font-size: 10px;
 }
 
 .tasklistentry {
@@ -71,6 +72,33 @@ html, body {
 }
 .tasklistentry:not(.focused):hover {
     background-color: #DDDDDD;
+}
+
+.taglist {
+    white-space: nowrap;
+    vertical-align: middle;
+    display: flex;
+}
+.taglistentry {
+    display: inline-block;
+    flex-grow: 1;
+    vertical-align: middle;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    padding: 0 1em;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.taglistentry:hover {
+    background-color: #BBBBBB;
+}
+.taglistentry.selected {
+    font-weight: bold;
+    background-color: #696969;
+    color: #EEEEEE;
 }
 
 .taskbarRunField {
