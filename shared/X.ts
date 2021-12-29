@@ -159,6 +159,15 @@ export interface XGeometry {
   depth: number;
 }
 
+export enum XMapState {
+  /** XCB_MAP_STATE_UNMAPPED */
+  IsUnmapped = 0,
+  /** XCB_MAP_STATE_UNVIEWABLE */
+  IsUnviewable = 1,
+  /** XCB_MAP_STATE_VIEWABLE */
+  IsViewable = 2,
+}
+
 export interface XWindowAttrs {
   backingStore: number;
   visual: number;
@@ -169,7 +178,7 @@ export interface XWindowAttrs {
   backingPixel: number;
   saveUnder: number;
   mapIsInstalled: number;
-  mapState: number;
+  mapState: XMapState;
   overrideRedirect: number;
   colormap: number;
   allEventMasks: number;

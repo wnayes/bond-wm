@@ -11,7 +11,7 @@ const x11 = require("x11");
 
 import { configureStore, ServerStore } from "./configureStore";
 import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient,
-  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms } from "../shared/X";
+  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
 
@@ -178,9 +178,9 @@ export function createServer(): XServer {
 
     X.UngrabServer();
 
-    // X.QueryTree(root, (err, tree) => {
-    //   tree.children.forEach(manageWindow);
-    // });
+    X.QueryTree(root, (err, tree) => {
+      tree.children.forEach(childWid => manageWindow(childWid, true));
+    });
 
     for (let modifier in registeredKeys) {
       if (!registeredKeys.hasOwnProperty(modifier))
@@ -343,7 +343,7 @@ export function createServer(): XServer {
     }
   }
 
-  async function manageWindow(wid: number): Promise<void> {
+  async function manageWindow(wid: number, checkUnmappedState: boolean): Promise<void> {
     console.log("MANAGE WINDOW: " + wid);
 
     if (initializingWins[wid]) {
@@ -373,8 +373,18 @@ export function createServer(): XServer {
     const [attrs, clientGeom, title, decorated] = values;
     console.log(`got values for ${wid}:`, values);
 
-    if (attrs.overrideRedirect === 1) {
-      console.log("don't manage " + wid);
+    const isOverrideRedirect = attrs.overrideRedirect === 1;
+    if (isOverrideRedirect) {
+      console.log(`Not managing ${wid} due to override redirect.`);
+    }
+
+    const isUnmappedState = checkUnmappedState && attrs.mapState === XMapState.IsUnmapped;
+    if (isUnmappedState) {
+      console.log(`Not managing ${wid} due to unmapped state.`);
+    }
+
+    if (isOverrideRedirect || isUnmappedState) {
+      delete initializingWins[wid];
       X.MapWindow(wid);
       return;
     }
@@ -546,7 +556,7 @@ export function createServer(): XServer {
       showWindow(wid);
     }
     else {
-      manageWindow(wid);
+      manageWindow(wid, false);
     }
   }
 
