@@ -9,6 +9,10 @@ export interface IGeometry {
 }
 
 export interface IScreen {
+  root: number;
+
+  x: number;
+  y: number;
   width: number;
   height: number;
   workArea: IGeometry;
@@ -23,6 +27,10 @@ function screens(state: IScreen[] = [], action: any) {
       {
         let newState = state.slice();
         newState.push({
+          root: action.payload.root,
+
+          x: action.payload.x,
+          y: action.payload.y,
           width: action.payload.width,
           height: action.payload.height,
 
@@ -53,9 +61,12 @@ function screens(state: IScreen[] = [], action: any) {
       }
 
     case "SET_CURRENT_TAGS":
-      let newState = state.slice();
-      newState[action.payload.screenIndex].currentTags = action.payload.currentTags;
-      return newState;
+      {
+        let newState = state.slice();
+        newState[action.payload.screenIndex] = { ...newState[action.payload.screenIndex] };
+        newState[action.payload.screenIndex].currentTags = action.payload.currentTags;
+        return newState;
+      }
 
     default:
       return state;

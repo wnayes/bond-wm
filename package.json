@@ -5,6 +5,7 @@
   "main": "./wm/main.js",
   "scripts": {
     "startx": "Xephyr -br -ac -noreset -screen 1600x900 :1",
+    "startx-multi": "Xephyr -br -ac -noreset -screen 1000x700 -screen 1000x600 +extension RANDR +xinerama :1",
     "build": "tsc -p ./tsconfig.json && npm run build-desktop && npm run build-frame",
     "build-desktop": "esbuild ./renderer-desktop/index.tsx --bundle --platform=node --external:electron --outfile=./renderer-desktop/dist.js",
     "build-frame": "esbuild ./renderer-frame/index.ts --bundle --platform=node --external:electron --outfile=./renderer-frame/dist.js",

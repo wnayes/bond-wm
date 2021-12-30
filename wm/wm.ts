@@ -11,12 +11,13 @@ const x11 = require("x11");
 
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient,
-  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState } from "../shared/X";
+  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState, XRandrExtension } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
 import { getFirstTagName } from "../shared/tags";
 import { batch } from "react-redux";
 import { anyIntersect } from "../shared/utils";
+import { requireExt as requireXinerama } from "./xinerama";
 
 const registeredKeys: { [keyModifiers: number]: { [keyCode: number]: boolean } } = {
   [X11_KEY_MODIFIER.Mod4Mask]: {
@@ -61,9 +62,6 @@ export function createServer(): XServer {
   const frameBrowserWinIdToFrameId: { [wid: number]: number | undefined } = {};
   const frameBrowserFrameIdToWinId: { [fid: number]: number | undefined } = {};
 
-  var root: number;
-  let white: unknown;
-
   const initializingWins: { [win: number]: any } = {};
 
   const store = __setupStore();
@@ -89,6 +87,8 @@ export function createServer(): XServer {
 
       XDisplay = display;
       X = display.client;
+
+      console.log(X._extensions);
 
       await __setupAtoms();
       await __initDesktop();
@@ -151,20 +151,11 @@ export function createServer(): XServer {
   }
 
   async function __initScreen(screen: IXScreen): Promise<void> {
-    const props = {
-      width: screen.pixel_width,
-      height: screen.pixel_height
-    };
+    const root = screen.root;
 
-    console.log("Adding screen", props);
-
-    store.dispatch(actions.addScreen(props));
-
-    createDesktopBrowser(props);
-
-    root = screen.root;
-    console.log("Root wid", root);
-    white = screen.white_pixel;
+    const debugScreen = Object.assign({}, screen);
+    delete debugScreen.depths;
+    console.log("Processing X screen", debugScreen);
 
     X.GrabServer();
 
@@ -180,6 +171,32 @@ export function createServer(): XServer {
     await changeWindowEventMask(root, rootEvents);
 
     X.UngrabServer();
+
+    const logicalScreens = await getScreenGeometries(screen);
+    console.log("Obtained logical screens", logicalScreens);
+
+    for (const logicalScreen of logicalScreens) {
+      store.dispatch(actions.addScreen({
+        x: logicalScreen.x,
+        y: logicalScreen.y,
+        width: logicalScreen.width,
+        height: logicalScreen.height,
+        root,
+      }));
+
+      const did = createDesktopBrowser({
+        width: logicalScreen.width,
+        height: logicalScreen.height,
+      });
+
+      X.ConfigureWindow(did, {
+        borderWidth: 0,
+        width: logicalScreen.width,
+        height: logicalScreen.height,
+      });
+
+      X.ReparentWindow(did, root, logicalScreen.x, logicalScreen.y);
+    }
 
     X.QueryTree(root, (err, tree) => {
       tree.children.forEach(childWid => manageWindow(childWid, true));
@@ -435,7 +452,7 @@ export function createServer(): XServer {
 
       X.UngrabServer();
 
-      X.ReparentWindow(fid, root, effectiveGeometry.x, effectiveGeometry.y);
+      X.ReparentWindow(fid, state.screens[0].root, effectiveGeometry.x, effectiveGeometry.y);
       X.ReparentWindow(wid, fid, 0, 0);
 
       // X.ConfigureWindow(fid, {
@@ -670,7 +687,7 @@ export function createServer(): XServer {
 
     X.SetInputFocus(wid, 0);
 
-    if (!isDesktopBrowserWin(wid) && wid !== root) {
+    if (store.getState().windows.hasOwnProperty(wid)) {
       store.dispatch(actions.focusWindow(wid));
     }
   }
@@ -875,6 +892,45 @@ export function createServer(): XServer {
     });
   }
 
+  /**
+   * By default, one screen means one screen geometry.
+   * But if Xinerama is in play, we may have multiple logical screens
+   * represented within a single screen.
+   */
+  function getScreenGeometries(screen: IXScreen): Promise<Geometry[]> {
+    return new Promise((resolve, reject) => {
+      const defaultGeometry: Geometry = {
+        x: 0,
+        y: 0,
+        width: screen.pixel_width,
+        height: screen.pixel_height,
+      };
+
+      requireXinerama(XDisplay, (err, xinerama) => {
+        if (!xinerama) {
+          resolve([defaultGeometry]);
+          return;
+        }
+
+        xinerama.IsActive((err, isActive) => {
+          if (!isActive) {
+            resolve([defaultGeometry]);
+            return;
+          }
+
+          xinerama.QueryScreens((err, screenInfos) => {
+            if (err || !screenInfos) {
+              resolve([defaultGeometry]);
+              return;
+            }
+
+            resolve(screenInfos);
+          });
+        });
+      });
+    });
+  }
+
   //function determineWindowHidden(wid: number) {
     // X.InternAtom(true, "_NET_WM_ICON", function(err, atom) {
     //   X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
@@ -1026,7 +1082,8 @@ export function createServer(): XServer {
         // Call the next dispatch method in the middleware chain.
         const returnValue = next(action);
 
-        console.log("state after dispatch", getState());
+        console.log("state after dispatch:");
+        console.dir(getState(), { depth: 3 });
 
         // This will likely be the action itself, unless
         // a middleware further in chain changed it.

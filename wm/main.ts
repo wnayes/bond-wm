@@ -1,11 +1,9 @@
-import * as electron from "electron";
-const app = electron.app;
+import { app, dialog } from "electron";
 import { startX, XServer } from "./wm";
 
 let server: XServer;
 
 // Disable error dialogs by override
-const dialog = electron.dialog;
 dialog.showErrorBox = function(title, content) {
   console.error(`${title}\n${content}`);
 };
@@ -20,15 +18,6 @@ app.on("window-all-closed", function() {
   app.quit();
 });
 
-app.on("activate", function() {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  // if (mainWindow === null) {
-  //   createWindow();
-  // }
-});
-
 app.on("ready", function() {
-  console.log("test");
   server = startX();
 });

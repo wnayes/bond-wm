@@ -122,7 +122,7 @@ export interface IXScreen {
   root_visual: number,
   root_depth: number,
   backing_stores: number,
-  num_depths: number;
+  depths: object;
 }
 
 export interface IXDisplay {
@@ -148,6 +148,158 @@ interface XQueryTreeResult {
   parent: number;
   children: number[];
 }
+
+type XExtension<T> = XExtensionInfo & T;
+
+interface XExtensionInfo {
+  present: boolean;
+  majorOpcode: number;
+  firstEvent: number;
+  firstError: number;
+  // Enable(): void?
+}
+
+interface XRandrScreen {
+  px_width: number;
+  px_height: number;
+  mm_width: number;
+  mm_height: number;
+}
+
+interface XRandrScreenInfo {
+  rotations: unknown;
+  root: number;
+  timestamp: number;
+  config_timestamp: number;
+  sizeID: number;
+  rotation: unknown;
+  rate: unknown;
+  rates: unknown[];
+  screens: XRandrScreen[];
+}
+
+interface XRandrModeInfos {
+  id: unknown;
+  width: number;
+  height: number;
+  dot_clock: unknown;
+  h_sync_start: unknown;
+  h_sync_end: unknown;
+  h_total: unknown;
+  h_skew: unknown;
+  v_sync_start: unknown;
+  v_sync_end: unknown;
+  v_total: unknown;
+  modeflags: unknown;
+  name: string;
+}
+
+interface XRandrScreenResources {
+  timestamp: number;
+  config_timestamp: number;
+  crtcs: number[];
+  outputs: number[];
+  modeinfos: XRandrModeInfos[];
+}
+
+interface XRandrOutputInfo {
+  timestamp: number;
+  crtc: number;
+  mm_width: number;
+  mm_height: number;
+  connection: unknown;
+  subpixelOrder: unknown;
+  preferredModes: unknown;
+  crtcs: number[];
+  modes: number[];
+  clones: number[];
+  name: string;
+}
+
+interface XRandrCtrcInfo {
+  status: unknown;
+  timestamp: unknown;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  mode: unknown;
+  rotation: unknown;
+  rotations: unknown;
+  output: number[];
+  possible: number[];
+}
+
+interface RandrExtension {
+  events: {
+    RRScreenChangeNotify: 0
+  },
+  NotifyMask: {
+    ScreenChange: 1,
+    CrtcChange: 2,
+    OutputChange: 4,
+    OutputProperty: 8,
+    All: 15
+  },
+  Rotation: {
+    Rotate_0: 1,
+    Rotate_90: 2,
+    Rotate_180: 4,
+    Rotate_270: 8,
+    Reflect_X: 16,
+    Reflect_Y: 32
+  },
+  ConfigStatus: {
+    Sucess: 0,
+    InvalidConfigTime: 1,
+    InvalidTime: 2,
+    Failed: 3
+  },
+  ModeFlag: {
+    HSyncPositive: 1,
+    HSyncNegative: 2,
+    VSyncPositive: 4,
+    VSyncNegative: 8,
+    Interlace: 16,
+    DoubleScan: 32,
+    CSync: 64,
+    CSyncPositive: 128,
+    CSyncNegative: 256,
+    HSkewPresent: 512,
+    BCast: 1024,
+    PixelMultiplex: 2048,
+    DoubleClock: 4096,
+    ClockDivideBy2: 8192
+  },
+
+  QueryVersion(clientMaj: number, clientMin: number, callback: XCbWithErr<[unknown]>): void;
+  //SetScreenConfig(win, ts, configTs, sizeId, rotation, rate, cb): void;
+  //SelectInput(win, mask): void;
+  GetScreenInfo(win: number, cb: XCbWithErr<[info: XRandrScreenInfo]>): void;
+  GetScreenResources(win: number, cb: XCbWithErr<[res: XRandrScreenResources]>): void;
+  GetOutputInfo(output: number, ts: number, cb: XCbWithErr<[info: XRandrOutputInfo]>): void;
+  GetCrtcInfo(crtc: number, configTs: number, cb: XCbWithErr<[info: XRandrCtrcInfo]>): void;
+}
+
+export type XRandrExtension = XExtension<RandrExtension>;
+
+export interface XineramaScreenInfo {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface XineramaExtension {
+  major: number;
+  minor: number;
+
+  QueryVersion(clientMaj: number, clientMin: number, callback: XCbWithErr<[[major: number, minor: number]]>): void;
+  IsActive(callback: XCbWithErr<[isActive: boolean]>): void;
+  QueryScreens(callback: XCbWithErr<[info: XineramaScreenInfo[]]>): void;
+}
+
+export type XXineramaExtension = XExtension<XineramaExtension>;
 
 export interface XGeometry {
   windowid: number;
@@ -192,7 +344,16 @@ enum XFocusRevertTo {
   Parent = 2,
 }
 
-export type XCbWithErr<TArgs extends any[]> = (err: unknown, ...args: TArgs) => void;
+interface UnpackStream {
+  pack(format: string, args: any[]): void;
+  flush(): void;
+}
+
+export interface XBuffer {
+  unpack(format: string, offset?: number): any[];
+}
+
+export type XCbWithErr<TArgs extends any[], TError = unknown> = (err: TError, ...args: TArgs) => void;
 
 export type Atom = number;
 
@@ -273,6 +434,14 @@ export interface IXClient {
 
   event_consumers: { [wid: number]: any };
 
+  seq_num: number;
+  pack_stream: UnpackStream;
+  replies: { [seq_num: number]: any[] };
+
+  _extensions: { [name: string]: unknown };
+
+  require<T>(extensionName: string, callback: XCbWithErr<[ext: T]>): void;
+
   AllocColor(...args: unknown[]): unknown;
   AllocID(): number;
   AllowEvents(...args: unknown[]): unknown;
@@ -327,7 +496,7 @@ export interface IXClient {
   PolyLine(...args: unknown[]): unknown;
   PolyText8(drawable: unknown, gc: unknown, x: number, y: number, items: unknown): void;
   PutImage(format: unknown, drawable: unknown, gc: unknown, width: number, height: number, dstX: number, dstY: number, leftPad: unknown, depth: unknown, dataBuffer: Buffer): void;
-  QueryExtension(callback: (extDescription: unknown) => void): void;
+  QueryExtension<T>(name: string, callback: XCbWithErr<[ext: XExtension<T>]>): void;
   QueryPointer(winId: number): void;
   QueryTree(winId: number, callback: XCbWithErr<[result: XQueryTreeResult]>): void;
   RaiseWindow(winId: number): void;

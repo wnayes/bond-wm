@@ -1,9 +1,14 @@
-import { IGeometry, IWindow } from "./reducers";
+import { IGeometry, IScreen, IWindow } from "./reducers";
 
-export function addScreen(screen: { width: number, height: number }) {
+type AddScreenProps = Pick<IScreen, "x" | "y" | "width" | "height" | "root">;
+
+export function addScreen(screen: AddScreenProps) {
   return {
     type: "ADD_SCREEN",
     payload: {
+      root: screen.root,
+      x: screen.x,
+      y: screen.y,
       width: screen.width,
       height: screen.height,
     }
