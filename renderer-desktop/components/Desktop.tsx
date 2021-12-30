@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useSelector } from "react-redux";
+import { RootState } from "../../renderer-shared/configureStore";
 import { selectRelevantWindows } from "../../renderer-shared/selectors";
 
 import { Taskbar } from "./Taskbar";
@@ -11,7 +12,7 @@ export interface IDesktopProps {
 }
 
 export function Desktop({ screenIndex }: IDesktopProps) {
-  const windows = useSelector(selectRelevantWindows);
+  const windows = useSelector((state: RootState) => selectRelevantWindows(state, screenIndex));
 
   return (
     <div id="desktop">

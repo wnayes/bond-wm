@@ -47,7 +47,7 @@ function screens(state: IScreen[] = [], action: any) {
         });
         return newState;
       }
-    case "SET_WORK_AREA":
+    case "CONFIGURE_SCREEN_WORK_AREA":
       {
         let newState = state.slice();
         newState[action.payload.screenIndex] = { ...newState[action.payload.screenIndex] };
