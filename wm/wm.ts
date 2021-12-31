@@ -11,10 +11,9 @@ const x11 = require("x11");
 
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient,
-  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState, XRandrExtension } from "../shared/X";
+  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState, XCB_EVENT_MASK_NO_EVENT } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
-import { getFirstTagName } from "../shared/tags";
 import { batch } from "react-redux";
 import { anyIntersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
@@ -69,6 +68,9 @@ export function createServer(): XServer {
   // The values here are arbitrary; we call InternAtom to get the true constants.
   const ExtraAtoms = {
     UTF8_STRING: -1,
+
+    WM_PROTOCOLS: 10000,
+    WM_DELETE_WINDOW: 10001,
 
     _NET_WM_NAME: 340,
   } as const;
@@ -130,6 +132,9 @@ export function createServer(): XServer {
     // TODO: Typings are a little awkward here.
     const extraAtoms = (ExtraAtoms as Mutable<typeof ExtraAtoms>);
     extraAtoms.UTF8_STRING = await internAtomAsync("UTF8_STRING") as any;
+
+    extraAtoms.WM_PROTOCOLS = await internAtomAsync("WM_PROTOCOLS") as any;
+    extraAtoms.WM_DELETE_WINDOW = await internAtomAsync("WM_DELETE_WINDOW") as any;
 
     extraAtoms._NET_WM_NAME = await internAtomAsync("_NET_WM_NAME") as any;
 
@@ -962,33 +967,26 @@ export function createServer(): XServer {
   }
 
   function XGetWMProtocols(wid: number, callback: XCbWithErr<[number[] | void]>) {
-    X.InternAtom(true, "WM_PROTOCOLS", (err, atom) => {
+    X.GetProperty(0, wid, ExtraAtoms.WM_PROTOCOLS, 0, 0, 10000000, (err, prop) => {
       if (err) {
         callback(err);
         return;
       }
 
-      X.GetProperty(0, wid, atom, 0, 0, 10000000, (err, prop) => {
-        if (err) {
-          callback(err);
+      const protocols = [];
+      if (prop && prop.data && prop.data.length) {
+        const len = prop.data.length;
+        if (len % 4) {
+          callback("Bad length on WM protocol buffer");
           return;
         }
 
-        const protocols = [];
-        if (prop && prop.data && prop.data.length) {
-          const len = prop.data.length;
-          if (len % 4) {
-            callback("Bad length on WM protocol buffer");
-            return;
-          }
-
-          for (let i = 0; i < len; i += 4) {
-            protocols.push(prop.data.readUInt32LE(i));
-          }
+        for (let i = 0; i < len; i += 4) {
+          protocols.push(prop.data.readUInt32LE(i));
         }
+      }
 
-        callback(null, protocols);
-      });
+      callback(null, protocols);
     });
   }
 
@@ -999,23 +997,23 @@ export function createServer(): XServer {
       }
       if (args && args.supported) {
         const eventData = Buffer.alloc(32);
-        eventData.writeUInt8(33, 0); // Event Type 33 = ClientMessage
+        eventData.writeUInt8(X11_EVENT_TYPE.ClientMessage, 0); // Event Type 33 = ClientMessage
         eventData.writeUInt8(32, 1); // Format
         eventData.writeUInt32LE(wid, 4); // Window ID
-        eventData.writeUInt32LE(args.atom as number, 8); // Message Type
-        console.log("Sending graceful kill", wid, eventData);
-        X.SendEvent(wid, false, 0, eventData);
-
-        X.KillClient(wid); // TODO: Above isn't working
+        eventData.writeUInt32LE(ExtraAtoms.WM_PROTOCOLS, 8); // Message Type
+        eventData.writeUInt32LE(ExtraAtoms.WM_DELETE_WINDOW, 12); // data32[0]
+        // Also send a timestamp in data32[1]?
+        log(wid, "Sending graceful kill", eventData);
+        X.SendEvent(wid, false, XCB_EVENT_MASK_NO_EVENT, eventData);
       }
       else {
-        console.log("Killing window client", wid);
+        log(wid, "Killing window client");
         X.KillClient(wid);
       }
     });
   }
 
-  function supportsGracefulDestroy(wid: number, callback: XCbWithErr<[{ atom: unknown, supported: boolean } | void]>) {
+  function supportsGracefulDestroy(wid: number, callback: XCbWithErr<[{ supported: boolean } | void]>) {
     XGetWMProtocols(wid, (err, protocols) => {
       if (err) {
         console.error("XGetWMProtocols error", err);
@@ -1023,16 +1021,8 @@ export function createServer(): XServer {
         return;
       }
 
-      X.InternAtom(true, "WM_DELETE_WINDOW", (err: unknown, atom) => {
-        if (err) {
-          callback(err);
-          return;
-        }
-
-        callback(null, {
-          atom: atom,
-          supported: !!protocols && protocols.indexOf(atom as number) >= 0
-        });
+      callback(null, {
+        supported: !!protocols && protocols.indexOf(ExtraAtoms.WM_DELETE_WINDOW) >= 0
       });
     });
   }

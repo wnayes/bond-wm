@@ -11,9 +11,12 @@ let store = configureStore();
 (window as any).store = store;
 setupIpc(store);
 
+const screenIndex = getScreenIndex();
+console.log(screenIndex);
+
 ReactDOM.render(
   <Provider store={store}>
-    <Desktop screenIndex={getScreenIndex()} />
+    <Desktop screenIndex={screenIndex} />
   </Provider>,
   document.getElementById("content")
 );

@@ -30,6 +30,7 @@ export enum X11_EVENT_TYPE {
   SelectionRequest = 30,
   SelectionNotify = 31,
   ColormapNotify = 32,
+  /** XCB_CLIENT_MESSAGE */
   ClientMessage = 33,
   MappingNotify = 34,
   GenericEvent = 35
@@ -45,6 +46,8 @@ export enum X11_KEY_MODIFIER {
   Mod4Mask = (1<<6),
   Mod5Mask = (1<<7)
 };
+
+export const XCB_EVENT_MASK_NO_EVENT = 0;
 
 // Event masks
 //  KeyPress = 1,
