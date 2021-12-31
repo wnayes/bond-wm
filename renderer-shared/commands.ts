@@ -15,3 +15,7 @@ export function closeWindow(wid: number) {
 export function exec(executable: string, args?: string) {
     ipcRenderer.send("exec", { executable, args });
 };
+
+export function showDevTools(screenIndex: number): void {
+    ipcRenderer.send("show-desktop-dev-tools", { screenIndex });
+};

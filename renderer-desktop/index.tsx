@@ -4,19 +4,18 @@ import { Provider } from "react-redux";
 import { Desktop } from "./components/Desktop";
 import { configureStore } from "../renderer-shared/configureStore";
 import { setupIpc } from "../renderer-shared/ipcRenderer";
+import { hookShortcuts } from "./shortcuts";
+import { getScreenIndex } from "./utils";
 
 let store = configureStore();
 (window as any).store = store;
-
-const urlParams = new URLSearchParams(window.location.search);
-const screen = parseInt(urlParams.get("screen"), 10);
-console.log("screen", screen);
+setupIpc(store);
 
 ReactDOM.render(
   <Provider store={store}>
-    <Desktop screenIndex={screen} />
+    <Desktop screenIndex={getScreenIndex()} />
   </Provider>,
   document.getElementById("content")
 );
 
-setupIpc(store);
+hookShortcuts(document.body);

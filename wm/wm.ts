@@ -120,6 +120,10 @@ export function createServer(): XServer {
     ipcMain.on("exec", (event, args) => {
       launchProcess(args.executable);
     });
+
+    ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
+      desktopBrowsers[args.screenIndex]?.webContents?.openDevTools();
+    });
   })();
 
   async function __setupAtoms(): Promise<void> {
@@ -261,9 +265,6 @@ export function createServer(): XServer {
     win.on("closed", function () {
       desktopBrowsers[index] = null;
     });
-
-    // Open the DevTools.
-    win.webContents.openDevTools();
 
     return handle;
   }
