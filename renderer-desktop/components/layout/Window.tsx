@@ -20,10 +20,9 @@ export function Window({ window }: IWindowProps) {
   };
 
   useLayoutEffect(() => {
-    const box = winEl.current!;
-    const clientRect = box.getBoundingClientRect();
+    const clientRect = winEl.current?.getBoundingClientRect();
 
-    if (window) {
+    if (window && clientRect) {
       if (geometriesDiffer(window.outer, clientRect)) {
         store.dispatch(actions.configureWindow(window.id, clientRect));
       }

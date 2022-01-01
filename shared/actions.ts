@@ -1,4 +1,4 @@
-import { IGeometry, IScreen, IWindow } from "./reducers";
+import { IBounds, IGeometry, IScreen, IWindow } from "./reducers";
 
 type AddScreenProps = Pick<IScreen, "x" | "y" | "width" | "height" | "root">;
 
@@ -62,7 +62,7 @@ export function configureWindow(wid: number, config: IGeometry) {
   };
 }
 
-export function configureInnerWindow(wid: number, config: any) {
+export function configureInnerWindow(wid: number, config: IBounds) {
   return {
     type: "CONFIGURE_INNER_WINDOW",
     payload: Object.assign(

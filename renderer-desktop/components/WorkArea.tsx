@@ -23,10 +23,9 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
   useWindowSize(); // To trigger size recalculations.
 
   useLayoutEffect(() => {
-    const box = workAreaDiv.current!;
-    const clientRect = box.getBoundingClientRect();
+    const clientRect = workAreaDiv.current?.getBoundingClientRect();
 
-    if (screen) {
+    if (screen && clientRect) {
       if (geometriesDiffer(screen.workArea, clientRect)) {
         store.dispatch(actions.configureScreenWorkArea(screenIndex, clientRect));
       }

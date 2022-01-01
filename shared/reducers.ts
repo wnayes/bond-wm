@@ -1,11 +1,20 @@
 import { combineReducers } from "redux";
 import { getFirstTagName, getTagNames } from "./tags";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface IGeometry {
   x: number;
   y: number;
   width: number;
   height: number;
+}
+
+export interface IBounds {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
 }
 
 export interface IScreen {
@@ -21,10 +30,10 @@ export interface IScreen {
   currentTags: string[];
 }
 
-function screens(state: IScreen[] = [], action: any) {
+function screens(state: IScreen[] = [], action: { type: string; payload: any }) {
   switch (action.type) {
     case "ADD_SCREEN": {
-      let newState = state.slice();
+      const newState = state.slice();
       newState.push({
         root: action.payload.root,
 
@@ -47,7 +56,7 @@ function screens(state: IScreen[] = [], action: any) {
       return newState;
     }
     case "CONFIGURE_SCREEN_WORK_AREA": {
-      let newState = state.slice();
+      const newState = state.slice();
       newState[action.payload.screenIndex] = {
         ...newState[action.payload.screenIndex],
       };
@@ -61,7 +70,7 @@ function screens(state: IScreen[] = [], action: any) {
     }
 
     case "SET_CURRENT_TAGS": {
-      let newState = state.slice();
+      const newState = state.slice();
       newState[action.payload.screenIndex] = {
         ...newState[action.payload.screenIndex],
       };
@@ -76,18 +85,8 @@ function screens(state: IScreen[] = [], action: any) {
 
 export interface IWindow {
   id: number;
-  outer: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-  inner: {
-    top: number;
-    left: number;
-    right: number;
-    bottom: number;
-  };
+  outer: IGeometry;
+  inner: IBounds;
   visible: boolean;
   focused: boolean;
   decorated: boolean;

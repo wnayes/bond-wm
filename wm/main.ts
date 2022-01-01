@@ -1,7 +1,5 @@
 import { app, dialog } from "electron";
-import { startX, XServer } from "./wm";
-
-let server: XServer;
+import { startX } from "./wm";
 
 // Disable error dialogs by override
 dialog.showErrorBox = function (title, content) {
@@ -19,5 +17,5 @@ app.on("window-all-closed", function () {
 });
 
 app.on("ready", function () {
-  server = startX();
+  startX();
 });

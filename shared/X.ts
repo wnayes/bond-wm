@@ -50,31 +50,33 @@ export enum X11_KEY_MODIFIER {
 export const XCB_EVENT_MASK_NO_EVENT = 0;
 
 // Event masks
-//  KeyPress = 1,
-//   KeyRelease = 2,
-//   ButtonPress = 4,
-//   ButtonRelease = 8,
-//   EnterWindow = 16,
-//   LeaveWindow = 32,
-//   PointerMotion = 64,
-//   PointerMotionHint = 128,
-//   Button1Motion = 256,
-//   Button2Motion = 512,
-//   Button3Motion = 1024,
-//   Button4Motion = 2048,
-//   Button5Motion = 4096,
-//   ButtonMotion = 8192,
-//   KeymapState = 16384,
-//   Exposure = 32768,
-//   VisibilityChange = 65536,
-//   StructureNotify = 131072,
-//   ResizeRedirect = 262144,
-//   SubstructureNotify = 524288,
-//   SubstructureRedirect = 1048576,
-//   FocusChange = 2097152,
-//   PropertyChange = 4194304,
-//   ColormapChange = 8388608,
-//   OwnerGrabButton = 16777216
+export enum XEventMask {
+  KeyPress = 1,
+  KeyRelease = 2,
+  ButtonPress = 4,
+  ButtonRelease = 8,
+  EnterWindow = 16,
+  LeaveWindow = 32,
+  PointerMotion = 64,
+  PointerMotionHint = 128,
+  Button1Motion = 256,
+  Button2Motion = 512,
+  Button3Motion = 1024,
+  Button4Motion = 2048,
+  Button5Motion = 4096,
+  ButtonMotion = 8192,
+  KeymapState = 16384,
+  Exposure = 32768,
+  VisibilityChange = 65536,
+  StructureNotify = 131072,
+  ResizeRedirect = 262144,
+  SubstructureNotify = 524288,
+  SubstructureRedirect = 1048576,
+  FocusChange = 2097152,
+  PropertyChange = 4194304,
+  ColormapChange = 8388608,
+  OwnerGrabButton = 16777216,
+}
 
 export interface IXEvent {
   type: number;
@@ -348,15 +350,15 @@ enum XFocusRevertTo {
 }
 
 interface UnpackStream {
-  pack(format: string, args: any[]): void;
+  pack(format: string, args: unknown[]): void;
   flush(): void;
 }
 
 export interface XBuffer {
-  unpack(format: string, offset?: number): any[];
+  unpack(format: string, offset?: number): number[];
 }
 
-export type XCbWithErr<TArgs extends any[], TError = unknown> = (err: TError, ...args: TArgs) => void;
+export type XCbWithErr<TArgs extends unknown[], TError = unknown> = (err: TError, ...args: TArgs) => void;
 
 export type Atom = number;
 
@@ -435,13 +437,11 @@ export interface XStandardAtoms {
 export interface IXClient {
   atoms: XStandardAtoms;
 
-  event_consumers: { [wid: number]: any };
+  event_consumers: { [wid: number]: unknown };
 
   seq_num: number;
   pack_stream: UnpackStream;
-  replies: { [seq_num: number]: any[] };
-
-  _extensions: { [name: string]: unknown };
+  replies: { [seq_num: number]: unknown[] };
 
   require<T>(extensionName: string, callback: XCbWithErr<[ext: T]>): void;
 
@@ -563,4 +563,14 @@ export interface IXClient {
   UngrabServer(...args: unknown[]): unknown;
   UnmapWindow(winId: number): void;
   WarpPointer(...args: unknown[]): unknown;
+}
+
+export interface IX11Client {
+  on(eventName: string, callback: (...args: unknown[]) => void): void;
+}
+
+export interface IX11Mod {
+  eventMask: typeof XEventMask;
+
+  createClient(callback: XCbWithErr<[display: IXDisplay]>): IX11Client;
 }

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
+import { RootState } from "../../renderer-shared/configureStore";
 import { useWindowSize } from "../../renderer-shared/hooks";
 import * as actions from "../../shared/actions";
 
@@ -20,7 +21,7 @@ export function WindowFrame(props: IWindowFrameProps) {
   const winBox = useRef<HTMLDivElement>();
 
   const store = useStore();
-  const window = useSelector((state: any) => state.windows[wid]);
+  const window = useSelector((state: RootState) => state.windows[wid]);
 
   let className = "winWrapper";
   if (window?.focused) {
@@ -35,7 +36,12 @@ export function WindowFrame(props: IWindowFrameProps) {
   useWindowSize(); // Triggers re-renders on resize.
 
   useLayoutEffect(() => {
-    const box = winBox.current!;
+    const box = winBox.current;
+    if (!box) {
+      return;
+    }
+
+    // eslint-disable-next-line prefer-const
     let { top, left, right, bottom } = box.getBoundingClientRect();
 
     const { right: bodyRight, bottom: bodyBottom } = document.body.getBoundingClientRect();

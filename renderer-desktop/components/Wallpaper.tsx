@@ -12,7 +12,10 @@ export function Wallpaper() {
     // https://github.com/roytanck/wallpaper-generator
     // GPL-3.0 License is included at the bottom of this file,
     // and applies only to this algorithm.
-    const canvas = canvasRef.current!;
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
     const ctx = canvas.getContext("2d");
 
     // line segments (either few, or fluent lines (200))
@@ -33,17 +36,17 @@ export function Wallpaper() {
     ctx.fillRect(0, 0, width, height);
 
     for (let l = 0; l < layers; l++) {
-      let h = hueStart + (l + 1) * hueIncrement;
-      let s = sat;
-      let v = light + (l + 1) * lightIncrement;
+      const h = hueStart + (l + 1) * hueIncrement;
+      const s = sat;
+      const v = light + (l + 1) * lightIncrement;
       ctx.fillStyle = "hsl( " + h + ", " + s + "%, " + v + "% )";
       ctx.beginPath();
-      let layerOffset = offset + offsetIncrement * l;
-      let offsetY = (l + 0.5) * (height / layers);
-      let startY = offsetY + ampl * Math.sin(layerOffset / wavelength);
+      const layerOffset = offset + offsetIncrement * l;
+      const offsetY = (l + 0.5) * (height / layers);
+      const startY = offsetY + ampl * Math.sin(layerOffset / wavelength);
       ctx.moveTo(0, startY);
       for (let i = 0; i <= segments; i++) {
-        let x = i * (width / segments);
+        const x = i * (width / segments);
         ctx.lineTo(x, startY + ampl * Math.sin((layerOffset + x) / wavelength));
       }
       ctx.lineTo(width, height);

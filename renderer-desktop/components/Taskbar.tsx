@@ -35,7 +35,7 @@ interface ITaskListProps {
 function TaskList(props: ITaskListProps) {
   const windows = props.windows;
   const entries = [];
-  for (let win of windows) {
+  for (const win of windows) {
     entries.push(<TaskListEntry key={win.id} window={win} />);
   }
   return <div className="tasklist">{entries}</div>;
@@ -63,9 +63,7 @@ function TaskListEntry(props: ITaskListEntryProps) {
   );
 }
 
-interface IRunFieldProps {}
-
-function RunField(props: IRunFieldProps) {
+function RunField() {
   const field = useRef<HTMLInputElement>();
 
   const [text, setText] = useState("");
@@ -77,7 +75,7 @@ function RunField(props: IRunFieldProps) {
     dispatch(actions.toggleTaskbarRunField(false));
   };
 
-  const onChange = (event: any) => {
+  const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setText(event.target.value);
   };
 
@@ -100,7 +98,7 @@ function RunField(props: IRunFieldProps) {
   };
 
   useEffect(() => {
-    field.current!.focus();
+    field.current?.focus();
   }, []);
 
   return (

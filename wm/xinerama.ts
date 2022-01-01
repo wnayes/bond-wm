@@ -17,7 +17,7 @@ export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXi
       X.seq_num++;
       X.pack_stream.pack("CCSCCxx", [ext.majorOpcode, 0, 2, clientMaj, clientMin]);
       X.replies[X.seq_num] = [
-        function (buf: XBuffer, opt: number) {
+        function (buf: XBuffer) {
           const res = buf.unpack("SSLLLLL");
           return res.slice(0, 2); // Remove unused values
         },
@@ -30,7 +30,7 @@ export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXi
       X.seq_num++;
       X.pack_stream.pack("CCS", [ext.majorOpcode, 4, 1]);
       X.replies[X.seq_num] = [
-        function (buf: XBuffer, opt: number) {
+        function (buf: XBuffer) {
           const res = buf.unpack("LLLLLL");
           console.log(res);
           return res[0] === 1;
@@ -44,11 +44,11 @@ export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXi
       X.seq_num++;
       X.pack_stream.pack("CCS", [ext.majorOpcode, 5, 1]);
       X.replies[X.seq_num] = [
-        function (buf: XBuffer, opt: number) {
+        function (buf: XBuffer) {
           const res = buf.unpack("LLLLLL");
           const count = res[0];
 
-          let infos: XineramaScreenInfo[] = [];
+          const infos: XineramaScreenInfo[] = [];
           for (let i = 0; i < count; i++) {
             const res = buf.unpack("ssSS", 6 * 4 + i * 8);
             infos.push({

@@ -1,14 +1,13 @@
 // This file is pretty messy, it is just a prototype for now!
 
+const x11: IX11Mod = require("x11"); // eslint-disable-line
+
 import { app, ipcMain, BrowserWindow } from "electron";
 import type { IWindow } from "../shared/reducers";
-
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
 import { Mutable } from "type-fest";
-const x11 = require("x11");
-
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import {
   X11_EVENT_TYPE,
@@ -27,6 +26,9 @@ import {
   XStandardAtoms,
   XMapState,
   XCB_EVENT_MASK_NO_EVENT,
+  IX11Mod,
+  XEventMask,
+  IX11Client,
 } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
@@ -65,7 +67,7 @@ export class XServer {
 
 export function createServer(): XServer {
   const server = new XServer();
-  let client: any;
+  let client: IX11Client;
 
   let XDisplay: IXDisplay;
   let X: IXClient;
@@ -73,13 +75,14 @@ export function createServer(): XServer {
   const knownWids = new Set<number>();
 
   const desktopBrowsers: BrowserWindow[] = [];
-  const desktopBrowserHandles: { [did: number]: any } = {};
+  /** Desktop window handle to index into `desktopBrowsers`. */
+  const desktopBrowserHandles: { [did: number]: number } = {};
 
   const frameBrowserWindows: { [wid: number]: BrowserWindow | undefined } = {};
   const frameBrowserWinIdToFrameId: { [wid: number]: number | undefined } = {};
   const frameBrowserFrameIdToWinId: { [fid: number]: number | undefined } = {};
 
-  const initializingWins: { [win: number]: any } = {};
+  const initializingWins: { [win: number]: boolean } = {};
 
   const store = __setupStore();
 
@@ -109,8 +112,6 @@ export function createServer(): XServer {
 
       XDisplay = display;
       X = display.client;
-
-      console.log(X._extensions);
 
       await __setupAtoms();
       await __initDesktop();
@@ -150,6 +151,7 @@ export function createServer(): XServer {
 
   async function __setupAtoms(): Promise<void> {
     // TODO: Typings are a little awkward here.
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const extraAtoms = ExtraAtoms as Mutable<typeof ExtraAtoms>;
     extraAtoms.UTF8_STRING = (await internAtomAsync("UTF8_STRING")) as any;
 
@@ -159,6 +161,7 @@ export function createServer(): XServer {
     extraAtoms._NET_WM_NAME = (await internAtomAsync("_NET_WM_NAME")) as any;
 
     console.log("ExtraAtoms", extraAtoms);
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }
 
   function internAtomAsync(name: string): Promise<number> {
@@ -234,10 +237,10 @@ export function createServer(): XServer {
       tree.children.forEach((childWid) => manageWindow(childWid, true));
     });
 
-    for (let modifier in registeredKeys) {
+    for (const modifier in registeredKeys) {
       if (!registeredKeys.hasOwnProperty(modifier)) continue;
 
-      for (let key in registeredKeys[modifier]) {
+      for (const key in registeredKeys[modifier]) {
         if (!registeredKeys[modifier].hasOwnProperty(key)) continue;
 
         X.GrabKey(root, true, parseInt(modifier), parseInt(key), 1 /* Async */, 1 /* Async */);
@@ -274,7 +277,7 @@ export function createServer(): XServer {
       },
     });
 
-    let index = desktopBrowsers.length;
+    const index = desktopBrowsers.length;
     desktopBrowsers[index] = win;
 
     const url = path.join(__dirname, "../renderer-desktop/index.html") + "?screen=" + index;
@@ -547,11 +550,11 @@ export function createServer(): XServer {
     };
   }
 
-  function changeWindowEventMask(wid: number, eventMask: any): Promise<void> {
+  function changeWindowEventMask(wid: number, eventMask: XEventMask): Promise<void> {
     return new Promise((resolve, reject) => {
       let failed;
       console.log("Changing event mask for", wid, eventMask);
-      X.ChangeWindowAttributes(wid, { eventMask }, (err: any) => {
+      X.ChangeWindowAttributes(wid, { eventMask }, (err: { error: number }) => {
         if (err && err.error === 10) {
           console.error(`Error for ${wid}: Another window manager already running.`);
           reject(err);
@@ -698,7 +701,7 @@ export function createServer(): XServer {
     log(wid, "onEnterNotify", ev);
 
     const isFrame = isFrameBrowserWin(wid);
-    let window = isFrame ? getWindowIdFromFrameId(wid) : wid;
+    const window = isFrame ? getWindowIdFromFrameId(wid) : wid;
 
     changeFocus(window);
   }
@@ -870,7 +873,7 @@ export function createServer(): XServer {
             return;
           }
 
-          let buffer = prop.data;
+          const buffer = prop.data;
           if (buffer && buffer.length) {
             if (buffer[0] === 0x02) {
               // Specifying decorations
@@ -924,7 +927,7 @@ export function createServer(): XServer {
    * represented within a single screen.
    */
   function getScreenGeometries(screen: IXScreen): Promise<Geometry[]> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const defaultGeometry: Geometry = {
         x: 0,
         y: 0,
@@ -978,8 +981,8 @@ export function createServer(): XServer {
   //}
 
   function getFocusedWindow() {
-    let windows = store.getState().windows;
-    for (let wid in windows) {
+    const windows = store.getState().windows;
+    for (const wid in windows) {
       if (windows[wid].focused) return parseInt(wid);
     }
     return null;
@@ -1046,8 +1049,8 @@ export function createServer(): XServer {
   }
 
   function raiseWindow(wid: number) {
-    let windows = store.getState().windows;
-    let window = windows[wid];
+    const windows = store.getState().windows;
+    const window = windows[wid];
 
     if (!window.visible) {
       showWindow(wid);
@@ -1063,8 +1066,8 @@ export function createServer(): XServer {
     unsetFocus();
   }
 
-  function log(wid: number, ...args: any[]): void {
-    let details = [];
+  function log(wid: number, ...args: unknown[]): void {
+    const details = [];
     if (typeof wid === "number") {
       details.push(wid);
 
@@ -1097,7 +1100,7 @@ export function createServer(): XServer {
       };
     };
 
-    const x11Middleware: Middleware<{}, ServerRootState> = function ({ getState }) {
+    const x11Middleware: Middleware<unknown, ServerRootState> = function ({ getState }) {
       return (next) => (action) => {
         const returnValue = next(action);
 

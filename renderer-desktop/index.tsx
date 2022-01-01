@@ -7,8 +7,8 @@ import { setupIpc } from "../renderer-shared/ipcRenderer";
 import { hookShortcuts } from "./shortcuts";
 import { getScreenIndex } from "./utils";
 
-let store = configureStore();
-(window as any).store = store;
+const store = configureStore();
+(window as any).store = store; // eslint-disable-line
 setupIpc(store);
 
 const screenIndex = getScreenIndex();
