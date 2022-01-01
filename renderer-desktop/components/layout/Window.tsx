@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { useStore } from "react-redux";
 import { IWindow } from "../../../shared/reducers";
 import * as actions from "../../../shared/actions";
+import { geometriesDiffer } from "../../../shared/utils";
 
 export interface IWindowProps {
     window: IWindow;
@@ -20,14 +21,11 @@ export function Window({ window }: IWindowProps) {
 
     useLayoutEffect(() => {
         const box = winEl.current!;
-        let { x, y, width, height } = box.getBoundingClientRect();
+        const clientRect = box.getBoundingClientRect();
 
         if (window) {
-          if (window.outer.x !== x
-            || window.outer.y !== y
-            || window.outer.width !== width
-            || window.outer.height !== height) {
-              store.dispatch(actions.configureWindow(window.id, { x, y, width, height }));
+          if (geometriesDiffer(window.outer, clientRect)) {
+            store.dispatch(actions.configureWindow(window.id, clientRect));
           }
         }
     });

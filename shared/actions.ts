@@ -18,9 +18,13 @@ export function addScreen(screen: AddScreenProps) {
 export function configureScreenWorkArea(screenIndex: number, config: IGeometry) {
   return {
     type: "CONFIGURE_SCREEN_WORK_AREA",
-    payload: Object.assign({
-      screenIndex
-    }, config)
+    payload: {
+      screenIndex,
+      x: config.x,
+      y: config.y,
+      width: config.width,
+      height: config.height,
+    },
   };
 }
 
@@ -48,9 +52,13 @@ export function removeWindow(wid: number) {
 export function configureWindow(wid: number, config: IGeometry) {
   return {
     type: "CONFIGURE_WINDOW",
-    payload: Object.assign({
-      wid
-    }, config)
+    payload: {
+      wid,
+      x: config.x,
+      y: config.y,
+      width: config.width,
+      height: config.height,
+    },
   };
 }
 

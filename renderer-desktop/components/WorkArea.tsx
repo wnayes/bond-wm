@@ -7,6 +7,7 @@ import { Layout } from "./layout/Layout";
 import { useWindowSize } from "../../renderer-shared/hooks";
 import { Wallpaper } from "./Wallpaper";
 import { IWindow } from "../../shared/reducers";
+import { geometriesDiffer } from "../../shared/utils";
 
 export interface IWorkAreaProps {
   screenIndex: number;
@@ -23,14 +24,11 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
   useLayoutEffect(() => {
     const box = workAreaDiv.current!;
-    let { x, y, width, height } = box.getBoundingClientRect();
+    const clientRect = box.getBoundingClientRect();
 
     if (screen) {
-      if (screen.workArea.x !== x
-        || screen.workArea.y !== y
-        || screen.workArea.width !== width
-        || screen.workArea.height !== height) {
-          store.dispatch(actions.configureScreenWorkArea(screenIndex, { x, y, width, height }));
+      if (geometriesDiffer(screen.workArea, clientRect)) {
+        store.dispatch(actions.configureScreenWorkArea(screenIndex, clientRect));
       }
     }
   });
