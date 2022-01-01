@@ -1,7 +1,7 @@
 
 import { configureStore } from "../renderer-shared/configureStore";
 import { setupIpc } from "../renderer-shared/ipcRenderer";
-import { setupWindowComponent } from "./components/Window"
+import { setupWindowComponent } from "./components/WindowSetup"
 
 const store = configureStore();
 setupIpc(store);

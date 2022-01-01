@@ -1,35 +1,34 @@
 import * as React from "react";
+import { useCallback } from "react";
 import { closeWindow } from "../../renderer-shared/commands";
+import { IWindow } from "../../shared/reducers";
 
 interface ITitleBarProps {
-  window: any;
+  window: IWindow;
 }
 
-export class TitleBar extends React.Component<ITitleBarProps> {
-  render() {
-    const window = this.props.window;
-    return (
-      <div className="winTitleBar">
-          <span className="winTitleBarText">{window.title}</span>
-          <TitleBarCloseButton window={window} />
-      </div>
-    );
-  }
+export function TitleBar(props: ITitleBarProps) {
+  const window = props.window;
+  return (
+    <div className="winTitleBar">
+        <span className="winTitleBarText">{window.title}</span>
+        <TitleBarCloseButton window={window} />
+    </div>
+  );
 }
 
 interface ITitleBarCloseButtonProps {
-  window: any;
+  window: IWindow;
 }
 
-class TitleBarCloseButton extends React.Component<ITitleBarCloseButtonProps> {
-  render() {
-    const window = this.props.window;
-    return (
-      <div className="winTitleBarCloseBtn" onClick={this.onClick.bind(this)}>X</div>
-    );
-  }
+function TitleBarCloseButton(props: ITitleBarCloseButtonProps) {
+  const window = props.window;
 
-  onClick() {
-    closeWindow(this.props.window.id);
-  }
+  const onClick = useCallback(() => {
+    closeWindow(window.id);
+  }, [window]);
+
+  return (
+    <div className="winTitleBarCloseBtn" onClick={onClick}>X</div>
+  );
 }

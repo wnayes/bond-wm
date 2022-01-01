@@ -6,11 +6,14 @@ import * as actions from "../../shared/actions";
 
 import { TitleBar } from "./TitleBar";
 
-interface IWindowWrapperProps {
+interface IWindowFrameProps {
   wid: number;
 }
 
-export function WindowWrapper(props: IWindowWrapperProps) {
+/**
+ * Component that renders a window frame around a client window.
+ */
+export function WindowFrame(props: IWindowFrameProps) {
   const { wid } = props;
 
   const rootDiv = useRef<HTMLDivElement>();
@@ -58,5 +61,3 @@ export function WindowWrapper(props: IWindowWrapperProps) {
     </div>
   );
 }
-
-module.exports = WindowWrapper;

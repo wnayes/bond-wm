@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 
 import { Provider } from "react-redux";
 
-import { WindowWrapper } from "./WindowWrapper";
+import { WindowFrame } from "./WindowFrame";
 import { Store } from "../../renderer-shared/configureStore";
 
 export function setupWindowComponent(container: HTMLElement, store: Store): void {
@@ -13,7 +13,7 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
 
     ReactDOM.render(
         <Provider store={store}>
-            <WindowWrapper wid={wid} />
+            <WindowFrame wid={wid} />
         </Provider>,
         container
     );
