@@ -1,12 +1,10 @@
 import * as React from "react";
 import { useCallback, useEffect, useRef } from "react";
 
-import moment from "moment";
-
 export function Clock() {
   const divRef = useRef<HTMLDivElement>();
 
-  const getTime = useCallback(() => moment().format("h:mm A"), []);
+  const getTime = useCallback(() => getFormattedCurrentTime(), []);
 
   const onTimeRefresh = useCallback(() => {
     if (divRef.current) {
@@ -24,4 +22,12 @@ export function Clock() {
       {getTime()}
     </div>
   );
+}
+
+function getFormattedCurrentTime(): string {
+  return new Date().toLocaleString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true
+  });
 }
