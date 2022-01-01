@@ -29,9 +29,7 @@ export function WindowFrame(props: IWindowFrameProps) {
 
   let titlebar;
   if (window?.decorated) {
-    titlebar = (
-      <TitleBar window={window} />
-    );
+    titlebar = <TitleBar window={window} />;
   }
 
   useWindowSize(); // Triggers re-renders on resize.
@@ -45,11 +43,13 @@ export function WindowFrame(props: IWindowFrameProps) {
     bottom = bodyBottom - bottom;
 
     if (window) {
-      if (window.inner.top !== top
-        || window.inner.left !== left
-        || window.inner.right !== right
-        || window.inner.bottom !== bottom) {
-          store.dispatch(actions.configureInnerWindow(wid, { top, left, right, bottom }));
+      if (
+        window.inner.top !== top ||
+        window.inner.left !== left ||
+        window.inner.right !== right ||
+        window.inner.bottom !== bottom
+      ) {
+        store.dispatch(actions.configureInnerWindow(wid, { top, left, right, bottom }));
       }
     }
   });

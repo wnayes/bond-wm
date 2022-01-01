@@ -4,10 +4,10 @@ import { IScreen, IWindow } from "../../../shared/reducers";
 import { Boxes } from "./layouts/Boxes";
 
 export interface ILayoutProps {
-    windows: IWindow[];
-    screen: IScreen;
+  windows: IWindow[];
+  screen: IScreen;
 }
 
 export const Layout: React.FC<ILayoutProps> = ({ screen, windows }) => {
-    return <Boxes windows={windows} screen={screen} />;
-}
+  return <Boxes windows={windows} screen={screen} />;
+};

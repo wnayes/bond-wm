@@ -11,8 +11,8 @@ export function TitleBar(props: ITitleBarProps) {
   const window = props.window;
   return (
     <div className="winTitleBar">
-        <span className="winTitleBarText">{window.title}</span>
-        <TitleBarCloseButton window={window} />
+      <span className="winTitleBarText">{window.title}</span>
+      <TitleBarCloseButton window={window} />
     </div>
   );
 }
@@ -29,6 +29,8 @@ function TitleBarCloseButton(props: ITitleBarCloseButtonProps) {
   }, [window]);
 
   return (
-    <div className="winTitleBarCloseBtn" onClick={onClick}>X</div>
+    <div className="winTitleBarCloseBtn" onClick={onClick}>
+      X
+    </div>
   );
 }

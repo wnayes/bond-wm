@@ -4,7 +4,7 @@ import { startX, XServer } from "./wm";
 let server: XServer;
 
 // Disable error dialogs by override
-dialog.showErrorBox = function(title, content) {
+dialog.showErrorBox = function (title, content) {
   console.error(`${title}\n${content}`);
 };
 
@@ -14,10 +14,10 @@ dialog.showErrorBox = function(title, content) {
 // catch {}
 
 // Quit when all windows are closed.
-app.on("window-all-closed", function() {
+app.on("window-all-closed", function () {
   app.quit();
 });
 
-app.on("ready", function() {
+app.on("ready", function () {
   server = startX();
 });

@@ -10,24 +10,42 @@ import { Mutable } from "type-fest";
 const x11 = require("x11");
 
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
-import { X11_EVENT_TYPE, X11_KEY_MODIFIER, IXEvent, IXConfigureEvent, IXScreen, IXDisplay, IXClient,
-  IXKeyEvent, XCbWithErr, XGeometry, XWindowAttrs, IXPropertyNotifyEvent, Atom, XStandardAtoms, XMapState, XCB_EVENT_MASK_NO_EVENT } from "../shared/X";
+import {
+  X11_EVENT_TYPE,
+  X11_KEY_MODIFIER,
+  IXEvent,
+  IXConfigureEvent,
+  IXScreen,
+  IXDisplay,
+  IXClient,
+  IXKeyEvent,
+  XCbWithErr,
+  XGeometry,
+  XWindowAttrs,
+  IXPropertyNotifyEvent,
+  Atom,
+  XStandardAtoms,
+  XMapState,
+  XCB_EVENT_MASK_NO_EVENT,
+} from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
 import { anyIntersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
 
-const registeredKeys: { [keyModifiers: number]: { [keyCode: number]: boolean } } = {
+const registeredKeys: {
+  [keyModifiers: number]: { [keyCode: number]: boolean };
+} = {
   [X11_KEY_MODIFIER.Mod4Mask]: {
-    27: true // Win + R
+    27: true, // Win + R
   },
   [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
-    24: true // Win + Shift + Q
+    24: true, // Win + Shift + Q
   },
   [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
-    27: true // Win + Ctrl + R
-  }
+    27: true, // Win + Ctrl + R
+  },
 };
 
 interface Geometry {
@@ -75,8 +93,10 @@ export function createServer(): XServer {
     _NET_WM_NAME: 340,
   } as const;
 
-  type AtomToType<TAtom> = TAtom extends XStandardAtoms["STRING"] ? string
-    : TAtom extends typeof ExtraAtoms["UTF8_STRING"] ? string
+  type AtomToType<TAtom> = TAtom extends XStandardAtoms["STRING"]
+    ? string
+    : TAtom extends typeof ExtraAtoms["UTF8_STRING"]
+    ? string
     : unknown;
 
   // Initialization.
@@ -130,13 +150,13 @@ export function createServer(): XServer {
 
   async function __setupAtoms(): Promise<void> {
     // TODO: Typings are a little awkward here.
-    const extraAtoms = (ExtraAtoms as Mutable<typeof ExtraAtoms>);
-    extraAtoms.UTF8_STRING = await internAtomAsync("UTF8_STRING") as any;
+    const extraAtoms = ExtraAtoms as Mutable<typeof ExtraAtoms>;
+    extraAtoms.UTF8_STRING = (await internAtomAsync("UTF8_STRING")) as any;
 
-    extraAtoms.WM_PROTOCOLS = await internAtomAsync("WM_PROTOCOLS") as any;
-    extraAtoms.WM_DELETE_WINDOW = await internAtomAsync("WM_DELETE_WINDOW") as any;
+    extraAtoms.WM_PROTOCOLS = (await internAtomAsync("WM_PROTOCOLS")) as any;
+    extraAtoms.WM_DELETE_WINDOW = (await internAtomAsync("WM_DELETE_WINDOW")) as any;
 
-    extraAtoms._NET_WM_NAME = await internAtomAsync("_NET_WM_NAME") as any;
+    extraAtoms._NET_WM_NAME = (await internAtomAsync("_NET_WM_NAME")) as any;
 
     console.log("ExtraAtoms", extraAtoms);
   }
@@ -150,7 +170,7 @@ export function createServer(): XServer {
         }
         resolve(atom);
       });
-    })
+    });
   }
 
   async function __initDesktop(): Promise<void> {
@@ -168,15 +188,16 @@ export function createServer(): XServer {
 
     X.GrabServer();
 
-    const rootEvents = x11.eventMask.SubstructureRedirect
-      | x11.eventMask.SubstructureNotify
-      | x11.eventMask.EnterWindow
-      | x11.eventMask.LeaveWindow
-      | x11.eventMask.StructureNotify
-      | x11.eventMask.ButtonPress
-      | x11.eventMask.ButtonRelease
-      | x11.eventMask.FocusChange
-      | x11.eventMask.PropertyChange;
+    const rootEvents =
+      x11.eventMask.SubstructureRedirect |
+      x11.eventMask.SubstructureNotify |
+      x11.eventMask.EnterWindow |
+      x11.eventMask.LeaveWindow |
+      x11.eventMask.StructureNotify |
+      x11.eventMask.ButtonPress |
+      x11.eventMask.ButtonRelease |
+      x11.eventMask.FocusChange |
+      x11.eventMask.PropertyChange;
     await changeWindowEventMask(root, rootEvents);
 
     X.UngrabServer();
@@ -185,13 +206,15 @@ export function createServer(): XServer {
     console.log("Obtained logical screens", logicalScreens);
 
     for (const logicalScreen of logicalScreens) {
-      store.dispatch(actions.addScreen({
-        x: logicalScreen.x,
-        y: logicalScreen.y,
-        width: logicalScreen.width,
-        height: logicalScreen.height,
-        root,
-      }));
+      store.dispatch(
+        actions.addScreen({
+          x: logicalScreen.x,
+          y: logicalScreen.y,
+          width: logicalScreen.width,
+          height: logicalScreen.height,
+          root,
+        })
+      );
 
       const did = createDesktopBrowser({
         width: logicalScreen.width,
@@ -208,16 +231,14 @@ export function createServer(): XServer {
     }
 
     X.QueryTree(root, (err, tree) => {
-      tree.children.forEach(childWid => manageWindow(childWid, true));
+      tree.children.forEach((childWid) => manageWindow(childWid, true));
     });
 
     for (let modifier in registeredKeys) {
-      if (!registeredKeys.hasOwnProperty(modifier))
-        continue;
+      if (!registeredKeys.hasOwnProperty(modifier)) continue;
 
       for (let key in registeredKeys[modifier]) {
-        if (!registeredKeys[modifier].hasOwnProperty(key))
-          continue;
+        if (!registeredKeys[modifier].hasOwnProperty(key)) continue;
 
         X.GrabKey(root, true, parseInt(modifier), parseInt(key), 1 /* Async */, 1 /* Async */);
       }
@@ -240,7 +261,7 @@ export function createServer(): XServer {
     return frameBrowserFrameIdToWinId[wid];
   }
 
-  function createDesktopBrowser(props: { width: number, height: number }) {
+  function createDesktopBrowser(props: { width: number; height: number }) {
     const win = new BrowserWindow({
       frame: false,
       fullscreen: true,
@@ -393,7 +414,7 @@ export function createServer(): XServer {
       determineWindowAttributes(wid),
       determineWindowGeometry(wid),
       getWindowTitle(wid),
-      determineWindowDecorated(wid)
+      determineWindowDecorated(wid),
     ]);
 
     const [attrs, clientGeom, title, decorated] = values;
@@ -425,35 +446,36 @@ export function createServer(): XServer {
 
       const state = store.getState();
 
-      store.dispatch(actions.addWindow(wid, {
-        outer: {
-          x: effectiveGeometry.x,
-          y: effectiveGeometry.y,
-          width: effectiveGeometry.width,
-          height: effectiveGeometry.height,
-        },
-        visible: true,
-        decorated,
-        title,
-        screenIndex: 0,
-        tags: [state.screens[0].currentTags[0]],
-      }));
+      store.dispatch(
+        actions.addWindow(wid, {
+          outer: {
+            x: effectiveGeometry.x,
+            y: effectiveGeometry.y,
+            width: effectiveGeometry.width,
+            height: effectiveGeometry.height,
+          },
+          visible: true,
+          decorated,
+          title,
+          screenIndex: 0,
+          tags: [state.screens[0].currentTags[0]],
+        })
+      );
 
       X.GrabServer();
 
-      const frameEvents = x11.eventMask.StructureNotify
-        | x11.eventMask.EnterWindow
-        | x11.eventMask.LeaveWindow
-        | x11.eventMask.Exposure
-        | x11.eventMask.SubstructureRedirect
-        | x11.eventMask.PointerMotion
-        | x11.eventMask.ButtonPress
-        | x11.eventMask.ButtonRelease;
+      const frameEvents =
+        x11.eventMask.StructureNotify |
+        x11.eventMask.EnterWindow |
+        x11.eventMask.LeaveWindow |
+        x11.eventMask.Exposure |
+        x11.eventMask.SubstructureRedirect |
+        x11.eventMask.PointerMotion |
+        x11.eventMask.ButtonPress |
+        x11.eventMask.ButtonRelease;
       await changeWindowEventMask(fid, frameEvents);
 
-      const clientEvents = x11.eventMask.StructureNotify
-        | x11.eventMask.PropertyChange
-        | x11.eventMask.FocusChange;
+      const clientEvents = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.FocusChange;
       await changeWindowEventMask(wid, clientEvents);
 
       X.UngrabServer();
@@ -536,7 +558,7 @@ export function createServer(): XServer {
           failed = true;
           return;
         }
-        console.error('Error: Error in root event masking');
+        console.error("Error: Error in root event masking");
         reject(err);
         failed = true;
       });
@@ -560,8 +582,7 @@ export function createServer(): XServer {
       delete frameBrowserFrameIdToWinId[wid];
       delete frameBrowserWinIdToFrameId[innerWid];
       delete frameBrowserWindows[innerWid];
-    }
-    else {
+    } else {
       if (store.getState().windows.hasOwnProperty(wid)) {
         store.dispatch(actions.removeWindow(wid));
       }
@@ -580,13 +601,11 @@ export function createServer(): XServer {
     const wid = ev.wid;
     log(wid, "onMapRequest", ev);
 
-    if (initializingWins[wid])
-      return;
+    if (initializingWins[wid]) return;
 
     if (knownWids.has(wid)) {
       showWindow(wid);
-    }
-    else {
+    } else {
       manageWindow(wid, false);
     }
   }
@@ -597,8 +616,7 @@ export function createServer(): XServer {
     if (isFrame) {
       fid = wid;
       wid = getWindowIdFromFrameId(wid);
-    }
-    else {
+    } else {
       fid = getFrameIdFromWindowId(wid);
     }
 
@@ -618,10 +636,8 @@ export function createServer(): XServer {
 
   function hideWindow(wid: number) {
     const fid = getFrameIdFromWindowId(wid);
-    if (fid)
-      X.UnmapWindow(fid);
-    if (wid)
-      X.UnmapWindow(wid);
+    if (fid) X.UnmapWindow(fid);
+    if (wid) X.UnmapWindow(wid);
 
     const state = store.getState();
     if (state.windows[wid]?.visible === true) {
@@ -669,8 +685,7 @@ export function createServer(): XServer {
     if (isFrame) {
       //frameBrowserWindows[ev.wid].setPos
       // X.ConfigureWindow(frames[ev.wid], config);
-    }
-    else {
+    } else {
       X.ConfigureWindow(getFrameIdFromWindowId(ev.wid), config);
       X.ConfigureWindow(ev.wid, innerConfig);
     }
@@ -731,13 +746,13 @@ export function createServer(): XServer {
     }
 
     switch (ev.buttons) {
-      case (X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask):
+      case X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask:
         // Win + Shift + Q
         if (ev.keycode === 24) {
           app.quit();
         }
         break;
-      case (X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask):
+      case X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask:
         // Win + Ctrl + R
         if (ev.keycode === 27) {
           app.relaunch();
@@ -751,8 +766,7 @@ export function createServer(): XServer {
     const { wid } = ev;
     log(wid, "onButtonPress", ev);
 
-    if (isDesktopBrowserWin(ev.wid))
-      return;
+    if (isDesktopBrowserWin(ev.wid)) return;
     // X.RaiseWindow(ev.wid);
   }
 
@@ -798,7 +812,7 @@ export function createServer(): XServer {
   function launchProcess(name: string) {
     const child = spawn(name, [], {
       detached: true,
-      stdio: "ignore"
+      stdio: "ignore",
     });
     child.unref(); // Allow electron to close before this child
   }
@@ -858,8 +872,10 @@ export function createServer(): XServer {
 
           let buffer = prop.data;
           if (buffer && buffer.length) {
-            if (buffer[0] === 0x02) { // Specifying decorations
-              if (buffer[2] === 0x00) { // No decorations
+            if (buffer[0] === 0x02) {
+              // Specifying decorations
+              if (buffer[2] === 0x00) {
+                // No decorations
                 resolve(false);
               }
             }
@@ -870,7 +886,11 @@ export function createServer(): XServer {
     });
   }
 
-  function getPropertyValue<TTypeAtom extends Atom, TValue = AtomToType<TTypeAtom>>(wid: number, nameAtom: Atom, typeAtom: TTypeAtom): Promise<TValue> {
+  function getPropertyValue<TTypeAtom extends Atom, TValue = AtomToType<TTypeAtom>>(
+    wid: number,
+    nameAtom: Atom,
+    typeAtom: TTypeAtom
+  ): Promise<TValue> {
     return new Promise((resolve, reject) => {
       X.GetProperty(0, wid, nameAtom, typeAtom, 0, 10000000, function (err, prop) {
         if (err) {
@@ -938,30 +958,29 @@ export function createServer(): XServer {
   }
 
   //function determineWindowHidden(wid: number) {
-    // X.InternAtom(true, "_NET_WM_ICON", function(err, atom) {
-    //   X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
-    //     if (err) {
-    //       console.error("GetProperty _NET_WM_ICON error", err);
-    //       return;
-    //     }
-    //     console.log(prop);
-    //     // let buffer = prop.data;
-    //     // if (buffer && buffer.length) {
-    //     //   if (buffer[0] === 0x02) { // Specifying decorations
-    //     //     if (buffer[2] === 0x00) { // No decorations
-    //     //       store.dispatch(actions.setWindowDecorated(wid, false));
-    //     //     }
-    //     //   }
-    //     // }
-    //   });
-    // });
+  // X.InternAtom(true, "_NET_WM_ICON", function(err, atom) {
+  //   X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
+  //     if (err) {
+  //       console.error("GetProperty _NET_WM_ICON error", err);
+  //       return;
+  //     }
+  //     console.log(prop);
+  //     // let buffer = prop.data;
+  //     // if (buffer && buffer.length) {
+  //     //   if (buffer[0] === 0x02) { // Specifying decorations
+  //     //     if (buffer[2] === 0x00) { // No decorations
+  //     //       store.dispatch(actions.setWindowDecorated(wid, false));
+  //     //     }
+  //     //   }
+  //     // }
+  //   });
+  // });
   //}
 
   function getFocusedWindow() {
     let windows = store.getState().windows;
     for (let wid in windows) {
-      if (windows[wid].focused)
-        return parseInt(wid);
+      if (windows[wid].focused) return parseInt(wid);
     }
     return null;
   }
@@ -1005,8 +1024,7 @@ export function createServer(): XServer {
         // Also send a timestamp in data32[1]?
         log(wid, "Sending graceful kill", eventData);
         X.SendEvent(wid, false, XCB_EVENT_MASK_NO_EVENT, eventData);
-      }
-      else {
+      } else {
         log(wid, "Killing window client");
         X.KillClient(wid);
       }
@@ -1022,7 +1040,7 @@ export function createServer(): XServer {
       }
 
       callback(null, {
-        supported: !!protocols && protocols.indexOf(ExtraAtoms.WM_DELETE_WINDOW) >= 0
+        supported: !!protocols && protocols.indexOf(ExtraAtoms.WM_DELETE_WINDOW) >= 0,
       });
     });
   }
@@ -1033,13 +1051,10 @@ export function createServer(): XServer {
 
     if (!window.visible) {
       showWindow(wid);
-    }
-    else {
+    } else {
       const fid = getFrameIdFromWindowId(wid);
-      if (fid)
-        X.RaiseWindow(fid);
-      if (wid)
-        X.RaiseWindow(wid);
+      if (fid) X.RaiseWindow(fid);
+      if (wid) X.RaiseWindow(wid);
     }
   }
 
@@ -1067,7 +1082,7 @@ export function createServer(): XServer {
 
   function __setupStore(): ServerStore {
     const loggerMiddleware: Middleware = function ({ getState }) {
-      return next => action => {
+      return (next) => (action) => {
         console.log("will dispatch", action);
 
         // Call the next dispatch method in the middleware chain.
@@ -1079,11 +1094,11 @@ export function createServer(): XServer {
         // This will likely be the action itself, unless
         // a middleware further in chain changed it.
         return returnValue;
-      }
-    }
+      };
+    };
 
     const x11Middleware: Middleware<{}, ServerRootState> = function ({ getState }) {
-      return next => action => {
+      return (next) => (action) => {
         const returnValue = next(action);
 
         switch (action.type) {
@@ -1122,15 +1137,17 @@ export function createServer(): XServer {
           case "SET_CURRENT_TAGS":
             {
               const state = getState();
-              const { currentTags } = action.payload as { currentTags: string[], screenIndex: number };
+              const { currentTags } = action.payload as {
+                currentTags: string[];
+                screenIndex: number;
+              };
               batch(() => {
                 for (const widStr in state.windows) {
                   const wid = parseInt(widStr, 10);
                   const win = state.windows[widStr];
                   if (anyIntersect(win.tags, currentTags)) {
                     showWindow(wid);
-                  }
-                  else {
+                  } else {
                     hideWindow(wid);
                   }
                 }
@@ -1140,8 +1157,8 @@ export function createServer(): XServer {
         }
 
         return returnValue;
-      }
-    }
+      };
+    };
 
     const store = configureStore([loggerMiddleware, x11Middleware]);
     return store;

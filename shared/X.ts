@@ -33,19 +33,19 @@ export enum X11_EVENT_TYPE {
   /** XCB_CLIENT_MESSAGE */
   ClientMessage = 33,
   MappingNotify = 34,
-  GenericEvent = 35
-};
+  GenericEvent = 35,
+}
 
 export enum X11_KEY_MODIFIER {
-  ShiftMask = (1<<0),
-  LockMask = (1<<1),
-  ControlMask = (1<<2),
-  Mod1Mask = (1<<3),
-  Mod2Mask = (1<<4),
-  Mod3Mask = (1<<5),
-  Mod4Mask = (1<<6),
-  Mod5Mask = (1<<7)
-};
+  ShiftMask = 1 << 0,
+  LockMask = 1 << 1,
+  ControlMask = 1 << 2,
+  Mod1Mask = 1 << 3,
+  Mod2Mask = 1 << 4,
+  Mod3Mask = 1 << 5,
+  Mod4Mask = 1 << 6,
+  Mod5Mask = 1 << 7,
+}
 
 export const XCB_EVENT_MASK_NO_EVENT = 0;
 
@@ -78,13 +78,13 @@ export const XCB_EVENT_MASK_NO_EVENT = 0;
 
 export interface IXEvent {
   type: number;
-  seq: number,
-  name: string,
-  format: number,
-  wid: number,
+  seq: number;
+  name: string;
+  format: number;
+  wid: number;
   //message_type: number,
   //data: number[],
-  rawData: Buffer,
+  rawData: Buffer;
 }
 
 interface IXConfigureInfo {
@@ -97,7 +97,7 @@ interface IXConfigureInfo {
   stackMode: number;
 }
 
-export interface IXConfigureEvent extends IXEvent, IXConfigureInfo { }
+export interface IXConfigureEvent extends IXEvent, IXConfigureInfo {}
 
 export interface IXKeyEvent extends IXEvent {
   buttons: number;
@@ -111,20 +111,20 @@ export interface IXPropertyNotifyEvent extends IXEvent {
 }
 
 export interface IXScreen {
-  root: number,
-  default_colormap: number,
-  white_pixel: number,
-  black_pixel: number,
-  input_masks: number,
-  pixel_width: number,
-  pixel_height: number,
-  mm_width: number,
-  mm_height: number,
-  min_installed_maps: number,
-  max_installed_maps: number,
-  root_visual: number,
-  root_depth: number,
-  backing_stores: number,
+  root: number;
+  default_colormap: number;
+  white_pixel: number;
+  black_pixel: number;
+  input_masks: number;
+  pixel_width: number;
+  pixel_height: number;
+  mm_width: number;
+  mm_height: number;
+  min_installed_maps: number;
+  max_installed_maps: number;
+  root_visual: number;
+  root_depth: number;
+  backing_stores: number;
   depths: object;
 }
 
@@ -235,45 +235,45 @@ interface XRandrCtrcInfo {
 
 interface RandrExtension {
   events: {
-    RRScreenChangeNotify: 0
-  },
+    RRScreenChangeNotify: 0;
+  };
   NotifyMask: {
-    ScreenChange: 1,
-    CrtcChange: 2,
-    OutputChange: 4,
-    OutputProperty: 8,
-    All: 15
-  },
+    ScreenChange: 1;
+    CrtcChange: 2;
+    OutputChange: 4;
+    OutputProperty: 8;
+    All: 15;
+  };
   Rotation: {
-    Rotate_0: 1,
-    Rotate_90: 2,
-    Rotate_180: 4,
-    Rotate_270: 8,
-    Reflect_X: 16,
-    Reflect_Y: 32
-  },
+    Rotate_0: 1;
+    Rotate_90: 2;
+    Rotate_180: 4;
+    Rotate_270: 8;
+    Reflect_X: 16;
+    Reflect_Y: 32;
+  };
   ConfigStatus: {
-    Sucess: 0,
-    InvalidConfigTime: 1,
-    InvalidTime: 2,
-    Failed: 3
-  },
+    Sucess: 0;
+    InvalidConfigTime: 1;
+    InvalidTime: 2;
+    Failed: 3;
+  };
   ModeFlag: {
-    HSyncPositive: 1,
-    HSyncNegative: 2,
-    VSyncPositive: 4,
-    VSyncNegative: 8,
-    Interlace: 16,
-    DoubleScan: 32,
-    CSync: 64,
-    CSyncPositive: 128,
-    CSyncNegative: 256,
-    HSkewPresent: 512,
-    BCast: 1024,
-    PixelMultiplex: 2048,
-    DoubleClock: 4096,
-    ClockDivideBy2: 8192
-  },
+    HSyncPositive: 1;
+    HSyncNegative: 2;
+    VSyncPositive: 4;
+    VSyncNegative: 8;
+    Interlace: 16;
+    DoubleScan: 32;
+    CSync: 64;
+    CSyncPositive: 128;
+    CSyncNegative: 256;
+    HSkewPresent: 512;
+    BCast: 1024;
+    PixelMultiplex: 2048;
+    DoubleClock: 4096;
+    ClockDivideBy2: 8192;
+  };
 
   QueryVersion(clientMaj: number, clientMin: number, callback: XCbWithErr<[unknown]>): void;
   //SetScreenConfig(win, ts, configTs, sizeId, rotation, rate, cb): void;
@@ -361,74 +361,74 @@ export type XCbWithErr<TArgs extends any[], TError = unknown> = (err: TError, ..
 export type Atom = number;
 
 export interface XStandardAtoms {
-  PRIMARY: 1,
-  SECONDARY: 2,
-  ARC: 3,
-  ATOM: 4,
-  BITMAP: 5,
-  CARDINAL: 6,
-  COLORMAP: 7,
-  CURSOR: 8,
-  CUT_BUFFER0: 9,
-  CUT_BUFFER1: 10,
-  CUT_BUFFER2: 11,
-  CUT_BUFFER3: 12,
-  CUT_BUFFER4: 13,
-  CUT_BUFFER5: 14,
-  CUT_BUFFER6: 15,
-  CUT_BUFFER7: 16,
-  DRAWABLE: 17,
-  FONT: 18,
-  INTEGER: 19,
-  PIXMAP: 20,
-  POINT: 21,
-  RECTANGLE: 22,
-  RESOURCE_MANAGER: 23,
-  RGB_COLOR_MAP: 24,
-  RGB_BEST_MAP: 25,
-  RGB_BLUE_MAP: 26,
-  RGB_DEFAULT_MAP: 27,
-  RGB_GRAY_MAP: 28,
-  RGB_GREEN_MAP: 29,
-  RGB_RED_MAP: 30,
-  STRING: 31,
-  VISUALID: 32,
-  WINDOW: 33,
-  WM_COMMAND: 34,
-  WM_HINTS: 35,
-  WM_CLIENT_MACHINE: 36,
-  WM_ICON_NAME: 37,
-  WM_ICON_SIZE: 38,
-  WM_NAME: 39,
-  WM_NORMAL_HINTS: 40,
-  WM_SIZE_HINTS: 41,
-  WM_ZOOM_HINTS: 42,
-  MIN_SPACE: 43,
-  NORM_SPACE: 44,
-  MAX_SPACE: 45,
-  END_SPACE: 46,
-  SUPERSCRIPT_X: 47,
-  SUPERSCRIPT_Y: 48,
-  SUBSCRIPT_X: 49,
-  SUBSCRIPT_Y: 50,
-  UNDERLINE_POSITION: 51,
-  UNDERLINE_THICKNESS: 52,
-  STRIKEOUT_ASCENT: 53,
-  STRIKEOUT_DESCENT: 54,
-  ITALIC_ANGLE: 55,
-  X_HEIGHT: 56,
-  QUAD_WIDTH: 57,
-  WEIGHT: 58,
-  POINT_SIZE: 59,
-  RESOLUTION: 60,
-  COPYRIGHT: 61,
-  NOTICE: 62,
-  FONT_NAME: 63,
-  FAMILY_NAME: 64,
-  FULL_NAME: 65,
-  CAP_HEIGHT: 66,
-  WM_CLASS: 67,
-  WM_TRANSIENT_FOR: 68,
+  PRIMARY: 1;
+  SECONDARY: 2;
+  ARC: 3;
+  ATOM: 4;
+  BITMAP: 5;
+  CARDINAL: 6;
+  COLORMAP: 7;
+  CURSOR: 8;
+  CUT_BUFFER0: 9;
+  CUT_BUFFER1: 10;
+  CUT_BUFFER2: 11;
+  CUT_BUFFER3: 12;
+  CUT_BUFFER4: 13;
+  CUT_BUFFER5: 14;
+  CUT_BUFFER6: 15;
+  CUT_BUFFER7: 16;
+  DRAWABLE: 17;
+  FONT: 18;
+  INTEGER: 19;
+  PIXMAP: 20;
+  POINT: 21;
+  RECTANGLE: 22;
+  RESOURCE_MANAGER: 23;
+  RGB_COLOR_MAP: 24;
+  RGB_BEST_MAP: 25;
+  RGB_BLUE_MAP: 26;
+  RGB_DEFAULT_MAP: 27;
+  RGB_GRAY_MAP: 28;
+  RGB_GREEN_MAP: 29;
+  RGB_RED_MAP: 30;
+  STRING: 31;
+  VISUALID: 32;
+  WINDOW: 33;
+  WM_COMMAND: 34;
+  WM_HINTS: 35;
+  WM_CLIENT_MACHINE: 36;
+  WM_ICON_NAME: 37;
+  WM_ICON_SIZE: 38;
+  WM_NAME: 39;
+  WM_NORMAL_HINTS: 40;
+  WM_SIZE_HINTS: 41;
+  WM_ZOOM_HINTS: 42;
+  MIN_SPACE: 43;
+  NORM_SPACE: 44;
+  MAX_SPACE: 45;
+  END_SPACE: 46;
+  SUPERSCRIPT_X: 47;
+  SUPERSCRIPT_Y: 48;
+  SUBSCRIPT_X: 49;
+  SUBSCRIPT_Y: 50;
+  UNDERLINE_POSITION: 51;
+  UNDERLINE_THICKNESS: 52;
+  STRIKEOUT_ASCENT: 53;
+  STRIKEOUT_DESCENT: 54;
+  ITALIC_ANGLE: 55;
+  X_HEIGHT: 56;
+  QUAD_WIDTH: 57;
+  WEIGHT: 58;
+  POINT_SIZE: 59;
+  RESOLUTION: 60;
+  COPYRIGHT: 61;
+  NOTICE: 62;
+  FONT_NAME: 63;
+  FAMILY_NAME: 64;
+  FULL_NAME: 65;
+  CAP_HEIGHT: 66;
+  WM_CLASS: 67;
+  WM_TRANSIENT_FOR: 68;
 }
 
 // https://github.com/sidorares/node-x11/wiki/Core-requests
@@ -448,12 +448,31 @@ export interface IXClient {
   AllocColor(...args: unknown[]): unknown;
   AllocID(): number;
   AllowEvents(...args: unknown[]): unknown;
-  CreateWindow(winId: number, parentId: number, x: number, y: number, width: number, height: number, borderWidth: number, depth: number, _class: unknown, visual: unknown, createWindowAdditionalValues: unknown): void;
+  CreateWindow(
+    winId: number,
+    parentId: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderWidth: number,
+    depth: number,
+    _class: unknown,
+    visual: unknown,
+    createWindowAdditionalValues: unknown
+  ): void;
   ChangeActivePointerGrab(...args: unknown[]): unknown;
   ChangeGC(...args: unknown[]): unknown;
   // replace mode: 0 replace, 1 prepend, 2 append
   // unitSize = 8/16/32 TODO: remove, use depending on buffer size
-  ChangeProperty(replaceMode: XReplaceMode, winId: number, propNameAtom: unknown, typeNameAtom: unknown, units: unknown, data: unknown): void;
+  ChangeProperty(
+    replaceMode: XReplaceMode,
+    winId: number,
+    propNameAtom: unknown,
+    typeNameAtom: unknown,
+    units: unknown,
+    data: unknown
+  ): void;
   ChangeSaveSet(a: number, wid: number): void;
   ChangeWindowAttributes(wid: number, values: { eventMask: unknown }, callback: XCbWithErr<[void]>): void;
   ClearArea(...args: unknown[]): unknown;
@@ -471,13 +490,28 @@ export interface IXClient {
   GetAtomName(atomId: Atom, callback: XCbWithErr<[atomName: string]>): void;
   GetGeometry(winId: number, callback: XCbWithErr<[drawable: XGeometry]>): void;
   GetImage(...args: unknown[]): unknown;
-  GetInputFocus(): { focus: number, revertTo: XFocusRevertTo };
+  GetInputFocus(): { focus: number; revertTo: XFocusRevertTo };
   GetKeyboardMapping(...args: unknown[]): unknown;
-  GetProperty(deleteAfterGet: unknown, wid: number, propNameAtom: Atom, typeNameAtom: Atom, offset: number, maxLen: number, callback: XCbWithErr<[XGetPropertyCallbackProps]>): void;
+  GetProperty(
+    deleteAfterGet: unknown,
+    wid: number,
+    propNameAtom: Atom,
+    typeNameAtom: Atom,
+    offset: number,
+    maxLen: number,
+    callback: XCbWithErr<[XGetPropertyCallbackProps]>
+  ): void;
   GetSelectionOwner(...args: unknown[]): unknown;
   GetWindowAttributes(wid: number, callback: XCbWithErr<[attrs: XWindowAttrs]>): void;
   GrabButton(...args: unknown[]): unknown;
-  GrabKey(wid: number, ownerEvents: boolean, modifiers: number, key: number, pointerMode: number, keybMode: number): void;
+  GrabKey(
+    wid: number,
+    ownerEvents: boolean,
+    modifiers: number,
+    key: number,
+    pointerMode: number,
+    keybMode: number
+  ): void;
   GrabKeyboard(...args: unknown[]): unknown;
   GrabPointer(...args: unknown[]): unknown;
   GrabServer(...args: unknown[]): unknown;
@@ -498,7 +532,18 @@ export interface IXClient {
   PolyPoint(...args: unknown[]): unknown;
   PolyLine(...args: unknown[]): unknown;
   PolyText8(drawable: unknown, gc: unknown, x: number, y: number, items: unknown): void;
-  PutImage(format: unknown, drawable: unknown, gc: unknown, width: number, height: number, dstX: number, dstY: number, leftPad: unknown, depth: unknown, dataBuffer: Buffer): void;
+  PutImage(
+    format: unknown,
+    drawable: unknown,
+    gc: unknown,
+    width: number,
+    height: number,
+    dstX: number,
+    dstY: number,
+    leftPad: unknown,
+    depth: unknown,
+    dataBuffer: Buffer
+  ): void;
   QueryExtension<T>(name: string, callback: XCbWithErr<[ext: XExtension<T>]>): void;
   QueryPointer(winId: number): void;
   QueryTree(winId: number, callback: XCbWithErr<[result: XQueryTreeResult]>): void;

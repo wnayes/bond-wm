@@ -11,7 +11,7 @@ export function addScreen(screen: AddScreenProps) {
       y: screen.y,
       width: screen.width,
       height: screen.height,
-    }
+    },
   };
 }
 
@@ -31,7 +31,7 @@ export function configureScreenWorkArea(screenIndex: number, config: IGeometry) 
 export function setScreenCurrentTags(screenIndex: number, currentTags: string[]) {
   return {
     type: "SET_CURRENT_TAGS",
-    payload: { screenIndex, currentTags }
+    payload: { screenIndex, currentTags },
   };
 }
 
@@ -45,7 +45,7 @@ export function addWindow(wid: number, win: Partial<IWindow>) {
 export function removeWindow(wid: number) {
   return {
     type: "REMOVE_WINDOW",
-    payload: wid
+    payload: wid,
   };
 }
 
@@ -65,23 +65,26 @@ export function configureWindow(wid: number, config: IGeometry) {
 export function configureInnerWindow(wid: number, config: any) {
   return {
     type: "CONFIGURE_INNER_WINDOW",
-    payload: Object.assign({
-      wid
-    }, config)
+    payload: Object.assign(
+      {
+        wid,
+      },
+      config
+    ),
   };
 }
 
 export function focusWindow(wid: number) {
   return {
     type: "FOCUS_WINDOW",
-    payload: wid
+    payload: wid,
   };
 }
 
 export function unfocusWindow(wid: number) {
   return {
     type: "UNFOCUS_WINDOW",
-    payload: wid
+    payload: wid,
   };
 }
 
@@ -91,7 +94,7 @@ export function setWindowTitle(wid: number, title: string) {
     payload: {
       wid,
       title,
-    }
+    },
   };
 }
 
@@ -101,7 +104,7 @@ export function setWindowVisible(wid: number, visible: boolean) {
     payload: {
       wid,
       visible,
-    }
+    },
   };
 }
 
@@ -111,7 +114,7 @@ export function setWindowDecorated(wid: number, decorated: boolean) {
     payload: {
       wid,
       decorated,
-    }
+    },
   };
 }
 

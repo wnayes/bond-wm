@@ -35,8 +35,8 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
   return (
     <div id="workarea" ref={workAreaDiv}>
-        <Wallpaper />
-        <Layout screen={screen} windows={windows} />
+      <Wallpaper />
+      <Layout screen={screen} windows={windows} />
     </div>
   );
 }

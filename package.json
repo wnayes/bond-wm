@@ -9,7 +9,8 @@
     "build": "tsc -p ./tsconfig.json && npm run build-desktop && npm run build-frame",
     "build-desktop": "esbuild ./renderer-desktop/index.tsx --bundle --platform=node --external:electron --outfile=./renderer-desktop/dist.js",
     "build-frame": "esbuild ./renderer-frame/index.ts --bundle --platform=node --external:electron --outfile=./renderer-frame/dist.js",
-    "start": "DISPLAY=:1 electron ."
+    "start": "DISPLAY=:1 electron .",
+    "prettier": "prettier --write ."
   },
   "repository": "",
   "keywords": [],
@@ -29,6 +30,7 @@
     "@types/react-dom": "^17.0.11",
     "electron-reloader": "^1.2.1",
     "esbuild": "^0.14.0",
+    "prettier": "2.5.1",
     "type-fest": "^2.8.0",
     "typescript": "^4.5.2"
   }

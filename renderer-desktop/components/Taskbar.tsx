@@ -16,7 +16,7 @@ interface ITaskbarProps {
 export function Taskbar(props: ITaskbarProps) {
   const windows = props.windows;
 
-  const showingRun = useSelector<RootState>(state => state.taskbar.showingRun);
+  const showingRun = useSelector<RootState>((state) => state.taskbar.showingRun);
 
   return (
     <div className="taskbar">
@@ -36,15 +36,9 @@ function TaskList(props: ITaskListProps) {
   const windows = props.windows;
   const entries = [];
   for (let win of windows) {
-    entries.push(
-      <TaskListEntry key={win.id} window={win} />
-    );
+    entries.push(<TaskListEntry key={win.id} window={win} />);
   }
-  return (
-    <div className="tasklist">
-      {entries}
-    </div>
-  );
+  return <div className="tasklist">{entries}</div>;
 }
 
 interface ITaskListEntryProps {
@@ -55,14 +49,11 @@ function TaskListEntry(props: ITaskListEntryProps) {
   const win = props.window;
 
   let className = "tasklistentry";
-  if (win.focused)
-    className += " focused";
+  if (win.focused) className += " focused";
 
-  const onClick = useCallback(() =>{
-    if (win.focused)
-      minimizeWindow(win.id);
-    else
-      raiseWindow(win.id);
+  const onClick = useCallback(() => {
+    if (win.focused) minimizeWindow(win.id);
+    else raiseWindow(win.id);
   }, [win]);
 
   return (
@@ -72,8 +63,7 @@ function TaskListEntry(props: ITaskListEntryProps) {
   );
 }
 
-interface IRunFieldProps {
-}
+interface IRunFieldProps {}
 
 function RunField(props: IRunFieldProps) {
   const field = useRef<HTMLInputElement>();
@@ -85,11 +75,11 @@ function RunField(props: IRunFieldProps) {
   const reset = () => {
     setText("");
     dispatch(actions.toggleTaskbarRunField(false));
-  }
+  };
 
   const onChange = (event: any) => {
     setText(event.target.value);
-  }
+  };
 
   const onKeyPress = (event: React.KeyboardEvent) => {
     if (text && event.key === "Enter") {
@@ -97,30 +87,33 @@ function RunField(props: IRunFieldProps) {
       reset();
       event.preventDefault();
     }
-  }
+  };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.keyCode === 27 /*esc*/) {
       reset();
     }
-  }
+  };
 
   const onBlur = () => {
     reset();
-  }
+  };
 
   useEffect(() => {
     field.current!.focus();
   }, []);
 
   return (
-    <input type="text" value={text}
+    <input
+      type="text"
+      value={text}
       className="taskbarRunField"
       ref={field}
       onChange={onChange}
       onKeyPress={onKeyPress}
       onKeyDown={onKeyDown}
-      onBlur={onBlur} />
+      onBlur={onBlur}
+    />
   );
 }
 
@@ -129,26 +122,25 @@ interface ITagListProps {
 }
 
 function TagList(props: ITagListProps) {
-  const tags = useSelector<RootState>(state => state.screens[props.screenIndex].tags) as string[];
-  const currentTags = useSelector<RootState>(state => state.screens[props.screenIndex].currentTags) as string[];
+  const tags = useSelector<RootState>((state) => state.screens[props.screenIndex].tags) as string[];
+  const currentTags = useSelector<RootState>((state) => state.screens[props.screenIndex].currentTags) as string[];
 
   const dispatch = useDispatch();
 
-  const entries = tags.map(tag => {
+  const entries = tags.map((tag) => {
     return (
-      <TagListEntry tag={tag} key={tag}
+      <TagListEntry
+        tag={tag}
+        key={tag}
         selected={currentTags.indexOf(tag) >= 0}
         onClick={() => {
           dispatch(actions.setScreenCurrentTags(props.screenIndex, [tag]));
-        }} />
+        }}
+      />
     );
   });
 
-  return (
-    <div className="taglist">
-      {entries}
-    </div>
-  );
+  return <div className="taglist">{entries}</div>;
 }
 
 interface ITagListEntryProps {
