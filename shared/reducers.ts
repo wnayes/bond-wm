@@ -162,13 +162,16 @@ function windows(state: WindowsState = {}, action: any) {
     case "FOCUS_WINDOW": {
       const wid = action.payload;
       newState = Object.assign({}, state);
-      if (newState[wid]) {
-        newState[wid] = Object.assign({}, newState[wid], { focused: true });
-        return newState;
-      } else {
-        console.error("Action on unknown window", action);
-        return state;
+      for (const widStr in newState) {
+        if (wid === parseInt(widStr, 10)) {
+          if (!newState[wid].focused) {
+            newState[wid] = Object.assign({}, newState[wid], { focused: true });
+          }
+        } else if (newState[widStr].focused) {
+          newState[widStr] = Object.assign({}, newState[widStr], { focused: false });
+        }
       }
+      return newState;
     }
     case "UNFOCUS_WINDOW": {
       const wid = action.payload;

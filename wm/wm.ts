@@ -125,15 +125,10 @@ export function createServer(): XServer {
 
     ipcMain.on("raise-window", (event, wid) => {
       raiseWindow(wid);
-      changeFocus(wid);
     });
 
     ipcMain.on("minimize-window", (event, wid) => {
       minimize(wid);
-    });
-
-    ipcMain.on("focus-window", (event, wid) => {
-      changeFocus(wid);
     });
 
     ipcMain.on("close-window", (event, wid) => {
@@ -201,7 +196,7 @@ export function createServer(): XServer {
       x11.eventMask.ButtonRelease |
       x11.eventMask.FocusChange |
       x11.eventMask.PropertyChange;
-    await changeWindowEventMask(root, rootEvents);
+    changeWindowEventMask(root, rootEvents);
 
     X.UngrabServer();
 
@@ -246,6 +241,9 @@ export function createServer(): XServer {
         X.GrabKey(root, true, parseInt(modifier), parseInt(key), 1 /* Async */, 1 /* Async */);
       }
     }
+
+    // TODO: What to do for more than one screen?
+    X.SetInputFocus(root, 0);
   }
 
   function isDesktopBrowserWin(win: number): boolean {
@@ -326,9 +324,6 @@ export function createServer(): XServer {
 
     console.log("Created frame window", fid, url);
 
-    // Open the DevTools.
-    //win.webContents.openDevTools({ mode: "undocked" });
-
     return fid;
   }
 
@@ -338,12 +333,12 @@ export function createServer(): XServer {
         onKeyPress(ev as IXKeyEvent);
         break;
       case X11_EVENT_TYPE.KeyRelease:
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.ButtonPress:
         onButtonPress(ev);
         break;
       case X11_EVENT_TYPE.MotionNotify:
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.EnterNotify:
         onEnterNotify(ev);
         break;
@@ -352,13 +347,13 @@ export function createServer(): XServer {
         break;
       case X11_EVENT_TYPE.FocusIn:
         log(ev.wid, "onFocusIn", ev);
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.FocusOut:
         log(ev.wid, "onFocusOut", ev);
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.Expose:
         log(ev.wid, "onExpose", ev);
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.CreateNotify:
         onCreateNotify(ev);
         break;
@@ -369,15 +364,15 @@ export function createServer(): XServer {
         onUnmapNotify(ev);
         break;
       case X11_EVENT_TYPE.MapNotify:
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.MapRequest:
         onMapRequest(ev);
         break;
       case X11_EVENT_TYPE.ReparentNotify:
         log(ev.wid, "onReparentNotify", ev);
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.ConfigureNotify:
-        break; // ignore
+        break;
       case X11_EVENT_TYPE.ConfigureRequest:
         onConfigureRequest(ev as IXConfigureEvent);
         break;
@@ -449,6 +444,30 @@ export function createServer(): XServer {
 
       const state = store.getState();
 
+      X.ReparentWindow(fid, state.screens[0].root, effectiveGeometry.x, effectiveGeometry.y);
+      X.ReparentWindow(wid, fid, 0, 0);
+
+      X.GrabServer();
+
+      const frameEvents =
+        x11.eventMask.StructureNotify |
+        x11.eventMask.EnterWindow |
+        x11.eventMask.LeaveWindow |
+        x11.eventMask.SubstructureRedirect;
+      changeWindowEventMask(fid, frameEvents);
+
+      const clientEvents = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.FocusChange;
+      changeWindowEventMask(wid, clientEvents);
+
+      X.UngrabServer();
+
+      X.ConfigureWindow(fid, {
+        borderWidth: 0,
+      });
+      X.ConfigureWindow(wid, {
+        borderWidth: 0,
+      });
+
       store.dispatch(
         actions.addWindow(wid, {
           outer: {
@@ -465,49 +484,7 @@ export function createServer(): XServer {
         })
       );
 
-      X.GrabServer();
-
-      const frameEvents =
-        x11.eventMask.StructureNotify |
-        x11.eventMask.EnterWindow |
-        x11.eventMask.LeaveWindow |
-        x11.eventMask.Exposure |
-        x11.eventMask.SubstructureRedirect |
-        x11.eventMask.PointerMotion |
-        x11.eventMask.ButtonPress |
-        x11.eventMask.ButtonRelease;
-      await changeWindowEventMask(fid, frameEvents);
-
-      const clientEvents = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.FocusChange;
-      await changeWindowEventMask(wid, clientEvents);
-
-      X.UngrabServer();
-
-      X.ReparentWindow(fid, state.screens[0].root, effectiveGeometry.x, effectiveGeometry.y);
-      X.ReparentWindow(wid, fid, 0, 0);
-
-      // X.ConfigureWindow(fid, {
-      //   x: effectiveGeometry.x,
-      //   y: effectiveGeometry.y,
-      //   width: effectiveGeometry.width,
-      //   height: effectiveGeometry.height,
-      // });
-      // X.ConfigureWindow(wid, {
-      //   x: 0,
-      //   y: 0,
-      //   width: effectiveGeometry.width,
-      //   height: effectiveGeometry.height,
-      //   borderWidth: 0,
-      // });
-      X.ConfigureWindow(wid, {
-        borderWidth: 0,
-      });
-
       X.MapWindow(fid);
-
-      // const ee = new EventEmitter();
-      // ee.on("event", __onXEvent);
-      // X.event_consumers[fid] = ee;
     }
 
     console.log("Initial map of wid", wid);
@@ -550,30 +527,56 @@ export function createServer(): XServer {
     };
   }
 
-  function changeWindowEventMask(wid: number, eventMask: XEventMask): Promise<void> {
-    return new Promise((resolve, reject) => {
-      let failed;
-      console.log("Changing event mask for", wid, eventMask);
-      X.ChangeWindowAttributes(wid, { eventMask }, (err: { error: number }) => {
-        if (err && err.error === 10) {
-          console.error(`Error for ${wid}: Another window manager already running.`);
-          reject(err);
-          failed = true;
-          return;
-        }
-        console.error("Error: Error in root event masking");
-        reject(err);
+  function changeWindowEventMask(wid: number, eventMask: XEventMask): boolean {
+    let failed;
+    console.log("Changing event mask for", wid, eventMask);
+    X.ChangeWindowAttributes(wid, { eventMask }, (err: { error: number }) => {
+      if (err && err.error === 10) {
+        console.error(
+          `Error while changing event mask for for ${wid} to ${eventMask}: Another window manager already running.`,
+          err
+        );
         failed = true;
-      });
-      if (!failed) {
-        resolve();
+        return;
       }
+      console.error(`Error while changing event mask for for ${wid} to ${eventMask}`, err);
+      failed = true;
     });
+    return !failed;
   }
 
   function onCreateNotify(ev: IXEvent) {
     const wid = ev.wid;
     log(wid, "onCreateNotify", ev);
+  }
+
+  function onMapRequest(ev: IXEvent) {
+    const wid = ev.wid;
+    log(wid, "onMapRequest", ev);
+
+    if (initializingWins[wid]) return;
+
+    if (knownWids.has(wid)) {
+      showWindow(wid);
+    } else {
+      manageWindow(wid, false);
+    }
+  }
+
+  function onUnmapNotify(ev: IXEvent) {
+    const wid = ev.wid;
+    log(wid, "onUnmapNotify", ev);
+    if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
+      const state = store.getState();
+      if (state.windows[wid]?.visible === true) {
+        store.dispatch(actions.setWindowVisible(wid, false));
+      }
+
+      const fid = getFrameIdFromWindowId(wid);
+      if (typeof fid === "number" && fid !== wid) {
+        X.UnmapWindow(fid);
+      }
+    }
   }
 
   function onDestroyNotify(ev: IXEvent) {
@@ -600,70 +603,6 @@ export function createServer(): XServer {
     knownWids.delete(wid);
   }
 
-  function onMapRequest(ev: IXEvent) {
-    const wid = ev.wid;
-    log(wid, "onMapRequest", ev);
-
-    if (initializingWins[wid]) return;
-
-    if (knownWids.has(wid)) {
-      showWindow(wid);
-    } else {
-      manageWindow(wid, false);
-    }
-  }
-
-  function showWindow(wid: number) {
-    let fid;
-    const isFrame = isFrameBrowserWin(wid);
-    if (isFrame) {
-      fid = wid;
-      wid = getWindowIdFromFrameId(wid);
-    } else {
-      fid = getFrameIdFromWindowId(wid);
-    }
-
-    if (typeof fid === "number") {
-      console.log("showWindow frame id", fid);
-      X.MapWindow(fid);
-    }
-
-    const state = store.getState();
-    if (state.windows[wid]?.visible === false) {
-      store.dispatch(actions.setWindowVisible(wid, true));
-    }
-
-    console.log("showWindow id", wid);
-    X.MapWindow(wid);
-  }
-
-  function hideWindow(wid: number) {
-    const fid = getFrameIdFromWindowId(wid);
-    if (fid) X.UnmapWindow(fid);
-    if (wid) X.UnmapWindow(wid);
-
-    const state = store.getState();
-    if (state.windows[wid]?.visible === true) {
-      store.dispatch(actions.setWindowVisible(wid, false));
-    }
-  }
-
-  function onUnmapNotify(ev: IXEvent) {
-    const wid = ev.wid;
-    log(wid, "onUnmapNotify", ev);
-    if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
-      const state = store.getState();
-      if (state.windows[wid]?.visible === true) {
-        store.dispatch(actions.setWindowVisible(wid, false));
-      }
-
-      const fid = getFrameIdFromWindowId(wid);
-      if (typeof fid === "number" && fid !== wid) {
-        X.UnmapWindow(fid);
-      }
-    }
-  }
-
   function onConfigureRequest(ev: IXConfigureEvent) {
     const { wid } = ev;
     log(wid, "onConfigureRequest", ev);
@@ -671,6 +610,8 @@ export function createServer(): XServer {
       return;
     }
 
+    // TODO: Let through any unmanaged windows?
+    // TODO: Deny for frames too?
     return;
 
     const config = {
@@ -707,19 +648,8 @@ export function createServer(): XServer {
   }
 
   function changeFocus(wid: number) {
-    unsetFocus();
-
-    X.SetInputFocus(wid, 0);
-
     if (store.getState().windows.hasOwnProperty(wid)) {
       store.dispatch(actions.focusWindow(wid));
-    }
-  }
-
-  function unsetFocus() {
-    const focusedWindow = getFocusedWindow();
-    if (focusedWindow) {
-      store.dispatch(actions.unfocusWindow(focusedWindow));
     }
   }
 
@@ -980,13 +910,13 @@ export function createServer(): XServer {
   // });
   //}
 
-  function getFocusedWindow() {
-    const windows = store.getState().windows;
-    for (const wid in windows) {
-      if (windows[wid].focused) return parseInt(wid);
-    }
-    return null;
-  }
+  // function getFocusedWindow() {
+  //   const windows = store.getState().windows;
+  //   for (const wid in windows) {
+  //     if (windows[wid].focused) return parseInt(wid);
+  //   }
+  //   return null;
+  // }
 
   function XGetWMProtocols(wid: number, callback: XCbWithErr<[number[] | void]>) {
     X.GetProperty(0, wid, ExtraAtoms.WM_PROTOCOLS, 0, 0, 10000000, (err, prop) => {
@@ -1048,6 +978,41 @@ export function createServer(): XServer {
     });
   }
 
+  function showWindow(wid: number) {
+    let fid;
+    const isFrame = isFrameBrowserWin(wid);
+    if (isFrame) {
+      fid = wid;
+      wid = getWindowIdFromFrameId(wid);
+    } else {
+      fid = getFrameIdFromWindowId(wid);
+    }
+
+    if (typeof fid === "number") {
+      console.log("showWindow frame id", fid);
+      X.MapWindow(fid);
+    }
+
+    const state = store.getState();
+    if (state.windows[wid]?.visible === false) {
+      store.dispatch(actions.setWindowVisible(wid, true));
+    }
+
+    console.log("showWindow id", wid);
+    X.MapWindow(wid);
+  }
+
+  function hideWindow(wid: number) {
+    const fid = getFrameIdFromWindowId(wid);
+    if (fid) X.UnmapWindow(fid);
+    if (wid) X.UnmapWindow(wid);
+
+    const state = store.getState();
+    if (state.windows[wid]?.visible === true) {
+      store.dispatch(actions.setWindowVisible(wid, false));
+    }
+  }
+
   function raiseWindow(wid: number) {
     const windows = store.getState().windows;
     const window = windows[wid];
@@ -1063,7 +1028,6 @@ export function createServer(): XServer {
 
   function minimize(wid: number) {
     hideWindow(wid);
-    unsetFocus();
   }
 
   function log(wid: number, ...args: unknown[]): void {
