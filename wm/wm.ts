@@ -108,21 +108,23 @@ export function createServer(): XServer {
     [keyModifiers: number]: { [keyCode: number]: boolean | VoidFunction };
   } = {
     [X11_KEY_MODIFIER.Mod4Mask]: {
-      27: true, // Win + R
+      27: true, // Mod4 + R
     },
     [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
-      // Win + Shift + Q
+      // Mod4 + Shift + C
+      54: () => closeFocusedWindow(),
+      // Mod4 + Shift + Q
       24: () => app.quit(),
     },
     [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
-      // Win + Ctrl + R
+      // Mod4 + Ctrl + R
       27: () => {
         app.relaunch();
         app.exit(0);
       },
     },
     [X11_KEY_MODIFIER.Mod4Mask]: {
-      // Win + Enter, TODO: launch default/configurable terminal.
+      // Mod4 + Enter, TODO: launch default/configurable terminal.
       36: () => launchProcess("urxvt"),
     },
   };
@@ -888,13 +890,13 @@ export function createServer(): XServer {
   // });
   //}
 
-  // function getFocusedWindow() {
-  //   const windows = store.getState().windows;
-  //   for (const wid in windows) {
-  //     if (windows[wid].focused) return parseInt(wid);
-  //   }
-  //   return null;
-  // }
+  function getFocusedWindowId(): number | null {
+    const windows = store.getState().windows;
+    for (const wid in windows) {
+      if (windows[wid].focused) return parseInt(wid);
+    }
+    return null;
+  }
 
   function XGetWMProtocols(wid: number, callback: XCbWithErr<[number[] | void]>) {
     X.GetProperty(0, wid, ExtraAtoms.WM_PROTOCOLS, 0, 0, 10000000, (err, prop) => {
@@ -918,6 +920,13 @@ export function createServer(): XServer {
 
       callback(null, protocols);
     });
+  }
+
+  function closeFocusedWindow(): void {
+    const wid = getFocusedWindowId();
+    if (typeof wid === "number" && !isDesktopBrowserWin(wid)) {
+      closeWindow(wid);
+    }
   }
 
   function closeWindow(wid: number) {
