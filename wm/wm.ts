@@ -1086,7 +1086,7 @@ export function createServer(): XServer {
           case "SET_CURRENT_TAGS":
             {
               const state = getState();
-              const { currentTags } = action.payload as {
+              const { currentTags, screenIndex } = action.payload as {
                 currentTags: string[];
                 screenIndex: number;
               };
@@ -1094,6 +1094,9 @@ export function createServer(): XServer {
                 for (const widStr in state.windows) {
                   const wid = parseInt(widStr, 10);
                   const win = state.windows[widStr];
+                  if (win.screenIndex !== screenIndex) {
+                    continue; // Other screens not affected.
+                  }
                   if (anyIntersect(win.tags, currentTags)) {
                     showWindow(wid);
                   } else {
