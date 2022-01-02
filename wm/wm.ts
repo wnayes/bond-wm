@@ -229,7 +229,7 @@ export function createServer(): XServer {
     }
 
     X.QueryTree(root, (err, tree) => {
-      tree.children.forEach((childWid) => manageWindow(childWid, true));
+      tree.children.forEach((childWid) => manageWindow(childWid, 0, true));
     });
 
     for (const modifier in registeredKeys) {
@@ -388,7 +388,7 @@ export function createServer(): XServer {
     }
   }
 
-  async function manageWindow(wid: number, checkUnmappedState: boolean): Promise<void> {
+  async function manageWindow(wid: number, screenIndex: number, checkUnmappedState: boolean): Promise<void> {
     console.log("MANAGE WINDOW: " + wid);
 
     if (initializingWins[wid]) {
@@ -437,14 +437,15 @@ export function createServer(): XServer {
     X.ChangeSaveSet(1, wid);
 
     if (shouldCreateFrame(wid, clientGeom)) {
-      const effectiveGeometry = getGeometryForWindow(clientGeom, title);
+      const effectiveGeometry = getGeometryForWindow(clientGeom);
 
       const fid = createFrameBrowser(wid, effectiveGeometry);
       knownWids.add(fid);
 
       const state = store.getState();
+      const screen = state.screens[screenIndex];
 
-      X.ReparentWindow(fid, state.screens[0].root, effectiveGeometry.x, effectiveGeometry.y);
+      X.ReparentWindow(fid, screen.root, screen.x + effectiveGeometry.x, screen.y + effectiveGeometry.y);
       X.ReparentWindow(wid, fid, 0, 0);
 
       X.GrabServer();
@@ -479,8 +480,8 @@ export function createServer(): XServer {
           visible: true,
           decorated,
           title,
-          screenIndex: 0,
-          tags: [state.screens[0].currentTags[0]],
+          screenIndex,
+          tags: [screen.currentTags[0]],
         })
       );
 
@@ -508,17 +509,7 @@ export function createServer(): XServer {
     return true;
   }
 
-  function getGeometryForWindow(clientGeom: XGeometry, title: string | undefined): Geometry {
-    switch (title) {
-      case "xterm":
-        return {
-          height: 200,
-          width: 300,
-          x: 50,
-          y: 50,
-        };
-    }
-
+  function getGeometryForWindow(clientGeom: XGeometry): Geometry {
     return {
       height: clientGeom.height,
       width: clientGeom.width,
@@ -559,7 +550,7 @@ export function createServer(): XServer {
     if (knownWids.has(wid)) {
       showWindow(wid);
     } else {
-      manageWindow(wid, false);
+      manageWindow(wid, 0, false);
     }
   }
 
@@ -1071,17 +1062,21 @@ export function createServer(): XServer {
         switch (action.type) {
           case "CONFIGURE_WINDOW":
             {
-              const fid = getFrameIdFromWindowId(action.payload.wid) ?? action.payload.wid;
+              const state = getState();
+              const wid = action.payload.wid;
+              const win = state.windows[wid];
+              const screen = state.screens[win.screenIndex];
+
+              const fid = getFrameIdFromWindowId(wid) ?? wid;
               X.ConfigureWindow(fid, {
-                x: action.payload.x,
-                y: action.payload.y,
+                x: screen.x + action.payload.x,
+                y: screen.y + action.payload.y,
                 width: action.payload.width,
                 height: action.payload.height,
               });
-              if (fid !== action.payload.wid) {
-                const state = getState();
-                const win = state.windows[action.payload.wid] as IWindow;
-                X.ConfigureWindow(action.payload.wid, {
+
+              if (fid !== wid && win) {
+                X.ConfigureWindow(wid, {
                   width: action.payload.width - win.inner.left - win.inner.right,
                   height: action.payload.height - win.inner.top - win.inner.bottom,
                 });
