@@ -135,7 +135,7 @@ export interface IXDisplay {
   client: IXClient;
 }
 
-enum XReplaceMode {
+export enum XPropMode {
   Replace = 0,
   Prepend = 1,
   Append = 2,
@@ -463,15 +463,13 @@ export interface IXClient {
   ): void;
   ChangeActivePointerGrab(...args: unknown[]): unknown;
   ChangeGC(...args: unknown[]): unknown;
-  // replace mode: 0 replace, 1 prepend, 2 append
-  // unitSize = 8/16/32 TODO: remove, use depending on buffer size
   ChangeProperty(
-    replaceMode: XReplaceMode,
+    replaceMode: XPropMode,
     winId: number,
-    propNameAtom: unknown,
-    typeNameAtom: unknown,
-    units: unknown,
-    data: unknown
+    propNameAtom: Atom,
+    typeNameAtom: Atom,
+    units: 8 | 16 | 32,
+    data: Buffer | string
   ): void;
   ChangeSaveSet(a: number, wid: number): void;
   ChangeWindowAttributes(wid: number, values: { eventMask: unknown }, callback: XCbWithErr<[void]>): void;

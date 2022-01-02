@@ -22,8 +22,6 @@ import {
   XGeometry,
   XWindowAttrs,
   IXPropertyNotifyEvent,
-  Atom,
-  XStandardAtoms,
   XMapState,
   XCB_EVENT_MASK_NO_EVENT,
   IX11Mod,
@@ -35,6 +33,8 @@ import { Middleware } from "redux";
 import { batch } from "react-redux";
 import { anyIntersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
+import { createEWMHEventConsumer } from "./ewmh";
+import { getPropertyValue, internAtomAsync } from "./xutils";
 
 const registeredKeys: {
   [keyModifiers: number]: { [keyCode: number]: boolean };
@@ -57,6 +57,27 @@ interface Geometry {
   y: number;
 }
 
+// The values here are arbitrary; we call InternAtom to get the true constants.
+export const ExtraAtoms = {
+  UTF8_STRING: -1,
+
+  WM_PROTOCOLS: 10000,
+  WM_DELETE_WINDOW: 10001,
+
+  _NET_WM_NAME: 340,
+};
+
+export interface IXWMEventConsumer {
+  onMapNotify?(wid: number): void;
+  onUnmapNotify?(wid: number): void;
+}
+
+export interface XWMContext {
+  X: IXClient;
+  XDisplay: IXDisplay;
+  store: ServerStore;
+}
+
 export function startX(): XServer {
   return createServer();
 }
@@ -72,6 +93,8 @@ export function createServer(): XServer {
   let XDisplay: IXDisplay;
   let X: IXClient;
 
+  const eventConsumers: IXWMEventConsumer[] = [];
+
   const knownWids = new Set<number>();
 
   const desktopBrowsers: BrowserWindow[] = [];
@@ -86,21 +109,11 @@ export function createServer(): XServer {
 
   const store = __setupStore();
 
-  // The values here are arbitrary; we call InternAtom to get the true constants.
-  const ExtraAtoms = {
-    UTF8_STRING: -1,
-
-    WM_PROTOCOLS: 10000,
-    WM_DELETE_WINDOW: 10001,
-
-    _NET_WM_NAME: 340,
-  } as const;
-
-  type AtomToType<TAtom> = TAtom extends XStandardAtoms["STRING"]
-    ? string
-    : TAtom extends typeof ExtraAtoms["UTF8_STRING"]
-    ? string
-    : unknown;
+  const context: XWMContext = {
+    X,
+    XDisplay,
+    store,
+  };
 
   // Initialization.
   (() => {
@@ -110,8 +123,10 @@ export function createServer(): XServer {
         process.exit(1);
       }
 
-      XDisplay = display;
-      X = display.client;
+      XDisplay = context.XDisplay = display;
+      X = context.X = display.client;
+
+      eventConsumers.push(await createEWMHEventConsumer(context));
 
       await __setupAtoms();
       await __initDesktop();
@@ -148,27 +163,15 @@ export function createServer(): XServer {
     // TODO: Typings are a little awkward here.
     /* eslint-disable @typescript-eslint/no-explicit-any */
     const extraAtoms = ExtraAtoms as Mutable<typeof ExtraAtoms>;
-    extraAtoms.UTF8_STRING = (await internAtomAsync("UTF8_STRING")) as any;
+    extraAtoms.UTF8_STRING = (await internAtomAsync(X, "UTF8_STRING")) as any;
 
-    extraAtoms.WM_PROTOCOLS = (await internAtomAsync("WM_PROTOCOLS")) as any;
-    extraAtoms.WM_DELETE_WINDOW = (await internAtomAsync("WM_DELETE_WINDOW")) as any;
+    extraAtoms.WM_PROTOCOLS = (await internAtomAsync(X, "WM_PROTOCOLS")) as any;
+    extraAtoms.WM_DELETE_WINDOW = (await internAtomAsync(X, "WM_DELETE_WINDOW")) as any;
 
-    extraAtoms._NET_WM_NAME = (await internAtomAsync("_NET_WM_NAME")) as any;
+    extraAtoms._NET_WM_NAME = (await internAtomAsync(X, "_NET_WM_NAME")) as any;
 
     console.log("ExtraAtoms", extraAtoms);
     /* eslint-enable @typescript-eslint/no-explicit-any */
-  }
-
-  function internAtomAsync(name: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      X.InternAtom(false, name, (err, atom) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(atom);
-      });
-    });
   }
 
   async function __initDesktop(): Promise<void> {
@@ -268,6 +271,7 @@ export function createServer(): XServer {
       fullscreen: true,
       width: props.width,
       height: props.height,
+      type: "desktop",
       webPreferences: {
         preload: path.resolve(path.join(__dirname, "../renderer-shared/preload.js")),
         nodeIntegration: true,
@@ -364,6 +368,7 @@ export function createServer(): XServer {
         onUnmapNotify(ev);
         break;
       case X11_EVENT_TYPE.MapNotify:
+        onMapNotify(ev);
         break;
       case X11_EVENT_TYPE.MapRequest:
         onMapRequest(ev);
@@ -552,6 +557,13 @@ export function createServer(): XServer {
     } else {
       manageWindow(wid, 0, false);
     }
+  }
+
+  function onMapNotify(ev: IXEvent) {
+    const wid = ev.wid;
+    log(wid, "onMapNotify", ev);
+
+    eventConsumers.forEach((consumer) => consumer.onMapNotify(wid));
   }
 
   function onUnmapNotify(ev: IXEvent) {
@@ -771,8 +783,8 @@ export function createServer(): XServer {
 
   async function getWindowTitle(wid: number): Promise<string | undefined> {
     const [name, utf8name] = await Promise.all([
-      getPropertyValue(wid, X.atoms.WM_NAME, X.atoms.STRING),
-      getPropertyValue(wid, ExtraAtoms._NET_WM_NAME, ExtraAtoms.UTF8_STRING),
+      getPropertyValue<string>(X, wid, X.atoms.WM_NAME, X.atoms.STRING),
+      getPropertyValue<string>(X, wid, ExtraAtoms._NET_WM_NAME, ExtraAtoms.UTF8_STRING),
     ]);
 
     return utf8name || name;
@@ -806,38 +818,6 @@ export function createServer(): XServer {
           }
           resolve(true);
         });
-      });
-    });
-  }
-
-  function getPropertyValue<TTypeAtom extends Atom, TValue = AtomToType<TTypeAtom>>(
-    wid: number,
-    nameAtom: Atom,
-    typeAtom: TTypeAtom
-  ): Promise<TValue> {
-    return new Promise((resolve, reject) => {
-      X.GetProperty(0, wid, nameAtom, typeAtom, 0, 10000000, function (err, prop) {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        console.log("Got property value response", prop);
-
-        switch (prop.type) {
-          case X.atoms.STRING:
-            resolve(prop.data.toString() as unknown as TValue);
-            break;
-
-          case ExtraAtoms.UTF8_STRING:
-            resolve(prop.data.toString() as unknown as TValue);
-            break;
-
-          default:
-            console.log("Unhandled atom property type", prop);
-            resolve(undefined);
-            break;
-        }
       });
     });
   }
