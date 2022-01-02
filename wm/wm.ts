@@ -37,20 +37,6 @@ import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor } from "./pointer";
 
-const registeredKeys: {
-  [keyModifiers: number]: { [keyCode: number]: boolean };
-} = {
-  [X11_KEY_MODIFIER.Mod4Mask]: {
-    27: true, // Win + R
-  },
-  [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
-    24: true, // Win + Shift + Q
-  },
-  [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
-    27: true, // Win + Ctrl + R
-  },
-};
-
 interface Geometry {
   width: number;
   height: number;
@@ -114,6 +100,31 @@ export function createServer(): XServer {
     X,
     XDisplay,
     store,
+  };
+
+  // If `true`, send to the desktop browser.
+  // If a function, execute when pressed.
+  const registeredKeys: {
+    [keyModifiers: number]: { [keyCode: number]: boolean | VoidFunction };
+  } = {
+    [X11_KEY_MODIFIER.Mod4Mask]: {
+      27: true, // Win + R
+    },
+    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
+      // Win + Shift + Q
+      24: () => app.quit(),
+    },
+    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
+      // Win + Ctrl + R
+      27: () => {
+        app.relaunch();
+        app.exit(0);
+      },
+    },
+    [X11_KEY_MODIFIER.Mod4Mask]: {
+      // Win + Enter, TODO: launch default/configurable terminal.
+      36: () => launchProcess("urxvt"),
+    },
   };
 
   // Initialization.
@@ -236,18 +247,22 @@ export function createServer(): XServer {
       tree.children.forEach((childWid) => manageWindow(childWid, 0, true));
     });
 
+    __setupKeyShortcuts(root);
+
+    // TODO: What to do for more than one screen?
+    X.SetInputFocus(root, 0);
+  }
+
+  function __setupKeyShortcuts(rootWid: number) {
     for (const modifier in registeredKeys) {
       if (!registeredKeys.hasOwnProperty(modifier)) continue;
 
       for (const key in registeredKeys[modifier]) {
         if (!registeredKeys[modifier].hasOwnProperty(key)) continue;
 
-        X.GrabKey(root, true, parseInt(modifier), parseInt(key), 1 /* Async */, 1 /* Async */);
+        X.GrabKey(rootWid, true, parseInt(modifier, 10), parseInt(key, 10), 1 /* Async */, 1 /* Async */);
       }
     }
-
-    // TODO: What to do for more than one screen?
-    X.SetInputFocus(root, 0);
   }
 
   function isDesktopBrowserWin(win: number): boolean {
@@ -673,31 +688,20 @@ export function createServer(): XServer {
     log(wid, "onKeyPress", ev);
 
     const kb = registeredKeys;
-    if (kb[ev.buttons] && kb[ev.buttons][ev.keycode]) {
-      const screenIndex = await getScreenIndexWithCursor(context, wid);
-      const browser = desktopBrowsers[screenIndex];
-      if (browser) {
-        browser.webContents.send("x-keypress", {
-          buttons: ev.buttons,
-          keycode: ev.keycode,
-        });
+    if (kb[ev.buttons]) {
+      const entry = kb[ev.buttons][ev.keycode];
+      if (typeof entry === "function") {
+        entry();
+      } else if (typeof entry === "boolean") {
+        const screenIndex = await getScreenIndexWithCursor(context, wid);
+        const browser = desktopBrowsers[screenIndex];
+        if (browser) {
+          browser.webContents.send("x-keypress", {
+            buttons: ev.buttons,
+            keycode: ev.keycode,
+          });
+        }
       }
-    }
-
-    switch (ev.buttons) {
-      case X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask:
-        // Win + Shift + Q
-        if (ev.keycode === 24) {
-          app.quit();
-        }
-        break;
-      case X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask:
-        // Win + Ctrl + R
-        if (ev.keycode === 27) {
-          app.relaunch();
-          app.exit(0);
-        }
-        break;
     }
   }
 
