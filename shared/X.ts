@@ -349,6 +349,17 @@ enum XFocusRevertTo {
   Parent = 2,
 }
 
+export interface XQueryPointerResult {
+  root: number;
+  child: number;
+  rootX: number;
+  rootY: number;
+  childX: number;
+  childY: number;
+  keyMask: number;
+  sameScreen: boolean;
+}
+
 interface UnpackStream {
   pack(format: string, args: unknown[]): void;
   flush(): void;
@@ -543,7 +554,7 @@ export interface IXClient {
     dataBuffer: Buffer
   ): void;
   QueryExtension<T>(name: string, callback: XCbWithErr<[ext: XExtension<T>]>): void;
-  QueryPointer(winId: number): void;
+  QueryPointer(winId: number, callback: XCbWithErr<[result: XQueryPointerResult]>): void;
   QueryTree(winId: number, callback: XCbWithErr<[result: XQueryTreeResult]>): void;
   RaiseWindow(winId: number): void;
   ReleaseID(id: number): void;

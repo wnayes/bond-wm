@@ -21,3 +21,7 @@ export function geometriesDiffer(geo1: IGeometry | null | undefined, geo2: IGeom
 
   return geo1.x !== geo2.x || geo1.y !== geo2.y || geo1.width !== geo2.width || geo1.height !== geo2.height;
 }
+
+export function geometryContains(geo: IGeometry, x: number, y: number): boolean {
+  return x >= geo.x && x <= geo.x + geo.width && y >= geo.y && y <= geo.y + geo.height;
+}

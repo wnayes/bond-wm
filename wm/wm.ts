@@ -35,6 +35,7 @@ import { anyIntersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
+import { getScreenIndexWithCursor } from "./pointer";
 
 const registeredKeys: {
   [keyModifiers: number]: { [keyCode: number]: boolean };
@@ -394,7 +395,7 @@ export function createServer(): XServer {
   }
 
   async function manageWindow(wid: number, screenIndex: number, checkUnmappedState: boolean): Promise<void> {
-    console.log("MANAGE WINDOW: " + wid);
+    log(wid, `Manage window on screen ${screenIndex}`);
 
     if (initializingWins[wid]) {
       console.log(`Skip manage, ${wid} is already initializing`);
@@ -542,12 +543,12 @@ export function createServer(): XServer {
   }
 
   function onCreateNotify(ev: IXEvent) {
-    const wid = ev.wid;
+    const { wid } = ev;
     log(wid, "onCreateNotify", ev);
   }
 
-  function onMapRequest(ev: IXEvent) {
-    const wid = ev.wid;
+  async function onMapRequest(ev: IXEvent) {
+    const { wid } = ev;
     log(wid, "onMapRequest", ev);
 
     if (initializingWins[wid]) return;
@@ -555,19 +556,20 @@ export function createServer(): XServer {
     if (knownWids.has(wid)) {
       showWindow(wid);
     } else {
-      manageWindow(wid, 0, false);
+      const screenIndex = Math.max(0, await getScreenIndexWithCursor(context, wid));
+      manageWindow(wid, screenIndex, false);
     }
   }
 
   function onMapNotify(ev: IXEvent) {
-    const wid = ev.wid;
+    const { wid } = ev;
     log(wid, "onMapNotify", ev);
 
     eventConsumers.forEach((consumer) => consumer.onMapNotify(wid));
   }
 
   function onUnmapNotify(ev: IXEvent) {
-    const wid = ev.wid;
+    const { wid } = ev;
     log(wid, "onUnmapNotify", ev);
     if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
       const state = store.getState();
@@ -583,7 +585,7 @@ export function createServer(): XServer {
   }
 
   function onDestroyNotify(ev: IXEvent) {
-    const wid = ev.wid;
+    const { wid } = ev;
     log(wid, "onDestroyNotify", ev);
 
     if (isFrameBrowserWin(wid)) {
@@ -666,13 +668,14 @@ export function createServer(): XServer {
     // }
   }
 
-  function onKeyPress(ev: IXKeyEvent) {
+  async function onKeyPress(ev: IXKeyEvent) {
     const { wid } = ev;
     log(wid, "onKeyPress", ev);
 
     const kb = registeredKeys;
     if (kb[ev.buttons] && kb[ev.buttons][ev.keycode]) {
-      const browser = desktopBrowsers[0];
+      const screenIndex = await getScreenIndexWithCursor(context, wid);
+      const browser = desktopBrowsers[screenIndex];
       if (browser) {
         browser.webContents.send("x-keypress", {
           buttons: ev.buttons,

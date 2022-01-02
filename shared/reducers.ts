@@ -18,6 +18,8 @@ export interface IBounds {
 }
 
 export interface IScreen {
+  index: number;
+
   root: number;
 
   x: number;
@@ -35,6 +37,8 @@ function screens(state: IScreen[] = [], action: { type: string; payload: any }) 
     case "ADD_SCREEN": {
       const newState = state.slice();
       newState.push({
+        index: newState.length,
+
         root: action.payload.root,
 
         x: action.payload.x,
