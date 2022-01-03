@@ -109,7 +109,11 @@ export function createServer(): XServer {
     [keyModifiers: number]: { [keyCode: number]: boolean | VoidFunction };
   } = {
     [X11_KEY_MODIFIER.Mod4Mask]: {
-      27: true, // Mod4 + R
+      // Mod4 + R
+      27: true,
+
+      // Mod4 + Enter, TODO: launch default/configurable terminal.
+      36: () => launchProcess("urxvt"),
     },
     [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
       // Mod4 + Shift + C
@@ -123,10 +127,6 @@ export function createServer(): XServer {
         app.relaunch();
         app.exit(0);
       },
-    },
-    [X11_KEY_MODIFIER.Mod4Mask]: {
-      // Mod4 + Enter, TODO: launch default/configurable terminal.
-      36: () => launchProcess("urxvt"),
     },
   };
 
