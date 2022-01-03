@@ -36,6 +36,7 @@ import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor } from "./pointer";
+import { createICCCMEventConsumer } from "./icccm";
 
 interface Geometry {
   width: number;
@@ -140,6 +141,7 @@ export function createServer(): XServer {
       XDisplay = context.XDisplay = display;
       X = context.X = display.client;
 
+      eventConsumers.push(await createICCCMEventConsumer(context));
       eventConsumers.push(await createEWMHEventConsumer(context));
 
       await __setupAtoms();
@@ -582,17 +584,21 @@ export function createServer(): XServer {
     const { wid } = ev;
     log(wid, "onMapNotify", ev);
 
-    eventConsumers.forEach((consumer) => consumer.onMapNotify(wid));
+    if (isClientWin(wid)) {
+      eventConsumers.forEach((consumer) => consumer.onMapNotify(wid));
+    }
   }
 
   function onUnmapNotify(ev: IXEvent) {
     const { wid } = ev;
     log(wid, "onUnmapNotify", ev);
-    if (!isFrameBrowserWin(wid) && !isDesktopBrowserWin(wid)) {
+    if (isClientWin(wid)) {
       const state = store.getState();
       if (state.windows[wid]?.visible === true) {
         store.dispatch(actions.setWindowVisible(wid, false));
       }
+
+      eventConsumers.forEach((consumer) => consumer.onUnmapNotify(wid));
 
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number" && fid !== wid) {
@@ -1032,6 +1038,10 @@ export function createServer(): XServer {
 
     const logArgs = [...details, ...args];
     console.log(...logArgs);
+  }
+
+  function isClientWin(wid: number): boolean {
+    return typeof store.getState().windows[wid] !== "undefined";
   }
 
   function __setupStore(): ServerStore {
