@@ -84,6 +84,7 @@ export function createServer(): XServer {
   const eventConsumers: IXWMEventConsumer[] = [];
 
   const knownWids = new Set<number>();
+  const ignoredSeqNums = new Set<number>();
 
   const desktopBrowsers: BrowserWindow[] = [];
   /** Desktop window handle to index into `desktopBrowsers`. */
@@ -352,6 +353,17 @@ export function createServer(): XServer {
   }
 
   function __onXEvent(ev: IXEvent) {
+    if (typeof ev.seq === "number") {
+      if (ignoredSeqNums.has(ev.seq)) {
+        log(ev.wid, `Ignoring X ${X11_EVENT_TYPE[ev.type]} event based on sequence number`, ev);
+        return;
+      } else if (ignoredSeqNums.has(ev.seq - 1)) {
+        // Wait to delete an ignored seq_num until we see the next one.
+        // Sometimes events raise multiple times (similar to DOM event bubbling).
+        ignoredSeqNums.delete(ev.seq - 1);
+      }
+    }
+
     switch (ev.type) {
       case X11_EVENT_TYPE.KeyPress:
         onKeyPress(ev as IXKeyEvent);
@@ -519,6 +531,31 @@ export function createServer(): XServer {
     delete initializingWins[wid];
   }
 
+  function unmanageWindow(wid: number): void {
+    if (isFrameBrowserWin(wid)) {
+      log(wid, `Unmanage frame window`);
+
+      const innerWid = frameBrowserFrameIdToWinId[wid];
+      delete frameBrowserFrameIdToWinId[wid];
+      delete frameBrowserWinIdToFrameId[innerWid];
+      delete frameBrowserWindows[innerWid];
+    } else if (isClientWin(wid)) {
+      log(wid, `Unmanage window`);
+
+      if (store.getState().windows.hasOwnProperty(wid)) {
+        store.dispatch(actions.removeWindow(wid));
+      }
+
+      const fid = getFrameIdFromWindowId(wid);
+      if (typeof fid === "number" && fid !== wid) {
+        console.log("Calling DestroyWindow for frame " + fid);
+        X.DestroyWindow(fid);
+      }
+    }
+
+    knownWids.delete(wid);
+  }
+
   function shouldCreateFrame(wid: number, geometry: XGeometry): boolean {
     if (isDesktopBrowserWin(wid)) {
       return false;
@@ -561,6 +598,11 @@ export function createServer(): XServer {
     return !failed;
   }
 
+  function ignoreNextXResponse(): void {
+    // https://github.com/sidorares/node-x11/blob/86dfd41cad037a6462723bc4ff8810e8cafc5bec/lib/xcore.js#L186
+    ignoredSeqNums.add((X.seq_num + 1) % 65535);
+  }
+
   function onCreateNotify(ev: IXEvent) {
     const { wid } = ev;
     log(wid, "onCreateNotify", ev);
@@ -592,43 +634,17 @@ export function createServer(): XServer {
   function onUnmapNotify(ev: IXEvent) {
     const { wid } = ev;
     log(wid, "onUnmapNotify", ev);
-    if (isClientWin(wid)) {
-      const state = store.getState();
-      if (state.windows[wid]?.visible === true) {
-        store.dispatch(actions.setWindowVisible(wid, false));
-      }
 
-      eventConsumers.forEach((consumer) => consumer.onUnmapNotify(wid));
+    eventConsumers.forEach((consumer) => consumer.onUnmapNotify(wid));
 
-      const fid = getFrameIdFromWindowId(wid);
-      if (typeof fid === "number" && fid !== wid) {
-        X.UnmapWindow(fid);
-      }
-    }
+    unmanageWindow(wid);
   }
 
   function onDestroyNotify(ev: IXEvent) {
     const { wid } = ev;
     log(wid, "onDestroyNotify", ev);
 
-    if (isFrameBrowserWin(wid)) {
-      const innerWid = frameBrowserFrameIdToWinId[wid];
-      delete frameBrowserFrameIdToWinId[wid];
-      delete frameBrowserWinIdToFrameId[innerWid];
-      delete frameBrowserWindows[innerWid];
-    } else {
-      if (store.getState().windows.hasOwnProperty(wid)) {
-        store.dispatch(actions.removeWindow(wid));
-      }
-
-      const fid = getFrameIdFromWindowId(wid);
-      if (typeof fid === "number" && fid !== wid) {
-        console.log("Calling DestroyWindow for frame " + fid);
-        X.DestroyWindow(fid);
-      }
-    }
-
-    knownWids.delete(wid);
+    unmanageWindow(wid);
   }
 
   function onConfigureRequest(ev: IXConfigureEvent) {
@@ -995,10 +1011,17 @@ export function createServer(): XServer {
     X.MapWindow(wid);
   }
 
+  /** Hides a window without destroying its frame. */
   function hideWindow(wid: number) {
     const fid = getFrameIdFromWindowId(wid);
-    if (fid) X.UnmapWindow(fid);
-    if (wid) X.UnmapWindow(wid);
+    if (fid) {
+      ignoreNextXResponse();
+      X.UnmapWindow(fid);
+    }
+    if (wid) {
+      ignoreNextXResponse();
+      X.UnmapWindow(wid);
+    }
 
     const state = store.getState();
     if (state.windows[wid]?.visible === true) {
@@ -1008,9 +1031,9 @@ export function createServer(): XServer {
 
   function raiseWindow(wid: number) {
     const windows = store.getState().windows;
-    const window = windows[wid];
+    const win = windows[wid];
 
-    if (!window.visible) {
+    if (!win.visible) {
       showWindow(wid);
     } else {
       const fid = getFrameIdFromWindowId(wid);

@@ -197,17 +197,22 @@ function windows(state: WindowsState = {}, action: any) {
         console.error("Action on unknown window", action);
         return state;
       }
-    case "SET_WINDOW_VISIBLE":
+    case "SET_WINDOW_VISIBLE": {
+      const { wid, visible } = action.payload;
       newState = Object.assign({}, state);
-      if (newState[action.payload.wid]) {
-        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
-          visible: !!action.payload.visible,
+      if (newState[wid]) {
+        newState[wid] = Object.assign({}, newState[wid], {
+          visible: !!visible,
         });
+        if (!visible) {
+          newState[wid].focused = false;
+        }
         return newState;
       } else {
         console.error("Action on unknown window", action);
         return state;
       }
+    }
     case "SET_WINDOW_DECORATED":
       newState = Object.assign({}, state);
       if (newState[action.payload.wid]) {
