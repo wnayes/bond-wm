@@ -1,5 +1,5 @@
 import { XPropMode } from "../shared/X";
-import { IXWMEventConsumer, XWMContext } from "./wm";
+import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { internAtomAsync } from "./xutils";
 
 enum WMStateValue {
@@ -26,12 +26,16 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
   }
 
   return {
-    onMapNotify(wid) {
-      updateWindowState(wid);
+    onMapNotify({ wid, windowType }) {
+      if (windowType === XWMWindowType.Client) {
+        updateWindowState(wid);
+      }
     },
 
-    onUnmapNotify(wid) {
-      removeWindowState(wid);
+    onUnmapNotify({ wid, windowType }) {
+      if (windowType === XWMWindowType.Client) {
+        removeWindowState(wid);
+      }
     },
   };
 }

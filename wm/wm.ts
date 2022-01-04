@@ -55,9 +55,42 @@ export const ExtraAtoms = {
   _NET_WM_NAME: 340,
 };
 
+const NO_EVENT_MASK = 0;
+
+const ROOT_WIN_EVENT_MASK =
+  x11.eventMask.SubstructureRedirect |
+  x11.eventMask.SubstructureNotify |
+  x11.eventMask.EnterWindow |
+  x11.eventMask.LeaveWindow |
+  x11.eventMask.StructureNotify |
+  x11.eventMask.ButtonPress |
+  x11.eventMask.ButtonRelease |
+  x11.eventMask.FocusChange |
+  x11.eventMask.PropertyChange;
+
+const FRAME_WIN_EVENT_MASK =
+  x11.eventMask.StructureNotify |
+  x11.eventMask.EnterWindow |
+  x11.eventMask.LeaveWindow |
+  x11.eventMask.SubstructureRedirect;
+
+const CLIENT_WIN_EVENT_MASK = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.FocusChange;
+
+export enum XWMWindowType {
+  Other = 0,
+  Client = 1,
+  Frame = 2,
+  Desktop = 3,
+}
+
+export interface XWMEventConsumerArgs {
+  wid: number;
+  windowType: XWMWindowType;
+}
+
 export interface IXWMEventConsumer {
-  onMapNotify?(wid: number): void;
-  onUnmapNotify?(wid: number): void;
+  onMapNotify?(args: XWMEventConsumerArgs): void;
+  onUnmapNotify?(args: XWMEventConsumerArgs): void;
 }
 
 export interface XWMContext {
@@ -84,7 +117,7 @@ export function createServer(): XServer {
   const eventConsumers: IXWMEventConsumer[] = [];
 
   const knownWids = new Set<number>();
-  const ignoredSeqNums = new Set<number>();
+  const winIdToRootId: { [wid: number]: number } = {};
 
   const desktopBrowsers: BrowserWindow[] = [];
   /** Desktop window handle to index into `desktopBrowsers`. */
@@ -206,17 +239,7 @@ export function createServer(): XServer {
 
     X.GrabServer();
 
-    const rootEvents =
-      x11.eventMask.SubstructureRedirect |
-      x11.eventMask.SubstructureNotify |
-      x11.eventMask.EnterWindow |
-      x11.eventMask.LeaveWindow |
-      x11.eventMask.StructureNotify |
-      x11.eventMask.ButtonPress |
-      x11.eventMask.ButtonRelease |
-      x11.eventMask.FocusChange |
-      x11.eventMask.PropertyChange;
-    changeWindowEventMask(root, rootEvents);
+    changeWindowEventMask(root, ROOT_WIN_EVENT_MASK);
 
     X.UngrabServer();
 
@@ -286,6 +309,10 @@ export function createServer(): XServer {
     return frameBrowserFrameIdToWinId[wid];
   }
 
+  function getRootIdFromWindowId(wid: number): number | undefined {
+    return winIdToRootId[wid];
+  }
+
   function createDesktopBrowser(props: { width: number; height: number }) {
     const win = new BrowserWindow({
       frame: false,
@@ -353,18 +380,9 @@ export function createServer(): XServer {
   }
 
   function __onXEvent(ev: IXEvent) {
-    if (typeof ev.seq === "number") {
-      if (ignoredSeqNums.has(ev.seq)) {
-        log(ev.wid, `Ignoring X ${X11_EVENT_TYPE[ev.type]} event based on sequence number`, ev);
-        return;
-      } else if (ignoredSeqNums.has(ev.seq - 1)) {
-        // Wait to delete an ignored seq_num until we see the next one.
-        // Sometimes events raise multiple times (similar to DOM event bubbling).
-        ignoredSeqNums.delete(ev.seq - 1);
-      }
-    }
+    const { type } = ev;
 
-    switch (ev.type) {
+    switch (type) {
       case X11_EVENT_TYPE.KeyPress:
         onKeyPress(ev as IXKeyEvent);
         break;
@@ -482,20 +500,16 @@ export function createServer(): XServer {
       const state = store.getState();
       const screen = state.screens[screenIndex];
 
+      winIdToRootId[wid] = screen.root;
+      winIdToRootId[fid] = screen.root;
+
       X.ReparentWindow(fid, screen.root, screen.x + effectiveGeometry.x, screen.y + effectiveGeometry.y);
       X.ReparentWindow(wid, fid, 0, 0);
 
       X.GrabServer();
 
-      const frameEvents =
-        x11.eventMask.StructureNotify |
-        x11.eventMask.EnterWindow |
-        x11.eventMask.LeaveWindow |
-        x11.eventMask.SubstructureRedirect;
-      changeWindowEventMask(fid, frameEvents);
-
-      const clientEvents = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.FocusChange;
-      changeWindowEventMask(wid, clientEvents);
+      changeWindowEventMask(fid, FRAME_WIN_EVENT_MASK);
+      changeWindowEventMask(wid, CLIENT_WIN_EVENT_MASK);
 
       X.UngrabServer();
 
@@ -554,6 +568,7 @@ export function createServer(): XServer {
     }
 
     knownWids.delete(wid);
+    delete winIdToRootId[wid];
   }
 
   function shouldCreateFrame(wid: number, geometry: XGeometry): boolean {
@@ -598,9 +613,33 @@ export function createServer(): XServer {
     return !failed;
   }
 
-  function ignoreNextXResponse(): void {
-    // https://github.com/sidorares/node-x11/blob/86dfd41cad037a6462723bc4ff8810e8cafc5bec/lib/xcore.js#L186
-    ignoredSeqNums.add((X.seq_num + 1) % 65535);
+  function runXCallsWithoutEvents(wid: number, fn: VoidFunction): void {
+    X.GrabServer();
+    try {
+      const root = getRootIdFromWindowId(wid);
+      if (typeof root === "number") {
+        changeWindowEventMask(root, NO_EVENT_MASK);
+      }
+      const fid = getFrameIdFromWindowId(wid);
+      if (typeof fid === "number") {
+        changeWindowEventMask(fid, NO_EVENT_MASK);
+      }
+      changeWindowEventMask(wid, NO_EVENT_MASK);
+
+      try {
+        fn();
+      } finally {
+        if (typeof root === "number") {
+          changeWindowEventMask(root, NO_EVENT_MASK);
+        }
+        if (typeof fid === "number") {
+          changeWindowEventMask(fid, FRAME_WIN_EVENT_MASK);
+        }
+        changeWindowEventMask(wid, CLIENT_WIN_EVENT_MASK);
+      }
+    } finally {
+      X.UngrabServer();
+    }
   }
 
   function onCreateNotify(ev: IXEvent) {
@@ -627,7 +666,7 @@ export function createServer(): XServer {
     log(wid, "onMapNotify", ev);
 
     if (isClientWin(wid)) {
-      eventConsumers.forEach((consumer) => consumer.onMapNotify(wid));
+      eventConsumers.forEach((consumer) => consumer.onMapNotify({ wid, windowType: getWindowType(wid) }));
     }
   }
 
@@ -635,7 +674,7 @@ export function createServer(): XServer {
     const { wid } = ev;
     log(wid, "onUnmapNotify", ev);
 
-    eventConsumers.forEach((consumer) => consumer.onUnmapNotify(wid));
+    eventConsumers.forEach((consumer) => consumer.onUnmapNotify({ wid, windowType: getWindowType(wid) }));
 
     unmanageWindow(wid);
   }
@@ -1014,14 +1053,15 @@ export function createServer(): XServer {
   /** Hides a window without destroying its frame. */
   function hideWindow(wid: number) {
     const fid = getFrameIdFromWindowId(wid);
-    if (fid) {
-      ignoreNextXResponse();
-      X.UnmapWindow(fid);
-    }
-    if (wid) {
-      ignoreNextXResponse();
-      X.UnmapWindow(wid);
-    }
+
+    runXCallsWithoutEvents(wid, () => {
+      if (fid) {
+        X.UnmapWindow(fid);
+      }
+      if (wid) {
+        X.UnmapWindow(wid);
+      }
+    });
 
     const state = store.getState();
     if (state.windows[wid]?.visible === true) {
@@ -1043,6 +1083,7 @@ export function createServer(): XServer {
   }
 
   function minimize(wid: number) {
+    log(wid, "minimize");
     hideWindow(wid);
   }
 
@@ -1051,16 +1092,32 @@ export function createServer(): XServer {
     if (typeof wid === "number") {
       details.push(wid);
 
-      if (isFrameBrowserWin(wid)) {
-        details.push(`(frame for ${getWindowIdFromFrameId(wid)})`);
-      }
-      if (isDesktopBrowserWin(wid)) {
-        details.push("(desktop)");
+      switch (getWindowType(wid)) {
+        case XWMWindowType.Frame:
+          details.push(`(frame for ${getWindowIdFromFrameId(wid)})`);
+          break;
+        case XWMWindowType.Desktop:
+          details.push("(desktop)");
+          break;
       }
     }
 
     const logArgs = [...details, ...args];
     console.log(...logArgs);
+  }
+
+  function getWindowType(wid: number): XWMWindowType {
+    if (isFrameBrowserWin(wid)) {
+      return XWMWindowType.Frame;
+    }
+    if (isDesktopBrowserWin(wid)) {
+      return XWMWindowType.Desktop;
+    }
+    if (isClientWin(wid)) {
+      return XWMWindowType.Client;
+    }
+
+    return XWMWindowType.Other;
   }
 
   function isClientWin(wid: number): boolean {

@@ -1,5 +1,5 @@
 import { XPropMode } from "../shared/X";
-import { IXWMEventConsumer, XWMContext } from "./wm";
+import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { internAtomAsync } from "./xutils";
 
 export async function createEWMHEventConsumer({ X }: XWMContext): Promise<IXWMEventConsumer> {
@@ -20,12 +20,16 @@ export async function createEWMHEventConsumer({ X }: XWMContext): Promise<IXWMEv
   }
 
   return {
-    onMapNotify(wid) {
-      updateWindowStateHints(wid);
+    onMapNotify({ wid, windowType }) {
+      if (windowType === XWMWindowType.Client) {
+        updateWindowStateHints(wid);
+      }
     },
 
-    onUnmapNotify(wid) {
-      removeWindowStateHints(wid);
+    onUnmapNotify({ wid, windowType }) {
+      if (windowType === XWMWindowType.Client) {
+        removeWindowStateHints(wid);
+      }
     },
   };
 }
