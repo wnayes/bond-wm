@@ -36,7 +36,7 @@ import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor } from "./pointer";
-import { createICCCMEventConsumer } from "./icccm";
+import { createICCCMEventConsumer, getNormalHints } from "./icccm";
 
 interface Geometry {
   width: number;
@@ -468,9 +468,10 @@ export function createServer(): XServer {
       determineWindowGeometry(wid),
       getWindowTitle(wid),
       determineWindowDecorated(wid),
+      getNormalHints(X, wid),
     ]);
 
-    const [attrs, clientGeom, title, decorated] = values;
+    const [attrs, clientGeom, title, decorated, normalHints] = values;
     console.log(`got values for ${wid}:`, values);
 
     const isOverrideRedirect = attrs.overrideRedirect === 1;
@@ -533,6 +534,7 @@ export function createServer(): XServer {
           title,
           screenIndex,
           tags: [screen.currentTags[0]],
+          normalHints,
         })
       );
 

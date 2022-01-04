@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { WMSizeHints } from "../wm/icccm";
 import { getFirstTagName, getTagNames } from "./tags";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -97,6 +98,7 @@ export interface IWindow {
   title: string | undefined;
   screenIndex: number;
   tags: string[];
+  normalHints: WMSizeHints | undefined;
 }
 
 type WindowsState = { [wid: number]: IWindow };
@@ -122,6 +124,7 @@ function windows(state: WindowsState = {}, action: any) {
           title: win.title,
           screenIndex: win.screenIndex,
           tags: win.tags,
+          normalHints: win.normalHints,
         },
       });
     }

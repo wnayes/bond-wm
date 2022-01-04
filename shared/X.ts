@@ -141,7 +141,7 @@ export enum XPropMode {
   Append = 2,
 }
 
-interface XGetPropertyCallbackProps {
+export interface XGetPropertyCallbackProps {
   type: Atom;
   data: Buffer;
   /** remaining data. property length on the server is offset*4 + prop.data.length + prop.bytesAfter */
