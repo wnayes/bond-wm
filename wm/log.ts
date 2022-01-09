@@ -11,6 +11,12 @@ export function log(...args: unknown[]): void {
   stdout.write(logText);
 }
 
+export function logDir(obj: unknown, options: object): void {
+  const logText = util.inspect(obj, { showHidden: false, depth: 3, colors: false, ...options }) + "\n";
+  logFile.write(logText);
+  stdout.write(logText);
+}
+
 export function logError(...args: unknown[]): void {
   const logText = formatLogText(args);
   logFile.write(logText);

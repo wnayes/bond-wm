@@ -8,7 +8,7 @@ import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
 import { Mutable } from "type-fest";
-import { log, logError } from "./log";
+import { log, logDir, logError } from "./log";
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import {
   X11_EVENT_TYPE,
@@ -633,7 +633,7 @@ export function createServer(): XServer {
         fn();
       } finally {
         if (typeof root === "number") {
-          changeWindowEventMask(root, NO_EVENT_MASK);
+          changeWindowEventMask(root, ROOT_WIN_EVENT_MASK);
         }
         if (typeof fid === "number") {
           changeWindowEventMask(fid, FRAME_WIN_EVENT_MASK);
@@ -725,7 +725,7 @@ export function createServer(): XServer {
 
   function onEnterNotify(ev: IXEvent) {
     const { wid } = ev;
-    widLog(wid, "onEnterNotify", ev);
+    widLog(wid, "onEnterNotify");
 
     const isFrame = isFrameBrowserWin(wid);
     const window = isFrame ? getWindowIdFromFrameId(wid) : wid;
@@ -741,7 +741,7 @@ export function createServer(): XServer {
 
   function onLeaveNotify(ev: IXEvent) {
     const { wid } = ev;
-    widLog(wid, "onLeaveNotify", ev);
+    widLog(wid, "onLeaveNotify");
     // if (!isBrowserWin(ev.wid)) {
     //   const isFrame = !!frames[ev.wid];
     //   let window = isFrame ? frames[ev.wid] : ev.wid;
@@ -819,6 +819,8 @@ export function createServer(): XServer {
   }
 
   function launchProcess(name: string) {
+    log("launchProcess", name);
+
     const child = spawn(name, [], {
       detached: true,
       stdio: "ignore",
@@ -1136,7 +1138,7 @@ export function createServer(): XServer {
         const returnValue = next(action);
 
         log("state after dispatch:");
-        console.dir(getState(), { depth: 3 });
+        logDir(getState(), { depth: 3 });
 
         // This will likely be the action itself, unless
         // a middleware further in chain changed it.
