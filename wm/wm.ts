@@ -8,6 +8,7 @@ import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
 import { Mutable } from "type-fest";
+import { log, logError } from "./log";
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import {
   X11_EVENT_TYPE,
@@ -168,7 +169,7 @@ export function createServer(): XServer {
   (() => {
     client = x11.createClient(async (err: unknown, display: IXDisplay) => {
       if (err) {
-        console.error(err);
+        logError(err);
         process.exit(1);
       }
 
@@ -183,7 +184,7 @@ export function createServer(): XServer {
     });
 
     client.on("error", (err: unknown) => {
-      console.error(err);
+      logError(err);
     });
 
     client.on("event", __onXEvent);
@@ -220,7 +221,7 @@ export function createServer(): XServer {
 
     extraAtoms._NET_WM_NAME = (await internAtomAsync(X, "_NET_WM_NAME")) as any;
 
-    console.log("ExtraAtoms", extraAtoms);
+    log("ExtraAtoms", extraAtoms);
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }
 
@@ -235,7 +236,7 @@ export function createServer(): XServer {
 
     const debugScreen = Object.assign({}, screen);
     delete debugScreen.depths;
-    console.log("Processing X screen", debugScreen);
+    log("Processing X screen", debugScreen);
 
     X.GrabServer();
 
@@ -244,7 +245,7 @@ export function createServer(): XServer {
     X.UngrabServer();
 
     const logicalScreens = await getScreenGeometries(screen);
-    console.log("Obtained logical screens", logicalScreens);
+    log("Obtained logical screens", logicalScreens);
 
     for (const logicalScreen of logicalScreens) {
       store.dispatch(
@@ -335,11 +336,11 @@ export function createServer(): XServer {
 
     const handle = getNativeWindowHandleInt(win);
     if (!handle) {
-      console.error("Browser handle was null");
+      logError("Browser handle was null");
     }
     desktopBrowserHandles[handle] = index;
 
-    console.log("Created browser window", handle);
+    log("Created browser window", handle);
 
     win.on("closed", function () {
       desktopBrowsers[index] = null;
@@ -369,12 +370,12 @@ export function createServer(): XServer {
 
     const fid = getNativeWindowHandleInt(win);
     if (!fid) {
-      console.error("Frame window handle was null");
+      logError("Frame window handle was null");
     }
     frameBrowserWinIdToFrameId[wid] = fid;
     frameBrowserFrameIdToWinId[fid] = wid;
 
-    console.log("Created frame window", fid, url);
+    log("Created frame window", fid, url);
 
     return fid;
   }
@@ -400,13 +401,13 @@ export function createServer(): XServer {
         onLeaveNotify(ev);
         break;
       case X11_EVENT_TYPE.FocusIn:
-        log(ev.wid, "onFocusIn", ev);
+        widLog(ev.wid, "onFocusIn", ev);
         break;
       case X11_EVENT_TYPE.FocusOut:
-        log(ev.wid, "onFocusOut", ev);
+        widLog(ev.wid, "onFocusOut", ev);
         break;
       case X11_EVENT_TYPE.Expose:
-        log(ev.wid, "onExpose", ev);
+        widLog(ev.wid, "onExpose", ev);
         break;
       case X11_EVENT_TYPE.CreateNotify:
         onCreateNotify(ev);
@@ -424,7 +425,7 @@ export function createServer(): XServer {
         onMapRequest(ev);
         break;
       case X11_EVENT_TYPE.ReparentNotify:
-        log(ev.wid, "onReparentNotify", ev);
+        widLog(ev.wid, "onReparentNotify", ev);
         break;
       case X11_EVENT_TYPE.ConfigureNotify:
         break;
@@ -438,24 +439,24 @@ export function createServer(): XServer {
         onPropertyNotify(ev as IXPropertyNotifyEvent);
         break;
       default:
-        console.log("Unhandled event", ev);
+        log("Unhandled event", ev);
         break;
     }
   }
 
   async function manageWindow(wid: number, screenIndex: number, checkUnmappedState: boolean): Promise<void> {
-    log(wid, `Manage window on screen ${screenIndex}`);
+    widLog(wid, `Manage window on screen ${screenIndex}`);
 
     if (initializingWins[wid]) {
-      console.log(`Skip manage, ${wid} is already initializing`);
+      log(`Skip manage, ${wid} is already initializing`);
       return;
     }
     if (knownWids.has(wid)) {
-      console.log(`Skip manage, ${wid} is known`);
+      log(`Skip manage, ${wid} is known`);
       return;
     }
     if (isFrameBrowserWin(wid)) {
-      console.log(`Skip manage, ${wid} is a frame window`);
+      log(`Skip manage, ${wid} is a frame window`);
       return;
     }
 
@@ -472,16 +473,16 @@ export function createServer(): XServer {
     ]);
 
     const [attrs, clientGeom, title, decorated, normalHints] = values;
-    console.log(`got values for ${wid}:`, values);
+    log(`got values for ${wid}:`, values);
 
     const isOverrideRedirect = attrs.overrideRedirect === 1;
     if (isOverrideRedirect) {
-      console.log(`Not managing ${wid} due to override redirect.`);
+      log(`Not managing ${wid} due to override redirect.`);
     }
 
     const isUnmappedState = checkUnmappedState && attrs.mapState === XMapState.IsUnmapped;
     if (isUnmappedState) {
-      console.log(`Not managing ${wid} due to unmapped state.`);
+      log(`Not managing ${wid} due to unmapped state.`);
     }
 
     if (isOverrideRedirect || isUnmappedState) {
@@ -541,7 +542,7 @@ export function createServer(): XServer {
       X.MapWindow(fid);
     }
 
-    console.log("Initial map of wid", wid);
+    log("Initial map of wid", wid);
     X.MapWindow(wid);
 
     delete initializingWins[wid];
@@ -549,14 +550,14 @@ export function createServer(): XServer {
 
   function unmanageWindow(wid: number): void {
     if (isFrameBrowserWin(wid)) {
-      log(wid, `Unmanage frame window`);
+      widLog(wid, `Unmanage frame window`);
 
       const innerWid = frameBrowserFrameIdToWinId[wid];
       delete frameBrowserFrameIdToWinId[wid];
       delete frameBrowserWinIdToFrameId[innerWid];
       delete frameBrowserWindows[innerWid];
     } else if (isClientWin(wid)) {
-      log(wid, `Unmanage window`);
+      widLog(wid, `Unmanage window`);
 
       if (store.getState().windows.hasOwnProperty(wid)) {
         store.dispatch(actions.removeWindow(wid));
@@ -564,7 +565,7 @@ export function createServer(): XServer {
 
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number" && fid !== wid) {
-        console.log("Calling DestroyWindow for frame " + fid);
+        log("Calling DestroyWindow for frame " + fid);
         X.DestroyWindow(fid);
       }
     }
@@ -599,17 +600,17 @@ export function createServer(): XServer {
 
   function changeWindowEventMask(wid: number, eventMask: XEventMask): boolean {
     let failed;
-    console.log("Changing event mask for", wid, eventMask);
+    log("Changing event mask for", wid, eventMask);
     X.ChangeWindowAttributes(wid, { eventMask }, (err: { error: number }) => {
       if (err && err.error === 10) {
-        console.error(
+        logError(
           `Error while changing event mask for for ${wid} to ${eventMask}: Another window manager already running.`,
           err
         );
         failed = true;
         return;
       }
-      console.error(`Error while changing event mask for for ${wid} to ${eventMask}`, err);
+      logError(`Error while changing event mask for for ${wid} to ${eventMask}`, err);
       failed = true;
     });
     return !failed;
@@ -646,12 +647,12 @@ export function createServer(): XServer {
 
   function onCreateNotify(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onCreateNotify", ev);
+    widLog(wid, "onCreateNotify", ev);
   }
 
   async function onMapRequest(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onMapRequest", ev);
+    widLog(wid, "onMapRequest", ev);
 
     if (initializingWins[wid]) return;
 
@@ -665,7 +666,7 @@ export function createServer(): XServer {
 
   function onMapNotify(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onMapNotify", ev);
+    widLog(wid, "onMapNotify", ev);
 
     if (isClientWin(wid)) {
       eventConsumers.forEach((consumer) => consumer.onMapNotify({ wid, windowType: getWindowType(wid) }));
@@ -674,7 +675,7 @@ export function createServer(): XServer {
 
   function onUnmapNotify(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onUnmapNotify", ev);
+    widLog(wid, "onUnmapNotify", ev);
 
     eventConsumers.forEach((consumer) => consumer.onUnmapNotify({ wid, windowType: getWindowType(wid) }));
 
@@ -683,14 +684,14 @@ export function createServer(): XServer {
 
   function onDestroyNotify(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onDestroyNotify", ev);
+    widLog(wid, "onDestroyNotify", ev);
 
     unmanageWindow(wid);
   }
 
   function onConfigureRequest(ev: IXConfigureEvent) {
     const { wid } = ev;
-    log(wid, "onConfigureRequest", ev);
+    widLog(wid, "onConfigureRequest", ev);
     if (isDesktopBrowserWin(wid)) {
       return;
     }
@@ -724,7 +725,7 @@ export function createServer(): XServer {
 
   function onEnterNotify(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onEnterNotify", ev);
+    widLog(wid, "onEnterNotify", ev);
 
     const isFrame = isFrameBrowserWin(wid);
     const window = isFrame ? getWindowIdFromFrameId(wid) : wid;
@@ -740,7 +741,7 @@ export function createServer(): XServer {
 
   function onLeaveNotify(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onLeaveNotify", ev);
+    widLog(wid, "onLeaveNotify", ev);
     // if (!isBrowserWin(ev.wid)) {
     //   const isFrame = !!frames[ev.wid];
     //   let window = isFrame ? frames[ev.wid] : ev.wid;
@@ -750,7 +751,7 @@ export function createServer(): XServer {
 
   async function onKeyPress(ev: IXKeyEvent) {
     const { wid } = ev;
-    log(wid, "onKeyPress", ev);
+    widLog(wid, "onKeyPress", ev);
 
     const kb = registeredKeys;
     if (kb[ev.buttons]) {
@@ -772,7 +773,7 @@ export function createServer(): XServer {
 
   function onButtonPress(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onButtonPress", ev);
+    widLog(wid, "onButtonPress", ev);
 
     if (isDesktopBrowserWin(ev.wid)) return;
     // X.RaiseWindow(ev.wid);
@@ -780,7 +781,7 @@ export function createServer(): XServer {
 
   function onClientMessage(ev: IXEvent) {
     const { wid } = ev;
-    log(wid, "onClientMessage", ev);
+    widLog(wid, "onClientMessage", ev);
 
     // ClientMessage
     // minimize
@@ -796,7 +797,7 @@ export function createServer(): XServer {
 
   async function onPropertyNotify(ev: IXPropertyNotifyEvent): Promise<void> {
     const { wid, atom } = ev;
-    log(wid, "onPropertyNotify", ev);
+    widLog(wid, "onPropertyNotify", ev);
 
     if (isFrameBrowserWin(wid) || isDesktopBrowserWin(wid)) {
       return;
@@ -829,7 +830,7 @@ export function createServer(): XServer {
     return new Promise((resolve, reject) => {
       X.GetWindowAttributes(wid, function (err: unknown, attrs) {
         if (err) {
-          console.error("Couldn't GetWindowAttributes", wid, err);
+          logError("Couldn't GetWindowAttributes", wid, err);
           reject(err);
           return;
         }
@@ -843,7 +844,7 @@ export function createServer(): XServer {
     return new Promise((resolve, reject) => {
       X.GetGeometry(wid, function (err: unknown, clientGeom) {
         if (err) {
-          console.error("Couldn't read geometry", err);
+          logError("Couldn't read geometry", err);
           reject(err);
           return;
         }
@@ -866,14 +867,14 @@ export function createServer(): XServer {
     return new Promise((resolve, reject) => {
       X.InternAtom(true, "_MOTIF_WM_HINTS", (err, atom) => {
         if (err) {
-          console.error("InternAtom _MOTIF_WM_HINTS error", err);
+          logError("InternAtom _MOTIF_WM_HINTS error", err);
           reject(err);
           return;
         }
 
         X.GetProperty(0, wid, atom, 0, 0, 10000000, (err, prop) => {
           if (err) {
-            console.error("GetProperty _MOTIF_WM_HINTS error", err);
+            logError("GetProperty _MOTIF_WM_HINTS error", err);
             reject(err);
             return;
           }
@@ -937,10 +938,10 @@ export function createServer(): XServer {
   // X.InternAtom(true, "_NET_WM_ICON", function(err, atom) {
   //   X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
   //     if (err) {
-  //       console.error("GetProperty _NET_WM_ICON error", err);
+  //       logError("GetProperty _NET_WM_ICON error", err);
   //       return;
   //     }
-  //     console.log(prop);
+  //     log(prop);
   //     // let buffer = prop.data;
   //     // if (buffer && buffer.length) {
   //     //   if (buffer[0] === 0x02) { // Specifying decorations
@@ -995,7 +996,7 @@ export function createServer(): XServer {
   function closeWindow(wid: number) {
     supportsGracefulDestroy(wid, (err, args) => {
       if (err) {
-        console.log("Error in supportsGracefulDestroy", err);
+        log("Error in supportsGracefulDestroy", err);
       }
       if (args && args.supported) {
         const eventData = Buffer.alloc(32);
@@ -1005,10 +1006,10 @@ export function createServer(): XServer {
         eventData.writeUInt32LE(ExtraAtoms.WM_PROTOCOLS, 8); // Message Type
         eventData.writeUInt32LE(ExtraAtoms.WM_DELETE_WINDOW, 12); // data32[0]
         // Also send a timestamp in data32[1]?
-        log(wid, "Sending graceful kill", eventData);
+        widLog(wid, "Sending graceful kill", eventData);
         X.SendEvent(wid, false, XCB_EVENT_MASK_NO_EVENT, eventData);
       } else {
-        log(wid, "Killing window client");
+        widLog(wid, "Killing window client");
         X.KillClient(wid);
       }
     });
@@ -1017,7 +1018,7 @@ export function createServer(): XServer {
   function supportsGracefulDestroy(wid: number, callback: XCbWithErr<[{ supported: boolean } | void]>) {
     XGetWMProtocols(wid, (err, protocols) => {
       if (err) {
-        console.error("XGetWMProtocols error", err);
+        logError("XGetWMProtocols error", err);
         callback(err);
         return;
       }
@@ -1039,7 +1040,7 @@ export function createServer(): XServer {
     }
 
     if (typeof fid === "number") {
-      console.log("showWindow frame id", fid);
+      log("showWindow frame id", fid);
       X.MapWindow(fid);
     }
 
@@ -1048,7 +1049,7 @@ export function createServer(): XServer {
       store.dispatch(actions.setWindowVisible(wid, true));
     }
 
-    console.log("showWindow id", wid);
+    log("showWindow id", wid);
     X.MapWindow(wid);
   }
 
@@ -1085,11 +1086,11 @@ export function createServer(): XServer {
   }
 
   function minimize(wid: number) {
-    log(wid, "minimize");
+    widLog(wid, "minimize");
     hideWindow(wid);
   }
 
-  function log(wid: number, ...args: unknown[]): void {
+  function widLog(wid: number, ...args: unknown[]): void {
     const details = [];
     if (typeof wid === "number") {
       details.push(wid);
@@ -1105,7 +1106,7 @@ export function createServer(): XServer {
     }
 
     const logArgs = [...details, ...args];
-    console.log(...logArgs);
+    log(...logArgs);
   }
 
   function getWindowType(wid: number): XWMWindowType {
@@ -1129,12 +1130,12 @@ export function createServer(): XServer {
   function __setupStore(): ServerStore {
     const loggerMiddleware: Middleware = function ({ getState }) {
       return (next) => (action) => {
-        console.log("will dispatch", action);
+        log("will dispatch", action);
 
         // Call the next dispatch method in the middleware chain.
         const returnValue = next(action);
 
-        console.log("state after dispatch:");
+        log("state after dispatch:");
         console.dir(getState(), { depth: 3 });
 
         // This will likely be the action itself, unless
