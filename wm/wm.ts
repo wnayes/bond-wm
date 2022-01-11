@@ -565,8 +565,8 @@ export function createServer(): XServer {
 
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number" && fid !== wid) {
-        log("Calling DestroyWindow for frame " + fid);
-        X.DestroyWindow(fid);
+        log("Destroying BrowserWindow for frame " + fid);
+        frameBrowserWindows[wid].destroy();
       }
     }
 

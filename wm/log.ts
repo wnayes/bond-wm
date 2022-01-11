@@ -17,6 +17,12 @@ export function logDir(obj: unknown, options: object): void {
   stdout.write(logText);
 }
 
+export function logTrace(message: string): void {
+  const logText = formatLogText([message, new Error().stack]);
+  logFile.write(logText);
+  stdout.write(logText);
+}
+
 export function logError(...args: unknown[]): void {
   const logText = formatLogText(args);
   logFile.write(logText);

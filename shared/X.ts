@@ -492,7 +492,7 @@ export interface IXClient {
   CreateCursor(...args: unknown[]): unknown;
   CreateGC(gcId: unknown, drawableId: unknown, createGCAdditionalValues: unknown): void;
   CreatePixmap(...args: unknown[]): unknown;
-  DeleteProperty(winId: number, propNameAtom: Atom): void;
+  DeleteProperty(winId: number, propNameAtom: Atom, callback?: XCbWithErr<[void]>): void;
   DestroyWindow(winId: number): void;
   ForceScreenSaver(...args: unknown[]): unknown;
   FreePixmap(...args: unknown[]): unknown;

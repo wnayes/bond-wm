@@ -1,6 +1,7 @@
 import { IXClient, XPropMode } from "../shared/X";
+import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
-import { getPropertyValue, getRawPropertyValue, internAtomAsync } from "./xutils";
+import { getRawPropertyValue, internAtomAsync } from "./xutils";
 
 enum WMStateValue {
   WithdrawnState = 0,
@@ -61,7 +62,11 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
   }
 
   function removeWindowState(wid: number): void {
-    X.DeleteProperty(wid, atoms.WM_STATE);
+    X.DeleteProperty(wid, atoms.WM_STATE, (err) => {
+      if (err) {
+        log("Could not delete WM_STATE");
+      }
+    });
   }
 
   return {

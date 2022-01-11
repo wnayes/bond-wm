@@ -1,4 +1,5 @@
 import { XPropMode } from "../shared/X";
+import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { internAtomAsync } from "./xutils";
 
@@ -16,7 +17,11 @@ export async function createEWMHEventConsumer({ X }: XWMContext): Promise<IXWMEv
   }
 
   function removeWindowStateHints(wid: number): void {
-    X.DeleteProperty(wid, ewmhAtoms._NET_WM_STATE);
+    X.DeleteProperty(wid, ewmhAtoms._NET_WM_STATE, (err) => {
+      if (err) {
+        log("Could not delete _NET_WM_STATE");
+      }
+    });
   }
 
   return {
