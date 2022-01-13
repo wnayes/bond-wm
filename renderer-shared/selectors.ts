@@ -2,17 +2,21 @@ import { IWindow } from "../shared/reducers";
 import { anyIntersect } from "../shared/utils";
 import { RootState } from "./configureStore";
 
-export function selectRelevantWindows(state: RootState, screenIndex: number): IWindow[] {
-  const currentTags = state.screens[screenIndex].currentTags;
+export function selectWindowsFromScreen(state: RootState, screenIndex: number): IWindow[] {
   const wins = [];
   for (const widStr in state.windows) {
     const win = state.windows[widStr];
     if (win.screenIndex !== screenIndex) {
       continue;
     }
-    if (anyIntersect(win.tags, currentTags)) {
-      wins.push(win);
-    }
+    wins.push(win);
   }
   return wins;
+}
+
+export function selectRelevantWindows(state: RootState, screenIndex: number): IWindow[] {
+  const currentTags = state.screens[screenIndex].currentTags;
+  return selectWindowsFromScreen(state, screenIndex).filter((win) => {
+    return anyIntersect(win.tags, currentTags);
+  });
 }

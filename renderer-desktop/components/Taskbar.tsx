@@ -4,9 +4,10 @@ import { Clock } from "./Clock";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../shared/actions";
 import { exec, minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { RootState } from "../../renderer-shared/configureStore";
 import { IWindow } from "../../shared/reducers";
+import { selectWindowsFromScreen } from "../../renderer-shared/selectors";
 
 interface ITaskbarProps {
   screenIndex: number;
@@ -123,6 +124,17 @@ function TagList(props: ITagListProps) {
   const tags = useSelector<RootState>((state) => state.screens[props.screenIndex].tags) as string[];
   const currentTags = useSelector<RootState>((state) => state.screens[props.screenIndex].currentTags) as string[];
 
+  const windows = useSelector((state: RootState) => selectWindowsFromScreen(state, props.screenIndex));
+  const tagWindowMap = useMemo(() => {
+    const map: { [tag: string]: boolean } = {};
+    for (const win of windows) {
+      for (const tag of win.tags) {
+        map[tag] = true;
+      }
+    }
+    return map;
+  }, [windows]);
+
   const dispatch = useDispatch();
 
   const entries = tags.map((tag) => {
@@ -131,6 +143,7 @@ function TagList(props: ITagListProps) {
         tag={tag}
         key={tag}
         selected={currentTags.indexOf(tag) >= 0}
+        populated={!!tagWindowMap[tag]}
         onClick={() => {
           dispatch(actions.setScreenCurrentTags(props.screenIndex, [tag]));
         }}
@@ -144,10 +157,11 @@ function TagList(props: ITagListProps) {
 interface ITagListEntryProps {
   tag: string;
   selected: boolean;
+  populated: boolean;
   onClick(): void;
 }
 
-function TagListEntry({ tag, selected, onClick }: ITagListEntryProps) {
+function TagListEntry({ tag, selected, populated, onClick }: ITagListEntryProps) {
   let className = "taglistentry";
   if (selected) {
     className += " selected";
@@ -156,6 +170,7 @@ function TagListEntry({ tag, selected, onClick }: ITagListEntryProps) {
 
   return (
     <div className={className} onClick={onClick}>
+      {populated && <div className="taglistEntryBadge"></div>}
       {tag}
     </div>
   );

@@ -81,8 +81,10 @@ html, body {
 }
 .taglistentry {
     display: inline-block;
+    position: relative;
     flex-grow: 1;
     vertical-align: middle;
+    text-align: center;
     overflow: hidden;
     font-size: 11px;
     line-height: 20px;
@@ -99,6 +101,17 @@ html, body {
     font-weight: bold;
     background-color: #696969;
     color: #EEEEEE;
+}
+.taglistEntryBadge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-color: #094091;
+}
+.taglistentry.selected .taglistEntryBadge {
+    background-color: white;
 }
 
 .taskbarRunField {

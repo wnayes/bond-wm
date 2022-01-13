@@ -44,6 +44,7 @@ html, body {
     cursor: default;
     -webkit-user-select: none;
     user-select: none;
+    text-align: center;
 }
 .winWrapper.focused .winTitleBarText {
     font-weight: bold;
