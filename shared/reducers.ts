@@ -166,6 +166,19 @@ function windows(state: WindowsState = {}, action: any) {
         console.error("Action on unknown window", action);
         return state;
       }
+    case "SET_WINDOW_INTO_SCREEN":
+      {
+        const { wid, screenIndex } = action.payload;
+        const newState = Object.assign({}, state);
+        if (newState[wid]) {
+          newState[wid] = Object.assign({}, newState[wid], { screenIndex });
+          return newState;
+        } else {
+          console.error("Action on unknown window", action);
+          return state;
+        }
+      }
+      break;
     case "FOCUS_WINDOW": {
       const wid = action.payload;
       newState = Object.assign({}, state);

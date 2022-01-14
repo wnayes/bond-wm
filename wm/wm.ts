@@ -144,6 +144,9 @@ export function createServer(): XServer {
     [keyModifiers: number]: { [keyCode: number]: boolean | VoidFunction };
   } = {
     [X11_KEY_MODIFIER.Mod4Mask]: {
+      // Mod4 + O
+      32: () => sendActiveWindowToNextScreen(),
+
       // Mod4 + R
       27: true,
 
@@ -936,26 +939,6 @@ export function createServer(): XServer {
     });
   }
 
-  //function determineWindowHidden(wid: number) {
-  // X.InternAtom(true, "_NET_WM_ICON", function(err, atom) {
-  //   X.GetProperty(0, wid, atom, 0, 0, 10000000, function(err, prop) {
-  //     if (err) {
-  //       logError("GetProperty _NET_WM_ICON error", err);
-  //       return;
-  //     }
-  //     log(prop);
-  //     // let buffer = prop.data;
-  //     // if (buffer && buffer.length) {
-  //     //   if (buffer[0] === 0x02) { // Specifying decorations
-  //     //     if (buffer[2] === 0x00) { // No decorations
-  //     //       store.dispatch(actions.setWindowDecorated(wid, false));
-  //     //     }
-  //     //   }
-  //     // }
-  //   });
-  // });
-  //}
-
   function getFocusedWindowId(): number | null {
     const windows = store.getState().windows;
     for (const wid in windows) {
@@ -1046,8 +1029,8 @@ export function createServer(): XServer {
       X.MapWindow(fid);
     }
 
-    const state = store.getState();
-    if (state.windows[wid]?.visible === false) {
+    const win = getWinFromStore(wid);
+    if (win?.visible === false) {
       store.dispatch(actions.setWindowVisible(wid, true));
     }
 
@@ -1068,15 +1051,14 @@ export function createServer(): XServer {
       }
     });
 
-    const state = store.getState();
-    if (state.windows[wid]?.visible === true) {
+    const win = getWinFromStore(wid);
+    if (win?.visible === true) {
       store.dispatch(actions.setWindowVisible(wid, false));
     }
   }
 
   function raiseWindow(wid: number) {
-    const windows = store.getState().windows;
-    const win = windows[wid];
+    const win = getWinFromStore(wid);
 
     if (!win.visible) {
       showWindow(wid);
@@ -1090,6 +1072,16 @@ export function createServer(): XServer {
   function minimize(wid: number) {
     widLog(wid, "minimize");
     hideWindow(wid);
+  }
+
+  function sendActiveWindowToNextScreen(): void {
+    const wid = getFocusedWindowId();
+    const win = getWinFromStore(wid);
+    if (win) {
+      const screenCount = store.getState().screens.length;
+      const nextScreen = (win.screenIndex + 1) % screenCount;
+      store.dispatch(actions.setWindowIntoScreen(wid, nextScreen));
+    }
   }
 
   function widLog(wid: number, ...args: unknown[]): void {
@@ -1126,7 +1118,11 @@ export function createServer(): XServer {
   }
 
   function isClientWin(wid: number): boolean {
-    return typeof store.getState().windows[wid] !== "undefined";
+    return !!getWinFromStore(wid);
+  }
+
+  function getWinFromStore(wid: number): IWindow | undefined {
+    return store.getState().windows[wid];
   }
 
   function __setupStore(): ServerStore {

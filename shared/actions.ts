@@ -74,6 +74,16 @@ export function configureInnerWindow(wid: number, config: IBounds) {
   };
 }
 
+export function setWindowIntoScreen(wid: number, screenIndex: number) {
+  return {
+    type: "SET_WINDOW_INTO_SCREEN",
+    payload: {
+      wid,
+      screenIndex,
+    },
+  };
+}
+
 export function focusWindow(wid: number) {
   return {
     type: "FOCUS_WINDOW",
