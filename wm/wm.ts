@@ -1058,10 +1058,9 @@ export function createServer(): XServer {
     const fid = getFrameIdFromWindowId(wid);
 
     runXCallsWithoutEvents(wid, () => {
-      if (fid) {
+      if (typeof fid === "number") {
         X.UnmapWindow(fid);
-      }
-      if (wid) {
+      } else if (wid) {
         X.UnmapWindow(wid);
       }
     });
@@ -1079,8 +1078,12 @@ export function createServer(): XServer {
       showWindow(wid);
     } else {
       const fid = getFrameIdFromWindowId(wid);
-      if (fid) X.RaiseWindow(fid);
-      if (wid) X.RaiseWindow(wid);
+      if (fid) {
+        X.RaiseWindow(fid);
+      }
+      if (wid) {
+        X.RaiseWindow(wid);
+      }
     }
   }
 
