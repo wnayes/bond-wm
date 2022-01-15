@@ -51,10 +51,9 @@ html, body {
 
 .tasklistentry {
     display: inline-block;
-    flex-grow: 1;
+    flex: 1 1 0;
     vertical-align: middle;
     min-width: 100px;
-    max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
     height: 15px;

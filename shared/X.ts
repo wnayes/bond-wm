@@ -343,7 +343,9 @@ export interface XWindowAttrs {
   doNotPropogateMask: number;
 }
 
-enum XFocusRevertTo {
+export const PointerRoot = 1;
+
+export enum XFocusRevertTo {
   None = 0,
   PointerRoot = 1,
   Parent = 2,

@@ -25,6 +25,8 @@ export interface WMSizeHints {
   gravity: unknown;
 }
 
+const SIZEOF_WMSizeHints = 72;
+
 enum WMSizeHintsFlags {
   /** User-specified x, y */
   USPosition = 1,
@@ -86,6 +88,11 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
 
 export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHints | undefined> {
   const { data } = await getRawPropertyValue(X, wid, X.atoms.WM_NORMAL_HINTS, X.atoms.WM_SIZE_HINTS);
+
+  if (!data || data.length < SIZEOF_WMSizeHints) {
+    return;
+  }
+
   const hints: WMSizeHints = {
     flags: data.readInt32LE(0),
     minWidth: data.readInt32LE(20),

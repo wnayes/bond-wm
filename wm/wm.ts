@@ -28,6 +28,8 @@ import {
   IX11Mod,
   XEventMask,
   IX11Client,
+  XFocusRevertTo,
+  PointerRoot,
 } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
@@ -281,8 +283,7 @@ export function createServer(): XServer {
 
     __setupKeyShortcuts(root);
 
-    // TODO: What to do for more than one screen?
-    X.SetInputFocus(root, 0);
+    X.SetInputFocus(PointerRoot, XFocusRevertTo.PointerRoot);
   }
 
   function __setupKeyShortcuts(rootWid: number) {
@@ -737,7 +738,7 @@ export function createServer(): XServer {
   }
 
   function changeFocus(wid: number) {
-    if (store.getState().windows.hasOwnProperty(wid)) {
+    if (isClientWin(wid)) {
       store.dispatch(actions.focusWindow(wid));
     }
   }
