@@ -1,4 +1,5 @@
 import { ipcRenderer } from "electron";
+import { ContextMenuKind } from "../shared/ContextMenuKind";
 
 export function raiseWindow(wid: number) {
   ipcRenderer.send("raise-window", wid);
@@ -18,4 +19,8 @@ export function exec(executable: string, args?: string) {
 
 export function showDevTools(screenIndex: number): void {
   ipcRenderer.send("show-desktop-dev-tools", { screenIndex });
+}
+
+export function showContextMenu(menuKind: ContextMenuKind): void {
+  ipcRenderer.send("show-context-menu", { menuKind });
 }

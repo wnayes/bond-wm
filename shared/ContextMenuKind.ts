@@ -1,0 +1,3 @@
+export enum ContextMenuKind {
+  General,
+}

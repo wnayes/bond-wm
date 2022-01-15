@@ -41,6 +41,8 @@ import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
+import { ContextMenuKind } from "../shared/ContextMenuKind";
+import { showContextMenu } from "./menus";
 
 interface Geometry {
   width: number;
@@ -202,10 +204,7 @@ export function createServer(): XServer {
       await __initDesktop();
     });
 
-    client.on("error", (err: unknown) => {
-      logError(err);
-    });
-
+    client.on("error", logError);
     client.on("event", __onXEvent);
 
     ipcMain.on("raise-window", (event, wid) => {
@@ -222,6 +221,10 @@ export function createServer(): XServer {
 
     ipcMain.on("exec", (event, args) => {
       launchProcess(args.executable);
+    });
+
+    ipcMain.on("show-context-menu", (event, args: { menuKind: ContextMenuKind }) => {
+      showContextMenu(event, args.menuKind);
     });
 
     ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
