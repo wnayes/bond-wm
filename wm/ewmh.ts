@@ -6,6 +6,7 @@ import { internAtomAsync } from "./xutils";
 export async function createEWMHEventConsumer({ X }: XWMContext): Promise<IXWMEventConsumer> {
   const ewmhAtoms = {
     _NET_WM_STATE: await internAtomAsync(X, "_NET_WM_STATE"),
+    _NET_FRAME_EXTENTS: await internAtomAsync(X, "_NET_FRAME_EXTENTS"),
   };
 
   function updateWindowStateHints(wid: number): void {
@@ -35,6 +36,16 @@ export async function createEWMHEventConsumer({ X }: XWMContext): Promise<IXWMEv
       if (windowType === XWMWindowType.Client) {
         removeWindowStateHints(wid);
       }
+    },
+
+    onSetFrameExtents({ wid, frameExtents }) {
+      const extentsInts = Buffer.alloc(16);
+      extentsInts.writeInt32LE(frameExtents.left, 0);
+      extentsInts.writeInt32LE(frameExtents.right, 4);
+      extentsInts.writeInt32LE(frameExtents.top, 8);
+      extentsInts.writeInt32LE(frameExtents.bottom, 12);
+
+      X.ChangeProperty(XPropMode.Replace, wid, ewmhAtoms._NET_FRAME_EXTENTS, X.atoms.CARDINAL, 32, extentsInts);
     },
   };
 }

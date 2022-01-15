@@ -55,7 +55,7 @@ export function WindowFrame(props: IWindowFrameProps) {
         window.inner.right !== right ||
         window.inner.bottom !== bottom
       ) {
-        store.dispatch(actions.configureInnerWindow(wid, { top, left, right, bottom }));
+        store.dispatch(actions.setWindowFrameExtents(wid, { top, left, right, bottom }));
       }
     }
   });

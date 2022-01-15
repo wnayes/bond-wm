@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import type { IWindow } from "../shared/reducers";
+import type { IBounds, IWindow } from "../shared/reducers";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -88,12 +88,21 @@ export enum XWMWindowType {
 
 export interface XWMEventConsumerArgs {
   wid: number;
+}
+
+export interface XWMEventConsumerArgsWithType extends XWMEventConsumerArgs {
   windowType: XWMWindowType;
 }
 
+export interface XWMEventConsumerSetFrameExtentsArgs extends XWMEventConsumerArgs {
+  frameExtents: IBounds;
+}
+
 export interface IXWMEventConsumer {
-  onMapNotify?(args: XWMEventConsumerArgs): void;
-  onUnmapNotify?(args: XWMEventConsumerArgs): void;
+  onMapNotify?(args: XWMEventConsumerArgsWithType): void;
+  onUnmapNotify?(args: XWMEventConsumerArgsWithType): void;
+
+  onSetFrameExtents?(args: XWMEventConsumerSetFrameExtentsArgs): void;
 }
 
 export interface XWMContext {
@@ -1171,17 +1180,30 @@ export function createServer(): XServer {
               }
             }
             break;
-          case "CONFIGURE_INNER_WINDOW":
+          case "SET_WINDOW_FRAME_EXTENTS":
             {
               const state = getState();
-              const win = state.windows[action.payload.wid] as IWindow;
+              const wid = action.payload.wid;
+              const win = state.windows[wid] as IWindow;
               const { width, height } = win.outer;
-              X.ConfigureWindow(action.payload.wid, {
+              X.ConfigureWindow(wid, {
                 x: action.payload.left,
                 y: action.payload.top,
                 width: width - action.payload.left - action.payload.right,
                 height: height - action.payload.top - action.payload.bottom,
               });
+
+              eventConsumers.forEach((consumer) =>
+                consumer.onSetFrameExtents?.({
+                  wid,
+                  frameExtents: {
+                    left: action.payload.left,
+                    right: action.payload.right,
+                    top: action.payload.top,
+                    bottom: action.payload.bottom,
+                  },
+                })
+              );
             }
             break;
           case "SET_CURRENT_TAGS":

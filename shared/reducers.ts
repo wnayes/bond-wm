@@ -150,7 +150,7 @@ function windows(state: WindowsState = {}, action: any) {
         console.error("Action on unknown window", action);
         return state;
       }
-    case "CONFIGURE_INNER_WINDOW":
+    case "SET_WINDOW_FRAME_EXTENTS":
       newState = Object.assign({}, state);
       if (newState[action.payload.wid]) {
         newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {

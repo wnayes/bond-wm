@@ -62,9 +62,9 @@ export function configureWindow(wid: number, config: IGeometry) {
   };
 }
 
-export function configureInnerWindow(wid: number, config: IBounds) {
+export function setWindowFrameExtents(wid: number, config: IBounds) {
   return {
-    type: "CONFIGURE_INNER_WINDOW",
+    type: "SET_WINDOW_FRAME_EXTENTS",
     payload: Object.assign(
       {
         wid,
