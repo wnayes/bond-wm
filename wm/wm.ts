@@ -7,7 +7,7 @@ import type { IBounds, IWindow } from "../shared/reducers";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
-import { Mutable } from "type-fest";
+import { AsyncReturnType, Mutable } from "type-fest";
 import { log, logDir, logError } from "./log";
 import { configureStore, ServerRootState, ServerStore } from "./configureStore";
 import {
@@ -40,6 +40,7 @@ import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints } from "./icccm";
+import { createMotifModule, hasMotifDecorations } from "./motif";
 
 interface Geometry {
   width: number;
@@ -128,6 +129,8 @@ export function createServer(): XServer {
 
   const eventConsumers: IXWMEventConsumer[] = [];
 
+  let motif: AsyncReturnType<typeof createMotifModule>;
+
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
 
@@ -192,6 +195,8 @@ export function createServer(): XServer {
 
       eventConsumers.push(await createICCCMEventConsumer(context));
       eventConsumers.push(await createEWMHEventConsumer(context));
+
+      motif = await createMotifModule(context);
 
       await __setupAtoms();
       await __initDesktop();
@@ -481,11 +486,11 @@ export function createServer(): XServer {
       determineWindowAttributes(wid),
       determineWindowGeometry(wid),
       getWindowTitle(wid),
-      determineWindowDecorated(wid),
       getNormalHints(X, wid),
+      motif.getMotifHints(wid),
     ]);
 
-    const [attrs, clientGeom, title, decorated, normalHints] = values;
+    const [attrs, clientGeom, title, normalHints, motifHints] = values;
     log(`got values for ${wid}:`, values);
 
     const isOverrideRedirect = attrs.overrideRedirect === 1;
@@ -544,7 +549,7 @@ export function createServer(): XServer {
             height: effectiveGeometry.height,
           },
           visible: true,
-          decorated,
+          decorated: hasMotifDecorations(motifHints),
           title,
           screenIndex,
           tags: [screen.currentTags[0]],
@@ -878,37 +883,37 @@ export function createServer(): XServer {
     return utf8name || name;
   }
 
-  function determineWindowDecorated(wid: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      X.InternAtom(true, "_MOTIF_WM_HINTS", (err, atom) => {
-        if (err) {
-          logError("InternAtom _MOTIF_WM_HINTS error", err);
-          reject(err);
-          return;
-        }
+  // function determineWindowDecorated(wid: number): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     X.InternAtom(true, "_MOTIF_WM_HINTS", (err, atom) => {
+  //       if (err) {
+  //         logError("InternAtom _MOTIF_WM_HINTS error", err);
+  //         reject(err);
+  //         return;
+  //       }
 
-        X.GetProperty(0, wid, atom, 0, 0, 10000000, (err, prop) => {
-          if (err) {
-            logError("GetProperty _MOTIF_WM_HINTS error", err);
-            reject(err);
-            return;
-          }
+  //       X.GetProperty(0, wid, atom, 0, 0, 10000000, (err, prop) => {
+  //         if (err) {
+  //           logError("GetProperty _MOTIF_WM_HINTS error", err);
+  //           reject(err);
+  //           return;
+  //         }
 
-          const buffer = prop.data;
-          if (buffer && buffer.length) {
-            if (buffer[0] === 0x02) {
-              // Specifying decorations
-              if (buffer[2] === 0x00) {
-                // No decorations
-                resolve(false);
-              }
-            }
-          }
-          resolve(true);
-        });
-      });
-    });
-  }
+  //         const buffer = prop.data;
+  //         if (buffer && buffer.length) {
+  //           if (buffer[0] === 0x02) {
+  //             // Specifying decorations
+  //             if (buffer[2] === 0x00) {
+  //               // No decorations
+  //               resolve(false);
+  //             }
+  //           }
+  //         }
+  //         resolve(true);
+  //       });
+  //     });
+  //   });
+  // }
 
   /**
    * By default, one screen means one screen geometry.
