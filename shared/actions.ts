@@ -49,7 +49,7 @@ export function removeWindow(wid: number) {
   };
 }
 
-export function configureWindow(wid: number, config: IGeometry) {
+export function configureWindow(wid: number, config: Partial<IGeometry>) {
   return {
     type: "CONFIGURE_WINDOW",
     payload: {

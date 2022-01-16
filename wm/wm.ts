@@ -30,6 +30,8 @@ import {
   IX11Client,
   XFocusRevertTo,
   PointerRoot,
+  IXConfigureInfo,
+  CWMaskBits,
 } from "../shared/X";
 import * as actions from "../shared/actions";
 import { Middleware } from "redux";
@@ -713,35 +715,43 @@ export function createServer(): XServer {
   function onConfigureRequest(ev: IXConfigureEvent) {
     const { wid } = ev;
     widLog(wid, "onConfigureRequest", ev);
-    if (isDesktopBrowserWin(wid)) {
+
+    // Ignore any configure requests for these; we always control their size.
+    if (isDesktopBrowserWin(wid) || isFrameBrowserWin(wid)) {
       return;
     }
 
-    // TODO: Let through any unmanaged windows?
-    // TODO: Deny for frames too?
-    return;
+    if (isClientWin(wid)) {
+      const mask = ev.mask;
+      if (!mask) {
+        return; // There's no requested changes?
+      }
 
-    const config = {
-      x: ev.x,
-      y: ev.y,
-      width: ev.width,
-      height: ev.height,
-      //borderWidth: 0, // No borders
-      //sibling: ev.sibling,
-      //stackMode: ev.stackMode
-    };
-    const innerConfig = Object.assign({}, config, { x: 5, y: 10 });
+      const fid = getFrameIdFromWindowId(wid);
+      const widToChange = fid ?? wid;
 
-    const isFrame = isFrameBrowserWin(ev.wid);
-    if (isFrame) {
-      //frameBrowserWindows[ev.wid].setPos
-      // X.ConfigureWindow(frames[ev.wid], config);
+      const config: Partial<IXConfigureInfo> = {};
+      if (mask & CWMaskBits.CWX) {
+        config.x = ev.x;
+      }
+      if (mask & CWMaskBits.CWY) {
+        config.y = ev.y;
+      }
+      if (mask & CWMaskBits.CWWidth) {
+        config.width = ev.width;
+      }
+      if (mask & CWMaskBits.CWHeight) {
+        config.height = ev.height;
+      }
+
+      if (Object.keys(config).length > 0) {
+        X.ConfigureWindow(widToChange, config);
+        store.dispatch(actions.configureWindow(wid, config));
+      }
     } else {
-      X.ConfigureWindow(getFrameIdFromWindowId(ev.wid), config);
-      X.ConfigureWindow(ev.wid, innerConfig);
+      // Some unmanaged window; pass the call through.
+      X.ConfigureWindow(wid, ev);
     }
-
-    store.dispatch(actions.configureWindow(ev.wid, config));
   }
 
   function onEnterNotify(ev: IXEvent) {

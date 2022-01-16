@@ -137,14 +137,20 @@ function windows(state: WindowsState = {}, action: any) {
     case "CONFIGURE_WINDOW":
       newState = Object.assign({}, state);
       if (newState[action.payload.wid]) {
-        newState[action.payload.wid] = Object.assign({}, newState[action.payload.wid], {
-          outer: {
-            x: action.payload.x,
-            y: action.payload.y,
-            width: action.payload.width,
-            height: action.payload.height,
-          },
-        });
+        newState[action.payload.wid] = { ...newState[action.payload.wid] };
+        newState[action.payload.wid].outer = { ...newState[action.payload.wid].outer };
+        if (typeof action.payload.x === "number") {
+          newState[action.payload.wid].outer.x = action.payload.x;
+        }
+        if (typeof action.payload.y === "number") {
+          newState[action.payload.wid].outer.y = action.payload.y;
+        }
+        if (typeof action.payload.width === "number") {
+          newState[action.payload.wid].outer.width = action.payload.width;
+        }
+        if (typeof action.payload.height === "number") {
+          newState[action.payload.wid].outer.height = action.payload.height;
+        }
         return newState;
       } else {
         console.error("Action on unknown window", action);

@@ -89,7 +89,7 @@ export interface IXEvent {
   rawData: Buffer;
 }
 
-interface IXConfigureInfo {
+export interface IXConfigureInfo {
   x: number;
   y: number;
   width: number;
@@ -99,7 +99,19 @@ interface IXConfigureInfo {
   stackMode: number;
 }
 
-export interface IXConfigureEvent extends IXEvent, IXConfigureInfo {}
+export enum CWMaskBits {
+  CWX = 1 << 0,
+  CWY = 1 << 1,
+  CWWidth = 1 << 2,
+  CWHeight = 1 << 3,
+  CWBorderWidth = 1 << 4,
+  CWSibling = 1 << 5,
+  CWStackMode = 1 << 6,
+}
+
+export interface IXConfigureEvent extends IXEvent, IXConfigureInfo {
+  mask: CWMaskBits;
+}
 
 export interface IXKeyEvent extends IXEvent {
   buttons: number;
