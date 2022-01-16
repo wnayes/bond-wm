@@ -58,7 +58,7 @@ function TaskListEntry(props: ITaskListEntryProps) {
   }, [win]);
 
   return (
-    <div className={className} onClick={onClick}>
+    <div className={className} onClick={onClick} title={win.title}>
       {win.title}
     </div>
   );

@@ -47,13 +47,14 @@ html, body {
     display: flex;
     flex-grow: 1;
     font-size: 10px;
+    overflow: hidden;
 }
 
 .tasklistentry {
     display: inline-block;
     flex: 1 1 0;
     vertical-align: middle;
-    min-width: 100px;
+    min-width: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     height: 15px;
