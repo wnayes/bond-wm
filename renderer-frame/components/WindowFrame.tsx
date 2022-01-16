@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState } from "../../renderer-shared/configureStore";
 import { useWindowSize } from "../../renderer-shared/hooks";
-import * as actions from "../../shared/actions";
+import { setFrameExtentsAction } from "../../shared/redux/windowSlice";
 
 import { TitleBar } from "./TitleBar";
 
@@ -55,7 +55,7 @@ export function WindowFrame(props: IWindowFrameProps) {
         window.inner.right !== right ||
         window.inner.bottom !== bottom
       ) {
-        store.dispatch(actions.setWindowFrameExtents(wid, { top, left, right, bottom }));
+        store.dispatch(setFrameExtentsAction({ wid, top, left, right, bottom }));
       }
     }
   });

@@ -1,4 +1,4 @@
-import { IWindow } from "../shared/reducers";
+import { IWindow } from "../shared/types";
 import { anyIntersect } from "../shared/utils";
 import { RootState } from "./configureStore";
 

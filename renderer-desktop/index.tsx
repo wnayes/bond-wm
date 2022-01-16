@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { Desktop } from "./components/Desktop";
-import { configureStore } from "../renderer-shared/configureStore";
+import { configureRendererStore } from "../renderer-shared/configureStore";
 import { setupIpc } from "../renderer-shared/ipcRenderer";
 import { hookShortcuts } from "./shortcuts";
 import { getScreenIndex } from "./utils";
@@ -10,7 +10,7 @@ import { getScreenIndex } from "./utils";
 const screenIndex = getScreenIndex();
 console.log(screenIndex);
 
-const store = configureStore();
+const store = configureRendererStore();
 (window as any).store = store; // eslint-disable-line
 setupIpc(store, screenIndex);
 

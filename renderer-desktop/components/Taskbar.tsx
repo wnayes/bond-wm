@@ -2,12 +2,13 @@ import * as React from "react";
 
 import { Clock } from "./Clock";
 import { useDispatch, useSelector } from "react-redux";
-import * as actions from "../../shared/actions";
 import { exec, minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { RootState } from "../../renderer-shared/configureStore";
-import { IWindow } from "../../shared/reducers";
+import { IWindow } from "../../shared/types";
 import { selectWindowsFromScreen } from "../../renderer-shared/selectors";
+import { showRunFieldAction } from "../../renderer-shared/redux/taskbarSlice";
+import { setScreenCurrentTagsAction } from "../../shared/redux/screenSlice";
 
 interface ITaskbarProps {
   screenIndex: number;
@@ -73,7 +74,7 @@ function RunField() {
 
   const reset = () => {
     setText("");
-    dispatch(actions.toggleTaskbarRunField(false));
+    dispatch(showRunFieldAction(false));
   };
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -145,7 +146,7 @@ function TagList(props: ITagListProps) {
         selected={currentTags.indexOf(tag) >= 0}
         populated={!!tagWindowMap[tag]}
         onClick={() => {
-          dispatch(actions.setScreenCurrentTags(props.screenIndex, [tag]));
+          dispatch(setScreenCurrentTagsAction({ screenIndex: props.screenIndex, currentTags: [tag] }));
         }}
       />
     );

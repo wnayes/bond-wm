@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useStore } from "react-redux";
-import { IWindow } from "../../../shared/reducers";
-import * as actions from "../../../shared/actions";
+import { IWindow } from "../../../shared/types";
 import { geometriesDiffer } from "../../../shared/utils";
+import { configureWindowAction } from "../../../shared/redux/windowSlice";
 
 export interface IWindowProps {
   window: IWindow;
@@ -24,7 +24,13 @@ export function Window({ window }: IWindowProps) {
 
     if (window && clientRect) {
       if (geometriesDiffer(window.outer, clientRect)) {
-        store.dispatch(actions.configureWindow(window.id, clientRect));
+        store.dispatch(configureWindowAction({
+          wid: window.id,
+          x: clientRect.x,
+          y: clientRect.y,
+          width: clientRect.width,
+          height: clientRect.height,
+        }));
       }
     }
   });

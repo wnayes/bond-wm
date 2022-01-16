@@ -1,7 +1,7 @@
-import { configureStore } from "../renderer-shared/configureStore";
+import { configureRendererStore } from "../renderer-shared/configureStore";
 import { setupWindowComponent } from "./components/WindowSetup";
 
-const store = configureStore();
+const store = configureRendererStore();
 
 // Debug code, remove eventually.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

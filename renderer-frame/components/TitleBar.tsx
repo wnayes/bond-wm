@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useCallback } from "react";
 import { closeWindow } from "../../renderer-shared/commands";
-import { IWindow } from "../../shared/reducers";
+import { IWindow } from "../../shared/types";
 
 interface ITitleBarProps {
   window: IWindow;

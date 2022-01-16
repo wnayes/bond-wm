@@ -1,4 +1,4 @@
-import { IGeometry } from "./reducers";
+import { IGeometry } from "./types";
 
 export function anyIntersect<T>(arr1: T[] | null | undefined, arr2: T[] | null | undefined): boolean {
   if (!arr1 || !arr2) {

@@ -3,13 +3,13 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import type { IBounds, IWindow } from "../shared/reducers";
+import type { IBounds, IWindow } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
 import { AsyncReturnType, Mutable } from "type-fest";
 import { log, logDir, logError } from "./log";
-import { configureStore, ServerRootState, ServerStore } from "./configureStore";
+import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
 import {
   X11_EVENT_TYPE,
   X11_KEY_MODIFIER,
@@ -33,7 +33,6 @@ import {
   IXConfigureInfo,
   CWMaskBits,
 } from "../shared/X";
-import * as actions from "../shared/actions";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
 import { anyIntersect } from "../shared/utils";
@@ -45,6 +44,17 @@ import { createICCCMEventConsumer, getNormalHints } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
 import { showContextMenu } from "./menus";
+import {
+  addWindowAction,
+  configureWindowAction,
+  focusWindowAction,
+  removeWindowAction,
+  setFrameExtentsAction,
+  setWindowIntoScreenAction,
+  setWindowTitleAction,
+  setWindowVisibleAction,
+} from "../shared/redux/windowSlice";
+import { addScreenAction, setScreenCurrentTagsAction } from "../shared/redux/screenSlice";
 
 interface Geometry {
   width: number;
@@ -278,7 +288,7 @@ export function createServer(): XServer {
 
     for (const logicalScreen of logicalScreens) {
       store.dispatch(
-        actions.addScreen({
+        addScreenAction({
           x: logicalScreen.x,
           y: logicalScreen.y,
           width: logicalScreen.width,
@@ -552,7 +562,8 @@ export function createServer(): XServer {
       });
 
       store.dispatch(
-        actions.addWindow(wid, {
+        addWindowAction({
+          wid,
           outer: {
             x: effectiveGeometry.x,
             y: effectiveGeometry.y,
@@ -589,7 +600,7 @@ export function createServer(): XServer {
       widLog(wid, `Unmanage window`);
 
       if (store.getState().windows.hasOwnProperty(wid)) {
-        store.dispatch(actions.removeWindow(wid));
+        store.dispatch(removeWindowAction(wid));
       }
 
       const fid = getFrameIdFromWindowId(wid);
@@ -752,7 +763,7 @@ export function createServer(): XServer {
 
       if (Object.keys(config).length > 0) {
         X.ConfigureWindow(widToChange, config);
-        store.dispatch(actions.configureWindow(wid, config));
+        store.dispatch(configureWindowAction({ wid, ...config }));
       }
     } else {
       // Some unmanaged window; pass the call through.
@@ -773,11 +784,6 @@ export function createServer(): XServer {
   function onLeaveNotify(ev: IXEvent) {
     const { wid } = ev;
     widLog(wid, "onLeaveNotify");
-    // if (!isBrowserWin(ev.wid)) {
-    //   const isFrame = !!frames[ev.wid];
-    //   let window = isFrame ? frames[ev.wid] : ev.wid;
-    //   store.dispatch(actions.unfocusWindow(window));
-    // }
   }
 
   async function onKeyPress(ev: IXKeyEvent) {
@@ -838,8 +844,8 @@ export function createServer(): XServer {
       case X.atoms.WM_NAME:
       case ExtraAtoms._NET_WM_NAME:
         {
-          const newTitle = await getWindowTitle(wid);
-          store.dispatch(actions.setWindowTitle(wid, newTitle));
+          const title = await getWindowTitle(wid);
+          store.dispatch(setWindowTitleAction({ wid, title }));
         }
         break;
 
@@ -1059,7 +1065,7 @@ export function createServer(): XServer {
 
     const win = getWinFromStore(wid);
     if (win?.visible === false) {
-      store.dispatch(actions.setWindowVisible(wid, true));
+      store.dispatch(setWindowVisibleAction({ wid, visible: true }));
     }
 
     log("showWindow id", wid);
@@ -1080,7 +1086,7 @@ export function createServer(): XServer {
 
     const win = getWinFromStore(wid);
     if (win?.visible === true) {
-      store.dispatch(actions.setWindowVisible(wid, false));
+      store.dispatch(setWindowVisibleAction({ wid, visible: false }));
     }
   }
 
@@ -1111,7 +1117,7 @@ export function createServer(): XServer {
     if (isClientWin(wid)) {
       X.SetInputFocus(wid, XFocusRevertTo.PointerRoot);
 
-      store.dispatch(actions.focusWindow(wid));
+      store.dispatch(focusWindowAction({ wid }));
     }
   }
 
@@ -1123,12 +1129,15 @@ export function createServer(): XServer {
   }
 
   function sendActiveWindowToNextScreen(): void {
+    const screenCount = store.getState().screens.length;
+    if (screenCount === 1) {
+      return; // Only one screen, can't switch.
+    }
     const wid = getFocusedWindowId();
     const win = getWinFromStore(wid);
     if (win) {
-      const screenCount = store.getState().screens.length;
       const nextScreen = (win.screenIndex + 1) % screenCount;
-      store.dispatch(actions.setWindowIntoScreen(wid, nextScreen));
+      store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreen }));
     }
   }
 
@@ -1195,7 +1204,7 @@ export function createServer(): XServer {
         const returnValue = next(action);
 
         switch (action.type) {
-          case "CONFIGURE_WINDOW":
+          case configureWindowAction.type:
             {
               const state = getState();
               const wid = action.payload.wid;
@@ -1218,7 +1227,7 @@ export function createServer(): XServer {
               }
             }
             break;
-          case "SET_WINDOW_FRAME_EXTENTS":
+          case setFrameExtentsAction.type:
             {
               const state = getState();
               const wid = action.payload.wid;
@@ -1244,7 +1253,7 @@ export function createServer(): XServer {
               );
             }
             break;
-          case "SET_CURRENT_TAGS":
+          case setScreenCurrentTagsAction.type:
             {
               const state = getState();
               const { currentTags, screenIndex } = action.payload as {
@@ -1273,7 +1282,7 @@ export function createServer(): XServer {
       };
     };
 
-    const store = configureStore([loggerMiddleware, x11Middleware]);
+    const store = configureWMStore([loggerMiddleware, x11Middleware]);
     return store;
   }
 

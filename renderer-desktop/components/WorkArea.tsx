@@ -1,13 +1,13 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import * as actions from "../../shared/actions";
 import { RootState } from "../../renderer-shared/configureStore";
 import { Layout } from "./layout/Layout";
 import { useWindowSize } from "../../renderer-shared/hooks";
 import { Wallpaper } from "./Wallpaper";
-import { IWindow } from "../../shared/reducers";
+import { IWindow } from "../../shared/types";
 import { geometriesDiffer } from "../../shared/utils";
+import { configureScreenWorkAreaAction } from "../../shared/redux/screenSlice";
 
 export interface IWorkAreaProps {
   screenIndex: number;
@@ -27,7 +27,13 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
     if (screen && clientRect) {
       if (geometriesDiffer(screen.workArea, clientRect)) {
-        store.dispatch(actions.configureScreenWorkArea(screenIndex, clientRect));
+        store.dispatch(configureScreenWorkAreaAction({
+          screenIndex,
+          x: clientRect.x,
+          y: clientRect.y,
+          width: clientRect.width,
+          height: clientRect.height,
+        }));
       }
     }
   });

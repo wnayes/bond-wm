@@ -1,8 +1,8 @@
 import { ipcRenderer } from "electron";
 import { X11_KEY_MODIFIER } from "../shared/X";
-import * as actions from "../shared/actions";
 import { Store } from "./configureStore";
 import { focusDesktopBrowser } from "./commands";
+import { showRunFieldAction } from "./redux/taskbarSlice";
 
 export function setupIpc(store: Store, screenIndex: number) {
   ipcRenderer.on("x-keypress", (event, args) => {
@@ -10,7 +10,7 @@ export function setupIpc(store: Store, screenIndex: number) {
     if (args.buttons === X11_KEY_MODIFIER.Mod4Mask) {
       if (args.keycode === 27) {
         // Mod4 + R
-        store.dispatch(actions.toggleTaskbarRunField(true));
+        store.dispatch(showRunFieldAction(true));
 
         focusDesktopBrowser(screenIndex);
       }
