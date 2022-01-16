@@ -103,10 +103,11 @@ html, body {
 }
 .taglistEntryBadge {
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 2px;
-    width: 100%;
+    top: -7px;
+    left: calc(50% - 5px);
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
     background-color: #094091;
 }
 .taglistentry.selected .taglistEntryBadge {
