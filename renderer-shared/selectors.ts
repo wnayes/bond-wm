@@ -20,3 +20,10 @@ export function selectRelevantWindows(state: RootState, screenIndex: number): IW
     return anyIntersect(win.tags, currentTags);
   });
 }
+
+export function selectRelevantVisibleWindows(state: RootState, screenIndex: number): IWindow[] {
+  const currentTags = state.screens[screenIndex].currentTags;
+  return selectWindowsFromScreen(state, screenIndex).filter((win) => {
+    return win.visible && anyIntersect(win.tags, currentTags);
+  });
+}
