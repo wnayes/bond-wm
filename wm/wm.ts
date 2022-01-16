@@ -141,6 +141,7 @@ export function createServer(): XServer {
   const desktopBrowsers: BrowserWindow[] = [];
   /** Desktop window handle to index into `desktopBrowsers`. */
   const desktopBrowserHandles: { [did: number]: number } = {};
+  const screenIndexToDesktopId: { [screenIndex: number]: number } = {};
 
   const frameBrowserWindows: { [wid: number]: BrowserWindow | undefined } = {};
   const frameBrowserWinIdToFrameId: { [wid: number]: number | undefined } = {};
@@ -219,6 +220,10 @@ export function createServer(): XServer {
 
     ipcMain.on("close-window", (event, wid) => {
       closeWindow(wid);
+    });
+
+    ipcMain.on("focus-desktop-browser", (event, screenIndex) => {
+      setFocusToDesktopWindow(screenIndex);
     });
 
     ipcMain.on("exec", (event, args) => {
@@ -362,6 +367,7 @@ export function createServer(): XServer {
       logError("Browser handle was null");
     }
     desktopBrowserHandles[handle] = index;
+    screenIndexToDesktopId[index] = handle;
 
     log("Created browser window", handle);
 
@@ -761,13 +767,7 @@ export function createServer(): XServer {
     const isFrame = isFrameBrowserWin(wid);
     const window = isFrame ? getWindowIdFromFrameId(wid) : wid;
 
-    changeFocus(window);
-  }
-
-  function changeFocus(wid: number) {
-    if (isClientWin(wid)) {
-      store.dispatch(actions.focusWindow(wid));
-    }
+    setFocus(window);
   }
 
   function onLeaveNotify(ev: IXEvent) {
@@ -1097,12 +1097,29 @@ export function createServer(): XServer {
       if (wid) {
         X.RaiseWindow(wid);
       }
+
+      setFocus(wid);
     }
   }
 
   function minimize(wid: number) {
     widLog(wid, "minimize");
     hideWindow(wid);
+  }
+
+  function setFocus(wid: number) {
+    if (isClientWin(wid)) {
+      X.SetInputFocus(wid, XFocusRevertTo.PointerRoot);
+
+      store.dispatch(actions.focusWindow(wid));
+    }
+  }
+
+  function setFocusToDesktopWindow(screenIndex: number) {
+    const did = screenIndexToDesktopId[screenIndex];
+    if (typeof did === "number") {
+      X.SetInputFocus(did, XFocusRevertTo.PointerRoot);
+    }
   }
 
   function sendActiveWindowToNextScreen(): void {

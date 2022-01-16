@@ -13,6 +13,10 @@ export function closeWindow(wid: number) {
   ipcRenderer.send("close-window", wid);
 }
 
+export function focusDesktopBrowser(screenIndex: number): void {
+  ipcRenderer.send("focus-desktop-browser", screenIndex);
+}
+
 export function exec(executable: string, args?: string) {
   ipcRenderer.send("exec", { executable, args });
 }

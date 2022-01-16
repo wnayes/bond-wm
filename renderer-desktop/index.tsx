@@ -7,12 +7,12 @@ import { setupIpc } from "../renderer-shared/ipcRenderer";
 import { hookShortcuts } from "./shortcuts";
 import { getScreenIndex } from "./utils";
 
-const store = configureStore();
-(window as any).store = store; // eslint-disable-line
-setupIpc(store);
-
 const screenIndex = getScreenIndex();
 console.log(screenIndex);
+
+const store = configureStore();
+(window as any).store = store; // eslint-disable-line
+setupIpc(store, screenIndex);
 
 ReactDOM.render(
   <Provider store={store}>
