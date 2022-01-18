@@ -1,11 +1,10 @@
 import * as React from "react";
-import { useLayoutEffect, useRef } from "react";
-import { useSelector, useStore } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../renderer-shared/configureStore";
 import { useWindowSize } from "../../renderer-shared/hooks";
-import { setFrameExtentsAction } from "../../shared/redux/windowSlice";
 
 import { TitleBar } from "./TitleBar";
+import { WindowClientArea } from "./WindowClientArea";
 
 interface IWindowFrameProps {
   wid: number;
@@ -17,56 +16,27 @@ interface IWindowFrameProps {
 export function WindowFrame(props: IWindowFrameProps) {
   const { wid } = props;
 
-  const rootDiv = useRef<HTMLDivElement>();
-  const winBox = useRef<HTMLDivElement>();
-
-  const store = useStore();
-  const window = useSelector((state: RootState) => state.windows[wid]);
+  const win = useSelector((state: RootState) => state.windows[wid]);
 
   let className = "winWrapper";
-  if (window?.focused) {
+  if (win?.focused) {
     className += " focused";
   }
-  if (window?.fullscreen) {
+  if (win?.fullscreen) {
     className += " fullscreen";
   }
 
   let titlebar;
-  if (window?.decorated && !window?.fullscreen) {
-    titlebar = <TitleBar window={window} />;
+  if (win?.decorated && !win?.fullscreen) {
+    titlebar = <TitleBar window={win} />;
   }
 
   useWindowSize(); // Triggers re-renders on resize.
 
-  useLayoutEffect(() => {
-    const box = winBox.current;
-    if (!box) {
-      return;
-    }
-
-    // eslint-disable-next-line prefer-const
-    let { top, left, right, bottom } = box.getBoundingClientRect();
-
-    const { right: bodyRight, bottom: bodyBottom } = document.body.getBoundingClientRect();
-    right = bodyRight - right;
-    bottom = bodyBottom - bottom;
-
-    if (window) {
-      if (
-        window.inner.top !== top ||
-        window.inner.left !== left ||
-        window.inner.right !== right ||
-        window.inner.bottom !== bottom
-      ) {
-        store.dispatch(setFrameExtentsAction({ wid, top, left, right, bottom }));
-      }
-    }
-  });
-
   return (
-    <div className={className} ref={rootDiv}>
+    <div className={className}>
       {titlebar}
-      <div className="winBox" ref={winBox}></div>
+      <WindowClientArea wid={wid} />
     </div>
   );
 }
