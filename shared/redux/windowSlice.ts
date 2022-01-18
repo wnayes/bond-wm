@@ -22,6 +22,7 @@ export const windowsSlice = createSlice({
           bottom: 0,
         },
         visible: payload.visible,
+        fullscreen: false,
         decorated: payload.decorated,
         focused: false,
         title: payload.title,
@@ -90,6 +91,13 @@ export const windowsSlice = createSlice({
       }
     },
 
+    setWindowFullscreenAction: (state, action: PayloadAction<{ wid: number; fullscreen: boolean }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        state[payload.wid].fullscreen = payload.fullscreen;
+      }
+    },
+
     setWindowVisibleAction: (state, action: PayloadAction<{ wid: number; visible: boolean }>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
@@ -125,6 +133,7 @@ export const {
   setWindowIntoScreenAction,
   focusWindowAction,
   setWindowTitleAction,
+  setWindowFullscreenAction,
   setWindowVisibleAction,
   setWindowDecoratedAction,
 } = windowsSlice.actions;

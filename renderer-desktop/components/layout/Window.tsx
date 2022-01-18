@@ -6,26 +6,31 @@ import { geometriesDiffer } from "../../../shared/utils";
 import { configureWindowAction } from "../../../shared/redux/windowSlice";
 
 export interface IWindowProps {
-  window: IWindow;
+  win: IWindow;
 }
 
-export function Window({ window }: IWindowProps) {
+export function Window({ win }: IWindowProps) {
   const winEl = useRef<HTMLDivElement>();
 
   const store = useStore();
 
-  const style = {
+  const style: React.CSSProperties = {
     width: "100%",
     height: "100%",
   };
+  if (win.fullscreen) {
+    style.position = "fixed";
+    style.left = 0;
+    style.top = 0;
+  }
 
   useLayoutEffect(() => {
     const clientRect = winEl.current?.getBoundingClientRect();
 
-    if (window && clientRect) {
-      if (geometriesDiffer(window.outer, clientRect)) {
+    if (win && clientRect) {
+      if (geometriesDiffer(win.outer, clientRect)) {
         store.dispatch(configureWindowAction({
-          wid: window.id,
+          wid: win.id,
           x: clientRect.x,
           y: clientRect.y,
           width: clientRect.width,

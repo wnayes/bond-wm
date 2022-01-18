@@ -84,8 +84,6 @@ export interface IXEvent {
   name: string;
   format: number;
   wid: number;
-  //message_type: number,
-  //data: number[],
   rawData: Buffer;
 }
 
@@ -122,6 +120,11 @@ export interface IXPropertyNotifyEvent extends IXEvent {
   atom: Atom;
   time: number;
   state: number;
+}
+
+export interface IClientMessageEvent extends IXEvent {
+  message_type: Atom;
+  data: number[];
 }
 
 export interface IXScreen {

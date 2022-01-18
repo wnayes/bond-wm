@@ -32,6 +32,8 @@ import {
   PointerRoot,
   IXConfigureInfo,
   CWMaskBits,
+  IClientMessageEvent,
+  Atom,
 } from "../shared/X";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
@@ -113,7 +115,13 @@ export interface XWMEventConsumerSetFrameExtentsArgs extends XWMEventConsumerArg
   frameExtents: IBounds;
 }
 
+export interface XWMEventConsumerClientMessageArgs extends XWMEventConsumerArgsWithType {
+  messageType: Atom;
+  data: number[];
+}
+
 export interface IXWMEventConsumer {
+  onClientMessage?(args: XWMEventConsumerClientMessageArgs): void;
   onMapNotify?(args: XWMEventConsumerArgsWithType): void;
   onUnmapNotify?(args: XWMEventConsumerArgsWithType): void;
 
@@ -472,7 +480,7 @@ export function createServer(): XServer {
         onConfigureRequest(ev as IXConfigureEvent);
         break;
       case X11_EVENT_TYPE.ClientMessage:
-        onClientMessage(ev);
+        onClientMessage(ev as IClientMessageEvent);
         break;
       case X11_EVENT_TYPE.PropertyNotify:
         onPropertyNotify(ev as IXPropertyNotifyEvent);
@@ -709,7 +717,7 @@ export function createServer(): XServer {
     widLog(wid, "onMapNotify", ev);
 
     if (isClientWin(wid)) {
-      eventConsumers.forEach((consumer) => consumer.onMapNotify({ wid, windowType: getWindowType(wid) }));
+      eventConsumers.forEach((consumer) => consumer.onMapNotify?.({ wid, windowType: getWindowType(wid) }));
     }
   }
 
@@ -717,7 +725,7 @@ export function createServer(): XServer {
     const { wid } = ev;
     widLog(wid, "onUnmapNotify", ev);
 
-    eventConsumers.forEach((consumer) => consumer.onUnmapNotify({ wid, windowType: getWindowType(wid) }));
+    eventConsumers.forEach((consumer) => consumer.onUnmapNotify?.({ wid, windowType: getWindowType(wid) }));
 
     unmanageWindow(wid);
   }
@@ -816,20 +824,21 @@ export function createServer(): XServer {
     // X.RaiseWindow(ev.wid);
   }
 
-  function onClientMessage(ev: IXEvent) {
+  function onClientMessage(ev: IClientMessageEvent) {
     const { wid } = ev;
-    widLog(wid, "onClientMessage", ev);
 
-    // ClientMessage
-    // minimize
-    // { type: 33,
-    //   seq: 60,
-    //   name: 'ClientMessage',
-    //   format: 32,
-    //   wid: 14680072,
-    //   message_type: 468,
-    //   data: [ 3, 0, 0, 0, 0 ],
-    //   rawData: <Buffer a1 20 3c 00 08 00 e0 00 d4 01 00 00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00> }
+    let atomName: string;
+    X.GetAtomName(ev.message_type, (err, name) => (atomName = name));
+    widLog(wid, `onClientMessage (type=${atomName})`, ev);
+
+    eventConsumers.forEach((consumer) =>
+      consumer.onClientMessage?.({
+        wid,
+        windowType: getWindowType(wid),
+        messageType: ev.message_type,
+        data: ev.data,
+      })
+    );
   }
 
   async function onPropertyNotify(ev: IXPropertyNotifyEvent): Promise<void> {

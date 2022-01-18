@@ -28,6 +28,9 @@ html, body {
 .winWrapper.focused {
     background-color: #222a50;
 }
+.winWrapper.fullscreen {
+    border-width: 0;
+}
 
 .winTitleBar {
     width: 100%;

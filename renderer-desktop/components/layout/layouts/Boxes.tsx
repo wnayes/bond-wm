@@ -4,12 +4,18 @@ import { ILayoutProps } from "../Layout";
 import { Window } from "../Window";
 
 export function Boxes({ windows }: ILayoutProps) {
-  const winComponents = [];
+  const windowComponents = [];
+  const fullscreenWindowComponents = [];
   for (const win of windows) {
-    winComponents.push(<Window window={win} key={win.id} />);
+    if (win.fullscreen) {
+      fullscreenWindowComponents.push(<Window win={win} key={win.id} />);
+    }
+    else {
+      windowComponents.push(<Window win={win} key={win.id} />);
+    }
   }
 
-  return (
+  return <>
     <div
       style={{
         display: "grid",
@@ -18,7 +24,8 @@ export function Boxes({ windows }: ILayoutProps) {
         width: "100%",
       }}
     >
-      {winComponents}
+      {windowComponents}
     </div>
-  );
+    {fullscreenWindowComponents}
+  </>;
 }

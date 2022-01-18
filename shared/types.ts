@@ -34,6 +34,7 @@ export interface IWindow {
   outer: IGeometry;
   inner: IBounds;
   visible: boolean;
+  fullscreen: boolean;
   focused: boolean;
   decorated: boolean;
   title: string | undefined;

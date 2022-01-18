@@ -27,9 +27,12 @@ export function WindowFrame(props: IWindowFrameProps) {
   if (window?.focused) {
     className += " focused";
   }
+  if (window?.fullscreen) {
+    className += " fullscreen";
+  }
 
   let titlebar;
-  if (window?.decorated) {
+  if (window?.decorated && !window?.fullscreen) {
     titlebar = <TitleBar window={window} />;
   }
 
