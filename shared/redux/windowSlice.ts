@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IBounds, IGeometry, IWindow } from "../types";
+import { IBounds, IGeometry } from "../types";
+import { IWindow } from "../window";
 
 export interface WindowsState {
   [wid: number]: IWindow;
@@ -15,7 +16,7 @@ export const windowsSlice = createSlice({
       state[payload.wid] = {
         id: payload.wid,
         outer: payload.outer,
-        inner: {
+        frameExtents: {
           top: 0,
           left: 0,
           right: 0,
@@ -57,10 +58,10 @@ export const windowsSlice = createSlice({
     setFrameExtentsAction: (state, action: PayloadAction<{ wid: number } & IBounds>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
-        state[payload.wid].inner.top = payload.top;
-        state[payload.wid].inner.left = payload.left;
-        state[payload.wid].inner.right = payload.right;
-        state[payload.wid].inner.bottom = payload.bottom;
+        state[payload.wid].frameExtents.top = payload.top;
+        state[payload.wid].frameExtents.left = payload.left;
+        state[payload.wid].frameExtents.right = payload.right;
+        state[payload.wid].frameExtents.bottom = payload.bottom;
       }
     },
 

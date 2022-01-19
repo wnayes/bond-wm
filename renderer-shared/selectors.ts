@@ -1,4 +1,4 @@
-import { IWindow } from "../shared/types";
+import { IWindow } from "../shared/window";
 import { anyIntersect } from "../shared/utils";
 import { RootState } from "./configureStore";
 

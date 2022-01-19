@@ -34,10 +34,10 @@ export function WindowClientArea(props: IWindowClientAreaProps) {
 
     if (win) {
       if (
-        win.inner.top !== top ||
-        win.inner.left !== left ||
-        win.inner.right !== right ||
-        win.inner.bottom !== bottom
+        win.frameExtents.top !== top ||
+        win.frameExtents.left !== left ||
+        win.frameExtents.right !== right ||
+        win.frameExtents.bottom !== bottom
       ) {
         store.dispatch(setFrameExtentsAction({ wid, top, left, right, bottom }));
       }

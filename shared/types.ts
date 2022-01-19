@@ -1,20 +1,3 @@
-import { WMSizeHints } from "../wm/icccm";
-
-export interface IScreen {
-  index: number;
-
-  root: number;
-
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  workArea: IGeometry;
-
-  tags: string[];
-  currentTags: string[];
-}
-
 export interface IGeometry {
   x: number;
   y: number;
@@ -29,16 +12,17 @@ export interface IBounds {
   right: number;
 }
 
-export interface IWindow {
-  id: number;
-  outer: IGeometry;
-  inner: IBounds;
-  visible: boolean;
-  fullscreen: boolean;
-  focused: boolean;
-  decorated: boolean;
-  title: string | undefined;
-  screenIndex: number;
+export interface IScreen {
+  index: number;
+
+  root: number;
+
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  workArea: IGeometry;
+
   tags: string[];
-  normalHints: WMSizeHints | undefined;
+  currentTags: string[];
 }

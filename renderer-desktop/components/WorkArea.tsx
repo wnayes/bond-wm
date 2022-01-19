@@ -5,7 +5,7 @@ import { RootState } from "../../renderer-shared/configureStore";
 import { Layout } from "./layout/Layout";
 import { useWindowSize } from "../../renderer-shared/hooks";
 import { Wallpaper } from "./Wallpaper";
-import { IWindow } from "../../shared/types";
+import { IWindow } from "../../shared/window";
 import { geometriesDiffer } from "../../shared/utils";
 import { configureScreenWorkAreaAction } from "../../shared/redux/screenSlice";
 
@@ -27,13 +27,15 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
     if (screen && clientRect) {
       if (geometriesDiffer(screen.workArea, clientRect)) {
-        store.dispatch(configureScreenWorkAreaAction({
-          screenIndex,
-          x: clientRect.x,
-          y: clientRect.y,
-          width: clientRect.width,
-          height: clientRect.height,
-        }));
+        store.dispatch(
+          configureScreenWorkAreaAction({
+            screenIndex,
+            x: clientRect.x,
+            y: clientRect.y,
+            width: clientRect.width,
+            height: clientRect.height,
+          })
+        );
       }
     }
   });

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { exec, minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { RootState } from "../../renderer-shared/configureStore";
-import { IWindow } from "../../shared/types";
+import { IWindow } from "../../shared/window";
 import { selectWindowsFromScreen } from "../../renderer-shared/selectors";
 import { showRunFieldAction } from "../../renderer-shared/redux/taskbarSlice";
 import { setScreenCurrentTagsAction } from "../../shared/redux/screenSlice";

@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import type { IBounds, IWindow } from "../shared/types";
+import { IBounds } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -57,6 +57,7 @@ import {
   setWindowVisibleAction,
 } from "../shared/redux/windowSlice";
 import { addScreenAction, setScreenCurrentTagsAction } from "../shared/redux/screenSlice";
+import { IWindow } from "../shared/window";
 
 interface Geometry {
   width: number;
@@ -1230,8 +1231,8 @@ export function createServer(): XServer {
 
               if (fid !== wid && win) {
                 X.ConfigureWindow(wid, {
-                  width: action.payload.width - win.inner.left - win.inner.right,
-                  height: action.payload.height - win.inner.top - win.inner.bottom,
+                  width: action.payload.width - win.frameExtents.left - win.frameExtents.right,
+                  height: action.payload.height - win.frameExtents.top - win.frameExtents.bottom,
                 });
               }
             }
@@ -1242,24 +1243,21 @@ export function createServer(): XServer {
               const wid = action.payload.wid;
               const win = state.windows[wid] as IWindow;
               const { width, height } = win.outer;
+              const frameExtents = {
+                left: action.payload.left,
+                right: action.payload.right,
+                top: action.payload.top,
+                bottom: action.payload.bottom,
+              };
+
               X.ConfigureWindow(wid, {
-                x: action.payload.left,
-                y: action.payload.top,
-                width: width - action.payload.left - action.payload.right,
-                height: height - action.payload.top - action.payload.bottom,
+                x: frameExtents.left,
+                y: frameExtents.top,
+                width: width - frameExtents.left - frameExtents.right,
+                height: height - frameExtents.top - frameExtents.bottom,
               });
 
-              eventConsumers.forEach((consumer) =>
-                consumer.onSetFrameExtents?.({
-                  wid,
-                  frameExtents: {
-                    left: action.payload.left,
-                    right: action.payload.right,
-                    top: action.payload.top,
-                    bottom: action.payload.bottom,
-                  },
-                })
-              );
+              eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents }));
             }
             break;
           case setScreenCurrentTagsAction.type:

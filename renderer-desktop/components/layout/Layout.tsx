@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { IScreen, IWindow } from "../../../shared/types";
+import { IScreen } from "../../../shared/types";
+import { IWindow } from "../../../shared/window";
 import { Boxes } from "./layouts/Boxes";
 
 export interface ILayoutProps {
