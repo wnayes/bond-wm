@@ -1023,6 +1023,8 @@ export function createServer(): XServer {
   }
 
   function closeWindow(wid: number) {
+    const nextFocusWid = wid === getFocusedWindowId() ? getNextFocusWid(wid) : undefined;
+
     supportsGracefulDestroy(wid, (err, args) => {
       if (err) {
         log("Error in supportsGracefulDestroy", err);
@@ -1041,6 +1043,10 @@ export function createServer(): XServer {
         widLog(wid, "Killing window client");
         X.KillClient(wid);
       }
+
+      if (typeof nextFocusWid == "number") {
+        setFocus(nextFocusWid);
+      }
     });
   }
 
@@ -1056,6 +1062,29 @@ export function createServer(): XServer {
         supported: !!protocols && protocols.indexOf(ExtraAtoms.WM_DELETE_WINDOW) >= 0,
       });
     });
+  }
+
+  function getNextFocusWid(widLosingFocus: number): number | undefined {
+    let nextFocusWid: number | undefined;
+    const win = getWinFromStore(widLosingFocus);
+    if (win) {
+      const wins = store.getState().windows;
+      for (const widStr in wins) {
+        const otherWin = wins[widStr];
+        if (otherWin.id !== widLosingFocus && otherWin.screenIndex === win.screenIndex) {
+          nextFocusWid = otherWin.id;
+
+          // Not breaking here, on the chance that we end up finding the "most recent"
+          // window later on in the enumeration. (Probably should implement some sort
+          // of true "focus history" stack.)
+        }
+      }
+
+      if (typeof nextFocusWid === "undefined") {
+        nextFocusWid = screenIndexToDesktopId[win.screenIndex];
+      }
+    }
+    return nextFocusWid;
   }
 
   function showWindow(wid: number) {
@@ -1125,17 +1154,25 @@ export function createServer(): XServer {
 
   function setFocus(wid: number) {
     if (isClientWin(wid)) {
-      X.SetInputFocus(wid, XFocusRevertTo.PointerRoot);
+      setXInputFocus(wid);
 
       store.dispatch(focusWindowAction({ wid }));
+    } else if (isDesktopBrowserWin(wid)) {
+      setXInputFocus(wid);
     }
   }
 
   function setFocusToDesktopWindow(screenIndex: number) {
     const did = screenIndexToDesktopId[screenIndex];
     if (typeof did === "number") {
-      X.SetInputFocus(did, XFocusRevertTo.PointerRoot);
+      setXInputFocus(did);
     }
+  }
+
+  function setXInputFocus(wid: number): void {
+    widLog(wid, "Setting X input focus");
+
+    X.SetInputFocus(wid, XFocusRevertTo.PointerRoot);
   }
 
   function sendActiveWindowToNextScreen(): void {
