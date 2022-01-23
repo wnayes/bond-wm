@@ -335,7 +335,7 @@ export function createServer(): XServer {
     }
 
     X.QueryTree(root, (err, tree) => {
-      tree.children.forEach((childWid) => manageWindow(childWid, 0, true));
+      tree.children.forEach((childWid) => manageWindow(childWid, { screenIndex: 0, checkUnmappedState: true }));
     });
 
     __setupKeyShortcuts(root);
@@ -508,7 +508,15 @@ export function createServer(): XServer {
     }
   }
 
-  async function manageWindow(wid: number, screenIndex: number, checkUnmappedState: boolean): Promise<void> {
+  interface ManageWindowOpts {
+    screenIndex: number;
+    checkUnmappedState: boolean;
+    focusWindow?: boolean;
+  }
+
+  async function manageWindow(wid: number, opts: ManageWindowOpts): Promise<void> {
+    const { screenIndex, checkUnmappedState, focusWindow } = opts;
+
     widLog(wid, `Manage window on screen ${screenIndex}`);
 
     if (initializingWins[wid]) {
@@ -609,6 +617,10 @@ export function createServer(): XServer {
 
     log("Initial map of wid", wid);
     X.MapWindow(wid);
+
+    if (focusWindow) {
+      setFocus(wid);
+    }
 
     delete initializingWins[wid];
   }
@@ -725,7 +737,7 @@ export function createServer(): XServer {
       showWindow(wid);
     } else {
       const screenIndex = Math.max(0, await getScreenIndexWithCursor(context, wid));
-      manageWindow(wid, screenIndex, false);
+      manageWindow(wid, { screenIndex, focusWindow: true, checkUnmappedState: false });
     }
   }
 
