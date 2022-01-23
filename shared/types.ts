@@ -25,4 +25,6 @@ export interface IScreen {
 
   tags: string[];
   currentTags: string[];
+
+  currentLayouts: { [tag: string]: string };
 }

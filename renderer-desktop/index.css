@@ -127,3 +127,10 @@ html, body {
     line-height: 20px;
     padding: 0 0.5em;
 }
+
+.layoutIndicator {
+    flex-grow: 0;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 0.5em;
+}

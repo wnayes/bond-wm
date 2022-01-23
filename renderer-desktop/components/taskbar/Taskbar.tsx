@@ -2,13 +2,14 @@ import * as React from "react";
 
 import { Clock } from "./Clock";
 import { useDispatch, useSelector } from "react-redux";
-import { minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
+import { minimizeWindow, raiseWindow } from "../../../renderer-shared/commands";
 import { useCallback, useMemo } from "react";
-import { RootState } from "../../renderer-shared/configureStore";
-import { IWindow } from "../../shared/window";
-import { selectWindowsFromScreen } from "../../renderer-shared/selectors";
-import { setScreenCurrentTagsAction } from "../../shared/redux/screenSlice";
+import { RootState } from "../../../renderer-shared/configureStore";
+import { IWindow } from "../../../shared/window";
+import { selectWindowsFromScreen } from "../../../renderer-shared/selectors";
+import { setScreenCurrentTagsAction } from "../../../shared/redux/screenSlice";
 import { RunField } from "./RunField";
+import { LayoutIndicator } from "./LayoutIndicator";
 
 interface ITaskbarProps {
   screenIndex: number;
@@ -26,6 +27,7 @@ export function Taskbar(props: ITaskbarProps) {
       {showingRun && <RunField />}
       <TaskList windows={windows} />
       <Clock />
+      <LayoutIndicator screenIndex={props.screenIndex} />
     </div>
   );
 }

@@ -10,25 +10,37 @@ import {
 } from "../../../shared/window";
 import { geometriesDiffer } from "../../../shared/utils";
 import { configureWindowAction } from "../../../shared/redux/windowSlice";
+import { IScreen } from "../../../shared/types";
 
 export interface IWindowProps {
   win: IWindow;
+  screen: IScreen;
+  fill?: boolean;
 }
 
-export function Window({ win }: IWindowProps) {
+export function Window({ win, fill }: IWindowProps) {
   const winEl = useRef<HTMLDivElement>();
 
   const store = useStore();
 
-  const style: React.CSSProperties = {
-    width: "100%",
-    height: "100%",
-  };
+  const style: React.CSSProperties = {};
+
   if (win.fullscreen) {
     style.position = "fixed";
     style.left = 0;
     style.top = 0;
+    style.width = "100%";
+    style.height = "100%";
   } else {
+    if (fill) {
+      style.width = "100%";
+      style.height = "100%";
+    } else {
+      style.float = "left";
+      style.width = win.outer.width;
+      style.height = win.outer.height;
+    }
+
     const minWidth = getWindowMinWidth(win);
     if (minWidth > 0) {
       style.minWidth = minWidth + win.frameExtents.left + win.frameExtents.right;
@@ -54,14 +66,29 @@ export function Window({ win }: IWindowProps) {
     const clientRect = winEl.current?.getBoundingClientRect();
 
     if (win && clientRect) {
-      if (geometriesDiffer(win.outer, clientRect)) {
+      const finalRect = {
+        x: clientRect.x,
+        y: clientRect.y,
+        width: clientRect.width,
+        height: clientRect.height,
+      };
+
+      // Keep the windows within the screen.
+      if (finalRect.x + finalRect.width > screen.width) {
+        finalRect.x = screen.width - finalRect.width;
+      }
+      finalRect.x = Math.max(0, finalRect.x);
+
+      if (finalRect.y + finalRect.height > screen.height) {
+        finalRect.y = screen.height - finalRect.height;
+      }
+      finalRect.y = Math.max(0, finalRect.y);
+
+      if (geometriesDiffer(win.outer, finalRect)) {
         store.dispatch(
           configureWindowAction({
             wid: win.id,
-            x: clientRect.x,
-            y: clientRect.y,
-            width: clientRect.width,
-            height: clientRect.height,
+            ...finalRect,
           })
         );
       }

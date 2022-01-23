@@ -7,7 +7,7 @@ import { RootState } from "../../renderer-shared/configureStore";
 import { selectRelevantVisibleWindows, selectRelevantWindows } from "../../renderer-shared/selectors";
 import { ContextMenuKind } from "../../shared/ContextMenuKind";
 
-import { Taskbar } from "./Taskbar";
+import { Taskbar } from "./taskbar/Taskbar";
 import { WorkArea } from "./WorkArea";
 
 export interface IDesktopProps {

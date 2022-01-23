@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { getFirstLayoutName } from "../layouts";
 import { getFirstTagName, getTagNames } from "../tags";
 import { IScreen, IGeometry } from "../types";
 
@@ -10,7 +11,13 @@ export const screensSlice = createSlice({
   name: "screens",
   initialState,
   reducers: {
-    addScreenAction: (state, { payload }: PayloadAction<any>) => {
+    addScreenAction: (state, { payload }: PayloadAction<Partial<IScreen>>) => {
+      const tags = getTagNames();
+      const currentLayouts = tags.reduce<{ [tag: string]: string }>((layoutTagMap, tag) => {
+        layoutTagMap[tag] = getFirstLayoutName();
+        return layoutTagMap;
+      }, {});
+
       state.push({
         index: state.length,
 
@@ -29,8 +36,10 @@ export const screensSlice = createSlice({
           height: payload.height,
         },
 
-        tags: getTagNames(),
+        tags,
         currentTags: [getFirstTagName()],
+
+        currentLayouts,
       });
     },
 
@@ -46,9 +55,17 @@ export const screensSlice = createSlice({
     setScreenCurrentTagsAction: (state, { payload }: PayloadAction<{ screenIndex: number; currentTags: string[] }>) => {
       state[payload.screenIndex].currentTags = payload.currentTags;
     },
+
+    setTagCurrentLayoutAction: (
+      state,
+      { payload }: PayloadAction<{ screenIndex: number; tag: string; layoutName: string }>
+    ) => {
+      state[payload.screenIndex].currentLayouts[payload.tag] = payload.layoutName;
+    },
   },
 });
 
-export const { addScreenAction, configureScreenWorkAreaAction, setScreenCurrentTagsAction } = screensSlice.actions;
+export const { addScreenAction, configureScreenWorkAreaAction, setScreenCurrentTagsAction, setTagCurrentLayoutAction } =
+  screensSlice.actions;
 
 export default screensSlice.reducer;
