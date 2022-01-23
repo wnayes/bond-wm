@@ -133,4 +133,8 @@ html, body {
     font-size: 12px;
     line-height: 20px;
     padding: 0 0.5em;
+    cursor: default;
+}
+.layoutIndicator:hover {
+    background-color: #BBBBBB;
 }

@@ -56,10 +56,10 @@ import {
   setWindowTitleAction,
   setWindowVisibleAction,
 } from "../shared/redux/windowSlice";
-import { addScreenAction, setScreenCurrentTagsAction, setTagCurrentLayoutAction } from "../shared/redux/screenSlice";
+import { addScreenAction, setScreenCurrentTagsAction } from "../shared/redux/screenSlice";
 import { IWindow } from "../shared/window";
 import { setupAutocompleteListener } from "./autocomplete";
-import { getNextLayoutName } from "../shared/layouts";
+import { switchToNextLayout } from "../shared/layouts";
 
 interface Geometry {
   width: number;
@@ -201,7 +201,7 @@ export function createServer(): XServer {
       36: () => launchProcess("urxvt"),
 
       // Mod4 + Space
-      65: () => switchToNextLayout(),
+      65: () => switchToNextLayoutWM(),
     },
     [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
       // Mod4 + Shift + C
@@ -1204,21 +1204,13 @@ export function createServer(): XServer {
     }
   }
 
-  async function switchToNextLayout(): Promise<void> {
+  async function switchToNextLayoutWM(): Promise<void> {
     const screens = store.getState().screens;
     let screenIndex = 0;
     if (screens.length > 1) {
       screenIndex = Math.max(0, await getScreenIndexWithCursor(context, screens[0].root));
     }
-    const screen = screens[screenIndex];
-    batch(() => {
-      for (const tag of screen.currentTags) {
-        const nextLayoutName = getNextLayoutName(screen.currentLayouts[tag]);
-        if (nextLayoutName !== screen.currentLayouts[tag]) {
-          store.dispatch(setTagCurrentLayoutAction({ screenIndex, tag, layoutName: nextLayoutName }));
-        }
-      }
-    });
+    switchToNextLayout(store, screenIndex);
   }
 
   function widLog(wid: number, ...args: unknown[]): void {
