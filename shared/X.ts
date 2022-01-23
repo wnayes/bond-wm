@@ -49,6 +49,8 @@ export enum X11_KEY_MODIFIER {
 
 export const XCB_EVENT_MASK_NO_EVENT = 0;
 
+export const XCB_COPY_FROM_PARENT = 0;
+
 // Event masks
 export enum XEventMask {
   KeyPress = 1,
@@ -487,7 +489,7 @@ export interface IXClient {
     depth: number,
     _class: unknown,
     visual: unknown,
-    createWindowAdditionalValues: unknown
+    createWindowAdditionalValues?: unknown
   ): void;
   ChangeActivePointerGrab(...args: unknown[]): unknown;
   ChangeGC(...args: unknown[]): unknown;
