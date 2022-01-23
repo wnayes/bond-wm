@@ -122,7 +122,14 @@ export interface XWMEventConsumerClientMessageArgs extends XWMEventConsumerArgsW
   data: number[];
 }
 
+export interface XWMEventConsumerScreenCreatedArgs {
+  /** Root window id. */
+  root: number;
+}
+
 export interface IXWMEventConsumer {
+  onScreenCreated?(args: XWMEventConsumerScreenCreatedArgs): void;
+
   onClientMessage?(args: XWMEventConsumerClientMessageArgs): void;
   onMapNotify?(args: XWMEventConsumerArgsWithType): void;
   onUnmapNotify?(args: XWMEventConsumerArgsWithType): void;
@@ -330,6 +337,8 @@ export function createServer(): XServer {
     __setupKeyShortcuts(root);
 
     X.SetInputFocus(PointerRoot, XFocusRevertTo.PointerRoot);
+
+    eventConsumers.forEach((consumer) => consumer.onScreenCreated?.({ root }));
   }
 
   function __setupKeyShortcuts(rootWid: number) {

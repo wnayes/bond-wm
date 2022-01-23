@@ -1,4 +1,5 @@
 import { setWindowFullscreenAction } from "../shared/redux/windowSlice";
+import { numsToBuffer } from "../shared/utils";
 import { Atom, XPropMode } from "../shared/X";
 import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
@@ -12,6 +13,10 @@ enum NetWmStateAction {
 
 export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise<IXWMEventConsumer> {
   const ewmhAtoms = {
+    _NET_SUPPORTED: await internAtomAsync(X, "_NET_SUPPORTED"),
+
+    _NET_WM_NAME: await internAtomAsync(X, "_NET_WM_NAME"),
+
     _NET_WM_STATE: await internAtomAsync(X, "_NET_WM_STATE"),
     _NET_WM_STATE_FULLSCREEN: await internAtomAsync(X, "_NET_WM_STATE_FULLSCREEN"),
 
@@ -29,12 +34,7 @@ export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise
       hintAtoms.push(ewmhAtoms._NET_WM_STATE_FULLSCREEN);
     }
 
-    const hintAtomsBuffer = Buffer.alloc(hintAtoms.length * 4);
-    for (let i = 0; i < hintAtoms.length; i++) {
-      hintAtomsBuffer.writeInt32LE(hintAtoms[i], i * 4);
-    }
-
-    X.ChangeProperty(XPropMode.Replace, wid, ewmhAtoms._NET_WM_STATE, X.atoms.ATOM, 32, hintAtomsBuffer);
+    X.ChangeProperty(XPropMode.Replace, wid, ewmhAtoms._NET_WM_STATE, X.atoms.ATOM, 32, numsToBuffer(hintAtoms));
   }
 
   function removeWindowStateHints(wid: number): void {
@@ -82,6 +82,23 @@ export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise
   }
 
   return {
+    onScreenCreated({ root }) {
+      X.ChangeProperty(
+        XPropMode.Replace,
+        root,
+        ewmhAtoms._NET_SUPPORTED,
+        X.atoms.ATOM,
+        32,
+        numsToBuffer([
+          ewmhAtoms._NET_SUPPORTED,
+          ewmhAtoms._NET_WM_NAME,
+          ewmhAtoms._NET_WM_STATE,
+          ewmhAtoms._NET_WM_STATE_FULLSCREEN,
+          ewmhAtoms._NET_FRAME_EXTENTS,
+        ])
+      );
+    },
+
     onClientMessage({ wid, windowType, messageType, data }) {
       if (windowType === XWMWindowType.Client) {
         switch (messageType) {
