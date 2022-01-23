@@ -2,13 +2,13 @@ import * as React from "react";
 
 import { Clock } from "./Clock";
 import { useDispatch, useSelector } from "react-redux";
-import { exec, minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { minimizeWindow, raiseWindow } from "../../renderer-shared/commands";
+import { useCallback, useMemo } from "react";
 import { RootState } from "../../renderer-shared/configureStore";
 import { IWindow } from "../../shared/window";
 import { selectWindowsFromScreen } from "../../renderer-shared/selectors";
-import { showRunFieldAction } from "../../renderer-shared/redux/taskbarSlice";
 import { setScreenCurrentTagsAction } from "../../shared/redux/screenSlice";
+import { RunField } from "./RunField";
 
 interface ITaskbarProps {
   screenIndex: number;
@@ -62,58 +62,6 @@ function TaskListEntry(props: ITaskListEntryProps) {
     <div className={className} onClick={onClick} title={win.title}>
       {win.title}
     </div>
-  );
-}
-
-function RunField() {
-  const field = useRef<HTMLInputElement>();
-
-  const [text, setText] = useState("");
-
-  const dispatch = useDispatch();
-
-  const reset = () => {
-    setText("");
-    dispatch(showRunFieldAction(false));
-  };
-
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    setText(event.target.value);
-  };
-
-  const onKeyPress = (event: React.KeyboardEvent) => {
-    if (text && event.key === "Enter") {
-      exec(text);
-      reset();
-      event.preventDefault();
-    }
-  };
-
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.keyCode === 27 /*esc*/) {
-      reset();
-    }
-  };
-
-  const onBlur = () => {
-    reset();
-  };
-
-  useEffect(() => {
-    field.current?.focus();
-  }, []);
-
-  return (
-    <input
-      type="text"
-      value={text}
-      className="taskbarRunField"
-      ref={field}
-      onChange={onChange}
-      onKeyPress={onKeyPress}
-      onKeyDown={onKeyDown}
-      onBlur={onBlur}
-    />
   );
 }
 

@@ -58,6 +58,7 @@ import {
 } from "../shared/redux/windowSlice";
 import { addScreenAction, setScreenCurrentTagsAction } from "../shared/redux/screenSlice";
 import { IWindow } from "../shared/window";
+import { setupAutocompleteListener } from "./autocomplete";
 
 interface Geometry {
   width: number;
@@ -256,6 +257,8 @@ export function createServer(): XServer {
     ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
       desktopBrowsers[args.screenIndex]?.webContents?.openDevTools();
     });
+
+    setupAutocompleteListener();
   })();
 
   async function __setupAtoms(): Promise<void> {

@@ -4,6 +4,10 @@ import { Store } from "./configureStore";
 import { focusDesktopBrowser } from "./commands";
 import { showRunFieldAction } from "./redux/taskbarSlice";
 
+type CompletionOptionsCallback = (options: string[]) => void;
+
+let _onCompletionOptionsResult: CompletionOptionsCallback | undefined;
+
 export function setupIpc(store: Store, screenIndex: number) {
   ipcRenderer.on("x-keypress", (event, args) => {
     console.log(args);
@@ -16,4 +20,13 @@ export function setupIpc(store: Store, screenIndex: number) {
       }
     }
   });
+
+  ipcRenderer.on("completion-options-result", (event, options: string[]) => {
+    _onCompletionOptionsResult?.(options);
+    _onCompletionOptionsResult = undefined;
+  });
+}
+
+export function setOnCompletionOptionsResult(callback: CompletionOptionsCallback): void {
+  _onCompletionOptionsResult = callback;
 }

@@ -1,5 +1,6 @@
 import { ipcRenderer } from "electron";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
+import { setOnCompletionOptionsResult } from "./ipcRenderer";
 
 export function raiseWindow(wid: number) {
   ipcRenderer.send("raise-window", wid);
@@ -27,4 +28,21 @@ export function showDevTools(screenIndex: number): void {
 
 export function showContextMenu(menuKind: ContextMenuKind): void {
   ipcRenderer.send("show-context-menu", { menuKind });
+}
+
+let _completionOptionsPromise: Promise<string[]> | undefined;
+
+export function getCompletionOptions(): Promise<string[]> {
+  if (!_completionOptionsPromise) {
+    _completionOptionsPromise = new Promise((resolve) => {
+      setOnCompletionOptionsResult((options) => {
+        _completionOptionsPromise = undefined;
+        resolve(options);
+      });
+
+      ipcRenderer.send("completion-options-get");
+    });
+  }
+
+  return _completionOptionsPromise;
 }
