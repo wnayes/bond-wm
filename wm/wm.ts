@@ -42,7 +42,7 @@ import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints } from "./icccm";
+import { createICCCMEventConsumer, getNormalHints, WMSizeHints } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
 import { showContextMenu } from "./menus";
@@ -566,7 +566,7 @@ export function createServer(): XServer {
     X.ChangeSaveSet(1, wid);
 
     if (shouldCreateFrame(wid, clientGeom)) {
-      const effectiveGeometry = getGeometryForWindow(clientGeom);
+      const effectiveGeometry = getGeometryForWindow(clientGeom, normalHints);
 
       const fid = createFrameBrowser(wid, effectiveGeometry);
       knownWids.add(fid);
@@ -666,13 +666,27 @@ export function createServer(): XServer {
     return true;
   }
 
-  function getGeometryForWindow(clientGeom: XGeometry): Geometry {
-    return {
+  function getGeometryForWindow(clientGeom: XGeometry, normalHints: WMSizeHints | undefined): Geometry {
+    const effectiveGeometry = {
       height: clientGeom.height,
       width: clientGeom.width,
       x: clientGeom.xPos,
       y: clientGeom.yPos,
     };
+    if (normalHints.maxHeight > 0) {
+      effectiveGeometry.height = Math.min(effectiveGeometry.height, normalHints.maxHeight);
+    }
+    if (normalHints.minHeight > 0) {
+      effectiveGeometry.height = Math.max(effectiveGeometry.height, normalHints.minHeight);
+    }
+    if (normalHints.maxWidth > 0) {
+      effectiveGeometry.width = Math.min(effectiveGeometry.width, normalHints.maxWidth);
+    }
+    if (normalHints.minWidth > 0) {
+      effectiveGeometry.width = Math.max(effectiveGeometry.width, normalHints.minWidth);
+    }
+
+    return effectiveGeometry;
   }
 
   function changeWindowEventMask(wid: number, eventMask: XEventMask): boolean {
@@ -768,6 +782,10 @@ export function createServer(): XServer {
 
   function onConfigureRequest(ev: IXConfigureEvent) {
     const { wid } = ev;
+
+    // Until node-x11 5a1fb64 reaches npm, `mask` needs to be read from the raw data.
+    const mask = (ev.mask = ev.rawData.readUInt16LE(26));
+
     widLog(wid, "onConfigureRequest", ev);
 
     // Ignore any configure requests for these; we always control their size.
@@ -776,13 +794,9 @@ export function createServer(): XServer {
     }
 
     if (isClientWin(wid)) {
-      const mask = ev.mask;
       if (!mask) {
         return; // There's no requested changes?
       }
-
-      const fid = getFrameIdFromWindowId(wid);
-      const widToChange = fid ?? wid;
 
       const config: Partial<IXConfigureInfo> = {};
       if (mask & CWMaskBits.CWX) {
@@ -799,7 +813,6 @@ export function createServer(): XServer {
       }
 
       if (Object.keys(config).length > 0) {
-        X.ConfigureWindow(widToChange, config);
         store.dispatch(configureWindowAction({ wid, ...config }));
       }
     } else {
