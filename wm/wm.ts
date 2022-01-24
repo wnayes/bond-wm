@@ -882,9 +882,8 @@ export function createServer(): XServer {
   function onClientMessage(ev: IClientMessageEvent) {
     const { wid } = ev;
 
-    let atomName: string;
-    X.GetAtomName(ev.message_type, (err, name) => (atomName = name));
-    widLog(wid, `onClientMessage (type=${atomName})`, ev);
+    widLog(wid, "onClientMessage", ev);
+    X.GetAtomName(ev.message_type, (err, name) => log(`(Client message message_type ${ev.message_type} == ${name})`));
 
     eventConsumers.forEach((consumer) =>
       consumer.onClientMessage?.({
