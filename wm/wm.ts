@@ -636,14 +636,19 @@ export function createServer(): XServer {
     } else if (isClientWin(wid)) {
       widLog(wid, `Unmanage window`);
 
-      if (store.getState().windows.hasOwnProperty(wid)) {
-        store.dispatch(removeWindowAction(wid));
-      }
+      const focusedWid = getFocusedWindowId();
+      const win = getWinFromStore(wid);
+
+      store.dispatch(removeWindowAction(wid));
 
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number" && fid !== wid) {
         log("Destroying BrowserWindow for frame " + fid);
         frameBrowserWindows[wid].destroy();
+      }
+
+      if (wid === focusedWid && win) {
+        setFocusToDesktopWindow(win.screenIndex);
       }
     }
 
