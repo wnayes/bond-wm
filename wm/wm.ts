@@ -177,6 +177,13 @@ export function createServer(): XServer {
 
   const initializingWins: { [win: number]: boolean } = {};
 
+  /**
+   * The last frame extents used for a window.
+   * Since the frame takes a little bit to render, and the extents are usually the same,
+   * we track this and use these extents as default as an optimization.
+   */
+  let lastFrameExtents: IBounds | undefined;
+
   const store = __setupStore();
 
   const context: XWMContext = {
@@ -578,7 +585,7 @@ export function createServer(): XServer {
       winIdToRootId[fid] = screen.root;
 
       X.ReparentWindow(fid, screen.root, screen.x + effectiveGeometry.x, screen.y + effectiveGeometry.y);
-      X.ReparentWindow(wid, fid, 0, 0);
+      X.ReparentWindow(wid, fid, lastFrameExtents?.left || 0, lastFrameExtents?.top || 0);
 
       X.GrabServer();
 
@@ -603,6 +610,7 @@ export function createServer(): XServer {
             width: effectiveGeometry.width,
             height: effectiveGeometry.height,
           },
+          frameExtents: lastFrameExtents,
           visible: true,
           decorated: hasMotifDecorations(motifHints),
           title,
@@ -1341,6 +1349,7 @@ export function createServer(): XServer {
                 top: action.payload.top,
                 bottom: action.payload.bottom,
               };
+              lastFrameExtents = frameExtents;
 
               X.ConfigureWindow(wid, {
                 x: frameExtents.left,
