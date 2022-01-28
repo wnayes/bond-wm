@@ -10,6 +10,7 @@ export interface IWindow {
   focused: boolean;
   decorated: boolean;
   title: string | undefined;
+  wmClass: [string, string] | undefined;
   screenIndex: number;
   tags: string[];
   normalHints: WMSizeHints | undefined;

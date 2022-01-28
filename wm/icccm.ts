@@ -86,6 +86,24 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
   };
 }
 
+/** Obtains the WM_CLASS X property value for a window. */
+export async function getWMClass(X: IXClient, wid: number): Promise<[string, string] | undefined> {
+  const { data } = await getRawPropertyValue(X, wid, X.atoms.WM_CLASS, X.atoms.STRING);
+  if (!data) {
+    return undefined;
+  }
+
+  const wmClass: [string, string] = ["", ""];
+  const firstNullByteIndex = data.indexOf(0);
+  if (firstNullByteIndex > 0) {
+    wmClass[0] = data.toString("utf8", 0, firstNullByteIndex);
+  }
+  if (firstNullByteIndex + 1 < data.length - 1) {
+    wmClass[1] = data.toString("utf8", firstNullByteIndex + 1, data.length - 1);
+  }
+  return wmClass;
+}
+
 export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHints | undefined> {
   const { data } = await getRawPropertyValue(X, wid, X.atoms.WM_NORMAL_HINTS, X.atoms.WM_SIZE_HINTS);
 

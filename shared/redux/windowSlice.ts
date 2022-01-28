@@ -27,6 +27,7 @@ export const windowsSlice = createSlice({
         decorated: payload.decorated,
         focused: false,
         title: payload.title,
+        wmClass: payload.wmClass,
         screenIndex: payload.screenIndex,
         tags: payload.tags,
         normalHints: payload.normalHints,
