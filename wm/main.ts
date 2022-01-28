@@ -6,16 +6,23 @@ dialog.showErrorBox = function (title, content) {
   console.error(`${title}\n${content}`);
 };
 
-// try {
-// 	require("electron-reloader")(module);
-// }
-// catch {}
+/* eslint-disable */
+try {
+  // With this ignore pattern, we're effectively just listening to CSS in the browser windows.
+  // It isn't too safe to reload code modules right now, at least not in the WM you're using currently!
+  require("electron-reloader")(module, {
+    ignore: ["**/*.tsx", "**/*.ts", "**/*.js", "**/*.md", "**/*.json"],
+  });
+} catch (e) {
+  console.error("electron-reloader error", e);
+}
+/* eslint-enable */
 
 // Quit when all windows are closed.
-app.on("window-all-closed", function () {
+app.on("window-all-closed", () => {
   app.quit();
 });
 
-app.on("ready", function () {
+app.on("ready", () => {
   startX();
 });
