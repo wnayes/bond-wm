@@ -60,6 +60,7 @@ import { addScreenAction, setScreenCurrentTagsAction } from "../shared/redux/scr
 import { IWindow } from "../shared/window";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
+import { customizeWindow } from "./customize";
 
 interface Geometry {
   width: number;
@@ -522,7 +523,8 @@ export function createServer(): XServer {
   }
 
   async function manageWindow(wid: number, opts: ManageWindowOpts): Promise<void> {
-    const { screenIndex, checkUnmappedState, focusWindow } = opts;
+    const { checkUnmappedState, focusWindow } = opts;
+    let { screenIndex } = opts;
 
     widLog(wid, `Manage window on screen ${screenIndex}`);
 
@@ -576,16 +578,45 @@ export function createServer(): XServer {
     if (shouldCreateFrame(wid, clientGeom)) {
       const effectiveGeometry = getGeometryForWindow(clientGeom, normalHints);
 
-      const fid = createFrameBrowser(wid, effectiveGeometry);
-      knownWids.add(fid);
+      const win: Partial<IWindow> = {
+        outer: {
+          x: effectiveGeometry.x,
+          y: effectiveGeometry.y,
+          width: effectiveGeometry.width,
+          height: effectiveGeometry.height,
+        },
+        frameExtents: lastFrameExtents,
+        visible: true,
+        decorated: hasMotifDecorations(motifHints),
+        title,
+        wmClass,
+        screenIndex,
+        normalHints,
+      };
 
+      customizeWindow(win);
+
+      // Accept any update to screenIndex (if it is valid).
       const state = store.getState();
-      const screen = state.screens[screenIndex];
+      let screen = state.screens[win.screenIndex];
+      if (screen) {
+        screenIndex = win.screenIndex;
+      } else {
+        win.screenIndex = screenIndex;
+        screen = state.screens[win.screenIndex];
+      }
+
+      if (!win.tags) {
+        win.tags = [screen.currentTags[0]];
+      }
+
+      const fid = createFrameBrowser(wid, win.outer);
+      knownWids.add(fid);
 
       winIdToRootId[wid] = screen.root;
       winIdToRootId[fid] = screen.root;
 
-      X.ReparentWindow(fid, screen.root, screen.x + effectiveGeometry.x, screen.y + effectiveGeometry.y);
+      X.ReparentWindow(fid, screen.root, screen.x + win.outer.x, screen.y + win.outer.y);
       X.ReparentWindow(wid, fid, lastFrameExtents?.left || 0, lastFrameExtents?.top || 0);
 
       X.GrabServer();
@@ -595,32 +626,10 @@ export function createServer(): XServer {
 
       X.UngrabServer();
 
-      X.ConfigureWindow(fid, {
-        borderWidth: 0,
-      });
-      X.ConfigureWindow(wid, {
-        borderWidth: 0,
-      });
+      X.ConfigureWindow(fid, { borderWidth: 0 });
+      X.ConfigureWindow(wid, { borderWidth: 0 });
 
-      store.dispatch(
-        addWindowAction({
-          wid,
-          outer: {
-            x: effectiveGeometry.x,
-            y: effectiveGeometry.y,
-            width: effectiveGeometry.width,
-            height: effectiveGeometry.height,
-          },
-          frameExtents: lastFrameExtents,
-          visible: true,
-          decorated: hasMotifDecorations(motifHints),
-          title,
-          wmClass,
-          screenIndex,
-          tags: [screen.currentTags[0]],
-          normalHints,
-        })
-      );
+      store.dispatch(addWindowAction({ wid, ...win }));
 
       X.MapWindow(fid);
     }
