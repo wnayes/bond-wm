@@ -98,7 +98,11 @@ const FRAME_WIN_EVENT_MASK =
   x11.eventMask.LeaveWindow |
   x11.eventMask.SubstructureRedirect;
 
-const CLIENT_WIN_EVENT_MASK = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.FocusChange;
+const CLIENT_WIN_EVENT_MASK =
+  x11.eventMask.StructureNotify |
+  x11.eventMask.PropertyChange |
+  x11.eventMask.FocusChange |
+  x11.eventMask.PointerMotion;
 
 export enum XWMWindowType {
   Other = 0,
@@ -177,6 +181,8 @@ export function createServer(): XServer {
   const frameBrowserFrameIdToWinId: { [fid: number]: number | undefined } = {};
 
   const initializingWins: { [win: number]: boolean } = {};
+
+  let ignoreEnterLeave = false;
 
   /**
    * The last frame extents used for a window.
@@ -465,6 +471,7 @@ export function createServer(): XServer {
         onButtonPress(ev);
         break;
       case X11_EVENT_TYPE.MotionNotify:
+        onPointerMotion(ev);
         break;
       case X11_EVENT_TYPE.EnterNotify:
         onEnterNotify(ev);
@@ -572,6 +579,8 @@ export function createServer(): XServer {
       X.MapWindow(wid);
       return;
     }
+
+    ignoreEnterLeave = true;
 
     X.ChangeSaveSet(1, wid);
 
@@ -847,7 +856,11 @@ export function createServer(): XServer {
 
   function onEnterNotify(ev: IXEvent) {
     const { wid } = ev;
-    widLog(wid, "onEnterNotify");
+    widLog(wid, "onEnterNotify", ignoreEnterLeave ? "ignoring" : "handling");
+
+    if (ignoreEnterLeave) {
+      return;
+    }
 
     const isFrame = isFrameBrowserWin(wid);
     const window = isFrame ? getWindowIdFromFrameId(wid) : wid;
@@ -857,7 +870,14 @@ export function createServer(): XServer {
 
   function onLeaveNotify(ev: IXEvent) {
     const { wid } = ev;
-    widLog(wid, "onLeaveNotify");
+    widLog(wid, "onLeaveNotify", ignoreEnterLeave ? "ignoring" : "handling");
+  }
+
+  function onPointerMotion(ev: IXEvent): void {
+    if (ignoreEnterLeave) {
+      widLog(ev.wid, "onMotionNotify", "clearing enterleave ignore");
+      ignoreEnterLeave = false;
+    }
   }
 
   async function onKeyPress(ev: IXKeyEvent) {
