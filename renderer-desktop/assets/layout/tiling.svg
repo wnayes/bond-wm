@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="210mm"
+   viewBox="0 0 210 210"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="tiling.svg"
+   inkscape:export-filename="/home/wnayes/code/electron-wm/renderer-desktop/assets/layout/floating.png"
+   inkscape:export-xdpi="30.959999"
+   inkscape:export-ydpi="30.959999"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.0999107"
+     inkscape:cx="-165.0134"
+     inkscape:cy="501.40434"
+     inkscape:window-width="3838"
+     inkscape:window-height="2118"
+     inkscape:window-x="2560"
+     inkscape:window-y="220"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg5" />
+  <defs
+     id="defs2" />
+  <path
+     id="rect912"
+     style="fill:#454545;fill-opacity:1;stroke-width:1.44277"
+     d="M 63.03125 11.789062 C 34.786203 11.789063 12.046875 34.52839 12.046875 62.773438 L 12.046875 351.94922 L 359.32812 351.94922 L 359.32812 11.789062 L 63.03125 11.789062 z M 444.54688 11.789062 L 444.54688 351.94922 L 780.85938 351.94922 L 780.85938 62.773438 C 780.85938 34.52839 758.12005 11.789062 729.875 11.789062 L 444.54688 11.789062 z M 12.046875 441.19141 L 12.046875 728.65625 C 12.046875 756.9013 34.786203 779.64063 63.03125 779.64062 L 359.32812 779.64062 L 359.32812 441.19141 L 12.046875 441.19141 z M 444.54688 441.19141 L 444.54688 779.64062 L 729.875 779.64062 C 758.12005 779.64063 780.85937 756.9013 780.85938 728.65625 L 780.85938 441.19141 L 444.54688 441.19141 z "
+     transform="scale(0.26458333)" />
+</svg>

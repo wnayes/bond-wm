@@ -1,6 +1,6 @@
 import * as React from "react";
-
-import { ILayout, ILayoutProps } from "../Layout";
+import { ILayout } from "../../../layouts";
+import { ILayoutProps } from "../Layout";
 import { Window } from "../Window";
 
 export function Floating({ windows, screen }: ILayoutProps) {
@@ -31,5 +31,6 @@ export function Floating({ windows, screen }: ILayoutProps) {
 
 export const FloatingLayout: ILayout = {
   name: "Floating",
+  icon: "assets/layout/floating.png",
   component: Floating,
 };

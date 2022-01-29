@@ -1,6 +1,6 @@
 import * as React from "react";
-
-import { ILayout, ILayoutProps } from "../Layout";
+import { ILayout } from "../../../layouts";
+import { ILayoutProps } from "../Layout";
 import { Window } from "../Window";
 
 export function Tiling({ windows, screen }: ILayoutProps) {
@@ -33,5 +33,6 @@ export function Tiling({ windows, screen }: ILayoutProps) {
 
 export const TilingLayout: ILayout = {
   name: "Tiling",
+  icon: "assets/layout/tiling.png",
   component: Tiling,
 };

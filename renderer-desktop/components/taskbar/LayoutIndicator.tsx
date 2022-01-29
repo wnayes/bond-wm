@@ -1,8 +1,9 @@
 import * as React from "react";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState } from "../../../renderer-shared/configureStore";
 import { switchToNextLayout } from "../../../shared/layouts";
+import { getLayouts } from "../../layouts";
 
 interface ILayoutIndicatorProps {
   screenIndex: number;
@@ -10,7 +11,10 @@ interface ILayoutIndicatorProps {
 
 export function LayoutIndicator({ screenIndex }: ILayoutIndicatorProps) {
   const tag = useSelector((state: RootState) => state.screens[screenIndex].currentTags[0]);
-  const currentLayout = useSelector((state: RootState) => state.screens[screenIndex].currentLayouts[tag]);
+  const currentLayoutName = useSelector((state: RootState) => state.screens[screenIndex].currentLayouts[tag]);
+  const currentLayout = useMemo(() => {
+    return getLayouts().find((layout) => layout.name === currentLayoutName);
+  }, [currentLayoutName]);
 
   const store = useStore();
 
@@ -18,9 +22,14 @@ export function LayoutIndicator({ screenIndex }: ILayoutIndicatorProps) {
     switchToNextLayout(store, screenIndex);
   }, [store, screenIndex]);
 
+  let layoutIcon;
+  if (currentLayout?.icon) {
+    layoutIcon = <img className="layoutIndicatorIcon" src={"./" + currentLayout.icon} />;
+  }
+
   return (
-    <div className="layoutIndicator" title={currentLayout} onClick={onClick}>
-      {currentLayout}
+    <div className="layoutIndicator" title={currentLayoutName} onClick={onClick}>
+      {layoutIcon ?? currentLayoutName}
     </div>
   );
 }

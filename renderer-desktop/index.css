@@ -138,3 +138,8 @@ html, body {
 .layoutIndicator:hover {
     background-color: #BBBBBB;
 }
+
+.layoutIndicatorIcon {
+    height: 16px;
+    padding-top: 2px;
+}

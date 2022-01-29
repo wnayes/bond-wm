@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="210mm"
+   viewBox="0 0 210 210"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="floating.svg"
+   inkscape:export-filename="/home/wnayes/code/electron-wm/assets/layouts/floating.png"
+   inkscape:export-xdpi="30.959999"
+   inkscape:export-ydpi="30.959999"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.0999107"
+     inkscape:cx="393.21374"
+     inkscape:cy="396.8504"
+     inkscape:window-width="3838"
+     inkscape:window-height="2118"
+     inkscape:window-x="2560"
+     inkscape:window-y="220"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg5" />
+  <defs
+     id="defs2" />
+  <path
+     id="rect912-6"
+     style="fill:#454545;stroke-width:1.16745;fill-opacity:1"
+     d="M 625.93359 220.42773 L 625.93359 512.58594 C 625.93359 535.27804 607.66476 553.54688 584.97266 553.54688 L 100.58203 553.54688 L 100.58203 740.70703 C 100.58203 765.81344 120.79398 786.02539 145.90039 786.02539 L 738.64453 786.02539 C 763.75094 786.02539 783.96289 765.81344 783.96289 740.70703 L 783.96289 265.74609 C 783.96289 240.63968 763.75094 220.42773 738.64453 220.42773 L 625.93359 220.42773 z "
+     transform="scale(0.26458333)" />
+  <rect
+     style="fill:#454545;stroke-width:0.264583;fill-opacity:1"
+     id="rect912"
+     width="150.79564"
+     height="131.65337"
+     x="2.1873362"
+     y="2.5070896"
+     rx="10" />
+</svg>

@@ -2,14 +2,7 @@ import * as React from "react";
 
 import { IScreen } from "../../../shared/types";
 import { IWindow } from "../../../shared/window";
-import { TilingLayout } from "./layouts/Tiling";
-import { FloatingLayout } from "./layouts/Floating";
-import { getLayoutNames } from "../../../shared/layouts";
-
-export interface ILayout {
-  name: string;
-  component: React.ComponentType<ILayoutProps>;
-}
+import { getLayouts } from "../../layouts";
 
 export interface ILayoutProps {
   windows: IWindow[];
@@ -31,11 +24,3 @@ export const Layout: React.FC<ILayoutProps> = ({ screen, windows }) => {
 
   return <LayoutComponent windows={windows} screen={screen} />;
 };
-
-function getLayouts(): ILayout[] {
-  const layouts = [FloatingLayout, TilingLayout];
-
-  return getLayoutNames().map((layoutName) => {
-    return layouts.find((layout) => layout.name === layoutName);
-  });
-}
