@@ -60,14 +60,15 @@ html, body {
 
 .winTitleBarCloseBtn {
     display: inline-block;
-    width: 12px;
-    cursor: pointer;
+    width: 40px;
+    height: 19px;
     text-align: center;
     -webkit-user-select: none;
     user-select: none;
 }
 .winTitleBarCloseBtn:hover {
     font-weight: bold;
+    background-color: #FF6961;
 }
 
 .winBox {
