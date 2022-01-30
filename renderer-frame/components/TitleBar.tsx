@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { closeWindow } from "../../renderer-shared/commands";
+import { closeWindow, showContextMenu } from "../../renderer-shared/commands";
+import { ContextMenuKind } from "../../shared/ContextMenuKind";
 import { IWindow } from "../../shared/window";
 
 interface ITitleBarProps {
@@ -9,8 +10,15 @@ interface ITitleBarProps {
 
 export function TitleBar(props: ITitleBarProps) {
   const window = props.window;
+
+  const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showContextMenu(ContextMenuKind.Frame);
+  }, []);
+
   return (
-    <div className="winTitleBar">
+    <div className="winTitleBar" onContextMenu={onContextMenu}>
       <span className="winTitleBarText">{window.title}</span>
       <TitleBarCloseButton window={window} />
     </div>

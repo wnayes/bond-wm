@@ -1,3 +1,4 @@
 export enum ContextMenuKind {
-  General,
+  Desktop,
+  Frame,
 }

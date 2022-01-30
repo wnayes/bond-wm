@@ -21,7 +21,7 @@ export function Desktop({ screenIndex }: IDesktopProps) {
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    showContextMenu(ContextMenuKind.General);
+    showContextMenu(ContextMenuKind.Desktop);
   }, []);
 
   return (
