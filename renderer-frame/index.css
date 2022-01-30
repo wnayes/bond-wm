@@ -26,7 +26,8 @@ html, body {
     border: 1px solid black;
 }
 .winWrapper.focused {
-    background-color: #222a50;
+    background-color: #7269d2;
+    border-color: #7269d2;
 }
 .winWrapper.fullscreen {
     border-width: 0;
