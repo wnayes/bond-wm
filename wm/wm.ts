@@ -34,6 +34,8 @@ import {
   CWMaskBits,
   IClientMessageEvent,
   Atom,
+  IXMotionNotifyEvent,
+  IXButtonReleaseEvent,
 } from "../shared/X";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
@@ -61,6 +63,7 @@ import { IWindow } from "../shared/window";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
 import { customizeWindow } from "./customize";
+import { createDragModule } from "./drag";
 
 interface Geometry {
   width: number;
@@ -96,7 +99,9 @@ const FRAME_WIN_EVENT_MASK =
   x11.eventMask.StructureNotify |
   x11.eventMask.EnterWindow |
   x11.eventMask.LeaveWindow |
-  x11.eventMask.SubstructureRedirect;
+  x11.eventMask.SubstructureRedirect |
+  x11.eventMask.PointerMotion |
+  x11.eventMask.ButtonRelease;
 
 const CLIENT_WIN_EVENT_MASK =
   x11.eventMask.StructureNotify |
@@ -133,12 +138,19 @@ export interface XWMEventConsumerScreenCreatedArgs {
   root: number;
 }
 
+export interface XWMEventConsumerPointerMotionArgs extends XWMEventConsumerArgsWithType {
+  rootx: number;
+  rooty: number;
+}
+
 export interface IXWMEventConsumer {
   onScreenCreated?(args: XWMEventConsumerScreenCreatedArgs): void;
 
   onClientMessage?(args: XWMEventConsumerClientMessageArgs): void;
   onMapNotify?(args: XWMEventConsumerArgsWithType): void;
   onUnmapNotify?(args: XWMEventConsumerArgsWithType): void;
+  onPointerMotion?(args: XWMEventConsumerPointerMotionArgs): void;
+  onButtonRelease?(args: XWMEventConsumerArgsWithType): void;
 
   onSetFrameExtents?(args: XWMEventConsumerSetFrameExtentsArgs): void;
 }
@@ -147,6 +159,9 @@ export interface XWMContext {
   X: IXClient;
   XDisplay: IXDisplay;
   store: ServerStore;
+
+  getWindowIdFromFrameId(wid: number): number | undefined;
+  getFrameIdFromWindowId(wid: number): number | undefined;
 }
 
 export function startX(): XServer {
@@ -197,6 +212,8 @@ export function createServer(): XServer {
     X,
     XDisplay,
     store,
+    getWindowIdFromFrameId,
+    getFrameIdFromWindowId,
   };
 
   // If `true`, send to the desktop browser.
@@ -243,8 +260,10 @@ export function createServer(): XServer {
       XDisplay = context.XDisplay = display;
       X = context.X = display.client;
 
+      const dragModule = await createDragModule(context);
+      eventConsumers.push(dragModule);
       eventConsumers.push(await createICCCMEventConsumer(context));
-      eventConsumers.push(await createEWMHEventConsumer(context));
+      eventConsumers.push(await createEWMHEventConsumer(context, dragModule));
 
       motif = await createMotifModule(context);
 
@@ -434,6 +453,8 @@ export function createServer(): XServer {
       height: geometry.height,
       x: geometry.x,
       y: geometry.y,
+      backgroundColor: "#00000000",
+      transparent: true,
       webPreferences: {
         preload: path.resolve(path.join(__dirname, "../renderer-shared/preload.js")),
         nodeIntegration: true,
@@ -468,10 +489,13 @@ export function createServer(): XServer {
       case X11_EVENT_TYPE.KeyRelease:
         break;
       case X11_EVENT_TYPE.ButtonPress:
-        onButtonPress(ev);
+        onButtonPress(ev as IXButtonReleaseEvent);
+        break;
+      case X11_EVENT_TYPE.ButtonRelease:
+        onButtonRelease(ev as IXButtonReleaseEvent);
         break;
       case X11_EVENT_TYPE.MotionNotify:
-        onPointerMotion(ev);
+        onPointerMotion(ev as IXMotionNotifyEvent);
         break;
       case X11_EVENT_TYPE.EnterNotify:
         onEnterNotify(ev);
@@ -873,11 +897,23 @@ export function createServer(): XServer {
     widLog(wid, "onLeaveNotify", ignoreEnterLeave ? "ignoring" : "handling");
   }
 
-  function onPointerMotion(ev: IXEvent): void {
+  function onPointerMotion(ev: IXMotionNotifyEvent): void {
+    const { wid } = ev;
+    widLog(wid, "onPointerMotion", ev);
+
     if (ignoreEnterLeave) {
-      widLog(ev.wid, "onMotionNotify", "clearing enterleave ignore");
+      widLog(wid, "onMotionNotify", "clearing enterleave ignore");
       ignoreEnterLeave = false;
     }
+
+    eventConsumers.forEach((consumer) =>
+      consumer.onPointerMotion?.({
+        wid,
+        windowType: getWindowType(wid),
+        rootx: ev.rootx,
+        rooty: ev.rooty,
+      })
+    );
   }
 
   async function onKeyPress(ev: IXKeyEvent) {
@@ -902,12 +938,28 @@ export function createServer(): XServer {
     }
   }
 
-  function onButtonPress(ev: IXEvent) {
+  function onButtonPress(ev: IXButtonReleaseEvent) {
+    const { wid } = ev;
+
+    // Why is this coming through ButtonPress?
+    if (ev.name === "ButtonRelease") {
+      onButtonRelease(ev);
+      return;
+    }
+
+    widLog(wid, "onButtonPress", ev);
+  }
+
+  function onButtonRelease(ev: IXButtonReleaseEvent) {
     const { wid } = ev;
     widLog(wid, "onButtonPress", ev);
 
-    if (isDesktopBrowserWin(ev.wid)) return;
-    // X.RaiseWindow(ev.wid);
+    eventConsumers.forEach((consumer) =>
+      consumer.onButtonRelease?.({
+        wid,
+        windowType: getWindowType(wid),
+      })
+    );
   }
 
   function onClientMessage(ev: IClientMessageEvent) {

@@ -12,6 +12,8 @@ export interface IBounds {
   right: number;
 }
 
+export type Coords = [x: number, y: number];
+
 export interface IScreen {
   index: number;
 

@@ -7,6 +7,7 @@ import {
   getWindowMinHeight,
   getWindowMinWidth,
   IWindow,
+  WindowPosition,
 } from "../../../shared/window";
 import { geometriesDiffer } from "../../../shared/utils";
 import { configureWindowAction } from "../../../shared/redux/windowSlice";
@@ -32,13 +33,24 @@ export function Window({ win, fill }: IWindowProps) {
     style.width = "100%";
     style.height = "100%";
   } else {
-    if (fill) {
-      style.width = "100%";
-      style.height = "100%";
-    } else {
-      style.float = "left";
-      style.width = win.outer.width;
-      style.height = win.outer.height;
+    switch (win.position) {
+      case WindowPosition.Default:
+        if (fill) {
+          style.width = "100%";
+          style.height = "100%";
+        } else {
+          style.float = "left";
+          style.width = win.outer.width;
+          style.height = win.outer.height;
+        }
+        break;
+      case WindowPosition.UserPositioned:
+        style.position = "absolute";
+        style.width = win.outer.width;
+        style.height = win.outer.height;
+        style.left = win.outer.x;
+        style.top = win.outer.y;
+        break;
     }
 
     const minWidth = getWindowMinWidth(win);
@@ -73,16 +85,18 @@ export function Window({ win, fill }: IWindowProps) {
         height: clientRect.height,
       };
 
-      // Keep the windows within the screen.
-      if (finalRect.x + finalRect.width > screen.width) {
-        finalRect.x = screen.width - finalRect.width;
-      }
-      finalRect.x = Math.max(0, finalRect.x);
+      if (win.position !== WindowPosition.UserPositioned) {
+        // Keep the windows within the screen.
+        if (finalRect.x + finalRect.width > screen.width) {
+          finalRect.x = screen.width - finalRect.width;
+        }
+        finalRect.x = Math.max(0, finalRect.x);
 
-      if (finalRect.y + finalRect.height > screen.height) {
-        finalRect.y = screen.height - finalRect.height;
+        if (finalRect.y + finalRect.height > screen.height) {
+          finalRect.y = screen.height - finalRect.height;
+        }
+        finalRect.y = Math.max(0, finalRect.y);
       }
-      finalRect.y = Math.max(0, finalRect.y);
 
       if (geometriesDiffer(win.outer, finalRect)) {
         store.dispatch(

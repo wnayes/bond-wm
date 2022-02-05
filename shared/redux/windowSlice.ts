@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IBounds, IGeometry } from "../types";
-import { IWindow } from "../window";
+import { IWindow, WindowPosition } from "../window";
 
 export interface WindowsState {
   [wid: number]: IWindow;
@@ -24,13 +24,15 @@ export const windowsSlice = createSlice({
         },
         visible: payload.visible,
         fullscreen: false,
-        decorated: payload.decorated,
+        position: WindowPosition.Default,
         focused: false,
+        decorated: payload.decorated,
         title: payload.title,
         wmClass: payload.wmClass,
         screenIndex: payload.screenIndex,
         tags: payload.tags,
         normalHints: payload.normalHints,
+        dragState: undefined,
       };
     },
 
@@ -100,6 +102,13 @@ export const windowsSlice = createSlice({
       }
     },
 
+    setWindowPositionAction: (state, action: PayloadAction<{ wid: number; position: WindowPosition }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        state[payload.wid].position = payload.position;
+      }
+    },
+
     setWindowVisibleAction: (state, action: PayloadAction<{ wid: number; visible: boolean }>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
@@ -114,6 +123,28 @@ export const windowsSlice = createSlice({
       const { payload } = action;
       if (assertWidInState(state, action)) {
         state[payload.wid].decorated = payload.decorated;
+      }
+    },
+
+    startDragAction: (
+      state,
+      action: PayloadAction<{ wid: number; moving?: boolean; coords: [x: number, y: number] }>
+    ) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        state[payload.wid].dragState = {
+          moving: payload.moving,
+          startCoordinates: payload.coords,
+          startOuterSize: state[payload.wid].outer,
+        };
+        state[payload.wid].position = WindowPosition.UserPositioned;
+      }
+    },
+
+    endDragAction: (state, action: PayloadAction<{ wid: number }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        state[payload.wid].dragState = undefined;
       }
     },
   },
@@ -136,8 +167,11 @@ export const {
   focusWindowAction,
   setWindowTitleAction,
   setWindowFullscreenAction,
+  setWindowPositionAction,
   setWindowVisibleAction,
   setWindowDecoratedAction,
+  startDragAction,
+  endDragAction,
 } = windowsSlice.actions;
 
 export default windowsSlice.reducer;

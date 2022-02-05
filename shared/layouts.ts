@@ -1,6 +1,9 @@
 import { batch } from "react-redux";
 import { SharedStore } from "./redux/basicStore";
 import { setTagCurrentLayoutAction } from "./redux/screenSlice";
+import { setWindowPositionAction } from "./redux/windowSlice";
+import { selectWindowsFromTag } from "./selectors";
+import { WindowPosition } from "./window";
 
 const _layouts = ["Floating", "Tiling"];
 
@@ -19,13 +22,20 @@ export function getNextLayoutName(fromLayoutName: string): string {
 }
 
 export function switchToNextLayout(store: SharedStore, screenIndex: number): void {
-  const screens = store.getState().screens;
-  const screen = screens[screenIndex];
+  const state = store.getState();
+  const screen = state.screens[screenIndex];
   batch(() => {
     for (const tag of screen.currentTags) {
       const nextLayoutName = getNextLayoutName(screen.currentLayouts[tag]);
       if (nextLayoutName !== screen.currentLayouts[tag]) {
         store.dispatch(setTagCurrentLayoutAction({ screenIndex, tag, layoutName: nextLayoutName }));
+
+        // Layout change resets any user positioned windows.
+        for (const win of selectWindowsFromTag(state, screenIndex, tag)) {
+          if (win.position === WindowPosition.UserPositioned) {
+            store.dispatch(setWindowPositionAction({ wid: win.id, position: WindowPosition.Default }));
+          }
+        }
       }
     }
   });

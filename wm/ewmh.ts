@@ -5,6 +5,8 @@ import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { internAtomAsync } from "./xutils";
 import { pid } from "process";
+import { DragModule } from "./drag";
+import { Coords } from "../shared/types";
 
 enum NetWmStateAction {
   _NET_WM_STATE_REMOVE = 0,
@@ -12,7 +14,29 @@ enum NetWmStateAction {
   _NET_WM_STATE_TOGGLE = 2,
 }
 
-export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise<IXWMEventConsumer> {
+type NetWmStateData = [action: NetWmStateAction, firstAtom: Atom, secondAtom: Atom, sourceIndication: number];
+
+type NetWmMoveResizeData = [xRoot: number, yRoot: number, direction: number, button: number, sourceIndication: number];
+
+enum NetWmMoveResizeType {
+  _NET_WM_MOVERESIZE_SIZE_TOPLEFT = 0,
+  _NET_WM_MOVERESIZE_SIZE_TOP = 1,
+  _NET_WM_MOVERESIZE_SIZE_TOPRIGHT = 2,
+  _NET_WM_MOVERESIZE_SIZE_RIGHT = 3,
+  _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT = 4,
+  _NET_WM_MOVERESIZE_SIZE_BOTTOM = 5,
+  _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT = 6,
+  _NET_WM_MOVERESIZE_SIZE_LEFT = 7,
+  _NET_WM_MOVERESIZE_MOVE = 8 /* movement only */,
+  _NET_WM_MOVERESIZE_SIZE_KEYBOARD = 9 /* size via keyboard */,
+  _NET_WM_MOVERESIZE_MOVE_KEYBOARD = 10 /* move via keyboard */,
+  _NET_WM_MOVERESIZE_CANCEL = 11 /* cancel operation */,
+}
+
+export async function createEWMHEventConsumer(
+  { X, store, getWindowIdFromFrameId }: XWMContext,
+  dragModule: DragModule
+): Promise<IXWMEventConsumer> {
   const atoms = {
     _NET_SUPPORTED: await internAtomAsync(X, "_NET_SUPPORTED"),
     _NET_SUPPORTING_WM_CHECK: await internAtomAsync(X, "_NET_SUPPORTING_WM_CHECK"),
@@ -24,6 +48,7 @@ export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise
 
     _NET_FRAME_EXTENTS: await internAtomAsync(X, "_NET_FRAME_EXTENTS"),
     _NET_WM_PID: await internAtomAsync(X, "_NET_WM_PID"),
+    _NET_WM_MOVERESIZE: await internAtomAsync(X, "_NET_WM_MOVERESIZE"),
 
     UTF8_STRING: await internAtomAsync(X, "UTF8_STRING"),
   };
@@ -49,8 +74,6 @@ export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise
       }
     });
   }
-
-  type NetWmStateData = [action: NetWmStateAction, firstAtom: Atom, secondAtom: Atom, sourceIndication: number];
 
   function processWindowStateChange(wid: number, action: NetWmStateAction, atom: Atom): void {
     switch (atom) {
@@ -102,6 +125,7 @@ export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise
           atoms._NET_WM_STATE_FULLSCREEN,
           atoms._NET_FRAME_EXTENTS,
           atoms._NET_WM_PID,
+          atoms._NET_WM_MOVERESIZE,
         ])
       );
 
@@ -116,18 +140,43 @@ export async function createEWMHEventConsumer({ X, store }: XWMContext): Promise
     },
 
     onClientMessage({ wid, windowType, messageType, data }) {
-      if (windowType === XWMWindowType.Client) {
-        switch (messageType) {
-          case atoms._NET_WM_STATE:
-            {
+      switch (messageType) {
+        case atoms._NET_WM_STATE:
+          {
+            if (windowType === XWMWindowType.Client) {
               const stateData = data as NetWmStateData;
               processWindowStateChange(wid, stateData[0], stateData[1]);
               if (stateData[2] !== 0) {
                 processWindowStateChange(wid, stateData[0], stateData[2]);
               }
             }
-            break;
-        }
+          }
+          break;
+
+        case atoms._NET_WM_MOVERESIZE:
+          {
+            if (windowType === XWMWindowType.Frame) {
+              wid = getWindowIdFromFrameId(wid);
+            }
+
+            const moveResizeData = data as NetWmMoveResizeData;
+            switch (moveResizeData[2]) {
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_MOVE:
+                {
+                  const coords: Coords = [moveResizeData[0], moveResizeData[1]];
+                  dragModule.startMove(wid, coords);
+                }
+                break;
+
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_CANCEL:
+                dragModule.endMoveResize(wid);
+                break;
+
+              default:
+                break;
+            }
+          }
+          break;
       }
     },
 

@@ -6,7 +6,7 @@ import { minimizeWindow, raiseWindow } from "../../../renderer-shared/commands";
 import { useCallback, useMemo } from "react";
 import { RootState } from "../../../renderer-shared/configureStore";
 import { IWindow } from "../../../shared/window";
-import { selectWindowsFromScreen } from "../../../renderer-shared/selectors";
+import { selectWindowsFromScreen } from "../../../shared/selectors";
 import { setScreenCurrentTagsAction } from "../../../shared/redux/screenSlice";
 import { RunField } from "./RunField";
 import { LayoutIndicator } from "./LayoutIndicator";

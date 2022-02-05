@@ -1,12 +1,14 @@
 import type { WMSizeHints } from "../wm/icccm";
-import { IBounds, IGeometry } from "./types";
+import { Coords, IBounds, IGeometry } from "./types";
 
+/** Data describing an X window. */
 export interface IWindow {
   id: number;
   outer: IGeometry;
   frameExtents: IBounds;
   visible: boolean;
   fullscreen: boolean;
+  position: WindowPosition;
   focused: boolean;
   decorated: boolean;
   title: string | undefined;
@@ -14,6 +16,33 @@ export interface IWindow {
   screenIndex: number;
   tags: string[];
   normalHints: WMSizeHints | undefined;
+  dragState: DragState | undefined;
+}
+
+export enum WindowPosition {
+  /** The window respects the layout for positioning. */
+  Default = 0,
+
+  /** The window has been user positioned. Layouts should respect this if able. */
+  UserPositioned = 1,
+}
+
+export interface DragState {
+  moving?: boolean;
+  resize?: ResizeDirection;
+  startCoordinates?: Coords;
+  startOuterSize?: IGeometry;
+}
+
+export enum ResizeDirection {
+  TopLeft = 1,
+  Top = 2,
+  TopRight = 3,
+  Right = 4,
+  BottomRight = 5,
+  Bottom = 6,
+  BottomLeft = 7,
+  Left = 8,
 }
 
 export function getWindowMinWidth(win: IWindow): number {

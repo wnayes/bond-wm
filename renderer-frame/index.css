@@ -6,6 +6,9 @@ html, body {
     overflow: hidden;
     background-color: #333333;
 
+    -webkit-user-select: none;
+    user-select: none;
+
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -41,6 +44,8 @@ html, body {
     color: white;
     font-size: 12px;
     line-height: 18px;
+
+    -webkit-app-region: drag;
 }
 
 .winTitleBarText {
@@ -50,8 +55,6 @@ html, body {
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: default;
-    -webkit-user-select: none;
-    user-select: none;
     text-align: center;
 }
 .winWrapper.focused .winTitleBarText {
@@ -63,8 +66,8 @@ html, body {
     width: 40px;
     height: 19px;
     text-align: center;
-    -webkit-user-select: none;
-    user-select: none;
+
+    -webkit-app-region: no-drag;
 }
 .winTitleBarCloseBtn:hover {
     font-weight: bold;

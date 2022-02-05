@@ -51,6 +51,9 @@ export const XCB_EVENT_MASK_NO_EVENT = 0;
 
 export const XCB_COPY_FROM_PARENT = 0;
 
+export const XCB_GRAB_MODE_SYNC = 0;
+export const XCB_GRAB_MODE_ASYNC = 1;
+
 // Event masks
 export enum XEventMask {
   KeyPress = 1,
@@ -116,6 +119,28 @@ export interface IXConfigureEvent extends IXEvent, IXConfigureInfo {
 export interface IXKeyEvent extends IXEvent {
   buttons: number;
   keycode: number;
+}
+
+export interface IXMotionNotifyEvent extends IXEvent {
+  keycode: number;
+  child: number;
+  rootx: number;
+  rooty: number;
+  x: number;
+  y: number;
+  buttons: number;
+  sameScreen: number;
+}
+
+export interface IXButtonReleaseEvent extends IXEvent {
+  keycode: number;
+  child: number;
+  rootx: number;
+  rooty: number;
+  x: number;
+  y: number;
+  buttons: number;
+  sameScreen: number;
 }
 
 export interface IXPropertyNotifyEvent extends IXEvent {
@@ -541,7 +566,17 @@ export interface IXClient {
     keybMode: number
   ): void;
   GrabKeyboard(...args: unknown[]): unknown;
-  GrabPointer(...args: unknown[]): unknown;
+  GrabPointer(
+    wid: number,
+    ownerEvents: boolean,
+    mask: number,
+    pointerMode: typeof XCB_GRAB_MODE_SYNC | typeof XCB_GRAB_MODE_ASYNC,
+    keybMode: typeof XCB_GRAB_MODE_SYNC | typeof XCB_GRAB_MODE_ASYNC,
+    confineTo: 0,
+    cursor: 0,
+    time: 0,
+    callback: XCbWithErr<[unknown]>
+  ): void;
   GrabServer(...args: unknown[]): unknown;
   InternAtom(returnOnlyIfExist: boolean, str: string, callback: XCbWithErr<[atomId: Atom]>): void;
   KillClient(resource: number): void;
@@ -587,7 +622,7 @@ export interface IXClient {
   UngrabButton(...args: unknown[]): unknown;
   UngrabKey(...args: unknown[]): unknown;
   UngrabKeyboard(...args: unknown[]): unknown;
-  UngrabPointer(...args: unknown[]): unknown;
+  UngrabPointer(time: number): void;
   UngrabServer(...args: unknown[]): unknown;
   UnmapWindow(winId: number): void;
   WarpPointer(...args: unknown[]): unknown;
