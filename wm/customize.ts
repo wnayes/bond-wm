@@ -1,4 +1,4 @@
-import { IWindow } from "../shared/window";
+import { IWindow, WindowPosition } from "../shared/window";
 
 /**
  * This is basically my personal customization.
@@ -7,7 +7,9 @@ import { IWindow } from "../shared/window";
 export function customizeWindow(win: Partial<IWindow>) {
   if (win.wmClass?.[0] === "xfreerdp") {
     win.screenIndex = 1;
+    win.position = WindowPosition.UserPositioned;
     win.decorated = false;
+    win.borderWidth = 0;
     win.outer.x = 0;
     win.outer.y = 0;
   }

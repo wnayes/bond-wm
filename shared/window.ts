@@ -11,6 +11,8 @@ export interface IWindow {
   position: WindowPosition;
   focused: boolean;
   decorated: boolean;
+  /** If set, indicates a specific border with the frame should respect. */
+  borderWidth: number | undefined;
   title: string | undefined;
   wmClass: [string, string] | undefined;
   screenIndex: number;
