@@ -1,4 +1,5 @@
 import { Atom, IXClient, XGetPropertyCallbackProps } from "../shared/X";
+import { log } from "./log";
 import { ExtraAtoms } from "./wm";
 
 export function internAtomAsync(X: IXClient, name: string): Promise<number> {
@@ -25,7 +26,7 @@ export async function getPropertyValue<TValue>(
       return prop.data.toString() as unknown as TValue;
 
     default:
-      console.log("Unhandled atom property type", prop);
+      log("Unhandled atom property type", prop);
       return undefined;
   }
 }
@@ -43,7 +44,7 @@ export function getRawPropertyValue(
         return;
       }
 
-      console.log("Got property value response", prop);
+      log("Got property value response", prop);
       resolve(prop);
     });
   });

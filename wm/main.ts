@@ -1,5 +1,6 @@
 import { app, dialog } from "electron";
 import { startX } from "./wm";
+import "./args";
 
 // Disable error dialogs by override
 dialog.showErrorBox = function (title, content) {

@@ -1,7 +1,7 @@
 import { configureWindowAction, endDragAction, startDragAction } from "../shared/redux/windowSlice";
 import { Coords } from "../shared/types";
 import { XCB_GRAB_MODE_ASYNC, XEventMask } from "../shared/X";
-import { log } from "./log";
+import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 
 export interface DragModule extends IXWMEventConsumer {
@@ -51,7 +51,7 @@ export async function createDragModule({
         0,
         (err) => {
           if (err) {
-            console.log(err);
+            logError(err);
           }
         }
       );

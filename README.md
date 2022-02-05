@@ -20,6 +20,17 @@ To start the window manager:
 
     npm run start
 
+## Usage
+
+```
+electron-wm window manager
+
+Options:
+  --console-logging  Enable console log output        [boolean] [default: false]
+  --file-logging     Enable logging output to a file
+  --help
+```
+
 ## License
 
 [MIT License](LICENSE.md)

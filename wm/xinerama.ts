@@ -32,7 +32,6 @@ export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXi
       X.replies[X.seq_num] = [
         function (buf: XBuffer) {
           const res = buf.unpack("LLLLLL");
-          console.log(res);
           return res[0] === 1;
         },
         callback,

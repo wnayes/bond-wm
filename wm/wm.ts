@@ -64,6 +64,7 @@ import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
 import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
+import { getArgs } from "./args";
 
 interface Geometry {
   width: number;
@@ -996,7 +997,7 @@ export function createServer(): XServer {
         break;
 
       default:
-        X.GetAtomName(atom, (err, name) => console.info(`Atom ${atom} (${name}) for property change is unhandled.`));
+        X.GetAtomName(atom, (err, name) => log(`Atom ${atom} (${name}) for property change is unhandled.`));
         break;
     }
   }
@@ -1472,7 +1473,13 @@ export function createServer(): XServer {
       };
     };
 
-    const store = configureWMStore([loggerMiddleware, x11Middleware]);
+    const middleware = [x11Middleware];
+    const { consoleLogging, fileLogging } = getArgs();
+    if (consoleLogging || fileLogging) {
+      middleware.unshift(loggerMiddleware);
+    }
+
+    const store = configureWMStore(middleware);
     return store;
   }
 
