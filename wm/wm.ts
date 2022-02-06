@@ -628,10 +628,11 @@ export function createServer(): XServer {
         normalHints,
       };
 
-      customizeWindow(win);
+      const state = store.getState();
+
+      customizeWindow(win, state);
 
       // Accept any update to screenIndex (if it is valid).
-      const state = store.getState();
       let screen = state.screens[win.screenIndex];
       if (screen) {
         screenIndex = win.screenIndex;
