@@ -7,6 +7,7 @@ import { internAtomAsync } from "./xutils";
 import { pid } from "process";
 import { DragModule } from "./drag";
 import { Coords } from "../shared/types";
+import { ResizeDirection } from "../shared/window";
 
 enum NetWmStateAction {
   _NET_WM_STATE_REMOVE = 0,
@@ -16,7 +17,13 @@ enum NetWmStateAction {
 
 type NetWmStateData = [action: NetWmStateAction, firstAtom: Atom, secondAtom: Atom, sourceIndication: number];
 
-type NetWmMoveResizeData = [xRoot: number, yRoot: number, direction: number, button: number, sourceIndication: number];
+type NetWmMoveResizeData = [
+  xRoot: number,
+  yRoot: number,
+  direction: NetWmMoveResizeType,
+  button: number,
+  sourceIndication: number
+];
 
 enum NetWmMoveResizeType {
   _NET_WM_MOVERESIZE_SIZE_TOPLEFT = 0,
@@ -31,6 +38,27 @@ enum NetWmMoveResizeType {
   _NET_WM_MOVERESIZE_SIZE_KEYBOARD = 9 /* size via keyboard */,
   _NET_WM_MOVERESIZE_MOVE_KEYBOARD = 10 /* move via keyboard */,
   _NET_WM_MOVERESIZE_CANCEL = 11 /* cancel operation */,
+}
+
+function netWMMoveResizeTypeToInternal(newWmMoveResizeType: NetWmMoveResizeType): ResizeDirection {
+  switch (newWmMoveResizeType) {
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_TOPLEFT:
+      return ResizeDirection.TopLeft;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_TOP:
+      return ResizeDirection.Top;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_TOPRIGHT:
+      return ResizeDirection.TopRight;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_RIGHT:
+      return ResizeDirection.Right;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT:
+      return ResizeDirection.BottomRight;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_BOTTOM:
+      return ResizeDirection.Bottom;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT:
+      return ResizeDirection.BottomLeft;
+    case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_LEFT:
+      return ResizeDirection.Left;
+  }
 }
 
 export async function createEWMHEventConsumer(
@@ -160,19 +188,27 @@ export async function createEWMHEventConsumer(
             }
 
             const moveResizeData = data as NetWmMoveResizeData;
+            if (moveResizeData[2] === NetWmMoveResizeType._NET_WM_MOVERESIZE_CANCEL) {
+              dragModule.endMoveResize(wid);
+              break;
+            }
+
+            const coords: Coords = [moveResizeData[0], moveResizeData[1]];
+
             switch (moveResizeData[2]) {
               case NetWmMoveResizeType._NET_WM_MOVERESIZE_MOVE:
-                {
-                  const coords: Coords = [moveResizeData[0], moveResizeData[1]];
-                  dragModule.startMove(wid, coords);
-                }
+                dragModule.startMove(wid, coords);
                 break;
 
-              case NetWmMoveResizeType._NET_WM_MOVERESIZE_CANCEL:
-                dragModule.endMoveResize(wid);
-                break;
-
-              default:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_TOPLEFT:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_TOP:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_TOPRIGHT:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_RIGHT:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_BOTTOM:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT:
+              case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_LEFT:
+                dragModule.startResize(wid, coords, netWMMoveResizeTypeToInternal(moveResizeData[2]));
                 break;
             }
           }

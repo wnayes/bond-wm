@@ -77,3 +77,19 @@ export function getWindowMaxHeight(win: IWindow): number {
   }
   return Infinity;
 }
+
+/**
+ * Returns the width to use for a window, given a desired width.
+ * The desired width will be returned unless it conflicts with dimension restrictions.
+ */
+export function newWidthForWindow(win: IWindow, desiredWidth: number): number {
+  return Math.max(getWindowMinWidth(win), Math.min(getWindowMaxWidth(win), desiredWidth));
+}
+
+/**
+ * Returns the height to use for a window, given a desired height.
+ * The desired height will be returned unless it conflicts with dimension restrictions.
+ */
+export function newHeightForWindow(win: IWindow, desiredHeight: number): number {
+  return Math.max(getWindowMinHeight(win), Math.min(getWindowMaxHeight(win), desiredHeight));
+}

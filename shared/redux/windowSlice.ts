@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IBounds, IGeometry } from "../types";
-import { IWindow, WindowPosition } from "../window";
+import { IWindow, ResizeDirection, WindowPosition } from "../window";
 
 export interface WindowsState {
   [wid: number]: IWindow;
@@ -129,12 +129,13 @@ export const windowsSlice = createSlice({
 
     startDragAction: (
       state,
-      action: PayloadAction<{ wid: number; moving?: boolean; coords: [x: number, y: number] }>
+      action: PayloadAction<{ wid: number; moving?: boolean; resize?: ResizeDirection; coords: [x: number, y: number] }>
     ) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
         state[payload.wid].dragState = {
           moving: payload.moving,
+          resize: payload.resize,
           startCoordinates: payload.coords,
           startOuterSize: state[payload.wid].outer,
         };
