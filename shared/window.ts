@@ -3,8 +3,11 @@ import { Coords, IBounds, IGeometry } from "./types";
 
 /** Data describing an X window. */
 export interface IWindow {
+  /** X window id. */
   id: number;
+  /** Position of the window relative to the current screen. */
   outer: IGeometry;
+  /** Size of the frame border around each side of the window. */
   frameExtents: IBounds;
   visible: boolean;
   fullscreen: boolean;

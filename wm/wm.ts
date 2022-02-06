@@ -43,7 +43,7 @@ import { anyIntersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
-import { getScreenIndexWithCursor } from "./pointer";
+import { getScreenIndexWithCursor, queryPointer } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints, getWMClass, WMSizeHints } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
@@ -102,7 +102,8 @@ const FRAME_WIN_EVENT_MASK =
   x11.eventMask.LeaveWindow |
   x11.eventMask.SubstructureRedirect |
   x11.eventMask.PointerMotion |
-  x11.eventMask.ButtonRelease;
+  x11.eventMask.ButtonRelease |
+  x11.eventMask.KeyPress;
 
 const CLIENT_WIN_EVENT_MASK =
   x11.eventMask.StructureNotify |
@@ -152,6 +153,7 @@ export interface IXWMEventConsumer {
   onUnmapNotify?(args: XWMEventConsumerArgsWithType): void;
   onPointerMotion?(args: XWMEventConsumerPointerMotionArgs): void;
   onButtonRelease?(args: XWMEventConsumerArgsWithType): void;
+  onKeyPress?(args: XWMEventConsumerArgsWithType): void;
 
   onSetFrameExtents?(args: XWMEventConsumerSetFrameExtentsArgs): void;
 }
@@ -182,6 +184,7 @@ export function createServer(): XServer {
 
   const eventConsumers: IXWMEventConsumer[] = [];
 
+  let dragModule: AsyncReturnType<typeof createDragModule>;
   let motif: AsyncReturnType<typeof createMotifModule>;
 
   const knownWids = new Set<number>();
@@ -219,6 +222,7 @@ export function createServer(): XServer {
 
   // If `true`, send to the desktop browser.
   // If a function, execute when pressed.
+  // `xmodmap -pk` for codes.
   const registeredKeys: {
     [keyModifiers: number]: { [keyCode: number]: boolean | VoidFunction };
   } = {
@@ -238,6 +242,8 @@ export function createServer(): XServer {
     [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
       // Mod4 + Shift + C
       54: () => closeFocusedWindow(),
+      // Mod4 + Shift + M
+      58: () => startDragFocusedWindow(),
       // Mod4 + Shift + Q
       24: () => app.quit(),
     },
@@ -261,7 +267,7 @@ export function createServer(): XServer {
       XDisplay = context.XDisplay = display;
       X = context.X = display.client;
 
-      const dragModule = await createDragModule(context);
+      dragModule = await createDragModule(context);
       eventConsumers.push(dragModule);
       eventConsumers.push(await createICCCMEventConsumer(context));
       eventConsumers.push(await createEWMHEventConsumer(context, dragModule));
@@ -630,7 +636,7 @@ export function createServer(): XServer {
 
       const state = store.getState();
 
-      customizeWindow(win, state);
+      customizeWindow(win);
 
       // Accept any update to screenIndex (if it is valid).
       let screen = state.screens[win.screenIndex];
@@ -645,13 +651,15 @@ export function createServer(): XServer {
         win.tags = [screen.currentTags[0]];
       }
 
-      const fid = createFrameBrowser(wid, win.outer);
+      const [frameX, frameY] = [screen.x + win.outer.x, screen.y + win.outer.y];
+
+      const fid = createFrameBrowser(wid, { ...win.outer, x: frameX, y: frameY });
       knownWids.add(fid);
 
       winIdToRootId[wid] = screen.root;
       winIdToRootId[fid] = screen.root;
 
-      X.ReparentWindow(fid, screen.root, screen.x + win.outer.x, screen.y + win.outer.y);
+      X.ReparentWindow(fid, screen.root, frameX, frameY);
       X.ReparentWindow(wid, fid, lastFrameExtents?.left || 0, lastFrameExtents?.top || 0);
 
       X.GrabServer();
@@ -661,7 +669,7 @@ export function createServer(): XServer {
 
       X.UngrabServer();
 
-      X.ConfigureWindow(fid, { borderWidth: 0 });
+      X.ConfigureWindow(fid, { borderWidth: 0, x: frameX, y: frameY });
       X.ConfigureWindow(wid, { borderWidth: 0 });
 
       store.dispatch(addWindowAction({ wid, ...win }));
@@ -857,12 +865,16 @@ export function createServer(): XServer {
         return; // There's no requested changes?
       }
 
+      const win = getWinFromStore(wid);
+      const screen = store.getState().screens[win.screenIndex];
+
       const config: Partial<IXConfigureInfo> = {};
       if (mask & CWMaskBits.CWX) {
-        config.x = ev.x;
+        // ev.x is absolute, but our state is relative to the screen.
+        config.x = ev.x - screen.x;
       }
       if (mask & CWMaskBits.CWY) {
-        config.y = ev.y;
+        config.y = ev.y - screen.y;
       }
       if (mask & CWMaskBits.CWWidth) {
         config.width = ev.width;
@@ -921,6 +933,13 @@ export function createServer(): XServer {
   async function onKeyPress(ev: IXKeyEvent) {
     const { wid } = ev;
     widLog(wid, "onKeyPress", ev);
+
+    eventConsumers.forEach((consumer) =>
+      consumer.onKeyPress?.({
+        wid,
+        windowType: getWindowType(wid),
+      })
+    );
 
     const kb = registeredKeys;
     if (kb[ev.buttons]) {
@@ -1151,6 +1170,16 @@ export function createServer(): XServer {
 
       callback(null, protocols);
     });
+  }
+
+  async function startDragFocusedWindow(): Promise<void> {
+    const wid = getFocusedWindowId();
+    if (typeof wid === "number" && !isDesktopBrowserWin(wid)) {
+      const pointerInfo = await queryPointer(X, wid);
+      if (pointerInfo) {
+        dragModule.startMove(wid, [pointerInfo.rootX, pointerInfo.rootY]);
+      }
+    }
   }
 
   function closeFocusedWindow(): void {

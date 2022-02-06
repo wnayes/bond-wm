@@ -1,6 +1,6 @@
 import { configureWindowAction, endDragAction, startDragAction } from "../shared/redux/windowSlice";
 import { Coords } from "../shared/types";
-import { XCB_GRAB_MODE_ASYNC, XEventMask } from "../shared/X";
+import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "../shared/X";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 
@@ -25,7 +25,8 @@ export async function createDragModule({
 
     store.dispatch(endDragAction({ wid }));
 
-    X.UngrabPointer(0);
+    X.UngrabPointer(XCB_CURRENT_TIME);
+    X.UngrabKeyboard(XCB_CURRENT_TIME);
   }
 
   return {
@@ -45,16 +46,17 @@ export async function createDragModule({
         false,
         XEventMask.PointerMotion | XEventMask.ButtonRelease,
         XCB_GRAB_MODE_ASYNC,
-        XCB_GRAB_MODE_ASYNC, // async
+        XCB_GRAB_MODE_ASYNC,
         0, // None
         0, // None
-        0,
+        XCB_CURRENT_TIME,
         (err) => {
           if (err) {
             logError(err);
           }
         }
       );
+      X.GrabKeyboard(fid, false, XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
     },
 
     endMoveResize,
@@ -84,6 +86,18 @@ export async function createDragModule({
     },
 
     onButtonRelease({ wid, windowType }) {
+      let fid;
+      if (windowType === XWMWindowType.Frame) {
+        fid = wid;
+        wid = getWindowIdFromFrameId(fid);
+      } else if (windowType === XWMWindowType.Client) {
+        fid = getFrameIdFromWindowId(wid);
+      }
+
+      endMoveResize(wid);
+    },
+
+    onKeyPress({ wid, windowType }) {
       let fid;
       if (windowType === XWMWindowType.Frame) {
         fid = wid;

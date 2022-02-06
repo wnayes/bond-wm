@@ -51,6 +51,8 @@ export const XCB_EVENT_MASK_NO_EVENT = 0;
 
 export const XCB_COPY_FROM_PARENT = 0;
 
+export const XCB_CURRENT_TIME = 0;
+
 export const XCB_GRAB_MODE_SYNC = 0;
 export const XCB_GRAB_MODE_ASYNC = 1;
 
@@ -565,7 +567,13 @@ export interface IXClient {
     pointerMode: number,
     keybMode: number
   ): void;
-  GrabKeyboard(...args: unknown[]): unknown;
+  GrabKeyboard(
+    wid: number,
+    ownerEvents: boolean,
+    time: number,
+    pointerMode: typeof XCB_GRAB_MODE_SYNC | typeof XCB_GRAB_MODE_ASYNC,
+    keybMode: typeof XCB_GRAB_MODE_SYNC | typeof XCB_GRAB_MODE_ASYNC
+  ): unknown;
   GrabPointer(
     wid: number,
     ownerEvents: boolean,
@@ -621,7 +629,7 @@ export interface IXClient {
   TranslateCoordinates(...args: unknown[]): unknown;
   UngrabButton(...args: unknown[]): unknown;
   UngrabKey(...args: unknown[]): unknown;
-  UngrabKeyboard(...args: unknown[]): unknown;
+  UngrabKeyboard(time: number): void;
   UngrabPointer(time: number): void;
   UngrabServer(...args: unknown[]): unknown;
   UnmapWindow(winId: number): void;
