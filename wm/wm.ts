@@ -1430,22 +1430,32 @@ export function createServer(): XServer {
           case configureWindowAction.type:
             {
               const state = getState();
+              const payload: Partial<Geometry> = action.payload;
               const wid = action.payload.wid;
               const win = state.windows[wid];
               const screen = state.screens[win.screenIndex];
 
               const fid = getFrameIdFromWindowId(wid) ?? wid;
-              X.ConfigureWindow(fid, {
-                x: screen.x + action.payload.x,
-                y: screen.y + action.payload.y,
-                width: action.payload.width,
-                height: action.payload.height,
-              });
+              const frameConfig: Partial<Geometry> = {};
+              if (typeof payload.x === "number") {
+                frameConfig.x = screen.x + payload.x;
+              }
+              if (typeof payload.y === "number") {
+                frameConfig.y = screen.y + payload.y;
+              }
+              if (typeof payload.width === "number") {
+                frameConfig.width = payload.width;
+              }
+              if (typeof payload.height === "number") {
+                frameConfig.height = payload.height;
+              }
+              widLog(fid, "Configuring from X11 middleware", frameConfig);
+              X.ConfigureWindow(fid, frameConfig);
 
               if (fid !== wid && win) {
                 X.ConfigureWindow(wid, {
-                  width: action.payload.width - win.frameExtents.left - win.frameExtents.right,
-                  height: action.payload.height - win.frameExtents.top - win.frameExtents.bottom,
+                  width: (payload.width ?? win.outer.width) - win.frameExtents.left - win.frameExtents.right,
+                  height: (payload.height ?? win.outer.height) - win.frameExtents.top - win.frameExtents.bottom,
                 });
               }
             }
