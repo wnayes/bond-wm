@@ -9,6 +9,7 @@ export function RunField() {
 
   const [text, setText] = useState("");
   const freezeTyping = useRef<boolean>(false);
+  const enterWhileFrozen = useRef<boolean>(false);
 
   const dispatch = useDispatch();
 
@@ -34,7 +35,9 @@ export function RunField() {
         event.preventDefault();
         event.stopPropagation();
 
-        if (text) {
+        if (freezeTyping.current) {
+          enterWhileFrozen.current = true;
+        } else if (text) {
           exec(text);
           reset();
         }
@@ -59,8 +62,13 @@ export function RunField() {
           const bestOption = selectOption(options, text);
           if (bestOption) {
             setText(bestOption);
+            if (enterWhileFrozen.current) {
+              exec(bestOption);
+              reset();
+            }
           }
           freezeTyping.current = false;
+          enterWhileFrozen.current = false;
         });
         break;
     }
