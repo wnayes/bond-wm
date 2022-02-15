@@ -57,21 +57,21 @@ html, body {
     min-width: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 15px;
-    line-height: 16px;
+    height: 100%;
+    line-height: 20px;
     padding: 0 0.5em;
-    margin: 1px 0 0 1px;
-    border: 1px solid #999999;
+    margin: 0 0 0 1px;
     cursor: default;
     -webkit-user-select: none;
     user-select: none;
 }
 .tasklistentry.focused {
     font-weight: bold;
-    background-color: #AAAAAA;
+    background-color: #7269d2;
+    color: #EEEEEE;
 }
 .tasklistentry:not(.focused):hover {
-    background-color: #DDDDDD;
+    background-color: #BBBBBB;
 }
 
 .taglist {
@@ -99,7 +99,7 @@ html, body {
 }
 .taglistentry.selected {
     font-weight: bold;
-    background-color: #696969;
+    background-color: #7269d2;
     color: #EEEEEE;
 }
 .taglistEntryBadge {
