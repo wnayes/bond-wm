@@ -705,6 +705,12 @@ export function createServer(): XServer {
 
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number" && fid !== wid) {
+        // Reparent the hosted window back to the root before destroying the BrowserWindow.
+        // This prevents a browser save popup closing from taking out the entire browser process for example.
+        // (Presumably destroying the BrowserWindow with a window inside it triggers mass destruction.)
+        const screen = store.getState().screens[win.screenIndex];
+        X.ReparentWindow(wid, screen.root, 0, 0);
+
         log("Destroying BrowserWindow for frame " + fid);
         frameBrowserWindows[wid].destroy();
       }
@@ -913,7 +919,7 @@ export function createServer(): XServer {
 
   function onPointerMotion(ev: IXMotionNotifyEvent): void {
     const { wid } = ev;
-    widLog(wid, "onPointerMotion", ev);
+    // widLog(wid, "onPointerMotion", ev);
 
     if (ignoreEnterLeave) {
       widLog(wid, "onMotionNotify", "clearing enterleave ignore");
