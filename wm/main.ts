@@ -1,6 +1,7 @@
 import { app, dialog } from "electron";
 import { startX } from "./wm";
 import "./args";
+import { log } from "./log";
 
 // Disable error dialogs by override
 dialog.showErrorBox = function (title, content) {
@@ -18,6 +19,9 @@ try {
   console.error("electron-reloader error", e);
 }
 /* eslint-enable */
+
+log("electron-wm main");
+log("user data path: ", app.getPath("userData"));
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {

@@ -197,6 +197,7 @@ export async function createDragModule({
       }
 
       endMoveResize(wid);
+      return false;
     },
   };
 }

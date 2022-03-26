@@ -5,7 +5,8 @@
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "sourceMap": true
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

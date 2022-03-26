@@ -14,13 +14,17 @@
     "prettier": "prettier --write ."
   },
   "repository": "https://github.com/wnayes/electron-wm",
-  "keywords": ["X11", "window manager"],
+  "keywords": [
+    "X11",
+    "window manager"
+  ],
   "author": "Will Nayes",
   "license": "MIT",
   "dependencies": {
     "@reduxjs/toolkit": "^1.7.2",
     "electron": "^17.0.0",
     "electron-redux": "2.0.0-alpha.9",
+    "keysym": "^0.0.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",

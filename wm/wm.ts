@@ -65,6 +65,7 @@ import { switchToNextLayout } from "../shared/layouts";
 import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
 import { getArgs } from "./args";
+import { createShortcutsModule } from "./shortcuts";
 
 interface Geometry {
   width: number;
@@ -145,6 +146,11 @@ export interface XWMEventConsumerPointerMotionArgs extends XWMEventConsumerArgsW
   rooty: number;
 }
 
+export interface XWMEventConsumerKeyPressArgs extends XWMEventConsumerArgsWithType {
+  modifiers: X11_KEY_MODIFIER;
+  keycode: number;
+}
+
 export interface IXWMEventConsumer {
   onScreenCreated?(args: XWMEventConsumerScreenCreatedArgs): void;
 
@@ -153,7 +159,7 @@ export interface IXWMEventConsumer {
   onUnmapNotify?(args: XWMEventConsumerArgsWithType): void;
   onPointerMotion?(args: XWMEventConsumerPointerMotionArgs): void;
   onButtonRelease?(args: XWMEventConsumerArgsWithType): void;
-  onKeyPress?(args: XWMEventConsumerArgsWithType): void;
+  onKeyPress?(args: XWMEventConsumerKeyPressArgs): boolean;
 
   onSetFrameExtents?(args: XWMEventConsumerSetFrameExtentsArgs): void;
 }
@@ -186,6 +192,7 @@ export function createServer(): XServer {
 
   let dragModule: AsyncReturnType<typeof createDragModule>;
   let motif: AsyncReturnType<typeof createMotifModule>;
+  let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
@@ -220,39 +227,32 @@ export function createServer(): XServer {
     getFrameIdFromWindowId,
   };
 
-  // If `true`, send to the desktop browser.
-  // If a function, execute when pressed.
-  // `xmodmap -pk` for codes.
-  const registeredKeys: {
-    [keyModifiers: number]: { [keyCode: number]: boolean | VoidFunction };
-  } = {
-    [X11_KEY_MODIFIER.Mod4Mask]: {
-      // Mod4 + O
-      32: () => sendActiveWindowToNextScreen(),
+  const sendKeyToBrowser = async (args: XWMEventConsumerKeyPressArgs) => {
+    const screenIndex = await getScreenIndexWithCursor(context, args.wid);
+    const browser = desktopBrowsers[screenIndex];
+    if (browser) {
+      browser.webContents.send("x-keypress", {
+        buttons: args.modifiers,
+        keycode: args.keycode,
+      });
+    }
+  };
 
-      // Mod4 + R
-      27: true,
+  const registeredKeys: { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void } = {
+    "Mod4 + o": () => sendActiveWindowToNextScreen(),
+    "Mod4 + r": sendKeyToBrowser,
 
-      // Mod4 + Enter, TODO: launch default/configurable terminal.
-      36: () => launchProcess("urxvt"),
+    // TODO: launch default/configurable terminal.
+    "Mod4 + Return": () => launchProcess("urxvt"),
+    "Mod4 + space": () => switchToNextLayoutWM(),
 
-      // Mod4 + Space
-      65: () => switchToNextLayoutWM(),
-    },
-    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ShiftMask]: {
-      // Mod4 + Shift + C
-      54: () => closeFocusedWindow(),
-      // Mod4 + Shift + M
-      58: () => startDragFocusedWindow(),
-      // Mod4 + Shift + Q
-      24: () => app.quit(),
-    },
-    [X11_KEY_MODIFIER.Mod4Mask | X11_KEY_MODIFIER.ControlMask]: {
-      // Mod4 + Ctrl + R
-      27: () => {
-        app.relaunch();
-        app.exit(0);
-      },
+    "Mod4 + Shift + C": () => closeFocusedWindow(),
+    "Mod4 + Shift + M": () => startDragFocusedWindow(),
+    "Mod4 + Shift + Q": () => app.quit(),
+
+    "Mod4 + Ctrl + r": () => {
+      app.relaunch();
+      app.exit(0);
     },
   };
 
@@ -273,6 +273,8 @@ export function createServer(): XServer {
       eventConsumers.push(await createEWMHEventConsumer(context, dragModule));
 
       motif = await createMotifModule(context);
+      shortcuts = await createShortcutsModule(context);
+      eventConsumers.push(shortcuts);
 
       await __setupAtoms();
       await __initDesktop();
@@ -378,23 +380,11 @@ export function createServer(): XServer {
       tree.children.forEach((childWid) => manageWindow(childWid, { screenIndex: 0, checkUnmappedState: true }));
     });
 
-    __setupKeyShortcuts(root);
+    shortcuts.setupKeyShortcuts(root, registeredKeys);
 
     X.SetInputFocus(PointerRoot, XFocusRevertTo.PointerRoot);
 
     eventConsumers.forEach((consumer) => consumer.onScreenCreated?.({ root }));
-  }
-
-  function __setupKeyShortcuts(rootWid: number) {
-    for (const modifier in registeredKeys) {
-      if (!registeredKeys.hasOwnProperty(modifier)) continue;
-
-      for (const key in registeredKeys[modifier]) {
-        if (!registeredKeys[modifier].hasOwnProperty(key)) continue;
-
-        X.GrabKey(rootWid, true, parseInt(modifier, 10), parseInt(key, 10), 1 /* Async */, 1 /* Async */);
-      }
-    }
   }
 
   function isDesktopBrowserWin(win: number): boolean {
@@ -940,27 +930,16 @@ export function createServer(): XServer {
     const { wid } = ev;
     widLog(wid, "onKeyPress", ev);
 
-    eventConsumers.forEach((consumer) =>
-      consumer.onKeyPress?.({
-        wid,
-        windowType: getWindowType(wid),
-      })
-    );
-
-    const kb = registeredKeys;
-    if (kb[ev.buttons]) {
-      const entry = kb[ev.buttons][ev.keycode];
-      if (typeof entry === "function") {
-        entry();
-      } else if (typeof entry === "boolean") {
-        const screenIndex = await getScreenIndexWithCursor(context, wid);
-        const browser = desktopBrowsers[screenIndex];
-        if (browser) {
-          browser.webContents.send("x-keypress", {
-            buttons: ev.buttons,
-            keycode: ev.keycode,
-          });
-        }
+    for (const consumer of eventConsumers) {
+      if (
+        consumer.onKeyPress?.({
+          wid,
+          windowType: getWindowType(wid),
+          modifiers: ev.buttons,
+          keycode: ev.keycode,
+        })
+      ) {
+        break; // Handled if returned true.
       }
     }
   }

@@ -119,7 +119,7 @@ export interface IXConfigureEvent extends IXEvent, IXConfigureInfo {
 }
 
 export interface IXKeyEvent extends IXEvent {
-  buttons: number;
+  buttons: X11_KEY_MODIFIER;
   keycode: number;
 }
 
@@ -177,6 +177,8 @@ export interface IXScreen {
 export interface IXDisplay {
   screen: IXScreen[];
   client: IXClient;
+  min_keycode: number;
+  max_keycode: number;
 }
 
 export enum XPropMode {
@@ -546,7 +548,7 @@ export interface IXClient {
   GetGeometry(winId: number, callback: XCbWithErr<[drawable: XGeometry]>): void;
   GetImage(...args: unknown[]): unknown;
   GetInputFocus(): { focus: number; revertTo: XFocusRevertTo };
-  GetKeyboardMapping(...args: unknown[]): unknown;
+  GetKeyboardMapping(firstKeycode: number, count: number, callback: XCbWithErr<[list: number[][]]>): void;
   GetProperty(
     deleteAfterGet: unknown,
     wid: number,
@@ -642,6 +644,7 @@ export interface IX11Client {
 
 export interface IX11Mod {
   eventMask: typeof XEventMask;
+  keySyms: unknown;
 
   createClient(callback: XCbWithErr<[display: IXDisplay]>): IX11Client;
 }
