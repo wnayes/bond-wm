@@ -1,4 +1,4 @@
-import type { WMSizeHints } from "../wm/icccm";
+import type { WMSizeHints } from "./X";
 import { Coords, IBounds, IGeometry } from "./types";
 
 /** Data describing an X window. */

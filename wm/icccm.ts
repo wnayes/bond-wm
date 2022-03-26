@@ -1,4 +1,4 @@
-import { IXClient, XPropMode } from "../shared/X";
+import { IXClient, WMSizeHints, XPropMode } from "../shared/X";
 import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
@@ -9,46 +9,7 @@ enum WMStateValue {
   IconicState = 3,
 }
 
-export interface WMSizeHints {
-  flags: WMSizeHintsFlags;
-  // x, y, width, height - deprecated?
-  minWidth: number | undefined;
-  minHeight: number | undefined;
-  maxWidth: number | undefined;
-  maxHeight: number | undefined;
-  widthIncrement: number | undefined;
-  heightIncrement: number | undefined;
-  minAspect: [number, number] | undefined;
-  maxAspect: [number, number] | undefined;
-  baseWidth: number | undefined;
-  baseHeight: number;
-  gravity: unknown;
-}
-
 const SIZEOF_WMSizeHints = 72;
-
-enum WMSizeHintsFlags {
-  /** User-specified x, y */
-  USPosition = 1,
-  /** User-specified width, height */
-  USSize = 2,
-  /** Program-specified position */
-  PPosition = 4,
-  /** Program-specified size */
-  PSize = 8,
-  /** Program-specified minimum size */
-  PMinSize = 16,
-  /** Program-specified maximum size */
-  PMaxSize = 32,
-  /** Program-specified resize increments */
-  PResizeInc = 64,
-  /** Program-specified min and max aspect ratios */
-  PAspect = 128,
-  /** Program-specified base size */
-  PBaseSize = 256,
-  /** Program-specified window gravity */
-  PWinGravity = 512,
-}
 
 export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWMEventConsumer> {
   const atoms = {

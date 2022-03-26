@@ -352,6 +352,46 @@ interface XineramaExtension {
 
 export type XXineramaExtension = XExtension<XineramaExtension>;
 
+/** ICCCM WM_SIZE_HINTS structure. */
+export interface WMSizeHints {
+  flags: WMSizeHintsFlags;
+  // x, y, width, height - deprecated?
+  minWidth: number | undefined;
+  minHeight: number | undefined;
+  maxWidth: number | undefined;
+  maxHeight: number | undefined;
+  widthIncrement: number | undefined;
+  heightIncrement: number | undefined;
+  minAspect: [number, number] | undefined;
+  maxAspect: [number, number] | undefined;
+  baseWidth: number | undefined;
+  baseHeight: number;
+  gravity: unknown;
+}
+
+enum WMSizeHintsFlags {
+  /** User-specified x, y */
+  USPosition = 1,
+  /** User-specified width, height */
+  USSize = 2,
+  /** Program-specified position */
+  PPosition = 4,
+  /** Program-specified size */
+  PSize = 8,
+  /** Program-specified minimum size */
+  PMinSize = 16,
+  /** Program-specified maximum size */
+  PMaxSize = 32,
+  /** Program-specified resize increments */
+  PResizeInc = 64,
+  /** Program-specified min and max aspect ratios */
+  PAspect = 128,
+  /** Program-specified base size */
+  PBaseSize = 256,
+  /** Program-specified window gravity */
+  PWinGravity = 512,
+}
+
 export interface XGeometry {
   windowid: number;
   width: number;

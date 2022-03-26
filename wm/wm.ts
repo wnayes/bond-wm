@@ -36,6 +36,7 @@ import {
   Atom,
   IXMotionNotifyEvent,
   IXButtonReleaseEvent,
+  WMSizeHints,
 } from "../shared/X";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
@@ -44,7 +45,7 @@ import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints, getWMClass, WMSizeHints } from "./icccm";
+import { createICCCMEventConsumer, getNormalHints, getWMClass } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
 import { showContextMenu } from "./menus";

@@ -1,14 +1,11 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitAny": true,
-    "jsx": "react",
-    "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
-    "isolatedModules": true,
-    "sourceMap": true,
-    "outDir": "./dist"
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "references": [
+    { "path": "./shared" },
+    { "path": "./wm" },
+    { "path": "./renderer-shared" },
+    { "path": "./renderer-desktop" },
+    { "path": "./renderer-frame" }
+  ],
+  "include": [],
+  "exclude": []
 }
