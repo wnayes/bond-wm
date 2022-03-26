@@ -1,7 +1,4 @@
 node_modules
-
-*.js
-!.*.js
-*.js.map
+dist
 
 .vscode

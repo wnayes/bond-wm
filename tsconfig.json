@@ -6,7 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "isolatedModules": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "./dist"
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

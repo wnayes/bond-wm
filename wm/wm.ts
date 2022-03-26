@@ -415,7 +415,7 @@ export function createServer(): XServer {
       height: props.height,
       type: "desktop",
       webPreferences: {
-        preload: path.resolve(path.join(__dirname, "../renderer-shared/preload.js")),
+        preload: path.resolve(path.join(__dirname, "../../dist/renderer-shared/preload.js")),
         nodeIntegration: true,
         contextIsolation: false,
       },
@@ -424,7 +424,7 @@ export function createServer(): XServer {
     const index = desktopBrowsers.length;
     desktopBrowsers[index] = win;
 
-    const url = path.join(__dirname, "../renderer-desktop/index.html") + "?screen=" + index;
+    const url = path.join(__dirname, "../../renderer-desktop/index.html") + "?screen=" + index;
     win.loadURL("file://" + url);
 
     const handle = getNativeWindowHandleInt(win);
@@ -435,6 +435,9 @@ export function createServer(): XServer {
     screenIndexToDesktopId[index] = handle;
 
     log("Created browser window", handle);
+
+    // Uncomment to help debug total failures of the desktop window.
+    // win.webContents.openDevTools({ mode: "right" });
 
     win.on("closed", function () {
       desktopBrowsers[index] = null;
@@ -453,13 +456,13 @@ export function createServer(): XServer {
       backgroundColor: "#00000000",
       transparent: true,
       webPreferences: {
-        preload: path.resolve(path.join(__dirname, "../renderer-shared/preload.js")),
+        preload: path.resolve(path.join(__dirname, "../../dist/renderer-shared/preload.js")),
         nodeIntegration: true,
         contextIsolation: false,
       },
     });
 
-    const url = path.join(__dirname, "../renderer-frame/index.html") + "?wid=" + wid;
+    const url = path.join(__dirname, "../../renderer-frame/index.html") + "?wid=" + wid;
     win.loadURL("file://" + url);
 
     frameBrowserWindows[wid] = win;
