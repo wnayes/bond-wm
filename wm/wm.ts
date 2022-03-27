@@ -1363,8 +1363,13 @@ export function createServer(): XServer {
     const wid = getFocusedWindowId();
     const win = getWinFromStore(wid);
     if (win) {
-      const nextScreen = (win.screenIndex + 1) % screenCount;
-      store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreen }));
+      const nextScreenIndex = (win.screenIndex + 1) % screenCount;
+      batch(() => {
+        store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreenIndex }));
+
+        // Trigger reconfigure since coordinates have remained the same, and we won't configure again otherwise.
+        store.dispatch(configureWindowAction({ wid, ...win.outer }));
+      });
     }
   }
 
