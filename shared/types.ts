@@ -25,6 +25,9 @@ export interface IScreen {
   height: number;
   workArea: IGeometry;
 
+  /** `zoomLevel` from Electron. */
+  zoom: number;
+
   tags: string[];
   currentTags: string[];
 

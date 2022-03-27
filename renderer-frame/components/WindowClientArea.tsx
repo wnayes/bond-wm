@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState } from "../../renderer-shared/configureStore";
 import { setFrameExtentsAction } from "../../shared/redux/windowSlice";
+import { getBoundingClientRectWithZoom } from "../../renderer-shared/dom";
 
 interface IWindowClientAreaProps {
   wid: number;
@@ -26,9 +27,9 @@ export function WindowClientArea(props: IWindowClientAreaProps) {
     }
 
     // eslint-disable-next-line prefer-const
-    let { top, left, right, bottom } = box.getBoundingClientRect();
+    let { top, left, right, bottom } = getBoundingClientRectWithZoom(box);
 
-    const { right: bodyRight, bottom: bodyBottom } = document.body.getBoundingClientRect();
+    const { right: bodyRight, bottom: bodyBottom } = getBoundingClientRectWithZoom(document.body);
     right = bodyRight - right;
     bottom = bodyBottom - bottom;
 

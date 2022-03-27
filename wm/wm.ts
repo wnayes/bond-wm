@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds } from "../shared/types";
+import { IBounds, IScreen } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -59,7 +59,7 @@ import {
   setWindowTitleAction,
   setWindowVisibleAction,
 } from "../shared/redux/windowSlice";
-import { addScreenAction, setScreenCurrentTagsAction } from "../shared/redux/screenSlice";
+import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "../shared/redux/screenSlice";
 import { IWindow } from "../shared/window";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
@@ -300,6 +300,18 @@ export function createServer(): XServer {
       setFocusToDesktopWindow(args.screenIndex, args.takeVisualFocus);
     });
 
+    ipcMain.on("desktop-zoom-in", (event, args: { screenIndex: number }) => {
+      desktopZoomIn(args.screenIndex);
+    });
+
+    ipcMain.on("desktop-zoom-out", (event, args: { screenIndex: number }) => {
+      desktopZoomOut(args.screenIndex);
+    });
+
+    ipcMain.on("desktop-zoom-reset", (event, args: { screenIndex: number }) => {
+      desktopZoomReset(args.screenIndex);
+    });
+
     ipcMain.on("exec", (event, args) => {
       launchProcess(args.executable);
     });
@@ -437,6 +449,11 @@ export function createServer(): XServer {
 
     log("Created browser window", handle);
 
+    const zoomLevel = win.webContents.getZoomLevel();
+    if (zoomLevel !== 1) {
+      store.dispatch(setScreenZoomLevelAction({ screenIndex: index, zoom: zoomLevel }));
+    }
+
     // Uncomment to help debug total failures of the desktop window.
     // win.webContents.openDevTools({ mode: "right" });
 
@@ -447,7 +464,7 @@ export function createServer(): XServer {
     return handle;
   }
 
-  function createFrameBrowser(wid: number, geometry: Geometry) {
+  function createFrameBrowser(wid: number, screen: IScreen, geometry: Geometry) {
     const win = new BrowserWindow({
       frame: false,
       width: geometry.width,
@@ -461,6 +478,10 @@ export function createServer(): XServer {
         nodeIntegration: true,
         contextIsolation: false,
       },
+    });
+
+    win.webContents.on("did-finish-load", () => {
+      win.webContents.setZoomLevel(screen.zoom);
     });
 
     const url = path.join(__dirname, "../../renderer-frame/index.html") + "?wid=" + wid;
@@ -647,7 +668,7 @@ export function createServer(): XServer {
 
       const [frameX, frameY] = [screen.x + win.outer.x, screen.y + win.outer.y];
 
-      const fid = createFrameBrowser(wid, { ...win.outer, x: frameX, y: frameY });
+      const fid = createFrameBrowser(wid, screen, { ...win.outer, x: frameX, y: frameY });
       knownWids.add(fid);
 
       winIdToRootId[wid] = screen.root;
@@ -1344,6 +1365,42 @@ export function createServer(): XServer {
     if (win) {
       const nextScreen = (win.screenIndex + 1) % screenCount;
       store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreen }));
+    }
+  }
+
+  function desktopZoomIn(screenIndex: number): void {
+    const browser = desktopBrowsers[screenIndex];
+    if (browser) {
+      setScreenZoomLevel(screenIndex, browser.webContents.getZoomLevel() + 1);
+    }
+  }
+
+  function desktopZoomOut(screenIndex: number): void {
+    const browser = desktopBrowsers[screenIndex];
+    if (browser) {
+      setScreenZoomLevel(screenIndex, browser.webContents.getZoomLevel() - 1);
+    }
+  }
+
+  function desktopZoomReset(screenIndex: number): void {
+    setScreenZoomLevel(screenIndex, 0);
+  }
+
+  function setScreenZoomLevel(screenIndex: number, zoomLevel: number): void {
+    const browser = desktopBrowsers[screenIndex];
+    if (browser) {
+      browser.webContents.setZoomLevel(zoomLevel);
+    }
+
+    setFrameWindowsZoomLevel(zoomLevel);
+    store.dispatch(setScreenZoomLevelAction({ screenIndex, zoom: zoomLevel }));
+
+    log(`Set zoom level to ${zoomLevel} (for ${screenIndex})`);
+  }
+
+  function setFrameWindowsZoomLevel(zoomLevel: number): void {
+    for (const frameWin of Object.values(frameBrowserWindows)) {
+      frameWin.webContents.setZoomLevel(zoomLevel);
     }
   }
 

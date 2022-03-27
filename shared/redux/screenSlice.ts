@@ -28,6 +28,8 @@ export const screensSlice = createSlice({
         width: payload.width,
         height: payload.height,
 
+        zoom: 1,
+
         // Work area is initially the same as screen area. Adjusts later based on Desktop render.
         workArea: {
           x: 0,
@@ -41,6 +43,10 @@ export const screensSlice = createSlice({
 
         currentLayouts,
       });
+    },
+
+    setScreenZoomLevelAction: (state, { payload }: PayloadAction<{ screenIndex: number; zoom: number }>) => {
+      state[payload.screenIndex].zoom = payload.zoom;
     },
 
     configureScreenWorkAreaAction: (state, { payload }: PayloadAction<{ screenIndex: number } & IGeometry>) => {
@@ -65,7 +71,12 @@ export const screensSlice = createSlice({
   },
 });
 
-export const { addScreenAction, configureScreenWorkAreaAction, setScreenCurrentTagsAction, setTagCurrentLayoutAction } =
-  screensSlice.actions;
+export const {
+  addScreenAction,
+  setScreenZoomLevelAction,
+  configureScreenWorkAreaAction,
+  setScreenCurrentTagsAction,
+  setTagCurrentLayoutAction,
+} = screensSlice.actions;
 
 export default screensSlice.reducer;

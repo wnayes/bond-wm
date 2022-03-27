@@ -12,6 +12,7 @@ import {
 import { geometriesDiffer } from "../../../shared/utils";
 import { configureWindowAction } from "../../../shared/redux/windowSlice";
 import { IScreen } from "../../../shared/types";
+import { getBoundingClientRectWithZoom } from "../../../renderer-shared/dom";
 
 export interface IWindowProps {
   win: IWindow;
@@ -20,7 +21,7 @@ export interface IWindowProps {
 }
 
 export function Window({ win, fill }: IWindowProps) {
-  const winEl = useRef<HTMLDivElement>();
+  const winElRef = useRef<HTMLDivElement>();
 
   const store = useStore();
 
@@ -40,16 +41,16 @@ export function Window({ win, fill }: IWindowProps) {
           style.height = "100%";
         } else {
           style.float = "left";
-          style.width = win.outer.width;
-          style.height = win.outer.height;
+          style.width = adjustForZoom(win.outer.width);
+          style.height = adjustForZoom(win.outer.height);
         }
         break;
       case WindowPosition.UserPositioned:
         style.position = "absolute";
-        style.width = win.outer.width;
-        style.height = win.outer.height;
-        style.left = win.outer.x;
-        style.top = win.outer.y;
+        style.width = adjustForZoom(win.outer.width);
+        style.height = adjustForZoom(win.outer.height);
+        style.left = adjustForZoom(win.outer.x);
+        style.top = adjustForZoom(win.outer.y);
         break;
     }
 
@@ -75,39 +76,49 @@ export function Window({ win, fill }: IWindowProps) {
   }
 
   useLayoutEffect(() => {
-    const clientRect = winEl.current?.getBoundingClientRect();
+    const winEl = winElRef?.current;
+    if (!winEl || !win) {
+      return;
+    }
 
-    if (win && clientRect) {
-      const finalRect = {
-        x: clientRect.x,
-        y: clientRect.y,
-        width: clientRect.width,
-        height: clientRect.height,
-      };
+    const clientRect = getBoundingClientRectWithZoom(winEl);
+    const finalRect = {
+      x: clientRect.x,
+      y: clientRect.y,
+      width: clientRect.width,
+      height: clientRect.height,
+    };
 
-      if (win.position !== WindowPosition.UserPositioned) {
-        // Keep the windows within the screen.
-        if (finalRect.x + finalRect.width > screen.width) {
-          finalRect.x = screen.width - finalRect.width;
-        }
-        finalRect.x = Math.max(0, finalRect.x);
-
-        if (finalRect.y + finalRect.height > screen.height) {
-          finalRect.y = screen.height - finalRect.height;
-        }
-        finalRect.y = Math.max(0, finalRect.y);
+    if (win.position !== WindowPosition.UserPositioned) {
+      // Keep the windows within the screen.
+      if (finalRect.x + finalRect.width > screen.width) {
+        finalRect.x = screen.width - finalRect.width;
       }
+      finalRect.x = Math.max(0, finalRect.x);
 
-      if (geometriesDiffer(win.outer, finalRect)) {
-        store.dispatch(
-          configureWindowAction({
-            wid: win.id,
-            ...finalRect,
-          })
-        );
+      if (finalRect.y + finalRect.height > screen.height) {
+        finalRect.y = screen.height - finalRect.height;
       }
+      finalRect.y = Math.max(0, finalRect.y);
+    }
+
+    if (geometriesDiffer(win.outer, finalRect)) {
+      store.dispatch(
+        configureWindowAction({
+          wid: win.id,
+          ...finalRect,
+        })
+      );
     }
   });
 
-  return <div ref={winEl} style={style}></div>;
+  return <div ref={winElRef} style={style}></div>;
+}
+
+function adjustForZoom(value: number): number {
+  const zoomRatio = window.devicePixelRatio;
+  if (zoomRatio !== 1) {
+    return value / zoomRatio;
+  }
+  return value;
 }

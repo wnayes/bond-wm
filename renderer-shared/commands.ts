@@ -24,6 +24,18 @@ export function focusDesktopBrowser({
   ipcRenderer.send("focus-desktop-browser", { screenIndex, takeVisualFocus });
 }
 
+export function desktopZoomIn(screenIndex: number): void {
+  ipcRenderer.send("desktop-zoom-in", { screenIndex });
+}
+
+export function desktopZoomOut(screenIndex: number): void {
+  ipcRenderer.send("desktop-zoom-out", { screenIndex });
+}
+
+export function desktopZoomReset(screenIndex: number): void {
+  ipcRenderer.send("desktop-zoom-reset", { screenIndex });
+}
+
 export function exec(executable: string, args?: string) {
   ipcRenderer.send("exec", { executable, args });
 }
