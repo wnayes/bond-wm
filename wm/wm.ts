@@ -296,8 +296,8 @@ export function createServer(): XServer {
       closeWindow(wid);
     });
 
-    ipcMain.on("focus-desktop-browser", (event, screenIndex) => {
-      setFocusToDesktopWindow(screenIndex);
+    ipcMain.on("focus-desktop-browser", (event, args: { screenIndex: number; takeVisualFocus?: boolean }) => {
+      setFocusToDesktopWindow(args.screenIndex, args.takeVisualFocus);
     });
 
     ipcMain.on("exec", (event, args) => {
@@ -1318,10 +1318,13 @@ export function createServer(): XServer {
     }
   }
 
-  function setFocusToDesktopWindow(screenIndex: number) {
+  function setFocusToDesktopWindow(screenIndex: number, takeVisualFocus?: boolean | undefined) {
     const did = screenIndexToDesktopId[screenIndex];
     if (typeof did === "number") {
-      setXInputFocus(did);
+      if (takeVisualFocus) {
+        store.dispatch(focusWindowAction({ wid: null }));
+      }
+      setFocus(did);
     }
   }
 

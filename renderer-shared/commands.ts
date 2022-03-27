@@ -14,8 +14,14 @@ export function closeWindow(wid: number) {
   ipcRenderer.send("close-window", wid);
 }
 
-export function focusDesktopBrowser(screenIndex: number): void {
-  ipcRenderer.send("focus-desktop-browser", screenIndex);
+export function focusDesktopBrowser({
+  screenIndex,
+  takeVisualFocus,
+}: {
+  screenIndex: number;
+  takeVisualFocus?: boolean;
+}): void {
+  ipcRenderer.send("focus-desktop-browser", { screenIndex, takeVisualFocus });
 }
 
 export function exec(executable: string, args?: string) {

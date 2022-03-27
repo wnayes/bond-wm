@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState } from "../../renderer-shared/configureStore";
 import { Layout } from "./layout/Layout";
@@ -8,6 +8,7 @@ import { Wallpaper } from "./Wallpaper";
 import { IWindow } from "../../shared/window";
 import { geometriesDiffer } from "../../shared/utils";
 import { configureScreenWorkAreaAction } from "../../shared/redux/screenSlice";
+import { focusDesktopBrowser } from "../../renderer-shared/commands";
 
 export interface IWorkAreaProps {
   screenIndex: number;
@@ -40,8 +41,12 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
     }
   });
 
+  const onWorkAreaClick = useCallback(() => {
+    focusDesktopBrowser({ screenIndex, takeVisualFocus: true });
+  }, []);
+
   return (
-    <div id="workarea" ref={workAreaDiv}>
+    <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
       <Wallpaper />
       <Layout screen={screen} windows={windows} />
     </div>

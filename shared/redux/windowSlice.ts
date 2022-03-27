@@ -76,7 +76,7 @@ export const windowsSlice = createSlice({
       }
     },
 
-    focusWindowAction: (state, action: PayloadAction<{ wid: number }>) => {
+    focusWindowAction: (state, action: PayloadAction<{ wid: number | null }>) => {
       const { payload } = action;
       for (const widStr in state) {
         if (payload.wid === parseInt(widStr, 10)) {

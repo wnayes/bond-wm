@@ -16,7 +16,7 @@ export function setupIpc(store: Store, screenIndex: number) {
         // Mod4 + R
         store.dispatch(showRunFieldAction(true));
 
-        focusDesktopBrowser(screenIndex);
+        focusDesktopBrowser({ screenIndex, takeVisualFocus: false });
       }
     }
   });
