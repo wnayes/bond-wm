@@ -1150,12 +1150,21 @@ export function createServer(): XServer {
     });
   }
 
-  function getFocusedWindowId(): number | null {
+  function getFocusedWindowId(screenIndex?: number): number | null {
     const windows = store.getState().windows;
-    for (const wid in windows) {
-      if (windows[wid].focused) return parseInt(wid);
+    for (const widStr in windows) {
+      const win = windows[widStr];
+      if (win.focused) {
+        if (typeof screenIndex !== "number" || win.screenIndex === screenIndex) {
+          return parseInt(widStr);
+        }
+      }
     }
     return null;
+  }
+
+  function anyWindowHasFocus(screenIndex?: number): boolean {
+    return typeof getFocusedWindowId(screenIndex) === "number";
   }
 
   function XGetWMProtocols(wid: number, callback: XCbWithErr<[number[] | void]>) {
@@ -1245,21 +1254,27 @@ export function createServer(): XServer {
     let nextFocusWid: number | undefined;
     const win = getWinFromStore(widLosingFocus);
     if (win) {
-      const wins = store.getState().windows;
-      for (const widStr in wins) {
-        const otherWin = wins[widStr];
-        if (otherWin.id !== widLosingFocus && otherWin.screenIndex === win.screenIndex) {
-          nextFocusWid = otherWin.id;
+      return getNextFocusWidForScreen(win.screenIndex, widLosingFocus);
+    }
+    return nextFocusWid;
+  }
 
-          // Not breaking here, on the chance that we end up finding the "most recent"
-          // window later on in the enumeration. (Probably should implement some sort
-          // of true "focus history" stack.)
-        }
-      }
+  function getNextFocusWidForScreen(screenIndex: number, widLosingFocus: number | undefined): number | undefined {
+    let nextFocusWid: number | undefined;
+    const wins = store.getState().windows;
+    for (const widStr in wins) {
+      const otherWin = wins[widStr];
+      if (otherWin.id !== widLosingFocus && otherWin.screenIndex === screenIndex && otherWin.visible) {
+        nextFocusWid = otherWin.id;
 
-      if (typeof nextFocusWid === "undefined") {
-        nextFocusWid = screenIndexToDesktopId[win.screenIndex];
+        // Not breaking here, on the chance that we end up finding the "most recent"
+        // window later on in the enumeration. (Probably should implement some sort
+        // of true "focus history" stack.)
       }
+    }
+
+    if (typeof nextFocusWid === "undefined") {
+      nextFocusWid = screenIndexToDesktopId[screenIndex];
     }
     return nextFocusWid;
   }
@@ -1546,6 +1561,7 @@ export function createServer(): XServer {
                 screenIndex: number;
               };
               batch(() => {
+                let hidFocusedWid: number | undefined = undefined;
                 for (const widStr in state.windows) {
                   const wid = parseInt(widStr, 10);
                   const win = state.windows[widStr];
@@ -1555,7 +1571,17 @@ export function createServer(): XServer {
                   if (anyIntersect(win.tags, currentTags)) {
                     showWindow(wid);
                   } else {
+                    if (win.focused) {
+                      hidFocusedWid = wid;
+                    }
                     hideWindow(wid);
+                  }
+                }
+
+                if (typeof hidFocusedWid === "number" || !anyWindowHasFocus()) {
+                  const nextFocusWid = getNextFocusWidForScreen(screenIndex, hidFocusedWid);
+                  if (typeof nextFocusWid === "number") {
+                    setFocus(nextFocusWid);
                   }
                 }
               });
