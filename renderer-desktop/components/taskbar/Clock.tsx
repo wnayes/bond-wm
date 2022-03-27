@@ -3,11 +3,18 @@ import { useCallback, useEffect, useRef } from "react";
 
 export function Clock() {
   const divRef = useRef<HTMLDivElement>();
+  const timeSpanRef = useRef<HTMLSpanElement>();
+  const dateSpanRef = useRef<HTMLSpanElement>();
 
   const onTimeRefresh = useCallback(() => {
     if (divRef.current) {
-      divRef.current.textContent = getFormattedCurrentTime();
       divRef.current.title = getFormattedCurrentDate();
+    }
+    if (timeSpanRef.current) {
+      timeSpanRef.current.textContent = getFormattedCurrentTime();
+    }
+    if (dateSpanRef.current) {
+      dateSpanRef.current.textContent = getFormattedSecondaryDate();
     }
   }, []);
 
@@ -18,7 +25,10 @@ export function Clock() {
 
   return (
     <div className="clock" ref={divRef} title={getFormattedCurrentDate()}>
-      {getFormattedCurrentTime()}
+      <span ref={dateSpanRef} className="clockDate">
+        {getFormattedSecondaryDate()}
+      </span>
+      <span ref={timeSpanRef}>{getFormattedCurrentTime()}</span>
     </div>
   );
 }
@@ -36,5 +46,12 @@ function getFormattedCurrentDate(): string {
     month: "long",
     day: "numeric",
     year: "numeric",
+  });
+}
+
+function getFormattedSecondaryDate(): string {
+  return new Date().toLocaleString("en-US", {
+    month: "numeric",
+    day: "numeric",
   });
 }

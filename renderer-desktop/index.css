@@ -126,6 +126,12 @@ html, body {
     font-size: 12px;
     line-height: 20px;
     padding: 0 0.5em;
+    cursor: default;
+}
+
+.clockDate {
+    color: #444444;
+    padding-right: 0.5em;
 }
 
 .layoutIndicator {
