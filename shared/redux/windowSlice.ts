@@ -76,6 +76,13 @@ export const windowsSlice = createSlice({
       }
     },
 
+    setWindowTagsAction: (state, action: PayloadAction<{ wid: number; tags: string[] }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        state[payload.wid].tags = payload.tags;
+      }
+    },
+
     focusWindowAction: (state, action: PayloadAction<{ wid: number | null }>) => {
       const { payload } = action;
       for (const widStr in state) {
@@ -166,6 +173,7 @@ export const {
   configureWindowAction,
   setFrameExtentsAction,
   setWindowIntoScreenAction,
+  setWindowTagsAction,
   focusWindowAction,
   setWindowTitleAction,
   setWindowFullscreenAction,

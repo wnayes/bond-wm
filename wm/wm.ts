@@ -40,7 +40,7 @@ import {
 } from "../shared/X";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
-import { anyIntersect } from "../shared/utils";
+import { anyIntersect, arraysEqual, intersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
@@ -56,6 +56,7 @@ import {
   removeWindowAction,
   setFrameExtentsAction,
   setWindowIntoScreenAction,
+  setWindowTagsAction,
   setWindowTitleAction,
   setWindowVisibleAction,
 } from "../shared/redux/windowSlice";
@@ -1371,7 +1372,8 @@ export function createServer(): XServer {
   }
 
   function sendActiveWindowToNextScreen(): void {
-    const screenCount = store.getState().screens.length;
+    const screens = store.getState().screens;
+    const screenCount = screens.length;
     if (screenCount === 1) {
       return; // Only one screen, can't switch.
     }
@@ -1380,9 +1382,21 @@ export function createServer(): XServer {
     if (win) {
       const nextScreenIndex = (win.screenIndex + 1) % screenCount;
       batch(() => {
+        // Update the window's tags if the next screen has different tags visible.
+        const nextScreenTags = screens[nextScreenIndex].currentTags;
+        const tagIntersect = intersect(win.tags, nextScreenTags);
+        if (tagIntersect.length > 0) {
+          if (!arraysEqual(tagIntersect, win.tags)) {
+            store.dispatch(setWindowTagsAction({ wid, tags: tagIntersect }));
+          }
+        } else if (nextScreenTags.length > 0) {
+          store.dispatch(setWindowTagsAction({ wid, tags: [nextScreenTags[0]] }));
+        }
+
         store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreenIndex }));
 
-        // Trigger reconfigure since coordinates have remained the same, and we won't configure again otherwise.
+        // Trigger reconfigure since coordinates have remained the same,
+        // and we won't configure again otherwise (at least not if we are floating).
         store.dispatch(configureWindowAction({ wid, ...win.outer }));
       });
     }

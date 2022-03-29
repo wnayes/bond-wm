@@ -14,6 +14,40 @@ export function anyIntersect<T>(arr1: T[] | null | undefined, arr2: T[] | null |
   return false;
 }
 
+export function intersect<T>(arr1: T[] | null | undefined, arr2: T[] | null | undefined): T[] {
+  if (!arr1 || !arr2) {
+    return [];
+  }
+  const intersectArr = [];
+  for (const item1 of arr1) {
+    for (const item2 of arr2) {
+      if (item1 === item2) {
+        intersectArr.push(item1);
+        break;
+      }
+    }
+  }
+  return intersectArr;
+}
+
+export function arraysEqual<T>(arr1: T[] | null | undefined, arr2: T[] | null | undefined): boolean {
+  if (arr1 == arr2) {
+    return true;
+  }
+  if (!arr1 || !arr2) {
+    return false;
+  }
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function geometriesDiffer(geo1: IGeometry | null | undefined, geo2: IGeometry | null | undefined): boolean {
   if ((!geo1 && geo2) || (geo1 && !geo2)) {
     return true;
