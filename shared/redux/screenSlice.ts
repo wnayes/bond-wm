@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getFirstLayoutName } from "../layouts";
+import { IScreen } from "../screen";
 import { getFirstTagName, getTagNames } from "../tags";
-import { IScreen, IGeometry } from "../types";
+import { IGeometry } from "../types";
 
 export type ScreensState = IScreen[];
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { IScreen } from "../../../shared/types";
+import { IScreen } from "../../../shared/screen";
 import { IWindow } from "../../../shared/window";
 import { getLayouts } from "../../layouts";
 

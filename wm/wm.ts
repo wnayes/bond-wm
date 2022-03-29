@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IScreen } from "../shared/types";
+import { IBounds } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -62,6 +62,7 @@ import {
 } from "../shared/redux/windowSlice";
 import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "../shared/redux/screenSlice";
 import { IWindow } from "../shared/window";
+import { IScreen } from "../shared/screen";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
 import { customizeWindow } from "./customize";

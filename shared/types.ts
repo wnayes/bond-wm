@@ -13,23 +13,3 @@ export interface IBounds {
 }
 
 export type Coords = [x: number, y: number];
-
-export interface IScreen {
-  index: number;
-
-  root: number;
-
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  workArea: IGeometry;
-
-  /** `zoomLevel` from Electron. */
-  zoom: number;
-
-  tags: string[];
-  currentTags: string[];
-
-  currentLayouts: { [tag: string]: string };
-}

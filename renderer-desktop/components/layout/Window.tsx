@@ -11,7 +11,7 @@ import {
 } from "../../../shared/window";
 import { geometriesDiffer } from "../../../shared/utils";
 import { configureWindowAction } from "../../../shared/redux/windowSlice";
-import { IScreen } from "../../../shared/types";
+import { IScreen } from "../../../shared/screen";
 import { getBoundingClientRectWithZoom } from "../../../renderer-shared/dom";
 
 export interface IWindowProps {
