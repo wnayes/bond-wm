@@ -22,6 +22,9 @@ export function WindowFrame(props: IWindowFrameProps) {
   if (win?.focused) {
     className += " focused";
   }
+  if (win?.urgent) {
+    className += " urgent";
+  }
   if (win?.fullscreen) {
     className += " fullscreen";
   }

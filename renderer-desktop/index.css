@@ -70,6 +70,10 @@ html, body {
     background-color: #7269d2;
     color: #EEEEEE;
 }
+.tasklistentry.urgent {
+    background-color: #c3723d;
+    color: #EEEEEE;
+}
 .tasklistentry:not(.focused):hover {
     background-color: #BBBBBB;
 }
@@ -100,6 +104,10 @@ html, body {
 .taglistentry.selected {
     font-weight: bold;
     background-color: #7269d2;
+    color: #EEEEEE;
+}
+.taglistentry.urgent {
+    background-color: #c3723d;
     color: #EEEEEE;
 }
 .taglistEntryBadge {

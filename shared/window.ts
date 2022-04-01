@@ -14,6 +14,8 @@ export interface IWindow {
   position: WindowPosition;
   focused: boolean;
   decorated: boolean;
+  /** If set, the window should display some sort of attention grabbing indication. */
+  urgent: boolean;
   /** If set, indicates a specific border with the frame should respect. */
   borderWidth: number | undefined;
   title: string | undefined;

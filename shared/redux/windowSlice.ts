@@ -27,6 +27,7 @@ export const windowsSlice = createSlice({
         position: payload.position ?? WindowPosition.Default,
         focused: false,
         decorated: payload.decorated,
+        urgent: payload.urgent,
         borderWidth: payload.borderWidth,
         title: payload.title,
         wmClass: payload.wmClass,
@@ -134,6 +135,13 @@ export const windowsSlice = createSlice({
       }
     },
 
+    setWindowUrgentAction: (state, action: PayloadAction<{ wid: number; urgent: boolean }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        state[payload.wid].urgent = payload.urgent;
+      }
+    },
+
     startDragAction: (
       state,
       action: PayloadAction<{ wid: number; moving?: boolean; resize?: ResizeDirection; coords: [x: number, y: number] }>
@@ -180,6 +188,7 @@ export const {
   setWindowPositionAction,
   setWindowVisibleAction,
   setWindowDecoratedAction,
+  setWindowUrgentAction,
   startDragAction,
   endDragAction,
 } = windowsSlice.actions;

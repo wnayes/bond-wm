@@ -1,4 +1,4 @@
-import { IXClient, WMSizeHints, XPropMode } from "../shared/X";
+import { IXClient, WMHints, WMHintsFlags, WMSizeHints, XPropMode } from "../shared/X";
 import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
@@ -9,6 +9,7 @@ enum WMStateValue {
   IconicState = 3,
 }
 
+const SIZEOF_WMHints = 32;
 const SIZEOF_WMSizeHints = 72;
 
 export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWMEventConsumer> {
@@ -63,6 +64,31 @@ export async function getWMClass(X: IXClient, wid: number): Promise<[string, str
     wmClass[1] = data.toString("utf8", firstNullByteIndex + 1, data.length - 1);
   }
   return wmClass;
+}
+
+/** Obtains the WM_HINTS X property value for a window. */
+export async function getWMHints(X: IXClient, wid: number): Promise<WMHints | undefined> {
+  const { data } = await getRawPropertyValue(X, wid, X.atoms.WM_HINTS, X.atoms.WM_HINTS);
+
+  if (!data || data.length < SIZEOF_WMHints) {
+    return;
+  }
+
+  const hints: WMHints = {
+    flags: data.readInt32LE(0),
+    input: data.readInt32LE(4),
+    initialState: data.readInt32LE(8),
+    iconPixmap: data.readInt32LE(12),
+    iconWindow: data.readInt32LE(16),
+    iconX: data.readInt32LE(20),
+    iconY: data.readInt32LE(24),
+    iconMask: data.readInt32LE(28),
+  };
+  return hints;
+}
+
+export function hasUrgencyHint(hints: WMHints | null | undefined): boolean {
+  return !!(hints.flags & WMHintsFlags.UrgencyHint);
 }
 
 export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHints | undefined> {

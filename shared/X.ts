@@ -352,6 +352,31 @@ interface XineramaExtension {
 
 export type XXineramaExtension = XExtension<XineramaExtension>;
 
+/** ICCCM WM_HINTS structure. */
+export interface WMHints {
+  flags: WMHintsFlags;
+  input: number;
+  initialState: number;
+  iconPixmap: unknown; // pixmap
+  iconWindow: number;
+  iconX: number;
+  iconY: number;
+  iconMask: unknown; // pixmap
+}
+
+/** Flags bits from WM_HINTS. */
+export enum WMHintsFlags {
+  InputHint = 1 << 0,
+  StateHint = 1 << 1,
+  IconPixmapHint = 1 << 2,
+  IconWindowHint = 1 << 3,
+  IconPositionHint = 1 << 4,
+  IconMaskHint = 1 << 5,
+  WindowGroupHint = 1 << 6,
+  MessageHint = 1 << 7, // obsolete
+  UrgencyHint = 1 << 8,
+}
+
 /** ICCCM WM_SIZE_HINTS structure. */
 export interface WMSizeHints {
   flags: WMSizeHintsFlags;

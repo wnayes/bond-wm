@@ -16,10 +16,14 @@ export function TagList(props: ITagListProps) {
 
   const windows = useSelector((state: RootState) => selectWindowsFromScreen(state, props.screenIndex));
   const tagWindowMap = useMemo(() => {
-    const map: { [tag: string]: boolean } = {};
+    const map: { [tag: string]: { urgent: boolean } } = {};
     for (const win of windows) {
       for (const tag of win.tags) {
-        map[tag] = true;
+        if (!map[tag]) {
+          map[tag] = { urgent: win.urgent };
+        } else if (!map[tag].urgent && win.urgent) {
+          map[tag].urgent = true;
+        }
       }
     }
     return map;
@@ -34,6 +38,7 @@ export function TagList(props: ITagListProps) {
         key={tag}
         selected={currentTags.indexOf(tag) >= 0}
         populated={!!tagWindowMap[tag]}
+        urgent={tagWindowMap[tag]?.urgent ?? false}
         onClick={() => {
           dispatch(setScreenCurrentTagsAction({ screenIndex: props.screenIndex, currentTags: [tag] }));
         }}
@@ -48,14 +53,18 @@ interface ITagListEntryProps {
   tag: string;
   selected: boolean;
   populated: boolean;
+  urgent: boolean;
   onClick(): void;
 }
 
-function TagListEntry({ tag, selected, populated, onClick }: ITagListEntryProps) {
+function TagListEntry({ tag, selected, populated, urgent, onClick }: ITagListEntryProps) {
   let className = "taglistentry";
   if (selected) {
     className += " selected";
     onClick = undefined;
+  }
+  if (urgent) {
+    className += " urgent";
   }
 
   return (

@@ -32,6 +32,10 @@ html, body {
     background-color: #7269d2;
     border-color: #7269d2;
 }
+.winWrapper.urgent {
+    background-color: #c3723d;
+    border-color: #c3723d;
+}
 .winWrapper.fullscreen {
     border-width: 0;
 }

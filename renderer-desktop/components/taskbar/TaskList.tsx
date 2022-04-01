@@ -25,7 +25,12 @@ function TaskListEntry(props: ITaskListEntryProps) {
   const win = props.window;
 
   let className = "tasklistentry";
-  if (win.focused) className += " focused";
+  if (win.focused) {
+    className += " focused";
+  }
+  if (win.urgent) {
+    className += " urgent";
+  }
 
   const onClick = useCallback(() => {
     if (win.focused) minimizeWindow(win.id);
