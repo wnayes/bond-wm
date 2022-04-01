@@ -75,9 +75,16 @@ export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promis
           continue;
         }
 
-        const keySym = nodeKeySym.fromName(lastPiece);
-        const keySymMap = xModifiers & X11_KEY_MODIFIER.ShiftMask ? keysymsToKeycodeShift : keysymsToKeycode;
-        const keycode = keySymMap[keySym.keysym];
+        // TODO: This is pretty messy / uncertain, just trying pretty much every combination...
+        // Just not sure exactly how shift factors in.
+        const hasShift = !!(xModifiers & X11_KEY_MODIFIER.ShiftMask);
+        let keySym = nodeKeySym.fromName(hasShift ? toUpper(lastPiece) : toLower(lastPiece));
+        if (!keySym) {
+          keySym = nodeKeySym.fromName(lastPiece);
+        }
+        const keySymMap = hasShift ? keysymsToKeycodeShift : keysymsToKeycode;
+        const keySymMapFallback = hasShift ? keysymsToKeycode : keysymsToKeycodeShift;
+        const keycode = keySymMap[keySym?.keysym] ?? keySymMapFallback[keySym?.keysym];
         if (keycode > 0) {
           processedRegisteredKeys[xModifiers] ||= {};
           processedRegisteredKeys[xModifiers][keycode] = registeredKeys[keyString];
@@ -126,4 +133,36 @@ async function getKeyboardMapping(XDisplay: IXDisplay): Promise<number[][]> {
       resolve(list);
     });
   });
+}
+
+// TODO: Any better way to do this? Probably doesn't work across locales...
+const _toUpperMap: { [value: string]: string | undefined } = {
+  "0": ")",
+  "1": "!",
+  "2": "@",
+  "3": "#",
+  "4": "$",
+  "5": "%",
+  "6": "^",
+  "7": "&",
+  "8": "*",
+  "9": "(",
+};
+const _toLowerMap: { [value: string]: string | undefined } = {};
+for (const lower in _toUpperMap) {
+  _toLowerMap[_toUpperMap[lower]] = lower;
+}
+
+function toUpper(value: string): string {
+  if (value in _toUpperMap) {
+    return _toUpperMap[value];
+  }
+  return value.toUpperCase();
+}
+
+function toLower(value: string): string {
+  if (value in _toLowerMap) {
+    return _toLowerMap[value];
+  }
+  return value.toLowerCase();
 }

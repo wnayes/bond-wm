@@ -258,6 +258,9 @@ export function createServer(): XServer {
       app.exit(0);
     },
   };
+  for (let i = 0; i <= 9; i++) {
+    registeredKeys[`Mod4 + Shift + ${i}`] = () => sendActiveWindowToTag(i);
+  }
 
   // Initialization.
   (() => {
@@ -1402,6 +1405,35 @@ export function createServer(): XServer {
         // and we won't configure again otherwise (at least not if we are floating).
         store.dispatch(configureWindowAction({ wid, ...win.outer }));
       });
+    }
+  }
+
+  function sendActiveWindowToTag(tagIndex: number): void {
+    const screens = store.getState().screens;
+    const wid = getFocusedWindowId();
+    const win = getWinFromStore(wid);
+    if (!win) {
+      return;
+    }
+
+    const screen = screens[win.screenIndex];
+    if (!screen) {
+      return;
+    }
+
+    const nextTag = screen.tags[tagIndex];
+    if (!nextTag || win.tags.includes(nextTag)) {
+      return;
+    }
+
+    store.dispatch(setWindowTagsAction({ wid, tags: [nextTag] }));
+
+    if (!screen.currentTags.includes(nextTag)) {
+      hideWindow(wid);
+      const nextFocusWid = getNextFocusWidForScreen(win.screenIndex, wid);
+      if (typeof nextFocusWid === "number") {
+        setFocus(nextFocusWid);
+      }
     }
   }
 
