@@ -253,8 +253,9 @@ export function createServer(): XServer {
       app.exit(0);
     },
   };
-  for (let i = 0; i <= 9; i++) {
-    registeredKeys[`Mod4 + Shift + ${i}`] = () => sendActiveWindowToTag(i);
+  for (let i = 1; i <= 9; i++) {
+    registeredKeys[`Mod4 + ${i}`] = async (args) => setTagIndexForActiveDesktop(i - 1, args.wid);
+    registeredKeys[`Mod4 + Shift + ${i}`] = () => sendActiveWindowToTag(i - 1);
   }
 
   // Initialization.
@@ -1418,7 +1419,7 @@ export function createServer(): XServer {
       return;
     }
 
-    const nextTag = screen.tags[tagIndex];
+    const nextTag = getScreenTagByIndex(win.screenIndex, tagIndex);
     if (!nextTag || win.tags.includes(nextTag)) {
       return;
     }
@@ -1432,6 +1433,24 @@ export function createServer(): XServer {
         setFocus(nextFocusWid);
       }
     }
+  }
+
+  async function setTagIndexForActiveDesktop(tagIndex: number, relativeWid: number): Promise<void> {
+    const screenIndex = await getScreenIndexWithCursor(context, relativeWid);
+    if (typeof screenIndex === "number") {
+      const screen = store.getState().screens[screenIndex];
+      const nextTag = getScreenTagByIndex(screenIndex, tagIndex);
+      if (!nextTag || arraysEqual(screen.currentTags, [nextTag])) {
+        return;
+      }
+      store.dispatch(setScreenCurrentTagsAction({ screenIndex, currentTags: [nextTag] }));
+    }
+  }
+
+  function getScreenTagByIndex(screenIndex: number, tagIndex: number): string | undefined {
+    const screens = store.getState().screens;
+    const screen = screens[screenIndex];
+    return screen?.tags[tagIndex];
   }
 
   function desktopZoomIn(screenIndex: number): void {
