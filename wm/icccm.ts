@@ -88,7 +88,7 @@ export async function getWMHints(X: IXClient, wid: number): Promise<WMHints | un
 }
 
 export function hasUrgencyHint(hints: WMHints | null | undefined): boolean {
-  return !!(hints.flags & WMHintsFlags.UrgencyHint);
+  return !!hints && !!(hints.flags & WMHintsFlags.UrgencyHint);
 }
 
 export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHints | undefined> {
