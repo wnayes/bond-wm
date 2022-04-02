@@ -5,6 +5,9 @@ export function getScreenIndex(): number {
     return _screenIndex;
   }
   const urlParams = new URLSearchParams(window.location.search);
-  _screenIndex = parseInt(urlParams.get("screen"), 10);
+  _screenIndex = parseInt(urlParams.get("screen") || "", 10);
+  if (typeof _screenIndex !== "number") {
+    return -1;
+  }
   return _screenIndex;
 }

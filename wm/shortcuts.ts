@@ -136,7 +136,7 @@ async function getKeyboardMapping(XDisplay: IXDisplay): Promise<number[][]> {
 }
 
 // TODO: Any better way to do this? Probably doesn't work across locales...
-const _toUpperMap: { [value: string]: string | undefined } = {
+const _toUpperMap: { [value: string]: string | undefined } = Object.assign(Object.create(null), {
   "0": ")",
   "1": "!",
   "2": "@",
@@ -147,22 +147,23 @@ const _toUpperMap: { [value: string]: string | undefined } = {
   "7": "&",
   "8": "*",
   "9": "(",
-};
-const _toLowerMap: { [value: string]: string | undefined } = {};
+  "`": "~",
+});
+const _toLowerMap: { [value: string]: string | undefined } = Object.create(null);
 for (const lower in _toUpperMap) {
-  _toLowerMap[_toUpperMap[lower]] = lower;
+  _toLowerMap[_toUpperMap[lower]!] = lower;
 }
 
 function toUpper(value: string): string {
   if (value in _toUpperMap) {
-    return _toUpperMap[value];
+    return _toUpperMap[value]!;
   }
   return value.toUpperCase();
 }
 
 function toLower(value: string): string {
   if (value in _toLowerMap) {
-    return _toLowerMap[value];
+    return _toLowerMap[value]!;
   }
   return value.toLowerCase();
 }

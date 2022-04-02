@@ -11,4 +11,7 @@ store.subscribe(() => {
 });
 
 const container = document.getElementById("content");
+if (!container) {
+  throw new Error("Missing container element in frame");
+}
 setupWindowComponent(container, store);

@@ -15,7 +15,7 @@ interface IWindowClientAreaProps {
 export function WindowClientArea(props: IWindowClientAreaProps) {
   const { wid } = props;
 
-  const winBox = useRef<HTMLDivElement>();
+  const winBox = useRef<HTMLDivElement>(null);
 
   const store = useStore();
   const win = useSelector((state: RootState) => state.windows[wid]);

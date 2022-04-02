@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { useWindowSize } from "../../renderer-shared/hooks";
 
 export function Wallpaper() {
-  const canvasRef = useRef<HTMLCanvasElement>();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { width, height } = useWindowSize();
 
@@ -17,6 +17,9 @@ export function Wallpaper() {
       return;
     }
     const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
 
     // line segments (either few, or fluent lines (200))
     const segments = Math.random() < 0.5 ? 1 + Math.floor(9 * Math.random()) : 200;

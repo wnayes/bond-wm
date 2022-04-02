@@ -84,7 +84,7 @@ export async function createDragModule({
       let fid;
       if (windowType === XWMWindowType.Frame) {
         fid = wid;
-        wid = getWindowIdFromFrameId(fid);
+        wid = getWindowIdFromFrameId(fid)!;
       } else if (windowType === XWMWindowType.Client) {
         fid = getFrameIdFromWindowId(wid);
       }
@@ -179,7 +179,7 @@ export async function createDragModule({
       let fid;
       if (windowType === XWMWindowType.Frame) {
         fid = wid;
-        wid = getWindowIdFromFrameId(fid);
+        wid = getWindowIdFromFrameId(fid)!;
       } else if (windowType === XWMWindowType.Client) {
         fid = getFrameIdFromWindowId(wid);
       }
@@ -191,7 +191,7 @@ export async function createDragModule({
       let fid;
       if (windowType === XWMWindowType.Frame) {
         fid = wid;
-        wid = getWindowIdFromFrameId(fid);
+        wid = getWindowIdFromFrameId(fid)!;
       } else if (windowType === XWMWindowType.Client) {
         fid = getFrameIdFromWindowId(wid);
       }

@@ -58,6 +58,8 @@ function netWMMoveResizeTypeToInternal(newWmMoveResizeType: NetWmMoveResizeType)
       return ResizeDirection.BottomLeft;
     case NetWmMoveResizeType._NET_WM_MOVERESIZE_SIZE_LEFT:
       return ResizeDirection.Left;
+    default:
+      throw new Error("Unexpected resize type");
   }
 }
 
@@ -184,7 +186,10 @@ export async function createEWMHEventConsumer(
         case atoms._NET_WM_MOVERESIZE:
           {
             if (windowType === XWMWindowType.Frame) {
-              wid = getWindowIdFromFrameId(wid);
+              const trueWid = getWindowIdFromFrameId(wid);
+              if (typeof trueWid === "number") {
+                wid = trueWid;
+              }
             }
 
             const moveResizeData = data as NetWmMoveResizeData;

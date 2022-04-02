@@ -15,5 +15,5 @@ export function getLayouts(): ILayout[] {
 
   return getLayoutNames().map((layoutName) => {
     return layouts.find((layout) => layout.name === layoutName);
-  });
+  }) as ILayout[];
 }

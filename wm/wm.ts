@@ -69,6 +69,7 @@ import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
 import { getArgs } from "./args";
 import { createShortcutsModule } from "./shortcuts";
+import { assert } from "./assert";
 
 interface Geometry {
   width: number;
@@ -200,7 +201,7 @@ export function createServer(): XServer {
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
 
-  const desktopBrowsers: BrowserWindow[] = [];
+  const desktopBrowsers: (BrowserWindow | null)[] = [];
   /** Desktop window handle to index into `desktopBrowsers`. */
   const desktopBrowserHandles: { [did: number]: number } = {};
   const screenIndexToDesktopId: { [screenIndex: number]: number } = {};
@@ -222,13 +223,7 @@ export function createServer(): XServer {
 
   const store = __setupStore();
 
-  const context: XWMContext = {
-    X,
-    XDisplay,
-    store,
-    getWindowIdFromFrameId,
-    getFrameIdFromWindowId,
-  };
+  let context: XWMContext;
 
   const sendKeyToBrowser = async (args: XWMEventConsumerKeyPressArgs) => {
     const screenIndex = await getScreenIndexWithCursor(context, args.wid);
@@ -270,8 +265,16 @@ export function createServer(): XServer {
         process.exit(1);
       }
 
-      XDisplay = context.XDisplay = display;
-      X = context.X = display.client;
+      XDisplay = display;
+      X = display.client;
+
+      context = {
+        X,
+        XDisplay,
+        store,
+        getWindowIdFromFrameId,
+        getFrameIdFromWindowId,
+      };
 
       dragModule = await createDragModule(context);
       eventConsumers.push(dragModule);
@@ -357,7 +360,7 @@ export function createServer(): XServer {
     const root = screen.root;
 
     const debugScreen = Object.assign({}, screen);
-    delete debugScreen.depths;
+    delete (debugScreen as any).depths; // eslint-disable-line
     log("Processing X screen", debugScreen);
 
     X.GrabServer();
@@ -658,7 +661,10 @@ export function createServer(): XServer {
 
       const state = store.getState();
 
-      customizeWindow(win);
+      customizeWindow(win as IWindow);
+
+      assert(typeof win.screenIndex === "number");
+      assert(win.outer);
 
       // Accept any update to screenIndex (if it is valid).
       let screen = state.screens[win.screenIndex];
@@ -715,13 +721,18 @@ export function createServer(): XServer {
 
       const innerWid = frameBrowserFrameIdToWinId[wid];
       delete frameBrowserFrameIdToWinId[wid];
-      delete frameBrowserWinIdToFrameId[innerWid];
-      delete frameBrowserWindows[innerWid];
+      if (typeof innerWid === "number") {
+        delete frameBrowserWinIdToFrameId[innerWid];
+        delete frameBrowserWindows[innerWid];
+      }
     } else if (isClientWin(wid)) {
       widLog(wid, `Unmanage window`);
 
       const focusedWid = getFocusedWindowId();
       const win = getWinFromStore(wid);
+      if (!win) {
+        return;
+      }
 
       store.dispatch(removeWindowAction(wid));
 
@@ -734,7 +745,7 @@ export function createServer(): XServer {
         X.ReparentWindow(wid, screen.root, 0, 0);
 
         log("Destroying BrowserWindow for frame " + fid);
-        frameBrowserWindows[wid].destroy();
+        frameBrowserWindows[wid]?.destroy();
       }
 
       if (wid === focusedWid && win) {
@@ -768,17 +779,19 @@ export function createServer(): XServer {
       x: clientGeom.xPos,
       y: clientGeom.yPos,
     };
-    if (normalHints.maxHeight > 0) {
-      effectiveGeometry.height = Math.min(effectiveGeometry.height, normalHints.maxHeight);
-    }
-    if (normalHints.minHeight > 0) {
-      effectiveGeometry.height = Math.max(effectiveGeometry.height, normalHints.minHeight);
-    }
-    if (normalHints.maxWidth > 0) {
-      effectiveGeometry.width = Math.min(effectiveGeometry.width, normalHints.maxWidth);
-    }
-    if (normalHints.minWidth > 0) {
-      effectiveGeometry.width = Math.max(effectiveGeometry.width, normalHints.minWidth);
+    if (normalHints) {
+      if (normalHints.maxHeight && normalHints.maxHeight > 0) {
+        effectiveGeometry.height = Math.min(effectiveGeometry.height, normalHints.maxHeight);
+      }
+      if (normalHints.minHeight && normalHints.minHeight > 0) {
+        effectiveGeometry.height = Math.max(effectiveGeometry.height, normalHints.minHeight);
+      }
+      if (normalHints.maxWidth && normalHints.maxWidth > 0) {
+        effectiveGeometry.width = Math.min(effectiveGeometry.width, normalHints.maxWidth);
+      }
+      if (normalHints.minWidth && normalHints.minWidth > 0) {
+        effectiveGeometry.width = Math.max(effectiveGeometry.width, normalHints.minWidth);
+      }
     }
 
     return effectiveGeometry;
@@ -787,7 +800,7 @@ export function createServer(): XServer {
   function changeWindowEventMask(wid: number, eventMask: XEventMask): boolean {
     let failed;
     log("Changing event mask for", wid, eventMask);
-    X.ChangeWindowAttributes(wid, { eventMask }, (err: { error: number }) => {
+    X.ChangeWindowAttributes(wid, { eventMask }, (err) => {
       if (err && err.error === 10) {
         logError(
           `Error while changing event mask for for ${wid} to ${eventMask}: Another window manager already running.`,
@@ -894,6 +907,9 @@ export function createServer(): XServer {
       }
 
       const win = getWinFromStore(wid);
+      if (!win) {
+        return;
+      }
       const screen = store.getState().screens[win.screenIndex];
 
       const config: Partial<IXConfigureInfo> = {};
@@ -929,9 +945,10 @@ export function createServer(): XServer {
     }
 
     const isFrame = isFrameBrowserWin(wid);
-    const window = isFrame ? getWindowIdFromFrameId(wid) : wid;
-
-    setFocus(window);
+    const focusWid = isFrame ? getWindowIdFromFrameId(wid) : wid;
+    if (typeof focusWid === "number") {
+      setFocus(focusWid);
+    }
   }
 
   function onLeaveNotify(ev: IXEvent) {
@@ -1029,7 +1046,7 @@ export function createServer(): XServer {
       case ExtraAtoms._NET_WM_NAME:
         {
           const title = await getWindowTitle(wid);
-          store.dispatch(setWindowTitleAction({ wid, title }));
+          store.dispatch(setWindowTitleAction({ wid, title: title || "" }));
         }
         break;
 
@@ -1085,38 +1102,6 @@ export function createServer(): XServer {
 
     return utf8name || name;
   }
-
-  // function determineWindowDecorated(wid: number): Promise<boolean> {
-  //   return new Promise((resolve, reject) => {
-  //     X.InternAtom(true, "_MOTIF_WM_HINTS", (err, atom) => {
-  //       if (err) {
-  //         logError("InternAtom _MOTIF_WM_HINTS error", err);
-  //         reject(err);
-  //         return;
-  //       }
-
-  //       X.GetProperty(0, wid, atom, 0, 0, 10000000, (err, prop) => {
-  //         if (err) {
-  //           logError("GetProperty _MOTIF_WM_HINTS error", err);
-  //           reject(err);
-  //           return;
-  //         }
-
-  //         const buffer = prop.data;
-  //         if (buffer && buffer.length) {
-  //           if (buffer[0] === 0x02) {
-  //             // Specifying decorations
-  //             if (buffer[2] === 0x00) {
-  //               // No decorations
-  //               resolve(false);
-  //             }
-  //           }
-  //         }
-  //         resolve(true);
-  //       });
-  //     });
-  //   });
-  // }
 
   /**
    * By default, one screen means one screen geometry.
@@ -1291,7 +1276,9 @@ export function createServer(): XServer {
     const isFrame = isFrameBrowserWin(wid);
     if (isFrame) {
       fid = wid;
-      wid = getWindowIdFromFrameId(wid);
+      const trueWid = getWindowIdFromFrameId(wid);
+      assert(typeof trueWid === "number");
+      wid = trueWid;
     } else {
       fid = getFrameIdFromWindowId(wid);
     }
@@ -1330,6 +1317,9 @@ export function createServer(): XServer {
 
   function raiseWindow(wid: number) {
     const win = getWinFromStore(wid);
+    if (!win) {
+      return;
+    }
 
     if (!win.visible) {
       showWindow(wid);
@@ -1384,6 +1374,10 @@ export function createServer(): XServer {
       return; // Only one screen, can't switch.
     }
     const wid = getFocusedWindowId();
+    if (typeof wid !== "number") {
+      return;
+    }
+
     const win = getWinFromStore(wid);
     if (win) {
       const nextScreenIndex = (win.screenIndex + 1) % screenCount;
@@ -1411,6 +1405,9 @@ export function createServer(): XServer {
   function sendActiveWindowToTag(tagIndex: number): void {
     const screens = store.getState().screens;
     const wid = getFocusedWindowId();
+    if (typeof wid !== "number") {
+      return;
+    }
     const win = getWinFromStore(wid);
     if (!win) {
       return;
@@ -1469,7 +1466,7 @@ export function createServer(): XServer {
 
   function setFrameWindowsZoomLevel(zoomLevel: number): void {
     for (const frameWin of Object.values(frameBrowserWindows)) {
-      frameWin.webContents.setZoomLevel(zoomLevel);
+      frameWin?.webContents.setZoomLevel(zoomLevel);
     }
   }
 

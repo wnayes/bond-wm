@@ -11,5 +11,6 @@ module.exports = {
   ],
   rules: {
     "no-prototype-builtins": 0,
+    "@typescript-eslint/no-non-null-assertion": 0
   }
 };

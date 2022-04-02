@@ -16,7 +16,7 @@ export interface IWorkAreaProps {
 }
 
 export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
-  const workAreaDiv = useRef<HTMLDivElement>();
+  const workAreaDiv = useRef<HTMLDivElement>(null);
 
   const store = useStore();
   const screen = useSelector((state: RootState) => state.screens[screenIndex]);

@@ -5,7 +5,7 @@
 
 import { IXDisplay, XBuffer, XCbWithErr, XineramaScreenInfo, XXineramaExtension } from "../shared/X";
 
-export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXineramaExtension]>) {
+export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXineramaExtension | null]>) {
   const X = display.client;
 
   X.QueryExtension<XXineramaExtension>("XINERAMA", (err, ext) => {

@@ -22,12 +22,12 @@ export const screensSlice = createSlice({
       state.push({
         index: state.length,
 
-        root: payload.root,
+        root: payload.root ?? 0,
 
-        x: payload.x,
-        y: payload.y,
-        width: payload.width,
-        height: payload.height,
+        x: payload.x ?? 0,
+        y: payload.y ?? 0,
+        width: payload.width ?? 0,
+        height: payload.height ?? 0,
 
         zoom: 1,
 
@@ -35,8 +35,8 @@ export const screensSlice = createSlice({
         workArea: {
           x: 0,
           y: 0,
-          width: payload.width,
-          height: payload.height,
+          width: payload.width ?? 0,
+          height: payload.height ?? 0,
         },
 
         tags,

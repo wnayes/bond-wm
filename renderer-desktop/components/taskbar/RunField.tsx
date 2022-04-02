@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { showRunFieldAction } from "../../../renderer-shared/redux/taskbarSlice";
 
 export function RunField() {
-  const field = useRef<HTMLInputElement>();
+  const field = useRef<HTMLInputElement>(null);
 
   const [text, setText] = useState("");
   const freezeTyping = useRef<boolean>(false);

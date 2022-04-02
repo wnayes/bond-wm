@@ -27,7 +27,7 @@ export async function getPropertyValue<TValue>(
 
     default:
       log("Unhandled atom property type", prop);
-      return undefined;
+      return undefined as unknown as TValue;
   }
 }
 

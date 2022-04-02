@@ -2,9 +2,9 @@ import * as React from "react";
 import { useCallback, useEffect, useRef } from "react";
 
 export function Clock() {
-  const divRef = useRef<HTMLDivElement>();
-  const timeSpanRef = useRef<HTMLSpanElement>();
-  const dateSpanRef = useRef<HTMLSpanElement>();
+  const divRef = useRef<HTMLDivElement>(null);
+  const timeSpanRef = useRef<HTMLSpanElement>(null);
+  const dateSpanRef = useRef<HTMLSpanElement>(null);
 
   const onTimeRefresh = useCallback(() => {
     if (divRef.current) {

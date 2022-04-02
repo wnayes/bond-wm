@@ -53,29 +53,33 @@ export enum ResizeDirection {
 }
 
 export function getWindowMinWidth(win: IWindow): number {
-  if (win.normalHints?.minWidth > 0) {
-    return win.normalHints?.minWidth;
+  const minWidth = win.normalHints?.minWidth;
+  if (minWidth && minWidth > 0) {
+    return minWidth;
   }
   return 0;
 }
 
 export function getWindowMaxWidth(win: IWindow): number {
-  if (win.normalHints?.maxWidth > 0) {
-    return win.normalHints?.maxWidth;
+  const maxWidth = win.normalHints?.maxWidth;
+  if (maxWidth && maxWidth > 0) {
+    return maxWidth;
   }
   return Infinity;
 }
 
 export function getWindowMinHeight(win: IWindow): number {
-  if (win.normalHints?.minHeight > 0) {
-    return win.normalHints?.minHeight;
+  const minHeight = win.normalHints?.minHeight;
+  if (minHeight && minHeight > 0) {
+    return minHeight;
   }
   return 0;
 }
 
 export function getWindowMaxHeight(win: IWindow): number {
-  if (win.normalHints?.maxHeight > 0) {
-    return win.normalHints?.maxHeight;
+  const maxHeight = win.normalHints?.maxHeight;
+  if (maxHeight && maxHeight > 0) {
+    return maxHeight || 0;
   }
   return Infinity;
 }

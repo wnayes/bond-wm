@@ -49,8 +49,14 @@ export function arraysEqual<T>(arr1: T[] | null | undefined, arr2: T[] | null | 
 }
 
 export function geometriesDiffer(geo1: IGeometry | null | undefined, geo2: IGeometry | null | undefined): boolean {
+  if (geo1 === geo2) {
+    return false;
+  }
   if ((!geo1 && geo2) || (geo1 && !geo2)) {
     return true;
+  }
+  if (!geo1 || !geo2) {
+    return false;
   }
 
   return geo1.x !== geo2.x || geo1.y !== geo2.y || geo1.width !== geo2.width || geo1.height !== geo2.height;

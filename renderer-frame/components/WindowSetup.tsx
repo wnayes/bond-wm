@@ -8,7 +8,11 @@ import { Store } from "../../renderer-shared/configureStore";
 
 export function setupWindowComponent(container: HTMLElement, store: Store): void {
   const urlParams = new URLSearchParams(window.location.search);
-  const wid = parseInt(urlParams.get("wid"), 10);
+  const widParam = urlParams.get("wid");
+  if (!widParam) {
+    throw new Error("Frame had no window id parameter");
+  }
+  const wid = parseInt(widParam, 10);
   console.log("wid", wid);
 
   ReactDOM.render(

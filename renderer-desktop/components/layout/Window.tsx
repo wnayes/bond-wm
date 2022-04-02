@@ -21,7 +21,7 @@ export interface IWindowProps {
 }
 
 export function Window({ win, fill }: IWindowProps) {
-  const winElRef = useRef<HTMLDivElement>();
+  const winElRef = useRef<HTMLDivElement>(null);
 
   const store = useStore();
 

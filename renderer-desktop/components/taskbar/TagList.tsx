@@ -54,7 +54,7 @@ interface ITagListEntryProps {
   selected: boolean;
   populated: boolean;
   urgent: boolean;
-  onClick(): void;
+  onClick?: VoidFunction | undefined;
 }
 
 function TagListEntry({ tag, selected, populated, urgent, onClick }: ITagListEntryProps) {

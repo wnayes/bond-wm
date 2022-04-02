@@ -18,6 +18,9 @@ export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind): voi
 
 function showDesktopMenu(event: IpcMainEvent) {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!browserWindow) {
+    return;
+  }
 
   const desktopMenu = Menu.buildFromTemplate([
     {
@@ -47,6 +50,9 @@ function showDesktopMenu(event: IpcMainEvent) {
 
 function showFrameMenu(event: IpcMainEvent) {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!browserWindow) {
+    return;
+  }
 
   const frameMenu = Menu.buildFromTemplate([
     {

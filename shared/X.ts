@@ -596,7 +596,11 @@ export interface IXClient {
     data: Buffer | string
   ): void;
   ChangeSaveSet(a: number, wid: number): void;
-  ChangeWindowAttributes(wid: number, values: { eventMask: unknown }, callback: XCbWithErr<[void]>): void;
+  ChangeWindowAttributes(
+    wid: number,
+    values: { eventMask: unknown },
+    callback: XCbWithErr<[void], { error: number }>
+  ): void;
   ClearArea(...args: unknown[]): unknown;
   ConfigureWindow(wid: number, info: Partial<IXConfigureInfo>): void;
   ConvertSelection(...args: unknown[]): unknown;
@@ -704,6 +708,7 @@ export interface IXClient {
 }
 
 export interface IX11Client {
+  on(eventName: "event", callback: (ev: IXEvent) => void): void;
   on(eventName: string, callback: (...args: unknown[]) => void): void;
 }
 
