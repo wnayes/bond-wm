@@ -43,7 +43,7 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
   const onWorkAreaClick = useCallback(() => {
     focusDesktopBrowser({ screenIndex, takeVisualFocus: true });
-  }, []);
+  }, [screenIndex]);
 
   return (
     <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>

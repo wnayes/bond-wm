@@ -21,7 +21,7 @@ export function Clock() {
   useEffect(() => {
     const interval = setInterval(onTimeRefresh, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [onTimeRefresh]);
 
   return (
     <div className="clock" ref={divRef} title={getFormattedCurrentDate()}>
