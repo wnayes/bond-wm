@@ -750,7 +750,7 @@ export function createServer(): XServer {
       }
 
       if (wid === focusedWid && win) {
-        setFocusToDesktopWindow(win.screenIndex);
+        tryReplaceFocusForScreen(win.screenIndex, focusedWid);
       }
     }
 
@@ -1280,6 +1280,13 @@ export function createServer(): XServer {
     return nextFocusWid;
   }
 
+  function tryReplaceFocusForScreen(screenIndex: number, widLosingFocus: number | undefined) {
+    const nextFocusWid = getNextFocusWidForScreen(screenIndex, widLosingFocus);
+    if (typeof nextFocusWid === "number") {
+      setFocus(nextFocusWid);
+    }
+  }
+
   function showWindow(wid: number) {
     let fid;
     const isFrame = isFrameBrowserWin(wid);
@@ -1438,10 +1445,7 @@ export function createServer(): XServer {
 
     if (!screen.currentTags.includes(nextTag)) {
       hideWindow(wid);
-      const nextFocusWid = getNextFocusWidForScreen(win.screenIndex, wid);
-      if (typeof nextFocusWid === "number") {
-        setFocus(nextFocusWid);
-      }
+      tryReplaceFocusForScreen(win.screenIndex, wid);
     }
   }
 
@@ -1687,10 +1691,7 @@ export function createServer(): XServer {
                 }
 
                 if (typeof hidFocusedWid === "number" || !anyWindowHasFocus()) {
-                  const nextFocusWid = getNextFocusWidForScreen(screenIndex, hidFocusedWid);
-                  if (typeof nextFocusWid === "number") {
-                    setFocus(nextFocusWid);
-                  }
+                  tryReplaceFocusForScreen(screenIndex, hidFocusedWid);
                 }
               });
             }
