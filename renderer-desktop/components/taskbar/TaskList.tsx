@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { minimizeWindow, raiseWindow } from "../../../renderer-shared/commands";
 import { useCallback } from "react";
-import { IWindow } from "../../../shared/window";
+import { isUrgent, IWindow } from "../../../shared/window";
 
 interface ITaskListProps {
   windows: IWindow[];
@@ -28,7 +28,7 @@ function TaskListEntry(props: ITaskListEntryProps) {
   if (win.focused) {
     className += " focused";
   }
-  if (win.urgent) {
+  if (isUrgent(win)) {
     className += " urgent";
   }
 

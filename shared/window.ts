@@ -1,4 +1,4 @@
-import type { WMSizeHints } from "./X";
+import { WMHints, WMHintsFlags, WMSizeHints } from "./X";
 import { Coords, IBounds, IGeometry } from "./types";
 
 /** Data describing an X window. */
@@ -13,15 +13,17 @@ export interface IWindow {
   fullscreen: boolean;
   position: WindowPosition;
   focused: boolean;
+  acceptsFocus: boolean | undefined;
   decorated: boolean;
   /** If set, the window should display some sort of attention grabbing indication. */
-  urgent: boolean;
+  urgent: boolean | undefined;
   /** If set, indicates a specific border with the frame should respect. */
   borderWidth: number | undefined;
   title: string | undefined;
   wmClass: [string, string] | undefined;
   screenIndex: number;
   tags: string[];
+  wmHints: WMHints | undefined;
   normalHints: WMSizeHints | undefined;
   dragState: DragState | undefined;
 }
@@ -98,4 +100,35 @@ export function newWidthForWindow(win: IWindow, desiredWidth: number): number {
  */
 export function newHeightForWindow(win: IWindow, desiredHeight: number): number {
   return Math.max(getWindowMinHeight(win), Math.min(getWindowMaxHeight(win), desiredHeight));
+}
+
+export function isUrgent(win: IWindow): boolean {
+  if (typeof win.urgent === "boolean") {
+    return win.urgent;
+  }
+
+  if (win.wmHints) {
+    return hasUrgencyHint(win.wmHints);
+  }
+
+  return false;
+}
+
+function hasUrgencyHint(hints: WMHints): boolean {
+  return !!(hints.flags & WMHintsFlags.UrgencyHint);
+}
+
+export function windowAcceptsFocus(win: IWindow): boolean {
+  if (typeof win.acceptsFocus === "boolean") {
+    return win.acceptsFocus;
+  }
+
+  if (win.wmHints) {
+    return hasInputHint(win.wmHints);
+  }
+  return true;
+}
+
+function hasInputHint(hints: WMHints): boolean {
+  return !!(hints.flags & WMHintsFlags.InputHint) && !!hints.input;
 }

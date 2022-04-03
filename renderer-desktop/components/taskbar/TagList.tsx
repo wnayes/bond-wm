@@ -6,6 +6,7 @@ import { RootState } from "../../../renderer-shared/configureStore";
 import { selectWindowsFromScreen } from "../../../shared/selectors";
 import { setScreenCurrentTagsAction } from "../../../shared/redux/screenSlice";
 import { arraysEqual } from "../../../shared/utils";
+import { isUrgent } from "../../../shared/window";
 
 interface ITagListProps {
   screenIndex: number;
@@ -22,8 +23,8 @@ export function TagList(props: ITagListProps) {
     for (const win of windows) {
       for (const tag of win.tags) {
         if (!map[tag]) {
-          map[tag] = { urgent: win.urgent };
-        } else if (!map[tag].urgent && win.urgent) {
+          map[tag] = { urgent: isUrgent(win) };
+        } else if (!map[tag].urgent && isUrgent(win)) {
           map[tag].urgent = true;
         }
       }

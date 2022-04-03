@@ -1,4 +1,4 @@
-import { IXClient, WMHints, WMHintsFlags, WMSizeHints, XPropMode } from "../shared/X";
+import { IXClient, WMHints, WMSizeHints, XPropMode } from "../shared/X";
 import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
@@ -85,10 +85,6 @@ export async function getWMHints(X: IXClient, wid: number): Promise<WMHints | un
     iconMask: data.readInt32LE(28),
   };
   return hints;
-}
-
-export function hasUrgencyHint(hints: WMHints | null | undefined): boolean {
-  return !!hints && !!(hints.flags & WMHintsFlags.UrgencyHint);
 }
 
 export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHints | undefined> {

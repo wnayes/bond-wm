@@ -45,7 +45,7 @@ import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, hasUrgencyHint } from "./icccm";
+import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
 import { showContextMenu } from "./menus";
@@ -61,7 +61,7 @@ import {
   setWindowVisibleAction,
 } from "../shared/redux/windowSlice";
 import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "../shared/redux/screenSlice";
-import { IWindow } from "../shared/window";
+import { IWindow, windowAcceptsFocus } from "../shared/window";
 import { IScreen } from "../shared/screen";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
@@ -585,8 +585,8 @@ export function createServer(): XServer {
   }
 
   async function manageWindow(wid: number, opts: ManageWindowOpts): Promise<void> {
-    const { checkUnmappedState, focusWindow } = opts;
-    let { screenIndex } = opts;
+    const { checkUnmappedState } = opts;
+    let { screenIndex, focusWindow } = opts;
 
     widLog(wid, `Manage window on screen ${screenIndex}`);
 
@@ -653,10 +653,10 @@ export function createServer(): XServer {
         frameExtents: lastFrameExtents,
         visible: true,
         decorated: hasMotifDecorations(motifHints),
-        urgent: hasUrgencyHint(wmHints),
         title,
         wmClass,
         screenIndex,
+        wmHints,
         normalHints,
       };
 
@@ -704,6 +704,10 @@ export function createServer(): XServer {
       store.dispatch(addWindowAction({ wid, ...win }));
 
       X.MapWindow(fid);
+
+      if (focusWindow && !windowAcceptsFocus(win as IWindow)) {
+        focusWindow = false;
+      }
     }
 
     log("Initial map of wid", wid);
@@ -948,7 +952,10 @@ export function createServer(): XServer {
     const isFrame = isFrameBrowserWin(wid);
     const focusWid = isFrame ? getWindowIdFromFrameId(wid) : wid;
     if (typeof focusWid === "number") {
-      setFocus(focusWid);
+      const win = getWinFromStore(focusWid);
+      if (win && windowAcceptsFocus(win)) {
+        setFocus(focusWid);
+      }
     }
   }
 
@@ -1257,7 +1264,12 @@ export function createServer(): XServer {
     const wins = store.getState().windows;
     for (const widStr in wins) {
       const otherWin = wins[widStr];
-      if (otherWin.id !== widLosingFocus && otherWin.screenIndex === screenIndex && otherWin.visible) {
+      if (
+        otherWin.id !== widLosingFocus &&
+        otherWin.screenIndex === screenIndex &&
+        otherWin.visible &&
+        windowAcceptsFocus(otherWin)
+      ) {
         nextFocusWid = otherWin.id;
 
         // Not breaking here, on the chance that we end up finding the "most recent"
@@ -1332,7 +1344,9 @@ export function createServer(): XServer {
       if (wid) {
         X.RaiseWindow(wid);
       }
+    }
 
+    if (windowAcceptsFocus(win)) {
       setFocus(wid);
     }
   }

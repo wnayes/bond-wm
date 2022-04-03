@@ -2,7 +2,7 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../renderer-shared/configureStore";
 import { useWindowSize } from "../../renderer-shared/hooks";
-
+import { isUrgent } from "../../shared/window";
 import { TitleBar } from "./TitleBar";
 import { WindowClientArea } from "./WindowClientArea";
 
@@ -22,7 +22,7 @@ export function WindowFrame(props: IWindowFrameProps) {
   if (win?.focused) {
     className += " focused";
   }
-  if (win?.urgent) {
+  if (win && isUrgent(win)) {
     className += " urgent";
   }
   if (win?.fullscreen) {
