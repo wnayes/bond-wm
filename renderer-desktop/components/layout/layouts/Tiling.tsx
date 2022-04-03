@@ -1,18 +1,23 @@
 import * as React from "react";
-import { windowShouldFloat } from "../../../../shared/window";
+import { windowIsDialog } from "../../../../shared/window";
 import { ILayout } from "../../../layouts";
 import { ILayoutProps } from "../Layout";
 import { Window } from "../Window";
+import { CenteringContainer } from "../WindowContainers";
 
 export function Tiling({ windows, screen }: ILayoutProps) {
   const windowComponents = [];
-  const floatingWindowComponents = [];
+  const floatingCenterWindowComponents = [];
   const fullscreenWindowComponents = [];
   for (const win of windows) {
     if (win.fullscreen) {
       fullscreenWindowComponents.push(<Window key={win.id} win={win} screen={screen} />);
-    } else if (windowShouldFloat(win)) {
-      floatingWindowComponents.push(<Window key={win.id} win={win} screen={screen} />);
+    } else if (windowIsDialog(win)) {
+      floatingCenterWindowComponents.push(
+        <CenteringContainer key={win.id}>
+          <Window key={win.id} win={win} screen={screen} />
+        </CenteringContainer>
+      );
     } else {
       windowComponents.push(<Window key={win.id} win={win} screen={screen} fill />);
     }
@@ -22,8 +27,8 @@ export function Tiling({ windows, screen }: ILayoutProps) {
     <>
       <div
         style={{
-          display: "grid",
           position: "absolute",
+          display: "grid",
           gridTemplateColumns: windowComponents.length > 1 ? "1fr 1fr" : "1fr",
           height: "100%",
           width: "100%",
@@ -31,15 +36,7 @@ export function Tiling({ windows, screen }: ILayoutProps) {
       >
         {windowComponents}
       </div>
-      <div
-        style={{
-          position: "absolute",
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        {floatingWindowComponents}
-      </div>
+      {floatingCenterWindowComponents}
       {fullscreenWindowComponents}
     </>
   );

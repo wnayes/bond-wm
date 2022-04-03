@@ -135,7 +135,7 @@ function hasInputHint(hints: WMHints): boolean {
   return !!(hints.flags & WMHintsFlags.InputHint) && !!hints.input;
 }
 
-export function windowShouldFloat(win: IWindow): boolean {
+export function windowIsDialog(win: IWindow): boolean {
   if (typeof win.transientFor === "number") {
     return true;
   }
