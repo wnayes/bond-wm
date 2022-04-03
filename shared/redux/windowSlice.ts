@@ -19,6 +19,7 @@ export const windowsSlice = createSlice({
         frameExtents: payload.frameExtents ?? { top: 0, left: 0, right: 0, bottom: 0 },
         visible: payload.visible ?? true,
         fullscreen: false,
+        transientFor: payload.transientFor,
         position: payload.position ?? WindowPosition.Default,
         focused: false,
         acceptsFocus: payload.acceptsFocus,

@@ -20,10 +20,11 @@ export interface IWindowProps {
   fill?: boolean;
 }
 
-export function Window({ win, fill }: IWindowProps) {
+export function Window({ win, screen, fill }: IWindowProps) {
   const winElRef = useRef<HTMLDivElement>(null);
 
   const store = useStore();
+  const workArea = screen.workArea;
 
   const style: React.CSSProperties = {};
 
@@ -49,8 +50,8 @@ export function Window({ win, fill }: IWindowProps) {
         style.position = "absolute";
         style.width = adjustForZoom(win.outer.width);
         style.height = adjustForZoom(win.outer.height);
-        style.left = adjustForZoom(win.outer.x);
-        style.top = adjustForZoom(win.outer.y);
+        style.left = adjustForZoom(win.outer.x) - workArea.x;
+        style.top = adjustForZoom(win.outer.y) - workArea.y;
         break;
     }
 

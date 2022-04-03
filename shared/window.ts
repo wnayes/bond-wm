@@ -11,6 +11,7 @@ export interface IWindow {
   frameExtents: IBounds;
   visible: boolean;
   fullscreen: boolean;
+  transientFor: number | undefined;
   position: WindowPosition;
   focused: boolean;
   acceptsFocus: boolean | undefined;
@@ -132,4 +133,11 @@ export function windowAcceptsFocus(win: IWindow): boolean {
 
 function hasInputHint(hints: WMHints): boolean {
   return !!(hints.flags & WMHintsFlags.InputHint) && !!hints.input;
+}
+
+export function windowShouldFloat(win: IWindow): boolean {
+  if (typeof win.transientFor === "number") {
+    return true;
+  }
+  return false;
 }

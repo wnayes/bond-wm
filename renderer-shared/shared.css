@@ -1,0 +1,9 @@
+.errorDisplay {
+    background: repeating-linear-gradient(
+        45deg,
+        #FFCCCC,
+        #FF9999 10px,
+        #FF7777 10px,
+        #FF3333 20px
+    );
+}

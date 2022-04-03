@@ -4,14 +4,12 @@ import { useWindowSize } from "../../renderer-shared/hooks";
 
 export function Wallpaper() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lastSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
+  const lastImageData = useRef<ImageData | null>(null);
 
   const { width, height } = useWindowSize();
 
   useEffect(() => {
-    // This rendering algorithm is modified from
-    // https://github.com/roytanck/wallpaper-generator
-    // GPL-3.0 License is included at the bottom of this file,
-    // and applies only to this algorithm.
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
@@ -20,6 +18,24 @@ export function Wallpaper() {
     if (!ctx) {
       return;
     }
+
+    // Rough attempt to avoid wallpaper changes when opening devtools.
+    // We can keep the existing wallpaper if we are shrinking.
+    if (width <= lastSizeRef.current.width && height <= lastSizeRef.current.height) {
+      // The canvas blanks when it changes size, so we keep and repaint the old image data.
+      if (lastImageData.current) {
+        ctx.putImageData(lastImageData.current, 0, 0);
+      }
+      return;
+    }
+
+    lastSizeRef.current.width = width;
+    lastSizeRef.current.height = height;
+
+    // This rendering algorithm is modified from
+    // https://github.com/roytanck/wallpaper-generator
+    // GPL-3.0 License is included at the bottom of this file,
+    // and applies only to this algorithm.
 
     // line segments (either few, or fluent lines (200))
     const segments = Math.random() < 0.5 ? 1 + Math.floor(9 * Math.random()) : 200;
@@ -57,6 +73,8 @@ export function Wallpaper() {
       ctx.lineTo(0, startY);
       ctx.fill();
     }
+
+    lastImageData.current = ctx.getImageData(0, 0, width, height);
   }, [width, height]);
 
   return <canvas className="wallpaper" ref={canvasRef} width={width} height={height}></canvas>;

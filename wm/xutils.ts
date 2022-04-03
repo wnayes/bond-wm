@@ -25,6 +25,12 @@ export async function getPropertyValue<TValue>(
     case ExtraAtoms.UTF8_STRING:
       return prop.data.toString() as unknown as TValue;
 
+    case X.atoms.WINDOW:
+      if (prop.data && prop.data.length >= 4) {
+        return prop.data.readInt32LE(0) as unknown as TValue;
+      }
+      return undefined as unknown as TValue;
+
     default:
       log("Unhandled atom property type", prop);
       return undefined as unknown as TValue;

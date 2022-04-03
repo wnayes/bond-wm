@@ -1,7 +1,7 @@
 import { IXClient, WMHints, WMSizeHints, XPropMode } from "../shared/X";
 import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
-import { getRawPropertyValue, internAtomAsync } from "./xutils";
+import { getPropertyValue, getRawPropertyValue, internAtomAsync } from "./xutils";
 
 enum WMStateValue {
   WithdrawnState = 0,
@@ -46,6 +46,10 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
       }
     },
   };
+}
+
+export async function getWMTransientFor(X: IXClient, wid: number): Promise<number | undefined> {
+  return await getPropertyValue<number>(X, wid, X.atoms.WM_TRANSIENT_FOR, X.atoms.WINDOW);
 }
 
 /** Obtains the WM_CLASS X property value for a window. */

@@ -45,7 +45,7 @@ import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints } from "./icccm";
+import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { ContextMenuKind } from "../shared/ContextMenuKind";
 import { showContextMenu } from "./menus";
@@ -609,9 +609,10 @@ export function createServer(): XServer {
       getWMHints(X, wid),
       getNormalHints(X, wid),
       motif.getMotifHints(wid),
+      getWMTransientFor(X, wid),
     ]);
 
-    const [attrs, clientGeom, title, wmClass, wmHints, normalHints, motifHints] = values;
+    const [attrs, clientGeom, title, wmClass, wmHints, normalHints, motifHints, transientFor] = values;
     log(`got values for ${wid}:`, values);
 
     const isOverrideRedirect = attrs.overrideRedirect === 1;
@@ -646,6 +647,7 @@ export function createServer(): XServer {
         },
         frameExtents: lastFrameExtents,
         visible: true,
+        transientFor,
         decorated: hasMotifDecorations(motifHints),
         title,
         wmClass,

@@ -20,6 +20,7 @@ export function Floating({ windows, screen }: ILayoutProps) {
         style={{
           height: "100%",
           width: "100%",
+          position: "absolute",
         }}
       >
         {windowComponents}
