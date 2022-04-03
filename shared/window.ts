@@ -26,6 +26,7 @@ export interface IWindow {
   wmHints: WMHints | undefined;
   normalHints: WMSizeHints | undefined;
   dragState: DragState | undefined;
+  sizeBeforeFullscreen: IGeometry | undefined;
 }
 
 export enum WindowPosition {

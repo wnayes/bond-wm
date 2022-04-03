@@ -32,6 +32,7 @@ export const windowsSlice = createSlice({
         wmHints: payload.wmHints,
         normalHints: payload.normalHints,
         dragState: undefined,
+        sizeBeforeFullscreen: undefined,
       };
     },
 
@@ -104,7 +105,18 @@ export const windowsSlice = createSlice({
     setWindowFullscreenAction: (state, action: PayloadAction<{ wid: number; fullscreen: boolean }>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
-        state[payload.wid].fullscreen = payload.fullscreen;
+        const { fullscreen } = payload;
+        const win = state[payload.wid];
+        win.fullscreen = fullscreen;
+
+        // We keep track of the prior size before fullscreen and restore it when leaving fullscreen.
+        // This is necessary for floating, where the window would otherwise remain effectively fullscreen,
+        // since the layout wouldn't alter its "current size" (which happens to be fullscreen).
+        if (fullscreen) {
+          win.sizeBeforeFullscreen = win.outer;
+        } else if (win.sizeBeforeFullscreen) {
+          win.outer = win.sizeBeforeFullscreen;
+        }
       }
     },
 

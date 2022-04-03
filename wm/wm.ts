@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds } from "../shared/types";
+import { IBounds, IGeometry } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -55,6 +55,7 @@ import {
   focusWindowAction,
   removeWindowAction,
   setFrameExtentsAction,
+  setWindowFullscreenAction,
   setWindowIntoScreenAction,
   setWindowTagsAction,
   setWindowTitleAction,
@@ -70,13 +71,6 @@ import { createDragModule } from "./drag";
 import { getArgs } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
-
-interface Geometry {
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-}
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
@@ -473,7 +467,7 @@ export function createServer(): XServer {
     return handle;
   }
 
-  function createFrameBrowser(wid: number, screen: IScreen, geometry: Geometry) {
+  function createFrameBrowser(wid: number, screen: IScreen, geometry: IGeometry) {
     const win = new BrowserWindow({
       frame: false,
       width: geometry.width,
@@ -777,7 +771,7 @@ export function createServer(): XServer {
     return true;
   }
 
-  function getGeometryForWindow(clientGeom: XGeometry, normalHints: WMSizeHints | undefined): Geometry {
+  function getGeometryForWindow(clientGeom: XGeometry, normalHints: WMSizeHints | undefined): IGeometry {
     const effectiveGeometry = {
       height: clientGeom.height,
       width: clientGeom.width,
@@ -1116,9 +1110,9 @@ export function createServer(): XServer {
    * But if Xinerama is in play, we may have multiple logical screens
    * represented within a single screen.
    */
-  function getScreenGeometries(screen: IXScreen): Promise<Geometry[]> {
+  function getScreenGeometries(screen: IXScreen): Promise<IGeometry[]> {
     return new Promise((resolve) => {
-      const defaultGeometry: Geometry = {
+      const defaultGeometry: IGeometry = {
         x: 0,
         y: 0,
         width: screen.pixel_width,
@@ -1553,6 +1547,17 @@ export function createServer(): XServer {
     return store.getState().windows[wid];
   }
 
+  function configureWindow(wid: number, fid: number, win: IWindow, frameConfig: IGeometry): void {
+    X.ConfigureWindow(fid, frameConfig);
+
+    if (fid !== wid && win) {
+      X.ConfigureWindow(wid, {
+        width: win.outer.width - win.frameExtents.left - win.frameExtents.right,
+        height: win.outer.height - win.frameExtents.top - win.frameExtents.bottom,
+      });
+    }
+  }
+
   function __setupStore(): ServerStore {
     const loggerMiddleware: Middleware = function ({ getState }) {
       return (next) => (action) => {
@@ -1578,13 +1583,12 @@ export function createServer(): XServer {
           case configureWindowAction.type:
             {
               const state = getState();
-              const payload: Partial<Geometry> = action.payload;
+              const payload: Partial<IGeometry> = action.payload;
               const wid = action.payload.wid;
               const win = state.windows[wid];
               const screen = state.screens[win.screenIndex];
 
-              const fid = getFrameIdFromWindowId(wid) ?? wid;
-              const frameConfig: Partial<Geometry> = {};
+              const frameConfig: Partial<IGeometry> = {};
               if (typeof payload.x === "number") {
                 frameConfig.x = screen.x + payload.x;
               }
@@ -1597,6 +1601,8 @@ export function createServer(): XServer {
               if (typeof payload.height === "number") {
                 frameConfig.height = payload.height;
               }
+
+              const fid = getFrameIdFromWindowId(wid) ?? wid;
               widLog(fid, "Configuring from X11 middleware", frameConfig);
               X.ConfigureWindow(fid, frameConfig);
 
@@ -1605,6 +1611,27 @@ export function createServer(): XServer {
                   width: (payload.width ?? win.outer.width) - win.frameExtents.left - win.frameExtents.right,
                   height: (payload.height ?? win.outer.height) - win.frameExtents.top - win.frameExtents.bottom,
                 });
+              }
+            }
+            break;
+          case setWindowFullscreenAction.type:
+            {
+              // Restore the window to its location prior to going fullscreen.
+              // We need to do this here since some layouts (floating) won't bother to move the window.
+              const { wid, fullscreen } = action.payload as { wid: number; fullscreen: boolean };
+              if (!fullscreen) {
+                const state = getState();
+                const win = state.windows[wid];
+                const screen = state.screens[win.screenIndex];
+                const fid = getFrameIdFromWindowId(wid) ?? wid;
+                const frameConfig = {
+                  x: screen.x + win.outer.x,
+                  y: screen.y + win.outer.y,
+                  width: win.outer.width,
+                  height: win.outer.height,
+                };
+                widLog(fid, "Configuring window after leaving fullscreen", frameConfig);
+                configureWindow(wid, fid, win, frameConfig);
               }
             }
             break;
