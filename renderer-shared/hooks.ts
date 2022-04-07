@@ -12,7 +12,7 @@ export function useWindowSize(): { width: number; height: number } {
   useEffect(() => {
     window.addEventListener("resize", resizeHandler);
     return () => window.removeEventListener("resize", resizeHandler);
-  }, []);
+  }, [resizeHandler]);
 
   return {
     width,

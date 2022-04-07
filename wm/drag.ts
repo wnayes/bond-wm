@@ -1,4 +1,5 @@
 import { configureWindowAction, endDragAction, startDragAction } from "../shared/redux/windowSlice";
+import { selectWindowMaximizeCanTakeEffect } from "../shared/selectors";
 import { Coords, IGeometry } from "../shared/types";
 import { IWindow, newHeightForWindow, newWidthForWindow, ResizeDirection } from "../shared/window";
 import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "../shared/X";
@@ -19,7 +20,7 @@ export async function createDragModule({
 }: XWMContext): Promise<DragModule> {
   function endMoveResize(wid: number): void {
     const win = store.getState().windows[wid];
-    if (!win || !win.dragState) {
+    if (!win || !win._dragState) {
       return;
     }
 
@@ -53,8 +54,14 @@ export async function createDragModule({
 
   return {
     startMove(wid, coords) {
+      const state = store.getState();
       const win = store.getState().windows[wid];
-      if (!win || win.dragState) {
+      if (
+        !win ||
+        win._dragState ||
+        (win.maximized && selectWindowMaximizeCanTakeEffect(state, wid)) ||
+        win.fullscreen
+      ) {
         return;
       }
 
@@ -66,8 +73,15 @@ export async function createDragModule({
     },
 
     startResize(wid, coords, direction) {
+      const state = store.getState();
       const win = store.getState().windows[wid];
-      if (!win || win.dragState) {
+      if (
+        !win ||
+        win._dragState ||
+        (win.maximized && selectWindowMaximizeCanTakeEffect(state, wid)) ||
+        win.fullscreen
+      ) {
+        log("Choosing to not start resize for " + wid, coords, ResizeDirection[direction]);
         return;
       }
 
@@ -90,11 +104,11 @@ export async function createDragModule({
       }
 
       const win = store.getState().windows[wid];
-      if (!win || !win.dragState || !win.dragState.startOuterSize || !win.dragState.startCoordinates) {
+      if (!win || !win._dragState || !win._dragState.startOuterSize || !win._dragState.startCoordinates) {
         return;
       }
 
-      const { startOuterSize, startCoordinates } = win.dragState;
+      const { startOuterSize, startCoordinates } = win._dragState;
       const xDiff = rootx - startCoordinates[0];
       const yDiff = rooty - startCoordinates[1];
 
@@ -111,7 +125,7 @@ export async function createDragModule({
         );
       }
 
-      if (win.dragState.moving) {
+      if (win._dragState.moving) {
         configureWindow(win, {
           x: startOuterSize.x + xDiff,
           y: startOuterSize.y + yDiff,
@@ -119,8 +133,8 @@ export async function createDragModule({
         return;
       }
 
-      if (typeof win.dragState.resize === "number") {
-        switch (win.dragState.resize) {
+      if (typeof win._dragState.resize === "number") {
+        switch (win._dragState.resize) {
           case ResizeDirection.TopLeft:
             configureWindow(win, {
               x: startOuterSize.x + xDiff,

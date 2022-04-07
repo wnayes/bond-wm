@@ -7,6 +7,19 @@ import { WindowPosition } from "./window";
 
 const _layouts = ["Floating", "Tiling"];
 
+interface ILayoutMetadata {
+  supportsMaximize: boolean;
+}
+
+const _layoutMetadata: { [layoutName: string]: ILayoutMetadata } = {
+  Floating: {
+    supportsMaximize: true,
+  },
+  Tiling: {
+    supportsMaximize: false,
+  },
+};
+
 export function getLayoutNames(): string[] {
   return _layouts;
 }
@@ -39,4 +52,8 @@ export function switchToNextLayout(store: SharedStore, screenIndex: number): voi
       }
     }
   });
+}
+
+export function layoutSupportsMaximize(layoutName: string): boolean {
+  return _layoutMetadata[layoutName]?.supportsMaximize ?? false;
 }

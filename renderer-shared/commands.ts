@@ -10,6 +10,14 @@ export function minimizeWindow(wid: number) {
   ipcRenderer.send("minimize-window", wid);
 }
 
+export function maximizeWindow(wid: number) {
+  ipcRenderer.send("maximize-window", wid);
+}
+
+export function restoreWindow(wid: number) {
+  ipcRenderer.send("restore-window", wid);
+}
+
 export function closeWindow(wid: number) {
   ipcRenderer.send("close-window", wid);
 }

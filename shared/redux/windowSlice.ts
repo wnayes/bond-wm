@@ -18,6 +18,7 @@ export const windowsSlice = createSlice({
         outer: payload.outer ?? { height: 0, width: 0, x: 0, y: 0 },
         frameExtents: payload.frameExtents ?? { top: 0, left: 0, right: 0, bottom: 0 },
         visible: payload.visible ?? true,
+        maximized: payload.maximized ?? false,
         fullscreen: false,
         transientFor: payload.transientFor,
         position: payload.position ?? WindowPosition.Default,
@@ -32,8 +33,8 @@ export const windowsSlice = createSlice({
         tags: payload.tags ?? [],
         wmHints: payload.wmHints,
         normalHints: payload.normalHints,
-        dragState: undefined,
-        sizeBeforeFullscreen: undefined,
+        _dragState: undefined,
+        _originalSize: undefined,
       };
     },
 
@@ -103,6 +104,18 @@ export const windowsSlice = createSlice({
       }
     },
 
+    setWindowMaximizedAction: (state, action: PayloadAction<{ wid: number; maximized: boolean }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        const { maximized } = payload;
+        const win = state[payload.wid];
+        win.maximized = maximized;
+
+        // Same reasoning as fullscreen.
+        updateOriginalSizeState(win, maximized);
+      }
+    },
+
     setWindowFullscreenAction: (state, action: PayloadAction<{ wid: number; fullscreen: boolean }>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
@@ -113,11 +126,7 @@ export const windowsSlice = createSlice({
         // We keep track of the prior size before fullscreen and restore it when leaving fullscreen.
         // This is necessary for floating, where the window would otherwise remain effectively fullscreen,
         // since the layout wouldn't alter its "current size" (which happens to be fullscreen).
-        if (fullscreen) {
-          win.sizeBeforeFullscreen = win.outer;
-        } else if (win.sizeBeforeFullscreen) {
-          win.outer = win.sizeBeforeFullscreen;
-        }
+        updateOriginalSizeState(win, fullscreen);
       }
     },
 
@@ -158,7 +167,7 @@ export const windowsSlice = createSlice({
     ) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
-        state[payload.wid].dragState = {
+        state[payload.wid]._dragState = {
           moving: payload.moving,
           resize: payload.resize,
           startCoordinates: payload.coords,
@@ -171,7 +180,7 @@ export const windowsSlice = createSlice({
     endDragAction: (state, action: PayloadAction<{ wid: number }>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
-        state[payload.wid].dragState = undefined;
+        state[payload.wid]._dragState = undefined;
       }
     },
   },
@@ -185,6 +194,17 @@ function assertWidInState(state: WindowsState, action: PayloadAction<{ wid: numb
   return false;
 }
 
+function updateOriginalSizeState(win: IWindow, setIt: boolean): void {
+  if (setIt) {
+    if (!win._originalSize) {
+      win._originalSize = win.outer;
+    }
+  } else if (win._originalSize) {
+    win.outer = win._originalSize;
+    win._originalSize = undefined;
+  }
+}
+
 export const {
   addWindowAction,
   removeWindowAction,
@@ -194,6 +214,7 @@ export const {
   setWindowTagsAction,
   focusWindowAction,
   setWindowTitleAction,
+  setWindowMaximizedAction,
   setWindowFullscreenAction,
   setWindowPositionAction,
   setWindowVisibleAction,

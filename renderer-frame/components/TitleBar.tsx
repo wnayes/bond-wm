@@ -1,15 +1,26 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { closeWindow, showContextMenu } from "../../renderer-shared/commands";
+import { useSelector } from "react-redux";
+import {
+  closeWindow,
+  maximizeWindow,
+  minimizeWindow,
+  restoreWindow,
+  showContextMenu,
+} from "../../renderer-shared/commands";
+import { RootState } from "../../renderer-shared/configureStore";
 import { ContextMenuKind } from "../../shared/ContextMenuKind";
+import { selectWindowMaximizeCanTakeEffect } from "../../shared/selectors";
 import { IWindow } from "../../shared/window";
 
 interface ITitleBarProps {
-  window: IWindow;
+  win: IWindow;
 }
 
 export function TitleBar(props: ITitleBarProps) {
-  const window = props.window;
+  const { win } = props;
+
+  const supportsMaximize = useSelector((state: RootState) => selectWindowMaximizeCanTakeEffect(state, win.id));
 
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -19,26 +30,73 @@ export function TitleBar(props: ITitleBarProps) {
 
   return (
     <div className="winTitleBar" onContextMenu={onContextMenu}>
-      <span className="winTitleBarText">{window.title}</span>
-      <TitleBarCloseButton window={window} />
+      <span className="winTitleBarText">{win.title}</span>
+      <TitleBarMinimizeButton win={win} />
+      {supportsMaximize && <TitleBarMaximizeButton win={win} />}
+      <TitleBarCloseButton win={win} />
     </div>
   );
 }
 
 interface ITitleBarCloseButtonProps {
-  window: IWindow;
+  win: IWindow;
 }
 
 function TitleBarCloseButton(props: ITitleBarCloseButtonProps) {
-  const window = props.window;
+  const { win } = props;
 
+  const winId = win.id;
   const onClick = useCallback(() => {
-    closeWindow(window.id);
-  }, [window]);
+    closeWindow(winId);
+  }, [winId]);
 
   return (
-    <div className="winTitleBarCloseBtn" onClick={onClick}>
-      X
+    <div className="winTitleBarBtn winTitleBarCloseBtn" onClick={onClick} title="Close">
+      <img className="winTitleBarBtnIcon" src="./assets/close.svg" />
+    </div>
+  );
+}
+
+interface ITitleBarMaximizeButtonProps {
+  win: IWindow;
+}
+
+function TitleBarMaximizeButton(props: ITitleBarMaximizeButtonProps) {
+  const { win } = props;
+
+  const onClick = useCallback(() => {
+    if (win.maximized) {
+      restoreWindow(win.id);
+    } else {
+      maximizeWindow(win.id);
+    }
+  }, [win]);
+
+  const graphic = win.maximized ? "./assets/restore.svg" : "./assets/maximize.svg";
+  const tooltip = win.maximized ? "Restore" : "Maximize";
+
+  return (
+    <div className="winTitleBarBtn winTitleBarMaximizeBtn" onClick={onClick} title={tooltip}>
+      <img className="winTitleBarBtnIcon" src={graphic} />
+    </div>
+  );
+}
+
+interface ITitleBarMinimizeButtonProps {
+  win: IWindow;
+}
+
+function TitleBarMinimizeButton(props: ITitleBarMinimizeButtonProps) {
+  const { win } = props;
+
+  const winId = win.id;
+  const onClick = useCallback(() => {
+    minimizeWindow(winId);
+  }, [winId]);
+
+  return (
+    <div className="winTitleBarBtn winTitleBarMinimizeBtn" onClick={onClick} title="Minimize">
+      <img className="winTitleBarBtnIcon" src="./assets/minimize.svg" />
     </div>
   );
 }

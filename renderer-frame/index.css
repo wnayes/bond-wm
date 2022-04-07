@@ -36,7 +36,7 @@ html, body {
     background-color: #c3723d;
     border-color: #c3723d;
 }
-.winWrapper.fullscreen {
+.winWrapper.fullscreen, .winWrapper.maximized {
     border-width: 0;
 }
 
@@ -65,17 +65,41 @@ html, body {
     font-weight: bold;
 }
 
-.winTitleBarCloseBtn {
+.winTitleBarBtn {
     display: inline-block;
-    width: 40px;
     height: 19px;
     text-align: center;
 
     -webkit-app-region: no-drag;
 }
+
+.winTitleBarCloseBtn {
+    width: 39px;
+}
 .winTitleBarCloseBtn:hover {
     font-weight: bold;
     background-color: #FF6961;
+}
+
+.winTitleBarMinimizeBtn {
+    width: 23px;
+}
+.winTitleBarMinimizeBtn:hover {
+    font-weight: bold;
+    background-color: #cea32f;
+}
+
+.winTitleBarMaximizeBtn {
+    width: 23px;
+}
+.winTitleBarMaximizeBtn:hover {
+    font-weight: bold;
+    background-color: #0daa49;
+}
+
+.winTitleBarBtnIcon {
+    height: 11px;
+    padding-top: 4px;
 }
 
 .winBox {

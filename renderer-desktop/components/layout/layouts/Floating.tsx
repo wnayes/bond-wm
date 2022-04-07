@@ -7,13 +7,18 @@ import { BasicFillContainer, CenteringContainer } from "../WindowContainers";
 
 export function Floating({ windows, screen }: ILayoutProps) {
   const windowComponents = [];
-  const floatingCenterWindowComponents = [];
-  const fullscreenWindowComponents = [];
+  const isolatedWindowComponents = [];
   for (const win of windows) {
     if (win.fullscreen) {
-      fullscreenWindowComponents.push(<Window key={win.id} win={win} screen={screen} />);
+      isolatedWindowComponents.push(<Window key={win.id} win={win} screen={screen} />);
+    } else if (win.maximized) {
+      isolatedWindowComponents.push(
+        <BasicFillContainer key={win.id}>
+          <Window key={win.id} win={win} screen={screen} />
+        </BasicFillContainer>
+      );
     } else if (windowIsDialog(win)) {
-      floatingCenterWindowComponents.push(
+      isolatedWindowComponents.push(
         <CenteringContainer key={win.id}>
           <Window key={win.id} win={win} screen={screen} />
         </CenteringContainer>
@@ -26,8 +31,7 @@ export function Floating({ windows, screen }: ILayoutProps) {
   return (
     <>
       <BasicFillContainer>{windowComponents}</BasicFillContainer>
-      {floatingCenterWindowComponents}
-      {fullscreenWindowComponents}
+      {isolatedWindowComponents}
     </>
   );
 }

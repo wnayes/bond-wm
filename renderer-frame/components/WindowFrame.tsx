@@ -28,6 +28,9 @@ export function WindowFrame(props: IWindowFrameProps) {
   if (win?.fullscreen) {
     className += " fullscreen";
   }
+  if (win?.maximized) {
+    className += " maximized";
+  }
 
   const style: React.CSSProperties = {};
   if (typeof win?.borderWidth === "number") {
@@ -36,7 +39,7 @@ export function WindowFrame(props: IWindowFrameProps) {
 
   let titlebar;
   if (win?.decorated && !win?.fullscreen) {
-    titlebar = <TitleBar window={win} />;
+    titlebar = <TitleBar win={win} />;
   }
 
   useWindowSize(); // Triggers re-renders on resize.

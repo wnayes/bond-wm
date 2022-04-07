@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
-import { useStore } from "react-redux";
+import { useSelector, useStore } from "react-redux";
 import {
   getWindowMaxHeight,
   getWindowMaxWidth,
@@ -13,6 +13,8 @@ import { geometriesDiffer } from "../../../shared/utils";
 import { configureWindowAction } from "../../../shared/redux/windowSlice";
 import { IScreen } from "../../../shared/screen";
 import { getBoundingClientRectWithZoom } from "../../../renderer-shared/dom";
+import { selectWindowMaximizeCanTakeEffect } from "../../../shared/selectors";
+import { SharedRootState } from "../../../shared/redux/basicStore";
 
 export interface IWindowProps {
   win: IWindow;
@@ -26,12 +28,17 @@ export function Window({ win, screen, fill }: IWindowProps) {
   const store = useStore();
   const workArea = screen.workArea;
 
+  const maximizeSupported = useSelector((state: SharedRootState) => selectWindowMaximizeCanTakeEffect(state, win.id));
+
   const style: React.CSSProperties = {};
 
   if (win.fullscreen) {
     style.position = "fixed";
     style.left = 0;
     style.top = 0;
+    style.width = "100%";
+    style.height = "100%";
+  } else if (maximizeSupported && win.maximized) {
     style.width = "100%";
     style.height = "100%";
   } else {

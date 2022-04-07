@@ -57,6 +57,7 @@ import {
   setFrameExtentsAction,
   setWindowFullscreenAction,
   setWindowIntoScreenAction,
+  setWindowMaximizedAction,
   setWindowTagsAction,
   setWindowTitleAction,
   setWindowVisibleAction,
@@ -293,6 +294,14 @@ export function createServer(): XServer {
 
     ipcMain.on("minimize-window", (event, wid) => {
       minimize(wid);
+    });
+
+    ipcMain.on("maximize-window", (event, wid) => {
+      maximize(wid);
+    });
+
+    ipcMain.on("restore-window", (event, wid) => {
+      restore(wid);
     });
 
     ipcMain.on("close-window", (event, wid) => {
@@ -1314,7 +1323,7 @@ export function createServer(): XServer {
   }
 
   /** Hides a window without destroying its frame. */
-  function hideWindow(wid: number) {
+  function hideWindow(wid: number): void {
     const fid = getFrameIdFromWindowId(wid);
 
     runXCallsWithoutEvents(wid, () => {
@@ -1331,7 +1340,7 @@ export function createServer(): XServer {
     }
   }
 
-  function raiseWindow(wid: number) {
+  function raiseWindow(wid: number): void {
     const win = getWinFromStore(wid);
     if (!win) {
       return;
@@ -1354,12 +1363,33 @@ export function createServer(): XServer {
     }
   }
 
-  function minimize(wid: number) {
+  function minimize(wid: number): void {
     widLog(wid, "minimize");
     hideWindow(wid);
   }
 
-  function setFocus(wid: number) {
+  function maximize(wid: number): void {
+    widLog(wid, "maximize");
+    setWindowMaximized(wid, true);
+  }
+
+  function restore(wid: number): void {
+    widLog(wid, "restore");
+    setWindowMaximized(wid, false);
+  }
+
+  function setWindowMaximized(wid: number, maximized: boolean): void {
+    const win = getWinFromStore(wid);
+    if (!win) {
+      return;
+    }
+
+    if (win.maximized !== maximized) {
+      store.dispatch(setWindowMaximizedAction({ wid, maximized }));
+    }
+  }
+
+  function setFocus(wid: number): void {
     if (isClientWin(wid)) {
       setXInputFocus(wid);
 
@@ -1564,6 +1594,20 @@ export function createServer(): XServer {
     }
   }
 
+  function configureToCurrentSize(state: ServerRootState, wid: number): void {
+    const win = state.windows[wid];
+    const screen = state.screens[win.screenIndex];
+    const fid = getFrameIdFromWindowId(wid) ?? wid;
+    const frameConfig = {
+      x: screen.x + win.outer.x,
+      y: screen.y + win.outer.y,
+      width: win.outer.width,
+      height: win.outer.height,
+    };
+    widLog(fid, "Configuring window to current size", frameConfig);
+    configureWindow(wid, fid, win, frameConfig);
+  }
+
   function __setupStore(): ServerStore {
     const loggerMiddleware: Middleware = function ({ getState }) {
       return (next) => (action) => {
@@ -1620,24 +1664,22 @@ export function createServer(): XServer {
               }
             }
             break;
+          case setWindowMaximizedAction.type:
+            {
+              // Restore the window to its location prior to going maximized.
+              // We need to do this here since some layouts (floating) won't bother to move the window.
+              const { wid, maximized } = action.payload as { wid: number; maximized: boolean };
+              if (!maximized) {
+                configureToCurrentSize(getState(), wid);
+              }
+            }
+            break;
           case setWindowFullscreenAction.type:
             {
               // Restore the window to its location prior to going fullscreen.
-              // We need to do this here since some layouts (floating) won't bother to move the window.
               const { wid, fullscreen } = action.payload as { wid: number; fullscreen: boolean };
               if (!fullscreen) {
-                const state = getState();
-                const win = state.windows[wid];
-                const screen = state.screens[win.screenIndex];
-                const fid = getFrameIdFromWindowId(wid) ?? wid;
-                const frameConfig = {
-                  x: screen.x + win.outer.x,
-                  y: screen.y + win.outer.y,
-                  width: win.outer.width,
-                  height: win.outer.height,
-                };
-                widLog(fid, "Configuring window after leaving fullscreen", frameConfig);
-                configureWindow(wid, fid, win, frameConfig);
+                configureToCurrentSize(getState(), wid);
               }
             }
             break;

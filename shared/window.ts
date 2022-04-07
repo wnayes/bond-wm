@@ -10,6 +10,7 @@ export interface IWindow {
   /** Size of the frame border around each side of the window. */
   frameExtents: IBounds;
   visible: boolean;
+  maximized: boolean;
   fullscreen: boolean;
   transientFor: number | undefined;
   position: WindowPosition;
@@ -26,8 +27,8 @@ export interface IWindow {
   tags: string[];
   wmHints: WMHints | undefined;
   normalHints: WMSizeHints | undefined;
-  dragState: DragState | undefined;
-  sizeBeforeFullscreen: IGeometry | undefined;
+  _dragState: DragState | undefined;
+  _originalSize: IGeometry | undefined;
 }
 
 export enum WindowPosition {
