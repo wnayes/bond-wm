@@ -21,11 +21,13 @@ export function Taskbar(props: ITaskbarProps) {
 
   return (
     <div className="taskbar">
-      <TagList screenIndex={props.screenIndex} />
-      {showingRun && <RunField />}
-      <TaskList windows={windows} />
-      <Clock />
-      <LayoutIndicator screenIndex={props.screenIndex} />
+      <>
+        <TagList screenIndex={props.screenIndex} />
+        {showingRun && <RunField />}
+        <TaskList windows={windows} />
+        <Clock />
+        <LayoutIndicator screenIndex={props.screenIndex} />
+      </>
     </div>
   );
 }

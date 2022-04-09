@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import { Provider } from "react-redux";
 
@@ -15,10 +15,10 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
   const wid = parseInt(widParam, 10);
   console.log("wid", wid);
 
-  ReactDOM.render(
+  const reactRoot = createRoot(container);
+  reactRoot.render(
     <Provider store={store}>
       <WindowFrame wid={wid} />
-    </Provider>,
-    container
+    </Provider>
   );
 }

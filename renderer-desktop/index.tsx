@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { Desktop } from "./components/Desktop";
 import { configureRendererStore } from "../renderer-shared/configureStore";
@@ -14,11 +14,11 @@ const store = configureRendererStore();
 (window as any).store = store; // eslint-disable-line
 setupIpc(store, screenIndex);
 
-ReactDOM.render(
+const reactRoot = createRoot(document.getElementById("content")!);
+reactRoot.render(
   <Provider store={store}>
     <Desktop screenIndex={screenIndex} />
-  </Provider>,
-  document.getElementById("content")
+  </Provider>
 );
 
 hookShortcuts(document.body);
