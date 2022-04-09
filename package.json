@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.1",
-    "electron": "^17.4.0",
+    "electron": "^18.0.3",
     "electron-redux": "2.0.0-alpha.9",
     "keysym": "^0.0.6",
     "react": "^18.0.0",
