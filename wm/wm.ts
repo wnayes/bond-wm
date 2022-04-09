@@ -1015,12 +1015,16 @@ export function createServer(): XServer {
       return;
     }
 
+    raiseWindow(wid);
+
     widLog(wid, "onButtonPress", ev);
   }
 
   function onButtonRelease(ev: IXButtonReleaseEvent) {
     const { wid } = ev;
-    widLog(wid, "onButtonPress", ev);
+    widLog(wid, "onButtonRelease", ev);
+
+    raiseWindow(wid);
 
     eventConsumers.forEach((consumer) =>
       consumer.onButtonRelease?.({
@@ -1341,6 +1345,12 @@ export function createServer(): XServer {
   }
 
   function raiseWindow(wid: number): void {
+    if (isFrameBrowserWin(wid)) {
+      const trueWid = getWindowIdFromFrameId(wid);
+      assert(typeof trueWid === "number");
+      wid = trueWid;
+    }
+
     const win = getWinFromStore(wid);
     if (!win) {
       return;
