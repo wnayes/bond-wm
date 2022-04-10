@@ -52,14 +52,14 @@ html, body {
 }
 
 .tasklistentry {
-    display: inline-block;
+    display: flex;
     flex: 1 1 0;
     vertical-align: middle;
     min-width: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     height: 100%;
-    line-height: 20px;
+    line-height: 22px;
     padding: 0 0.5em;
     margin: 0 0 0 1px;
     cursor: default;
@@ -77,6 +77,19 @@ html, body {
 }
 .tasklistentry:not(.focused):hover {
     background-color: #BBBBBB;
+}
+
+.tasklistentrytext {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tasklistentryicon {
+    height: 16px;
+    width: 16px;
+    margin-top: 2px;
+    margin-right: 3px;
 }
 
 .taglist {

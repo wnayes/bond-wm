@@ -1,13 +1,13 @@
 import { setWindowFullscreenAction } from "../shared/redux/windowSlice";
 import { numsToBuffer } from "../shared/utils";
 import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "../shared/X";
-import { log } from "./log";
+import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
-import { internAtomAsync } from "./xutils";
+import { getRawPropertyValue, internAtomAsync } from "./xutils";
 import { pid } from "process";
 import { DragModule } from "./drag";
 import { Coords } from "../shared/types";
-import { ResizeDirection } from "../shared/window";
+import { IIconInfo, ResizeDirection } from "../shared/window";
 
 enum NetWmStateAction {
   _NET_WM_STATE_REMOVE = 0,
@@ -63,15 +63,21 @@ function netWMMoveResizeTypeToInternal(newWmMoveResizeType: NetWmMoveResizeType)
   }
 }
 
+export interface EWMHModule extends IXWMEventConsumer {
+  getNetWmIcons(wid: number): Promise<IIconInfo[]>;
+}
+
 export async function createEWMHEventConsumer(
   { X, store, getWindowIdFromFrameId }: XWMContext,
   dragModule: DragModule
-): Promise<IXWMEventConsumer> {
+): Promise<EWMHModule> {
   const atoms = {
     _NET_SUPPORTED: await internAtomAsync(X, "_NET_SUPPORTED"),
     _NET_SUPPORTING_WM_CHECK: await internAtomAsync(X, "_NET_SUPPORTING_WM_CHECK"),
 
     _NET_WM_NAME: await internAtomAsync(X, "_NET_WM_NAME"),
+
+    _NET_WM_ICON: await internAtomAsync(X, "_NET_WM_ICON"),
 
     _NET_WM_STATE: await internAtomAsync(X, "_NET_WM_STATE"),
     _NET_WM_STATE_FULLSCREEN: await internAtomAsync(X, "_NET_WM_STATE_FULLSCREEN"),
@@ -241,6 +247,38 @@ export async function createEWMHEventConsumer(
       extentsInts.writeInt32LE(frameExtents.bottom, 12);
 
       X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_FRAME_EXTENTS, X.atoms.CARDINAL, 32, extentsInts);
+    },
+
+    async getNetWmIcons(wid: number): Promise<IIconInfo[]> {
+      const { data } = await getRawPropertyValue(X, wid, atoms._NET_WM_ICON, X.atoms.CARDINAL);
+      if (!data) {
+        return [];
+      }
+
+      const icons: IIconInfo[] = [];
+      const dataLength = data.byteLength;
+      let i = 0;
+      while (i < dataLength) {
+        const info: IIconInfo = {
+          width: data.readInt32LE(i),
+          height: data.readInt32LE(i + 4),
+          data: [],
+        };
+        i += 8;
+        for (let j = 0; j < info.width * info.height; j++) {
+          if (i >= dataLength) {
+            logError("Icon data truncated for " + wid);
+            break;
+          }
+
+          info.data.push(data.readUint32LE(i));
+          i += 4;
+        }
+
+        icons.push(info);
+      }
+
+      return icons;
     },
   };
 }

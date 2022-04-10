@@ -27,8 +27,15 @@ export interface IWindow {
   tags: string[];
   wmHints: WMHints | undefined;
   normalHints: WMSizeHints | undefined;
+  icons: IIconInfo[] | undefined;
   _dragState: DragState | undefined;
   _originalSize: IGeometry | undefined;
+}
+
+export interface IIconInfo {
+  width: number;
+  height: number;
+  data: number[];
 }
 
 export enum WindowPosition {

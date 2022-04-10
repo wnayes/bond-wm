@@ -189,6 +189,7 @@ export function createServer(): XServer {
 
   const eventConsumers: IXWMEventConsumer[] = [];
 
+  let ewmhModule: AsyncReturnType<typeof createEWMHEventConsumer>;
   let dragModule: AsyncReturnType<typeof createDragModule>;
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
@@ -275,7 +276,8 @@ export function createServer(): XServer {
       dragModule = await createDragModule(context);
       eventConsumers.push(dragModule);
       eventConsumers.push(await createICCCMEventConsumer(context));
-      eventConsumers.push(await createEWMHEventConsumer(context, dragModule));
+      ewmhModule = await createEWMHEventConsumer(context, dragModule);
+      eventConsumers.push(ewmhModule);
 
       motif = await createMotifModule(context);
       shortcuts = await createShortcutsModule(context);
@@ -619,9 +621,10 @@ export function createServer(): XServer {
       getNormalHints(X, wid),
       motif.getMotifHints(wid),
       getWMTransientFor(X, wid),
+      ewmhModule.getNetWmIcons(wid),
     ]);
 
-    const [attrs, clientGeom, title, wmClass, wmHints, normalHints, motifHints, transientFor] = values;
+    const [attrs, clientGeom, title, wmClass, wmHints, normalHints, motifHints, transientFor, icons] = values;
     log(`got values for ${wid}:`, values);
 
     const isOverrideRedirect = attrs.overrideRedirect === 1;
@@ -663,6 +666,7 @@ export function createServer(): XServer {
         screenIndex,
         wmHints,
         normalHints,
+        icons,
       };
 
       const state = store.getState();

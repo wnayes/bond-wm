@@ -52,6 +52,15 @@ html, body {
     -webkit-app-region: drag;
 }
 
+.winTitleBarIcon {
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: 16px;
+    width: 16px;
+    margin-top: 1px;
+    margin-left: 1px;
+}
+
 .winTitleBarText {
     display: inline-block;
     flex-grow: 1;

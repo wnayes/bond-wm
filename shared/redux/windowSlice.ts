@@ -33,6 +33,7 @@ export const windowsSlice = createSlice({
         tags: payload.tags ?? [],
         wmHints: payload.wmHints,
         normalHints: payload.normalHints,
+        icons: payload.icons,
         _dragState: undefined,
         _originalSize: undefined,
       };

@@ -9,9 +9,10 @@ import {
   showContextMenu,
 } from "../../renderer-shared/commands";
 import { RootState } from "../../renderer-shared/configureStore";
+import { useIconInfoDataUri } from "../../renderer-shared/hooks";
 import { ContextMenuKind } from "../../shared/ContextMenuKind";
 import { selectWindowMaximizeCanTakeEffect } from "../../shared/selectors";
-import { IWindow } from "../../shared/window";
+import { IIconInfo, IWindow } from "../../shared/window";
 
 interface ITitleBarProps {
   win: IWindow;
@@ -21,6 +22,7 @@ export function TitleBar(props: ITitleBarProps) {
   const { win } = props;
 
   const supportsMaximize = useSelector((state: RootState) => selectWindowMaximizeCanTakeEffect(state, win.id));
+  const hasIcons = (win.icons?.length ?? 0) > 0;
 
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -30,6 +32,7 @@ export function TitleBar(props: ITitleBarProps) {
 
   return (
     <div className="winTitleBar" onContextMenu={onContextMenu}>
+      {hasIcons && <TitleBarIcon icons={win.icons!} />}
       <span className="winTitleBarText">{win.title}</span>
       <TitleBarMinimizeButton win={win} />
       {supportsMaximize && <TitleBarMaximizeButton win={win} />}
@@ -99,4 +102,23 @@ function TitleBarMinimizeButton(props: ITitleBarMinimizeButtonProps) {
       <img className="winTitleBarBtnIcon" src="./assets/minimize.svg" />
     </div>
   );
+}
+
+interface ITitleBarIconProps {
+  icons: IIconInfo[];
+}
+
+function TitleBarIcon(props: ITitleBarIconProps) {
+  const { icons } = props;
+
+  const icon = icons[0]; // TODO: Pick "best" icon.
+  const dataUri = useIconInfoDataUri(icon);
+
+  // If there was no icon info, return null.
+  // We expect dataUri to be absent the initial render; still render the img in preparation in this case.
+  if (!icon) {
+    return null;
+  }
+
+  return <img className="winTitleBarIcon" src={dataUri} />;
 }

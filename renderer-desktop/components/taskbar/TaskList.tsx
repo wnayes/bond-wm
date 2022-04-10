@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { minimizeWindow, raiseWindow } from "../../../renderer-shared/commands";
 import { useCallback } from "react";
-import { isUrgent, IWindow } from "../../../shared/window";
+import { IIconInfo, isUrgent, IWindow } from "../../../shared/window";
+import { useIconInfoDataUri } from "../../../renderer-shared/hooks";
 
 interface ITaskListProps {
   windows: IWindow[];
@@ -12,17 +13,17 @@ export function TaskList(props: ITaskListProps) {
   const windows = props.windows;
   const entries = [];
   for (const win of windows) {
-    entries.push(<TaskListEntry key={win.id} window={win} />);
+    entries.push(<TaskListEntry key={win.id} win={win} />);
   }
   return <div className="tasklist">{entries}</div>;
 }
 
 interface ITaskListEntryProps {
-  window: IWindow;
+  win: IWindow;
 }
 
 function TaskListEntry(props: ITaskListEntryProps) {
-  const win = props.window;
+  const { win } = props;
 
   let className = "tasklistentry";
   if (win.focused) {
@@ -37,9 +38,31 @@ function TaskListEntry(props: ITaskListEntryProps) {
     else raiseWindow(win.id);
   }, [win]);
 
+  const hasIcons = (win.icons?.length ?? 0) > 0;
+
   return (
     <div className={className} onClick={onClick} title={win.title}>
-      {win.title}
+      {hasIcons && <TaskListEntryIcon icons={win.icons!} />}
+      <span className="tasklistentrytext">{win.title}</span>
     </div>
   );
+}
+
+interface ITaskListEntryIconProps {
+  icons: IIconInfo[];
+}
+
+function TaskListEntryIcon(props: ITaskListEntryIconProps) {
+  const { icons } = props;
+
+  const icon = icons[0]; // TODO: Pick "best" icon.
+  const dataUri = useIconInfoDataUri(icon);
+
+  // If there was no icon info, return null.
+  // We expect dataUri to be absent the initial render; still render the img in preparation in this case.
+  if (!icon) {
+    return null;
+  }
+
+  return <img className="tasklistentryicon" src={dataUri} />;
 }
