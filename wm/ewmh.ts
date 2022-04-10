@@ -157,6 +157,7 @@ export async function createEWMHEventConsumer(
           atoms._NET_SUPPORTED,
           atoms._NET_SUPPORTING_WM_CHECK,
           atoms._NET_WM_NAME,
+          atoms._NET_WM_ICON,
           atoms._NET_WM_STATE,
           atoms._NET_WM_STATE_FULLSCREEN,
           atoms._NET_FRAME_EXTENTS,
