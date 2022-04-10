@@ -959,6 +959,10 @@ export function createServer(): XServer {
       return;
     }
 
+    focusWindowOnEnter(wid);
+  }
+
+  function focusWindowOnEnter(wid: number): void {
     const isFrame = isFrameBrowserWin(wid);
     const focusWid = isFrame ? getWindowIdFromFrameId(wid) : wid;
     if (typeof focusWid === "number") {
@@ -981,6 +985,7 @@ export function createServer(): XServer {
     if (ignoreEnterLeave) {
       widLog(wid, "onMotionNotify", "clearing enterleave ignore");
       ignoreEnterLeave = false;
+      focusWindowOnEnter(wid); // In case we don't get onEnterNotify
     }
 
     eventConsumers.forEach((consumer) =>
