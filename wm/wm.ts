@@ -916,30 +916,47 @@ export function createServer(): XServer {
       return;
     }
 
-    if (isClientWin(wid)) {
-      if (!mask) {
-        return; // There's no requested changes?
-      }
+    if (!mask) {
+      return; // There's no requested changes?
+    }
 
+    const config: Partial<IXConfigureInfo> = {};
+    if (mask & CWMaskBits.CWX) {
+      // ev.x is absolute, but our state is relative to the screen.
+      config.x = ev.x;
+    }
+    if (mask & CWMaskBits.CWY) {
+      config.y = ev.y;
+    }
+    if (mask & CWMaskBits.CWWidth) {
+      config.width = ev.width;
+    }
+    if (mask & CWMaskBits.CWHeight) {
+      config.height = ev.height;
+    }
+    if (mask & CWMaskBits.CWBorderWidth) {
+      config.borderWidth = ev.borderWidth;
+    }
+    if (mask & CWMaskBits.CWSibling) {
+      config.sibling = ev.sibling;
+    }
+    if (mask & CWMaskBits.CWStackMode) {
+      config.stackMode = ev.stackMode;
+    }
+
+    if (isClientWin(wid)) {
       const win = getWinFromStore(wid);
       if (!win) {
         return;
       }
       const screen = store.getState().screens[win.screenIndex];
 
-      const config: Partial<IXConfigureInfo> = {};
+      // ev.x|y is absolute, but our state is relative to the screen.
       if (mask & CWMaskBits.CWX) {
-        // ev.x is absolute, but our state is relative to the screen.
-        config.x = ev.x - screen.x;
+        config.x! -= screen.x;
       }
       if (mask & CWMaskBits.CWY) {
-        config.y = ev.y - screen.y;
-      }
-      if (mask & CWMaskBits.CWWidth) {
-        config.width = ev.width;
-      }
-      if (mask & CWMaskBits.CWHeight) {
-        config.height = ev.height;
+        config.y! -= screen.y;
       }
 
       if (Object.keys(config).length > 0) {
@@ -947,7 +964,7 @@ export function createServer(): XServer {
       }
     } else {
       // Some unmanaged window; pass the call through.
-      X.ConfigureWindow(wid, ev);
+      X.ConfigureWindow(wid, config);
     }
   }
 
