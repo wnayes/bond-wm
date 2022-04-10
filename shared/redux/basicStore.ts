@@ -9,6 +9,12 @@ function configureBasicStore() {
       windows: windowReducer,
       screens: screenReducer,
     },
+
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        immutableCheck: false,
+        serializableCheck: false,
+      }),
   });
 }
 

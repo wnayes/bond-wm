@@ -13,6 +13,13 @@ export function configureWMStore(middleware: Middleware[]) {
       screens: screenReducer,
     },
     enhancers: [enhancer],
+
+    // Could try to tune this, but for now just disable it.
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        immutableCheck: false,
+        serializableCheck: false,
+      }),
   });
 }
 

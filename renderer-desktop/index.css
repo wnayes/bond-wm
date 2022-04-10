@@ -60,8 +60,7 @@ html, body {
     text-overflow: ellipsis;
     height: 100%;
     line-height: 22px;
-    padding: 0 0.5em;
-    margin: 0 0 0 1px;
+    padding: 0 3px;
     cursor: default;
     -webkit-user-select: none;
     user-select: none;

@@ -12,6 +12,13 @@ export function configureRendererStore() {
       taskbar: taskbarReducer,
     },
     enhancers: [stateSyncEnhancer()],
+
+    // It is enough to check these in the main process; no need for each renderer.
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        immutableCheck: false,
+        serializableCheck: false,
+      }),
   });
 }
 
