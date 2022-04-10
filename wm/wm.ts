@@ -58,6 +58,7 @@ import {
   setWindowFullscreenAction,
   setWindowIntoScreenAction,
   setWindowMaximizedAction,
+  setWindowMinimizedAction,
   setWindowTagsAction,
   setWindowTitleAction,
   setWindowVisibleAction,
@@ -1322,6 +1323,9 @@ export function createServer(): XServer {
     }
 
     const win = getWinFromStore(wid);
+    if (win?.minimized) {
+      setWindowMinimized(wid, false);
+    }
     if (win?.visible === false) {
       store.dispatch(setWindowVisibleAction({ wid, visible: true }));
     }
@@ -1379,6 +1383,7 @@ export function createServer(): XServer {
 
   function minimize(wid: number): void {
     widLog(wid, "minimize");
+    setWindowMinimized(wid, true);
     hideWindow(wid);
   }
 
@@ -1390,6 +1395,17 @@ export function createServer(): XServer {
   function restore(wid: number): void {
     widLog(wid, "restore");
     setWindowMaximized(wid, false);
+  }
+
+  function setWindowMinimized(wid: number, minimized: boolean): void {
+    const win = getWinFromStore(wid);
+    if (!win) {
+      return;
+    }
+
+    if (win.minimized !== minimized) {
+      store.dispatch(setWindowMinimizedAction({ wid, minimized }));
+    }
   }
 
   function setWindowMaximized(wid: number, maximized: boolean): void {
@@ -1737,7 +1753,9 @@ export function createServer(): XServer {
                     continue; // Other screens not affected.
                   }
                   if (anyIntersect(win.tags, currentTags)) {
-                    showWindow(wid);
+                    if (!win.minimized) {
+                      showWindow(wid);
+                    }
                   } else {
                     if (win.focused) {
                       hidFocusedWid = wid;

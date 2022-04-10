@@ -18,6 +18,7 @@ export const windowsSlice = createSlice({
         outer: payload.outer ?? { height: 0, width: 0, x: 0, y: 0 },
         frameExtents: payload.frameExtents ?? { top: 0, left: 0, right: 0, bottom: 0 },
         visible: payload.visible ?? true,
+        minimized: payload.minimized ?? false,
         maximized: payload.maximized ?? false,
         fullscreen: false,
         transientFor: payload.transientFor,
@@ -102,6 +103,15 @@ export const windowsSlice = createSlice({
       const { payload } = action;
       if (assertWidInState(state, action)) {
         state[payload.wid].title = payload.title;
+      }
+    },
+
+    setWindowMinimizedAction: (state, action: PayloadAction<{ wid: number; minimized: boolean }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        const { minimized } = payload;
+        const win = state[payload.wid];
+        win.minimized = minimized;
       }
     },
 
@@ -215,6 +225,7 @@ export const {
   setWindowTagsAction,
   focusWindowAction,
   setWindowTitleAction,
+  setWindowMinimizedAction,
   setWindowMaximizedAction,
   setWindowFullscreenAction,
   setWindowPositionAction,

@@ -10,6 +10,7 @@ export interface IWindow {
   /** Size of the frame border around each side of the window. */
   frameExtents: IBounds;
   visible: boolean;
+  minimized: boolean;
   maximized: boolean;
   fullscreen: boolean;
   transientFor: number | undefined;
