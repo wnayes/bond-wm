@@ -74,6 +74,7 @@ import { createDragModule } from "./drag";
 import { getArgs } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
+import { getConfig } from "./config";
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
@@ -238,8 +239,7 @@ export function createServer(): XServer {
     "Mod4 + o": () => sendActiveWindowToNextScreen(),
     "Mod4 + r": sendKeyToBrowser,
 
-    // TODO: launch default/configurable terminal.
-    "Mod4 + Return": () => launchProcess("urxvt"),
+    "Mod4 + Return": () => launchProcess(getConfig().term),
     "Mod4 + space": () => switchToNextLayoutWM(),
 
     "Mod4 + Shift + C": () => closeFocusedWindow(),
