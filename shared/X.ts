@@ -356,12 +356,18 @@ export type XXineramaExtension = XExtension<XineramaExtension>;
 export interface WMHints {
   flags: WMHintsFlags;
   input: number;
-  initialState: number;
+  initialState: WMHintsStates;
   iconPixmap: unknown; // pixmap
   iconWindow: number;
   iconX: number;
   iconY: number;
   iconMask: unknown; // pixmap
+}
+
+export enum WMHintsStates {
+  WithdrawnState = 0,
+  NormalState = 1,
+  IconicState = 3,
 }
 
 /** Flags bits from WM_HINTS. */

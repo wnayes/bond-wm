@@ -30,12 +30,27 @@ export function TitleBar(props: ITitleBarProps) {
     showContextMenu(ContextMenuKind.Frame);
   }, []);
 
+  const onMaximizeClick = useCallback(() => {
+    if (!supportsMaximize) {
+      return;
+    }
+
+    if (win.maximized) {
+      restoreWindow(win.id);
+    } else {
+      maximizeWindow(win.id);
+    }
+  }, [win, supportsMaximize]);
+
   return (
     <div className="winTitleBar" onContextMenu={onContextMenu}>
       {hasIcons && <TitleBarIcon icons={win.icons!} />}
-      <span className="winTitleBarText">{win.title}</span>
+      {/* FIXME: The double click doesn't work due to -webkit-app-region: drag */}
+      <span className="winTitleBarText" onDoubleClick={onMaximizeClick}>
+        {win.title}
+      </span>
       <TitleBarMinimizeButton win={win} />
-      {supportsMaximize && <TitleBarMaximizeButton win={win} />}
+      {supportsMaximize && <TitleBarMaximizeButton win={win} onClick={onMaximizeClick} />}
       <TitleBarCloseButton win={win} />
     </div>
   );
@@ -62,18 +77,11 @@ function TitleBarCloseButton(props: ITitleBarCloseButtonProps) {
 
 interface ITitleBarMaximizeButtonProps {
   win: IWindow;
+  onClick(): void;
 }
 
 function TitleBarMaximizeButton(props: ITitleBarMaximizeButtonProps) {
-  const { win } = props;
-
-  const onClick = useCallback(() => {
-    if (win.maximized) {
-      restoreWindow(win.id);
-    } else {
-      maximizeWindow(win.id);
-    }
-  }, [win]);
+  const { win, onClick } = props;
 
   const graphic = win.maximized ? "./assets/restore.svg" : "./assets/maximize.svg";
   const tooltip = win.maximized ? "Restore" : "Maximize";

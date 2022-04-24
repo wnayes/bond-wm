@@ -37,6 +37,7 @@ import {
   IXMotionNotifyEvent,
   IXButtonReleaseEvent,
   WMSizeHints,
+  WMHintsStates,
 } from "../shared/X";
 import { Middleware } from "redux";
 import { batch } from "react-redux";
@@ -859,9 +860,24 @@ export function createServer(): XServer {
     }
   }
 
-  function onCreateNotify(ev: IXEvent) {
+  async function onCreateNotify(ev: IXEvent) {
     const { wid } = ev;
     widLog(wid, "onCreateNotify", ev);
+
+    const wmHints = await getWMHints(X, wid);
+    if (knownWids.has(wid)) {
+      widLog(wid, "onCreateNotify exiting after obtaining WM_HINTS; window was already managed.");
+      return;
+    }
+
+    const initialState = wmHints?.initialState;
+    if (typeof initialState === "number") {
+      widLog(wid, `onCreateNotify initial state: ${initialState} (${WMHintsStates[initialState]})`);
+      // if (initialState === WMHintsStates.IconicState) {
+      //   const screenIndex = Math.max(0, await getScreenIndexWithCursor(context, wid));
+      //   manageWindow(wid, { screenIndex, focusWindow: true, checkUnmappedState: false });
+      // }
+    }
   }
 
   async function onMapRequest(ev: IXEvent) {

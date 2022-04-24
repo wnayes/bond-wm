@@ -6,9 +6,9 @@ const store = configureRendererStore();
 // Debug code, remove eventually.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).store = store;
-store.subscribe(() => {
-  console.log(store.getState());
-});
+// store.subscribe(() => {
+//   console.log(store.getState());
+// });
 
 const container = document.getElementById("content");
 if (!container) {
