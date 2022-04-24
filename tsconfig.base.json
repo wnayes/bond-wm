@@ -8,6 +8,7 @@
     "rootDir": ".",
     "module": "commonjs",
     "moduleResolution": "node",
+    "target": "ESNext",
     "jsx": "react",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
