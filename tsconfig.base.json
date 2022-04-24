@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "target": "ESNext",
     "jsx": "react",
+    "importHelpers": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
