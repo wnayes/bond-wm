@@ -394,6 +394,7 @@ export async function createServer(): Promise<XServer> {
           root,
           tags: config.tags,
           initialTag: config.initialTag,
+          initialLayout: config.initialLayout,
         })
       );
 

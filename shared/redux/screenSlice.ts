@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getFirstLayoutName } from "../layouts";
 import { IScreen } from "../screen";
 import { IGeometry } from "../types";
 
@@ -7,7 +6,7 @@ export type ScreensState = IScreen[];
 
 const initialState: ScreensState = [];
 
-type AddScreenActionPayload = Partial<IScreen> & Pick<IScreen, "tags"> & { initialTag: string };
+type AddScreenActionPayload = Partial<IScreen> & Pick<IScreen, "tags"> & { initialLayout: string; initialTag: string };
 
 export const screensSlice = createSlice({
   name: "screens",
@@ -15,7 +14,7 @@ export const screensSlice = createSlice({
   reducers: {
     addScreenAction: (state, { payload }: PayloadAction<AddScreenActionPayload>) => {
       const currentLayouts = payload.tags.reduce<{ [tag: string]: string }>((layoutTagMap, tag) => {
-        layoutTagMap[tag] = getFirstLayoutName();
+        layoutTagMap[tag] = payload.initialLayout;
         return layoutTagMap;
       }, {});
 
