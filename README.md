@@ -4,8 +4,12 @@
 
 An X Window Manager built on web technologies, including Electron and React.
 
-![electron-wm screenshot](assets/screenshots/1.png?raw=true)
+<br /><br /><br />
 
+## Screenshot
+
+![electron-wm screenshot](assets/screenshots/1.png?raw=true)
+    
 ## Development
 
 To do prerequisite build steps:
