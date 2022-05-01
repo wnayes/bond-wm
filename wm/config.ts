@@ -1,20 +1,18 @@
 import { env } from "process";
 import { existsSync } from "fs";
 import { log, logError } from "./log";
+import { IConfig, setConfigAction } from "../shared/redux/configSlice";
+import { ServerStore } from "./configureStore";
 
-interface IConfig {
-  term: string;
+let _store: ServerStore;
+
+export function getConfig(): IConfig {
+  return _store.getState().config;
 }
 
-const _config: IConfig = {
-  term: "xterm",
-};
+export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
+  _store = store;
 
-export function getConfig() {
-  return _config;
-}
-
-export async function loadConfigFromDisk(): Promise<void> {
   let XDG_CONFIG_HOME = env["XDG_CONFIG_HOME"];
   if (!XDG_CONFIG_HOME) {
     const HOME = env["HOME"];
@@ -23,9 +21,9 @@ export async function loadConfigFromDisk(): Promise<void> {
   log("XDG_CONFIG_HOME", XDG_CONFIG_HOME);
 
   const configPaths = [
-    // Support this once TypeScript emits import() correctly.
-    // XDG_CONFIG_HOME + "/.ewmrc.mjs",
-    XDG_CONFIG_HOME + "/.ewmrc.js",
+    // Support this once TypeScript emits import() correctly in Node.
+    // XDG_CONFIG_HOME + "/electron-wm-config/.ewmrc.mjs",
+    XDG_CONFIG_HOME + "/electron-wm-config/.ewmrc.js",
   ];
   for (const configPath of configPaths) {
     if (existsSync(configPath)) {
@@ -43,15 +41,15 @@ export async function loadConfigFromDisk(): Promise<void> {
     }
   }
 
-  log("Initial config", _config);
+  log("Initial config", getConfig());
 }
 
 interface IConfigModule {
-  TERM?: string;
+  config?: IConfig;
 }
 
 function processConfigModule(userConfigModule: IConfigModule): void {
-  if (typeof userConfigModule.TERM === "string") {
-    _config.term = userConfigModule.TERM;
+  if (typeof userConfigModule.config === "object") {
+    _store.dispatch(setConfigAction(userConfigModule.config));
   }
 }

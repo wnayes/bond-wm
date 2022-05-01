@@ -74,7 +74,7 @@ import { createDragModule } from "./drag";
 import { getArgs } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
-import { getConfig } from "./config";
+import { getConfig, loadConfigFromDisk } from "./config";
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
@@ -175,7 +175,7 @@ export interface XWMContext {
   getFrameIdFromWindowId(wid: number): number | undefined;
 }
 
-export function startX(): XServer {
+export function startX(): Promise<XServer> {
   return createServer();
 }
 
@@ -183,7 +183,7 @@ export class XServer {
   // Could put a teardown method here.
 }
 
-export function createServer(): XServer {
+export async function createServer(): Promise<XServer> {
   const server = new XServer();
   let client: IX11Client;
 
@@ -221,6 +221,8 @@ export function createServer(): XServer {
   let lastFrameExtents: IBounds | undefined;
 
   const store = __setupStore();
+
+  await loadConfigFromDisk(store);
 
   let context: XWMContext;
 
@@ -380,6 +382,8 @@ export function createServer(): XServer {
     const logicalScreens = await getScreenGeometries(screen);
     log("Obtained logical screens", logicalScreens);
 
+    const config = getConfig();
+
     for (const logicalScreen of logicalScreens) {
       store.dispatch(
         addScreenAction({
@@ -388,6 +392,8 @@ export function createServer(): XServer {
           width: logicalScreen.width,
           height: logicalScreen.height,
           root,
+          tags: config.tags,
+          initialTag: config.initialTag,
         })
       );
 

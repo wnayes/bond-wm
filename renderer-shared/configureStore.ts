@@ -1,15 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/renderer";
-import windowReducer from "../shared/redux/windowSlice";
+import configReducer from "../shared/redux/configSlice";
 import screenReducer from "../shared/redux/screenSlice";
 import taskbarReducer from "./redux/taskbarSlice";
+import windowReducer from "../shared/redux/windowSlice";
 
 export function configureRendererStore() {
   return configureStore({
     reducer: {
-      windows: windowReducer,
+      config: configReducer,
       screens: screenReducer,
       taskbar: taskbarReducer,
+      windows: windowReducer,
     },
     enhancers: [stateSyncEnhancer()],
 

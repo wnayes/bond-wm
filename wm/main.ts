@@ -2,7 +2,6 @@ import { app, dialog } from "electron";
 import { startX } from "./wm";
 import "./args";
 import { log } from "./log";
-import { loadConfigFromDisk } from "./config";
 
 // Disable error dialogs by override
 dialog.showErrorBox = function (title, content) {
@@ -30,6 +29,5 @@ app.on("window-all-closed", () => {
 });
 
 app.on("ready", async () => {
-  await loadConfigFromDisk();
   startX();
 });
