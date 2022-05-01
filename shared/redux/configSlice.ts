@@ -1,20 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface IConfig {
-  initialTag: string;
-  tags: string[];
-  term: string;
-}
-
-const _defaultConfig: IConfig = {
-  initialTag: "1",
-  tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-  term: "xterm",
-};
+import { defaultConfig, IConfig } from "../config";
 
 export const configSlice = createSlice({
   name: "config",
-  initialState: _defaultConfig,
+  initialState: defaultConfig,
   reducers: {
     setConfigAction: (state, { payload }: PayloadAction<Partial<IConfig>>) => {
       Object.assign(state, payload);

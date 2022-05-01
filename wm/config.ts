@@ -1,8 +1,9 @@
 import { env } from "process";
 import { existsSync } from "fs";
 import { log, logError } from "./log";
-import { IConfig, setConfigAction } from "../shared/redux/configSlice";
+import { setConfigAction } from "../shared/redux/configSlice";
 import { ServerStore } from "./configureStore";
+import { IConfig } from "../shared/config";
 
 let _store: ServerStore;
 
