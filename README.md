@@ -9,7 +9,7 @@ An X Window Manager built on web technologies, including Electron and React.
 ## Screenshot
 
 ![electron-wm screenshot](assets/screenshots/1.png?raw=true)
-    
+
 ## Development
 
 To do prerequisite build steps:
@@ -41,10 +41,14 @@ Command line flags:
 
 A basic config file is read from the following locations:
 
+- `app-path/.ewmrc.js`
+    - The file distributed with the application.
 - `$XDG_CONFIG_HOME/electron-wm-config/.ewmrc.js`
-    - (Typically `$HOME/.config/electron-wm-config/.ewmrc.js`)
+    - Typically `$HOME/.config/electron-wm-config/.ewmrc.js`
 
 See the `.ewmrc.js` example included in this repository.
+
+Possible locations are probed in the order listed above. If config files are found in each location, the values set by later config files override those from prior config files.
 
 ## License
 

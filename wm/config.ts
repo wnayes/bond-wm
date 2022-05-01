@@ -1,5 +1,7 @@
 import { env } from "process";
 import { existsSync } from "fs";
+import { join } from "path";
+import { app } from "electron";
 import { log, logError } from "./log";
 import { setConfigAction } from "../shared/redux/configSlice";
 import { ServerStore } from "./configureStore";
@@ -16,15 +18,20 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
 
   let XDG_CONFIG_HOME = env["XDG_CONFIG_HOME"];
   if (!XDG_CONFIG_HOME) {
-    const HOME = env["HOME"];
-    XDG_CONFIG_HOME = HOME + "/.config";
+    const HOME = env["HOME"] || "~";
+    XDG_CONFIG_HOME = join(HOME, ".config");
   }
   log("XDG_CONFIG_HOME", XDG_CONFIG_HOME);
 
+  // Later paths take precedence.
   const configPaths = [
+    // The file distributed with the app itself.
+    join(app.getAppPath(), ".ewmrc.js"),
+
     // Support this once TypeScript emits import() correctly in Node.
-    // XDG_CONFIG_HOME + "/electron-wm-config/.ewmrc.mjs",
-    XDG_CONFIG_HOME + "/electron-wm-config/.ewmrc.js",
+    // join(XDG_CONFIG_HOME, "electron-wm-config/.ewmrc.mjs"),
+
+    join(XDG_CONFIG_HOME, "electron-wm-config/.ewmrc.js"),
   ];
   for (const configPath of configPaths) {
     if (existsSync(configPath)) {
@@ -34,7 +41,6 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
         const userConfigModule = await import(configPath);
         if (userConfigModule) {
           processConfigModule(userConfigModule);
-          break;
         }
       } catch (e) {
         logError("Error reading user config file", e);
@@ -46,11 +52,13 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
 }
 
 interface IConfigModule {
-  config?: IConfig;
+  config?: Partial<IConfig>;
 }
 
 function processConfigModule(userConfigModule: IConfigModule): void {
-  if (typeof userConfigModule.config === "object") {
-    _store.dispatch(setConfigAction(userConfigModule.config));
+  const config = userConfigModule.config;
+  if (typeof config === "object") {
+    log("Config from module", config);
+    _store.dispatch(setConfigAction(config));
   }
 }
