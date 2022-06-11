@@ -261,8 +261,8 @@ export async function createServer(): Promise<XServer> {
   // Initialization.
   (() => {
     client = x11.createClient(async (err: unknown, display: IXDisplay) => {
-      if (err) {
-        logError(err);
+      if (err || !display) {
+        logError(err ?? "No display available.");
         process.exit(1);
       }
 
