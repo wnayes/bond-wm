@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useCallback, useMemo } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState } from "../../../renderer-shared/configureStore";
+import { RootState, Store } from "../../../renderer-shared/configureStore";
 import { switchToNextLayout } from "../../../shared/layouts";
 import { getLayouts } from "../../layouts";
 
@@ -16,7 +16,7 @@ export function LayoutIndicator({ screenIndex }: ILayoutIndicatorProps) {
     return getLayouts().find((layout) => layout.name === currentLayoutName);
   }, [currentLayoutName]);
 
-  const store = useStore();
+  const store: Store = useStore();
 
   const onClick = useCallback(() => {
     switchToNextLayout(store, screenIndex);
