@@ -1516,6 +1516,9 @@ export async function createServer(): Promise<XServer> {
           store.dispatch(setWindowTagsAction({ wid, tags: [nextScreenTags[0]] }));
         }
 
+        // Another window could move under our mouse; we don't want it to steal focus.
+        ignoreEnterLeave = true;
+
         store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreenIndex }));
 
         // Trigger reconfigure since coordinates have remained the same,
