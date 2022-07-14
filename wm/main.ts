@@ -23,6 +23,11 @@ try {
 log("electron-wm main");
 log("user data path: ", app.getPath("userData"));
 
+// Possibly could help with transparency?
+// app.commandLine.appendSwitch("enable-transparent-visuals");
+// app.commandLine.appendSwitch("disable-gpu");
+// app.disableHardwareAcceleration();
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   app.quit();

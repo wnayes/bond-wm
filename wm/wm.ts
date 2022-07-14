@@ -496,6 +496,7 @@ export async function createServer(): Promise<XServer> {
       y: geometry.y,
       backgroundColor: "#00000000",
       transparent: true,
+      hasShadow: false,
       webPreferences: {
         preload: path.resolve(path.join(__dirname, "../../dist/renderer-shared/preload.js")),
         nodeIntegration: true,

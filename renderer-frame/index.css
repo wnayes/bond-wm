@@ -4,7 +4,7 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #333333;
+    background-color: transparent;
 
     -webkit-user-select: none;
     user-select: none;
@@ -16,6 +16,7 @@ html, body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    background-color: transparent;
 }
 
 .winWrapper {
@@ -27,6 +28,7 @@ html, body {
     position: absolute;
     background-color: #333333;
     border: 1px solid black;
+    overflow: hidden;
 }
 .winWrapper.focused {
     background-color: #7269d2;
