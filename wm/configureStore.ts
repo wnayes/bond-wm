@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { composeWithStateSync } from "electron-redux/main";
 import configReducer from "../shared/redux/configSlice";
 import screenReducer from "../shared/redux/screenSlice";
+import trayReducer from "../shared/redux/traySlice";
 import windowReducer from "../shared/redux/windowSlice";
 
 export type ServerStore = ReturnType<typeof configureWMStore>;
@@ -16,6 +17,7 @@ export function configureWMStore(middleware: Middleware[]) {
     reducer: {
       config: configReducer,
       screens: screenReducer,
+      tray: trayReducer,
       windows: windowReducer,
     },
     enhancers: [enhancer],

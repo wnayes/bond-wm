@@ -567,6 +567,8 @@ export interface XStandardAtoms {
 export interface IXClient {
   atoms: XStandardAtoms;
 
+  screenNum: number;
+
   event_consumers: { [wid: number]: unknown };
 
   seq_num: number;
@@ -702,7 +704,7 @@ export interface IXClient {
   SendEvent(destination: number, propagate: boolean, eventMask: number, eventRawData: unknown): void;
   SetInputFocus(winId: number, revertTo: XFocusRevertTo): void;
   SetScreenSaver(...args: unknown[]): unknown;
-  SetSelectionOwner(...args: unknown[]): unknown;
+  SetSelectionOwner(owner: number, selection: number, time?: number): unknown;
   TranslateCoordinates(...args: unknown[]): unknown;
   UngrabButton(...args: unknown[]): unknown;
   UngrabKey(...args: unknown[]): unknown;

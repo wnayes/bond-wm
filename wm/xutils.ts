@@ -1,5 +1,5 @@
-import { Atom, IXClient, XGetPropertyCallbackProps } from "../shared/X";
-import { log } from "./log";
+import { Atom, IXClient, XEventMask, XGetPropertyCallbackProps } from "../shared/X";
+import { log, logError } from "./log";
 import { ExtraAtoms } from "./wm";
 
 export function internAtomAsync(X: IXClient, name: string): Promise<number> {
@@ -54,4 +54,22 @@ export function getRawPropertyValue(
       resolve(prop);
     });
   });
+}
+
+export function changeWindowEventMask(X: IXClient, wid: number, eventMask: XEventMask): boolean {
+  let failed;
+  log("Changing event mask for", wid, eventMask);
+  X.ChangeWindowAttributes(wid, { eventMask }, (err) => {
+    if (err && err.error === 10) {
+      logError(
+        `Error while changing event mask for for ${wid} to ${eventMask}: Another window manager already running.`,
+        err
+      );
+      failed = true;
+      return;
+    }
+    logError(`Error while changing event mask for for ${wid} to ${eventMask}`, err);
+    failed = true;
+  });
+  return !failed;
 }

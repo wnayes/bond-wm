@@ -8,6 +8,7 @@ import { RunField } from "./RunField";
 import { LayoutIndicator } from "./LayoutIndicator";
 import { TagList } from "./TagList";
 import { TaskList } from "./TaskList";
+import { SystemTray } from "./SystemTray";
 
 interface ITaskbarProps {
   screenIndex: number;
@@ -17,7 +18,10 @@ interface ITaskbarProps {
 export function Taskbar(props: ITaskbarProps) {
   const windows = props.windows;
 
-  const showingRun = useSelector<RootState>((state) => state.taskbar.showingRun);
+  const showingRun = useSelector((state: RootState) => state.taskbar.showingRun);
+
+  const showSystemTray = props.screenIndex === 0; // TODO: Configurable
+  const trayWindows = useSelector((state: RootState) => (showSystemTray ? state.tray.windows : null));
 
   return (
     <div className="taskbar">
@@ -25,6 +29,7 @@ export function Taskbar(props: ITaskbarProps) {
         <TagList screenIndex={props.screenIndex} />
         {showingRun && <RunField />}
         <TaskList windows={windows} />
+        {showSystemTray && <SystemTray trayWindows={trayWindows} />}
         <Clock />
         <LayoutIndicator screenIndex={props.screenIndex} />
       </>

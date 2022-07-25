@@ -3,6 +3,7 @@ import { stateSyncEnhancer } from "electron-redux/renderer";
 import configReducer from "../shared/redux/configSlice";
 import screenReducer from "../shared/redux/screenSlice";
 import taskbarReducer from "./redux/taskbarSlice";
+import trayReducer from "../shared/redux/traySlice";
 import windowReducer from "../shared/redux/windowSlice";
 
 export function configureRendererStore() {
@@ -11,6 +12,7 @@ export function configureRendererStore() {
       config: configReducer,
       screens: screenReducer,
       taskbar: taskbarReducer,
+      tray: trayReducer,
       windows: windowReducer,
     },
     enhancers: [stateSyncEnhancer()],

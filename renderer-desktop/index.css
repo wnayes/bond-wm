@@ -141,6 +141,29 @@ html, body {
     margin-top: 1px;
 }
 
+.sysTray {
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 0.25em;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+}
+.sysTray:empty {
+    padding: 0;
+}
+
+.sysTrayIcon {
+    height: 16px;
+    width: 16px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
 .clock {
     flex-grow: 0;
     flex-shrink: 0;

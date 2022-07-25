@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import windowReducer from "./windowSlice";
 import screenReducer from "./screenSlice";
+import trayReducer from "./traySlice";
 
 /** Never called, used to get typings. */
 function configureBasicStore() {
@@ -8,6 +9,7 @@ function configureBasicStore() {
     reducer: {
       windows: windowReducer,
       screens: screenReducer,
+      tray: trayReducer,
     },
 
     middleware: (getDefaultMiddleware) =>

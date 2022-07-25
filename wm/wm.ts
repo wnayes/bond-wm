@@ -26,7 +26,6 @@ import {
   XMapState,
   XCB_EVENT_MASK_NO_EVENT,
   IX11Mod,
-  XEventMask,
   IX11Client,
   XFocusRevertTo,
   PointerRoot,
@@ -39,12 +38,12 @@ import {
   WMSizeHints,
   WMHintsStates,
 } from "../shared/X";
-import { Middleware } from "redux";
+import { Action, Middleware } from "redux";
 import { batch } from "react-redux";
 import { anyIntersect, arraysEqual, intersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
-import { getPropertyValue, internAtomAsync } from "./xutils";
+import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
@@ -75,6 +74,7 @@ import { getArgs } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
 import { getConfig, loadConfigFromDisk } from "./config";
+import { createTrayEventConsumer } from "./systray";
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
@@ -141,6 +141,13 @@ export interface XWMEventConsumerClientMessageArgs extends XWMEventConsumerArgsW
 export interface XWMEventConsumerScreenCreatedArgs {
   /** Root window id. */
   root: number;
+  /** Window id of the desktop window created for the screen. */
+  desktopWindowId: number;
+}
+
+export interface XWMEventConsumerReduxActionArgs {
+  action: Action & { payload: unknown };
+  getState(): ServerRootState;
 }
 
 export interface XWMEventConsumerPointerMotionArgs extends XWMEventConsumerArgsWithType {
@@ -155,6 +162,7 @@ export interface XWMEventConsumerKeyPressArgs extends XWMEventConsumerArgsWithTy
 
 export interface IXWMEventConsumer {
   onScreenCreated?(args: XWMEventConsumerScreenCreatedArgs): void;
+  onReduxAction?(args: XWMEventConsumerReduxActionArgs): void;
 
   onClientMessage?(args: XWMEventConsumerClientMessageArgs): void;
   onMapNotify?(args: XWMEventConsumerArgsWithType): void;
@@ -282,6 +290,7 @@ export async function createServer(): Promise<XServer> {
       eventConsumers.push(await createICCCMEventConsumer(context));
       ewmhModule = await createEWMHEventConsumer(context, dragModule);
       eventConsumers.push(ewmhModule);
+      eventConsumers.push(await createTrayEventConsumer(context));
 
       motif = await createMotifModule(context);
       shortcuts = await createShortcutsModule(context);
@@ -375,7 +384,7 @@ export async function createServer(): Promise<XServer> {
 
     X.GrabServer();
 
-    changeWindowEventMask(root, ROOT_WIN_EVENT_MASK);
+    changeWindowEventMask(X, root, ROOT_WIN_EVENT_MASK);
 
     X.UngrabServer();
 
@@ -420,15 +429,24 @@ export async function createServer(): Promise<XServer> {
 
     X.SetInputFocus(PointerRoot, XFocusRevertTo.PointerRoot);
 
-    eventConsumers.forEach((consumer) => consumer.onScreenCreated?.({ root }));
+    eventConsumers.forEach((consumer) =>
+      consumer.onScreenCreated?.({
+        root,
+        desktopWindowId: screenIndexToDesktopId[0],
+      })
+    );
   }
 
   function isDesktopBrowserWin(win: number): boolean {
     return desktopBrowserHandles.hasOwnProperty(win);
   }
 
-  function isFrameBrowserWin(win: number) {
+  function isFrameBrowserWin(win: number): boolean {
     return frameBrowserFrameIdToWinId.hasOwnProperty(win);
+  }
+
+  function isTrayWin(win: number): boolean {
+    return win in store.getState().tray.windows;
   }
 
   function getFrameIdFromWindowId(wid: number): number | undefined {
@@ -617,6 +635,10 @@ export async function createServer(): Promise<XServer> {
       log(`Skip manage, ${wid} is a frame window`);
       return;
     }
+    if (isTrayWin(wid)) {
+      log(`Skip manage, ${wid} is a tray window`);
+      return;
+    }
 
     // Make sure we don't respond to too many messages at once.
     initializingWins[wid] = true;
@@ -712,8 +734,8 @@ export async function createServer(): Promise<XServer> {
 
       X.GrabServer();
 
-      changeWindowEventMask(fid, FRAME_WIN_EVENT_MASK);
-      changeWindowEventMask(wid, CLIENT_WIN_EVENT_MASK);
+      changeWindowEventMask(X, fid, FRAME_WIN_EVENT_MASK);
+      changeWindowEventMask(X, wid, CLIENT_WIN_EVENT_MASK);
 
       X.UngrabServer();
 
@@ -821,47 +843,29 @@ export async function createServer(): Promise<XServer> {
     return effectiveGeometry;
   }
 
-  function changeWindowEventMask(wid: number, eventMask: XEventMask): boolean {
-    let failed;
-    log("Changing event mask for", wid, eventMask);
-    X.ChangeWindowAttributes(wid, { eventMask }, (err) => {
-      if (err && err.error === 10) {
-        logError(
-          `Error while changing event mask for for ${wid} to ${eventMask}: Another window manager already running.`,
-          err
-        );
-        failed = true;
-        return;
-      }
-      logError(`Error while changing event mask for for ${wid} to ${eventMask}`, err);
-      failed = true;
-    });
-    return !failed;
-  }
-
   function runXCallsWithoutEvents(wid: number, fn: VoidFunction): void {
     X.GrabServer();
     try {
       const root = getRootIdFromWindowId(wid);
       if (typeof root === "number") {
-        changeWindowEventMask(root, NO_EVENT_MASK);
+        changeWindowEventMask(X, root, NO_EVENT_MASK);
       }
       const fid = getFrameIdFromWindowId(wid);
       if (typeof fid === "number") {
-        changeWindowEventMask(fid, NO_EVENT_MASK);
+        changeWindowEventMask(X, fid, NO_EVENT_MASK);
       }
-      changeWindowEventMask(wid, NO_EVENT_MASK);
+      changeWindowEventMask(X, wid, NO_EVENT_MASK);
 
       try {
         fn();
       } finally {
         if (typeof root === "number") {
-          changeWindowEventMask(root, ROOT_WIN_EVENT_MASK);
+          changeWindowEventMask(X, root, ROOT_WIN_EVENT_MASK);
         }
         if (typeof fid === "number") {
-          changeWindowEventMask(fid, FRAME_WIN_EVENT_MASK);
+          changeWindowEventMask(X, fid, FRAME_WIN_EVENT_MASK);
         }
-        changeWindowEventMask(wid, CLIENT_WIN_EVENT_MASK);
+        changeWindowEventMask(X, wid, CLIENT_WIN_EVENT_MASK);
       }
     } finally {
       X.UngrabServer();
@@ -1818,6 +1822,10 @@ export async function createServer(): Promise<XServer> {
                 }
               });
             }
+            break;
+
+          default:
+            eventConsumers.forEach((consumer) => consumer.onReduxAction?.({ action, getState }));
             break;
         }
 
