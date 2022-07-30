@@ -40,7 +40,7 @@ import {
 } from "../shared/X";
 import { Action, Middleware } from "redux";
 import { batch } from "react-redux";
-import { anyIntersect, arraysEqual, intersect } from "../shared/utils";
+import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "../shared/utils";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
@@ -64,7 +64,7 @@ import {
   setWindowVisibleAction,
 } from "../shared/redux/windowSlice";
 import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "../shared/redux/screenSlice";
-import { IWindow, windowAcceptsFocus } from "../shared/window";
+import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } from "../shared/window";
 import { IScreen } from "../shared/screen";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "../shared/layouts";
@@ -1511,7 +1511,8 @@ export async function createServer(): Promise<XServer> {
       const nextScreenIndex = (win.screenIndex + 1) % screenCount;
       batch(() => {
         // Update the window's tags if the next screen has different tags visible.
-        const nextScreenTags = screens[nextScreenIndex].currentTags;
+        const nextScreen = screens[nextScreenIndex];
+        const nextScreenTags = nextScreen.currentTags;
         const tagIntersect = intersect(win.tags, nextScreenTags);
         if (tagIntersect.length > 0) {
           if (!arraysEqual(tagIntersect, win.tags)) {
@@ -1526,9 +1527,15 @@ export async function createServer(): Promise<XServer> {
 
         store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreenIndex }));
 
+        // The new screen may have different dimensions. Try to fit the window nicely within.
+        const nextOuter = fitGeometryWithinAnother(nextScreen.workArea, win.outer, {
+          width: getWindowMinWidth(win),
+          height: getWindowMinHeight(win),
+        });
+
         // Trigger reconfigure since coordinates have remained the same,
         // and we won't configure again otherwise (at least not if we are floating).
-        store.dispatch(configureWindowAction({ wid, ...win.outer }));
+        store.dispatch(configureWindowAction({ wid, ...nextOuter }));
       });
     }
   }

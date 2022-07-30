@@ -1,4 +1,4 @@
-import { IGeometry } from "./types";
+import { IGeometry, ISize } from "./types";
 
 export function anyIntersect<T>(arr1: T[] | null | undefined, arr2: T[] | null | undefined): boolean {
   if (!arr1 || !arr2) {
@@ -64,6 +64,57 @@ export function geometriesDiffer(geo1: IGeometry | null | undefined, geo2: IGeom
 
 export function geometryContains(geo: IGeometry, x: number, y: number): boolean {
   return x >= geo.x && x <= geo.x + geo.width && y >= geo.y && y <= geo.y + geo.height;
+}
+
+const MIN_SIZE = { height: 0, width: 0 };
+
+/**
+ * Makes a best effort to adjust one geometry to fit within another.
+ * @param geoContainer Geometry acting as a container.
+ * @param geoWithin Geometry we are trying to fit into the container.
+ * @param geoWithinMinSize Minimum size of the geometry that must be respected.
+ * @returns Potentially adjusted geometry.
+ */
+export function fitGeometryWithinAnother(
+  geoContainer: IGeometry,
+  geoWithin: IGeometry,
+  geoWithinMinSize: ISize = MIN_SIZE
+): IGeometry {
+  const geoResult = { ...geoWithin };
+
+  // Don't be taller/wider than the container if we can avoid it.
+  if (geoResult.height > geoContainer.height) {
+    geoResult.height = Math.max(geoContainer.height, geoWithinMinSize.height);
+  }
+  if (geoResult.width > geoContainer.width) {
+    geoResult.width = Math.max(geoContainer.width, geoWithinMinSize.width);
+  }
+
+  // Don't fall out the right edge.
+  const withinRightEdge = geoResult.x + geoResult.width;
+  const containerRightEdge = geoContainer.x + geoContainer.width;
+  if (withinRightEdge > containerRightEdge) {
+    geoResult.x -= withinRightEdge - containerRightEdge;
+  }
+
+  // Don't fall out the left edge.
+  if (geoResult.x < geoContainer.x) {
+    geoResult.x = geoContainer.x;
+  }
+
+  // Don't fall out the bottom edge.
+  const withinBottomEdge = geoResult.y + geoResult.height;
+  const containerBottomEdge = geoContainer.y + geoContainer.height;
+  if (withinBottomEdge > containerBottomEdge) {
+    geoResult.y -= withinBottomEdge - containerBottomEdge;
+  }
+
+  // Don't fall out the top edge.
+  if (geoResult.y < geoContainer.y) {
+    geoResult.y = geoContainer.y;
+  }
+
+  return geoResult;
 }
 
 /**
