@@ -28,7 +28,7 @@ To start the window manager:
 
 The window manager is stable enough for basic daily usage.
 
-At this time, there is no distributed releases. To try out the window manager, check out this repository, built it, and invoke `electron` against the repository root directory.
+At this time, there is no distributed release. To try out the window manager, check out this repository, built it, and invoke `electron` against the repository root directory.
 
 ```
 Command line flags:
