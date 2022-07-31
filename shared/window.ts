@@ -1,5 +1,6 @@
 import { WMHints, WMHintsFlags, WMSizeHints } from "./X";
 import { Coords, IBounds, IGeometry } from "./types";
+import { IScreen } from "./screen";
 
 /** Data describing an X window. */
 export interface IWindow {
@@ -63,6 +64,14 @@ export enum ResizeDirection {
   Bottom = 6,
   BottomLeft = 7,
   Left = 8,
+}
+
+export function getAbsoluteWindowGeometry(screen: IScreen, win: IWindow): IGeometry {
+  return {
+    ...win.outer,
+    x: screen.x + win.outer.x,
+    y: screen.y + win.outer.y,
+  };
 }
 
 export function getWindowMinWidth(win: IWindow): number {

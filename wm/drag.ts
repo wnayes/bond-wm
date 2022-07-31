@@ -1,7 +1,21 @@
-import { configureWindowAction, endDragAction, startDragAction } from "../shared/redux/windowSlice";
+import { batch } from "react-redux";
+import {
+  configureWindowAction,
+  endDragAction,
+  setWindowIntoScreenAction,
+  startDragAction,
+} from "../shared/redux/windowSlice";
+import { IScreen } from "../shared/screen";
 import { selectWindowMaximizeCanTakeEffect } from "../shared/selectors";
 import { Coords, IGeometry } from "../shared/types";
-import { IWindow, newHeightForWindow, newWidthForWindow, ResizeDirection } from "../shared/window";
+import { geometryArea, geometryIntersect } from "../shared/utils";
+import {
+  getAbsoluteWindowGeometry,
+  IWindow,
+  newHeightForWindow,
+  newWidthForWindow,
+  ResizeDirection,
+} from "../shared/window";
 import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "../shared/X";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
@@ -19,17 +33,23 @@ export async function createDragModule({
   getWindowIdFromFrameId,
 }: XWMContext): Promise<DragModule> {
   function endMoveResize(wid: number): void {
-    const win = store.getState().windows[wid];
+    const state = store.getState();
+    const win = state.windows[wid];
     if (!win || !win._dragState) {
       return;
     }
 
     log("Ending drag for " + wid);
 
-    store.dispatch(endDragAction({ wid }));
-
     X.UngrabPointer(XCB_CURRENT_TIME);
     X.UngrabKeyboard(XCB_CURRENT_TIME);
+
+    batch(() => {
+      store.dispatch(endDragAction({ wid }));
+
+      // The window may now be on a different screen visually, so we should update state to match.
+      setWindowIntoBestScreen(state.screens, win);
+    });
   }
 
   function doGrabsForDrag(wid: number): void {
@@ -50,6 +70,44 @@ export async function createDragModule({
       }
     );
     X.GrabKeyboard(fid, false, XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
+  }
+
+  function setWindowIntoBestScreen(screens: IScreen[], win: IWindow): void {
+    const prevWinScreen = screens[win.screenIndex];
+    const bestWinScreen = getBestScreenForWindow(screens, win);
+    if (bestWinScreen && bestWinScreen !== prevWinScreen) {
+      store.dispatch(setWindowIntoScreenAction({ wid: win.id, screenIndex: screens.indexOf(bestWinScreen) }));
+
+      // The window coordinates need to be adjusted to be relative to the new screen.
+      store.dispatch(
+        configureWindowAction({
+          wid: win.id,
+          ...win.outer,
+          x: prevWinScreen.x + win.outer.x - bestWinScreen.x,
+          y: prevWinScreen.y + win.outer.y - bestWinScreen.y,
+        })
+      );
+    }
+  }
+
+  function getBestScreenForWindow(screens: IScreen[], win: IWindow): IScreen | null {
+    let bestScreen = null;
+    let bestIntersectArea = Number.MIN_SAFE_INTEGER;
+
+    const winAbsCoords = getAbsoluteWindowGeometry(screens[win.screenIndex], win);
+
+    for (const screen of screens) {
+      const intersect = geometryIntersect(screen, winAbsCoords);
+      if (!intersect) {
+        continue;
+      }
+      const intersectArea = geometryArea(intersect);
+      if (intersectArea > bestIntersectArea) {
+        bestIntersectArea = intersectArea;
+        bestScreen = screen;
+      }
+    }
+    return bestScreen;
   }
 
   return {

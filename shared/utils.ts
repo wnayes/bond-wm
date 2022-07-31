@@ -66,6 +66,27 @@ export function geometryContains(geo: IGeometry, x: number, y: number): boolean 
   return x >= geo.x && x <= geo.x + geo.width && y >= geo.y && y <= geo.y + geo.height;
 }
 
+export function geometryArea(geo: IGeometry): number {
+  return geo.width * geo.height;
+}
+
+export function geometryIntersect(geo1: IGeometry, geo2: IGeometry): IGeometry | null {
+  const leftX = Math.max(geo1.x, geo2.x);
+  const rightX = Math.min(geo1.x + geo1.width, geo2.x + geo2.width);
+  const topY = Math.max(geo1.y, geo2.y);
+  const bottomY = Math.min(geo1.y + geo1.height, geo2.y + geo2.height);
+
+  if (leftX < rightX && topY < bottomY) {
+    return {
+      x: leftX,
+      y: topY,
+      width: rightX - leftX,
+      height: bottomY - topY,
+    };
+  }
+  return null; // No overlap
+}
+
 const MIN_SIZE = { height: 0, width: 0 };
 
 /**
