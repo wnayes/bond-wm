@@ -1611,15 +1611,22 @@ export async function createServer(): Promise<XServer> {
       browser.webContents.setZoomLevel(zoomLevel);
     }
 
-    setFrameWindowsZoomLevel(zoomLevel);
+    setFrameWindowsZoomLevel(screenIndex, zoomLevel);
     store.dispatch(setScreenZoomLevelAction({ screenIndex, zoom: zoomLevel }));
 
     log(`Set zoom level to ${zoomLevel} (for ${screenIndex})`);
   }
 
-  function setFrameWindowsZoomLevel(zoomLevel: number): void {
-    for (const frameWin of Object.values(frameBrowserWindows)) {
-      frameWin?.webContents.setZoomLevel(zoomLevel);
+  function setFrameWindowsZoomLevel(screenIndex: number, zoomLevel: number): void {
+    const state = store.getState();
+    for (const widStr in state.windows) {
+      const wid = parseInt(widStr, 10);
+      const win = state.windows[widStr];
+      if (win.screenIndex !== screenIndex) {
+        continue;
+      }
+      const frameWin = frameBrowserWindows[wid];
+      frameWin?.webContents?.setZoomLevel(zoomLevel);
     }
   }
 
@@ -1777,7 +1784,7 @@ export async function createServer(): Promise<XServer> {
             {
               const state = getState();
               const wid = action.payload.wid;
-              const win = state.windows[wid] as IWindow;
+              const win = state.windows[wid];
               const { width, height } = win.outer;
               const frameExtents = {
                 left: action.payload.left,
@@ -1795,6 +1802,19 @@ export async function createServer(): Promise<XServer> {
               });
 
               eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents }));
+            }
+            break;
+          case setWindowIntoScreenAction.type:
+            {
+              const state = getState();
+              const { wid, screenIndex } = action.payload;
+              const screen = state.screens[screenIndex];
+
+              // Update the frame window's zoom level to match the screen zoom level, if it differs.
+              const frameWin = frameBrowserWindows[wid];
+              if (frameWin && frameWin.webContents && frameWin.webContents.zoomLevel !== screen.zoom) {
+                frameWin?.webContents.setZoomLevel(screen.zoom);
+              }
             }
             break;
           case setScreenCurrentTagsAction.type:
