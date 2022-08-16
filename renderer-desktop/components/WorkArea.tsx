@@ -5,6 +5,7 @@ import { RootState } from "../../renderer-shared/configureStore";
 import { Layout } from "./layout/Layout";
 import { useWindowSize } from "../../renderer-shared/hooks";
 import { Wallpaper } from "./Wallpaper";
+import { Dimmer } from "./Dimmer";
 import { IWindow } from "../../shared/window";
 import { geometriesDiffer } from "../../shared/utils";
 import { configureScreenWorkAreaAction } from "../../shared/redux/screenSlice";
@@ -48,6 +49,7 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
   return (
     <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
       <Wallpaper />
+      <Dimmer />
       <Layout screen={screen} windows={windows} />
     </div>
   );
