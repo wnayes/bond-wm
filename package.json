@@ -22,8 +22,8 @@
   "author": "Will Nayes",
   "license": "MIT",
   "dependencies": {
-    "@reduxjs/toolkit": "^1.8.3",
-    "electron": "^20.0.1",
+    "@reduxjs/toolkit": "^1.8.5",
+    "electron": "^20.1.4",
     "electron-redux": "2.0.0-alpha.9",
     "keysym": "^0.0.6",
     "react": "^18.2.0",
@@ -36,18 +36,18 @@
     "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "@types/react": "^18.0.15",
+    "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
-    "@types/yargs": "^17.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.32.0",
-    "@typescript-eslint/parser": "^5.32.0",
-    "electron-reloader": "^1.2.2",
-    "esbuild": "^0.14.53",
-    "eslint": "^8.21.0",
-    "eslint-config-prettier": "^8.3.0",
+    "@types/yargs": "^17.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "electron-reloader": "^1.2.3",
+    "esbuild": "^0.15.7",
+    "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "2.7.1",
-    "type-fest": "^2.18.0",
-    "typescript": "~4.7.4"
+    "type-fest": "^2.19.0",
+    "typescript": "~4.8.3"
   }
 }
