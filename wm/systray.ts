@@ -2,7 +2,7 @@ import { addTrayWindowAction, configureTrayWindowAction, removeTrayWindowAction 
 import { IGeometry } from "../shared/types";
 import { numsToBuffer } from "../shared/utils";
 import { IX11Mod, X11_EVENT_TYPE, XCB_COPY_FROM_PARENT, XPropMode } from "../shared/X";
-import { log } from "./log";
+import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
 import { changeWindowEventMask, internAtomAsync } from "./xutils";
 const x11: IX11Mod = require("x11"); // eslint-disable-line
@@ -22,6 +22,16 @@ const TRAY_OWNER_EVENT_MASK = x11.eventMask.SubstructureRedirect;
 
 const TRAY_WIN_EVENT_MASK = x11.eventMask.StructureNotify | x11.eventMask.PropertyChange | x11.eventMask.EnterWindow;
 
+interface NotificationState {
+  [trayWid: number]: {
+    [messageId: number]: {
+      text: string;
+      totalSize: number;
+      receivedSize: number;
+    };
+  };
+}
+
 /**
  * System tray implementation.
  * https://specifications.freedesktop.org/systemtray-spec/systemtray-spec-0.2.html
@@ -34,11 +44,14 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
     [TraySelectionAtom]: await internAtomAsync(X, TraySelectionAtom),
     _NET_SYSTEM_TRAY_OPCODE: await internAtomAsync(X, "_NET_SYSTEM_TRAY_OPCODE"),
     _NET_SYSTEM_TRAY_ORIENTATION: await internAtomAsync(X, "_NET_SYSTEM_TRAY_ORIENTATION"),
+    _NET_SYSTEM_TRAY_MESSAGE_DATA: await internAtomAsync(X, "_NET_SYSTEM_TRAY_MESSAGE_DATA"),
   };
 
   let _registered = false;
   let _trayOwnerWid = 0;
   let _trayDesktopWid = 0;
+
+  const _notificationState: NotificationState = {};
 
   function isTrayWin(win: number): boolean {
     return win in store.getState().tray.windows;
@@ -120,9 +133,63 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
             }
             break;
 
+          case SystemTrayOps.SYSTEM_TRAY_BEGIN_MESSAGE:
+            {
+              const trayWid = args.wid;
+              const timeout = args.data[2]; // milliseconds, or zero for infinite.
+              const messageLength = args.data[3];
+              const messageId = args.data[4];
+              log(
+                `SYSTEM_TRAY_BEGIN_MESSAGE, trayWid=${trayWid}, id=${messageId}, len=${messageLength}, timeout=${timeout}`
+              );
+
+              _notificationState[trayWid][messageId] = {
+                text: "",
+                totalSize: messageLength,
+                receivedSize: 0,
+              };
+            }
+            break;
+
+          case SystemTrayOps.SYSTEM_TRAY_CANCEL_MESSAGE:
+            {
+              const trayWid = args.wid;
+              const messageId = args.data[2];
+              log(`SYSTEM_TRAY_CANCEL_MESSAGE, trayWid=${trayWid}, id=${messageId}`);
+
+              delete _notificationState[trayWid][messageId];
+
+              // TODO: If already shown, hide it.
+            }
+            break;
+
           default:
             log("Unhandled system tray op", args.data[1], SystemTrayOps[args.data[1]]);
             break;
+        }
+      } else if (args.messageType === atoms._NET_SYSTEM_TRAY_MESSAGE_DATA) {
+        const trayWid = args.wid;
+        let stateEntry;
+        for (const messageId in _notificationState[trayWid]) {
+          if (stateEntry) {
+            logError(`_NET_SYSTEM_TRAY_MESSAGE_DATA: Unexpected: multiple notification entries`);
+          }
+          stateEntry = _notificationState[trayWid][messageId];
+        }
+        if (!stateEntry) {
+          logError(`_NET_SYSTEM_TRAY_MESSAGE_DATA: Unexpected: message data for non-existent notification`);
+          return;
+        }
+        const sizeToRead = Math.min(20, stateEntry.totalSize - stateEntry.receivedSize);
+        const textBuffer = numsToBuffer(args.data);
+        const partialText = textBuffer.toString("utf8", 0, sizeToRead);
+        log(`_NET_SYSTEM_TRAY_MESSAGE_DATA, trayWid=${trayWid}, partial=${partialText}`);
+
+        stateEntry.text += partialText;
+        stateEntry.receivedSize += sizeToRead;
+
+        if (stateEntry.receivedSize === stateEntry.totalSize) {
+          log(`_NET_SYSTEM_TRAY_MESSAGE_DATA, trayWid=${trayWid}, message complete=${stateEntry.text}`);
         }
       }
     },
