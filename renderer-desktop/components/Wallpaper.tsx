@@ -1,47 +1,70 @@
 import * as React from "react";
-import { useEffect, useRef } from "react";
-import { useWindowSize } from "../../renderer-shared/hooks";
+import { useLayoutEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../renderer-shared/configureStore";
+import { usePluginState, useWindowSize } from "../../renderer-shared/hooks";
+import { IGeometry, ISize } from "../../shared/types";
+import { getScreenIndex } from "../utils";
 
 export function Wallpaper() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const lastSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
-  const lastImageData = useRef<ImageData | null>(null);
+  //const lastSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
+  //const lastImageData = useRef<ImageData | null>(null);
 
-  const { width, height } = useWindowSize();
+  const { width: screenWidth, height: screenHeight } = useWindowSize();
+  const { width: totalWidth, height: totalHeight } = useCompositeScreenSize();
+  const screenIndex = getScreenIndex();
+  const screen = useSelector((state: RootState) => state.screens[screenIndex]);
 
-  useEffect(() => {
+  const [seed, setSeed] = usePluginState<IWallpaperSeed>("@electron-wm/wallpaper");
+  const [wallpaper, setWallpaper] = useState<CanvasRenderingContext2D | null>(null);
+
+  useLayoutEffect(() => {
+    if (!seed) {
+      setSeed(generateWallpaperSeed(totalWidth));
+    }
+  }, [seed, setSeed, totalWidth]);
+
+  useLayoutEffect(() => {
+    if (!seed) {
+      return;
+    }
+
+    setWallpaper(createWallpaper(seed, totalWidth, totalHeight));
+  }, [seed, totalWidth, totalHeight]);
+
+  useLayoutEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) {
+    if (!ctx || !wallpaper) {
       return;
     }
 
-    // Rough attempt to avoid wallpaper changes when opening devtools.
-    // We can keep the existing wallpaper if we are shrinking.
-    if (width <= lastSizeRef.current.width && height <= lastSizeRef.current.height) {
-      // The canvas blanks when it changes size, so we keep and repaint the old image data.
-      if (lastImageData.current) {
-        ctx.putImageData(lastImageData.current, 0, 0);
-      }
-      return;
-    }
+    paintWallpaperToScreen(wallpaper, ctx, screenWidth, screenHeight, screen.x, screen.y);
+  }, [wallpaper, screenWidth, screenHeight, screen.x, screen.y]);
 
-    lastSizeRef.current.width = width;
-    lastSizeRef.current.height = height;
+  return <canvas className="wallpaper" ref={canvasRef} width={screenWidth} height={screenHeight}></canvas>;
+}
 
-    // This rendering algorithm is modified from
-    // https://github.com/roytanck/wallpaper-generator
-    // GPL-3.0 License is included at the bottom of this file,
-    // and applies only to this algorithm.
+function useCompositeScreenSize(): ISize {
+  const compositeGeometry: IGeometry = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  };
 
-    // line segments (either few, or fluent lines (200))
-    const seed = generateWallpaperSeed(width);
+  const screens = useSelector((state: RootState) => state.screens);
+  for (const screen of screens) {
+    compositeGeometry.x = Math.min(compositeGeometry.x, screen.x);
+    compositeGeometry.y = Math.min(compositeGeometry.y, screen.y);
+    compositeGeometry.width = Math.max(compositeGeometry.width, screen.x + screen.width);
+    compositeGeometry.height = Math.max(compositeGeometry.height, screen.y + screen.height);
+  }
 
-    paintWallpaper(ctx, seed, width, height);
-
-    lastImageData.current = ctx.getImageData(0, 0, width, height);
-  }, [width, height]);
-
-  return <canvas className="wallpaper" ref={canvasRef} width={width} height={height}></canvas>;
+  return {
+    width: compositeGeometry.width - compositeGeometry.x,
+    height: compositeGeometry.height - compositeGeometry.y,
+  };
 }
 
 interface IWallpaperSeed {
@@ -57,6 +80,11 @@ interface IWallpaperSeed {
   light: number;
   lightIncrement: number;
 }
+
+// This rendering algorithm is modified from
+// https://github.com/roytanck/wallpaper-generator
+// GPL-3.0 License is included at the bottom of this file,
+// and applies only to this algorithm.
 
 function generateWallpaperSeed(width: number): IWallpaperSeed {
   // line segments (either few, or fluent lines (200))
@@ -88,7 +116,7 @@ function generateWallpaperSeed(width: number): IWallpaperSeed {
   };
 }
 
-function paintWallpaper(ctx: CanvasRenderingContext2D, seed: IWallpaperSeed, width: number, height: number): void {
+function createWallpaper(seed: IWallpaperSeed, width: number, height: number): CanvasRenderingContext2D {
   const {
     segments,
     wavelength,
@@ -102,6 +130,11 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, seed: IWallpaperSeed, wid
     light,
     lightIncrement,
   } = seed;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d")!;
 
   ctx.fillStyle = "hsl( " + hueStart + ", " + sat + "%, " + light + "% )";
   ctx.fillRect(0, 0, width, height);
@@ -125,6 +158,20 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, seed: IWallpaperSeed, wid
     ctx.lineTo(0, startY);
     ctx.fill();
   }
+
+  return ctx;
+}
+
+function paintWallpaperToScreen(
+  wallpaper: CanvasRenderingContext2D,
+  targetContext: CanvasRenderingContext2D,
+  screenWidth: number,
+  screenHeight: number,
+  screenX: number,
+  screenY: number
+): void {
+  const wallpaperSubsetData = wallpaper.getImageData(screenX, screenY, screenWidth, screenHeight);
+  targetContext.putImageData(wallpaperSubsetData, 0, 0);
 }
 
 /**
