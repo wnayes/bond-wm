@@ -7,7 +7,7 @@ import { IBounds, IGeometry } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
-import { AsyncReturnType, Mutable } from "type-fest";
+import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
 import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
 import {
@@ -357,7 +357,7 @@ export async function createServer(): Promise<XServer> {
   async function __setupAtoms(): Promise<void> {
     // TODO: Typings are a little awkward here.
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    const extraAtoms = ExtraAtoms as Mutable<typeof ExtraAtoms>;
+    const extraAtoms = ExtraAtoms as Writable<typeof ExtraAtoms>;
     extraAtoms.UTF8_STRING = (await internAtomAsync(X, "UTF8_STRING")) as any;
 
     extraAtoms.WM_PROTOCOLS = (await internAtomAsync(X, "WM_PROTOCOLS")) as any;
