@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IGeometry } from "../shared/types";
+import { Coords, IBounds, IGeometry } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -41,6 +41,7 @@ import {
 import { Action, Middleware } from "redux";
 import { batch } from "react-redux";
 import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "../shared/utils";
+import { ArraySet } from "../shared/data/ArraySet";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
@@ -370,12 +371,13 @@ export async function createServer(): Promise<XServer> {
   }
 
   async function __initDesktop(): Promise<void> {
+    const createdScreens = new ArraySet<Coords>();
     for (const screen of XDisplay.screen) {
-      await __initScreen(screen);
+      await __initScreen(screen, createdScreens);
     }
   }
 
-  async function __initScreen(screen: IXScreen): Promise<void> {
+  async function __initScreen(screen: IXScreen, createdScreens: ArraySet<Coords>): Promise<void> {
     const root = screen.root;
 
     const debugScreen = Object.assign({}, screen);
@@ -394,6 +396,12 @@ export async function createServer(): Promise<XServer> {
     const config = getConfig();
 
     for (const logicalScreen of logicalScreens) {
+      // Avoid creating the same desktop twice if we have "real" and xinerama screens together.
+      const screenCoords: Coords = [logicalScreen.x, logicalScreen.y];
+      if (createdScreens.has(screenCoords)) {
+        continue;
+      }
+
       store.dispatch(
         addScreenAction({
           x: logicalScreen.x,
@@ -419,6 +427,8 @@ export async function createServer(): Promise<XServer> {
       });
 
       X.ReparentWindow(did, root, logicalScreen.x, logicalScreen.y);
+
+      createdScreens.add(screenCoords);
     }
 
     X.QueryTree(root, (err, tree) => {
