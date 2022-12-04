@@ -39,13 +39,13 @@ export class ArraySet<TArray extends ReadonlyArray<any>> {
     for (let i = 0; i < len - 1; i++) {
       const value = array[i];
       const nextData: BackingDataMap | boolean | undefined = (currentData as BackingDataMap).get(value);
-      if (!nextData || nextData === true) {
+      if (typeof nextData === "undefined" || nextData === true) {
         return false;
       }
       currentData = nextData;
     }
 
     const lastValue = array[len - 1];
-    return currentData.get(lastValue) === true;
+    return (currentData as BackingDataMap).get(lastValue) === true;
   }
 }

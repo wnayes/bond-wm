@@ -36,5 +36,13 @@ describe("ArraySet", () => {
     expect(set.has([1, 2, 5])).toBe(true);
     expect(set.has([1, 3, 5])).toBe(true);
     expect(set.has([2, 3, 5])).toBe(true);
+
+    set.add([0, 3, 5]);
+    set.add([0, 3, 0]);
+    expect(set.has([1, 2, 3])).toBe(true);
+    expect(set.has([1, 2, 5])).toBe(true);
+    expect(set.has([1, 3, 5])).toBe(true);
+    expect(set.has([2, 3, 5])).toBe(true);
+    expect(set.has([0, 3, 0])).toBe(true);
   });
 });
