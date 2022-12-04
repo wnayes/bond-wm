@@ -3,7 +3,7 @@
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import { app, ipcMain, BrowserWindow } from "electron";
-import { Coords, IBounds, IGeometry } from "../shared/types";
+import { IBounds, IGeometry } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
@@ -41,7 +41,6 @@ import {
 import { Action, Middleware } from "redux";
 import { batch } from "react-redux";
 import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "../shared/utils";
-import { ArraySet } from "../shared/data/ArraySet";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
@@ -371,13 +370,12 @@ export async function createServer(): Promise<XServer> {
   }
 
   async function __initDesktop(): Promise<void> {
-    const createdScreens = new ArraySet<Coords>();
     for (const screen of XDisplay.screen) {
-      await __initScreen(screen, createdScreens);
+      await __initScreen(screen);
     }
   }
 
-  async function __initScreen(screen: IXScreen, createdScreens: ArraySet<Coords>): Promise<void> {
+  async function __initScreen(screen: IXScreen): Promise<void> {
     const root = screen.root;
 
     const debugScreen = Object.assign({}, screen);
@@ -396,12 +394,6 @@ export async function createServer(): Promise<XServer> {
     const config = getConfig();
 
     for (const logicalScreen of logicalScreens) {
-      // Avoid creating the same desktop twice if we have "real" and xinerama screens together.
-      const screenCoords: Coords = [logicalScreen.x, logicalScreen.y];
-      if (createdScreens.has(screenCoords)) {
-        continue;
-      }
-
       store.dispatch(
         addScreenAction({
           x: logicalScreen.x,
@@ -415,20 +407,20 @@ export async function createServer(): Promise<XServer> {
         })
       );
 
-      const did = createDesktopBrowser({
-        width: logicalScreen.width,
-        height: logicalScreen.height,
-      });
-
-      X.ConfigureWindow(did, {
-        borderWidth: 0,
+      const did = await createDesktopBrowser({
         width: logicalScreen.width,
         height: logicalScreen.height,
       });
 
       X.ReparentWindow(did, root, logicalScreen.x, logicalScreen.y);
 
-      createdScreens.add(screenCoords);
+      X.ConfigureWindow(did, {
+        borderWidth: 0,
+        x: logicalScreen.x,
+        y: logicalScreen.y,
+        width: logicalScreen.width,
+        height: logicalScreen.height,
+      });
     }
 
     X.QueryTree(root, (err, tree) => {
@@ -471,7 +463,7 @@ export async function createServer(): Promise<XServer> {
     return winIdToRootId[wid];
   }
 
-  function createDesktopBrowser(props: { width: number; height: number }) {
+  async function createDesktopBrowser(props: { width: number; height: number }): Promise<number> {
     const win = new BrowserWindow({
       frame: false,
       fullscreen: true,
@@ -488,9 +480,6 @@ export async function createServer(): Promise<XServer> {
     const index = desktopBrowsers.length;
     desktopBrowsers[index] = win;
 
-    const url = path.join(__dirname, "../../renderer-desktop/index.html") + "?screen=" + index;
-    win.loadURL("file://" + url);
-
     const handle = getNativeWindowHandleInt(win);
     if (!handle) {
       logError("Browser handle was null");
@@ -499,6 +488,9 @@ export async function createServer(): Promise<XServer> {
     screenIndexToDesktopId[index] = handle;
 
     log("Created browser window", handle);
+
+    const url = path.join(__dirname, "../../renderer-desktop/index.html") + "?screen=" + index;
+    await win.loadURL("file://" + url);
 
     const zoomLevel = win.webContents.getZoomLevel();
     if (zoomLevel !== 1) {
