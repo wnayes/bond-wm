@@ -942,7 +942,7 @@ export async function createServer(): Promise<XServer> {
     widLog(wid, "onConfigureRequest", ev);
 
     // Ignore any configure requests for these; we always control their size.
-    if (isDesktopBrowserWin(wid) || isFrameBrowserWin(wid)) {
+    if (isFrameBrowserWin(wid)) {
       return;
     }
 
@@ -971,7 +971,10 @@ export async function createServer(): Promise<XServer> {
       config.sibling = ev.sibling;
     }
     if (mask & CWMaskBits.CWStackMode) {
-      config.stackMode = ev.stackMode;
+      // Don't allow the desktop to come to the front.
+      if (!isDesktopBrowserWin(wid)) {
+        config.stackMode = ev.stackMode;
+      }
     }
 
     if (isClientWin(wid)) {
