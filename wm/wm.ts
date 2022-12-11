@@ -373,6 +373,12 @@ export async function createServer(): Promise<XServer> {
     for (const screen of XDisplay.screen) {
       await __initScreen(screen);
     }
+
+    // Set focus to the initial window/desktop.
+    const firstDesktopWid = getNextFocusWidForScreen(0, undefined);
+    if (typeof firstDesktopWid === "number") {
+      setFocus(firstDesktopWid);
+    }
   }
 
   async function __initScreen(screen: IXScreen): Promise<void> {
