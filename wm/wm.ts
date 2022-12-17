@@ -414,6 +414,8 @@ export async function createServer(): Promise<XServer> {
       );
 
       const did = await createDesktopBrowser({
+        x: logicalScreen.x,
+        y: logicalScreen.y,
         width: logicalScreen.width,
         height: logicalScreen.height,
       });
@@ -469,12 +471,14 @@ export async function createServer(): Promise<XServer> {
     return winIdToRootId[wid];
   }
 
-  async function createDesktopBrowser(props: { width: number; height: number }): Promise<number> {
+  async function createDesktopBrowser(props: IGeometry): Promise<number> {
     const win = new BrowserWindow({
       frame: false,
       fullscreen: true,
       width: props.width,
       height: props.height,
+      x: props.x,
+      y: props.y,
       type: "desktop",
       webPreferences: {
         preload: path.resolve(path.join(__dirname, "../../dist/renderer-shared/preload.js")),
