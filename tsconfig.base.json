@@ -1,15 +1,12 @@
 {
   "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
     "rootDir": ".",
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "ESNext",
     "jsx": "react",
+    "noEmit": true,
     "importHelpers": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useStore } from "react-redux";
-import { IIconInfo } from "../shared/window";
+import { IIconInfo } from "@electron-wm/shared/window";
 import { RootState } from "./configureStore";
-import { setPluginState } from "../shared/redux/pluginStateSlice";
+import { setPluginState } from "@electron-wm/shared/redux/pluginStateSlice";
 
 type PluginStateUpdater<T> = (newValue: T) => void;
 

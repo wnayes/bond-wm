@@ -1,56 +1,29 @@
 {
-  "name": "electron-wm",
-  "version": "1.0.0",
-  "description": "An X Window Manager built on web technologies, including Electron and React.",
-  "main": "./dist/wm/main.js",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "startx": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1600x900 :1",
     "startx-multi": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1000x700 -screen 1000x600 +xinerama :1",
-    "build": "tsc -b ./tsconfig.json && npm run build-desktop && npm run build-frame",
+    "buildold": "tsc -b ./tsconfig.json && npm run build-desktop && npm run build-frame",
     "build-desktop": "esbuild ./renderer-desktop/index.tsx --bundle --external:electron --outfile=./dist/renderer-desktop/dist.js",
     "build-frame": "esbuild ./renderer-frame/index.ts --bundle --external:electron --outfile=./dist/renderer-frame/dist.js",
     "clean": "rm -rf ./dist node_modules",
     "start": "DISPLAY=:1 electron .",
     "test": "jest",
-    "lint": "eslint .",
-    "prettier": "prettier --write ."
-  },
-  "repository": "https://github.com/wnayes/electron-wm",
-  "keywords": [
-    "X11",
-    "window manager"
-  ],
-  "author": "Will Nayes",
-  "license": "MIT",
-  "dependencies": {
-    "@reduxjs/toolkit": "^1.9.1",
-    "electron": "^22.0.0",
-    "electron-redux": "2.0.0-alpha.9",
-    "keysym": "^0.0.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-error-boundary": "^3.1.4",
-    "react-redux": "^8.0.5",
-    "redux": "^4.2.0",
-    "tslib": "^2.4.1",
-    "x11": "^2.3.0",
-    "yargs": "^17.6.2"
+    "lintold": "eslint .",
+    "prettier": "prettier --write .",
+
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint"
   },
   "devDependencies": {
-    "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.9",
-    "@types/yargs": "^17.0.15",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "electron-reloader": "^1.2.3",
-    "esbuild": "^0.15.16",
     "eslint": "^8.29.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "jest": "^29.3.1",
     "prettier": "2.8.0",
-    "ts-jest": "^29.0.3",
-    "type-fest": "^3.3.0",
-    "typescript": "~4.9.3"
-  }
+    "turbo": "latest"
+  },
+  "packageManager": "npm@8.12.1"
 }

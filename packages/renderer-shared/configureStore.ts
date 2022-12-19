@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/renderer";
-import configReducer from "../shared/redux/configSlice";
-import pluginStateReducer from "../shared/redux/pluginStateSlice";
-import screenReducer from "../shared/redux/screenSlice";
+import configReducer from "@electron-wm/shared/redux/configSlice";
+import pluginStateReducer from "@electron-wm/shared/redux/pluginStateSlice";
+import screenReducer from "@electron-wm/shared/redux/screenSlice";
 import taskbarReducer from "./redux/taskbarSlice";
-import trayReducer from "../shared/redux/traySlice";
-import windowReducer from "../shared/redux/windowSlice";
+import trayReducer from "@electron-wm/shared/redux/traySlice";
+import windowReducer from "@electron-wm/shared/redux/windowSlice";
 
 export function configureRendererStore() {
   return configureStore({
