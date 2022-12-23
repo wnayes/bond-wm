@@ -7,12 +7,14 @@
     "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json && esbuild ./preload.ts --bundle --external:electron --outfile=./dist/preload.js"
+  },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",
     "@reduxjs/toolkit": "^1.9.1",
     "electron": "^22.0.0",
     "electron-redux": "2.0.0-alpha.9",
-    "keysym": "^0.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",

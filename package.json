@@ -1,29 +1,26 @@
 {
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "main": "./apps/wm/dist/dist.js",
   "scripts": {
     "startx": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1600x900 :1",
     "startx-multi": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1000x700 -screen 1000x600 +xinerama :1",
-    "buildold": "tsc -b ./tsconfig.json && npm run build-desktop && npm run build-frame",
-    "build-desktop": "esbuild ./renderer-desktop/index.tsx --bundle --external:electron --outfile=./dist/renderer-desktop/dist.js",
-    "build-frame": "esbuild ./renderer-frame/index.ts --bundle --external:electron --outfile=./dist/renderer-frame/dist.js",
-    "clean": "rm -rf ./dist node_modules",
     "start": "DISPLAY=:1 electron .",
     "test": "jest",
     "lintold": "eslint .",
     "prettier": "prettier --write .",
 
+    "setup": "pnpm install",
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint"
+  },
+  "dependencies": {
+    "electron": "^22.0.0"
   },
   "devDependencies": {
     "eslint": "^8.29.0",
     "prettier": "2.8.0",
     "turbo": "latest"
   },
-  "packageManager": "npm@8.12.1"
+  "packageManager": "pnpm@7.19.0"
 }

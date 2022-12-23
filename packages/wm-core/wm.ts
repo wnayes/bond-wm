@@ -481,7 +481,7 @@ export async function createServer(): Promise<XServer> {
       y: props.y,
       type: "desktop",
       webPreferences: {
-        preload: path.resolve(path.join(__dirname, "../../dist/renderer-shared/preload.js")),
+        preload: path.resolve(path.join(__dirname, "../../../packages/renderer-shared/dist/preload.js")),
         nodeIntegration: true,
         contextIsolation: false,
       },
@@ -499,7 +499,7 @@ export async function createServer(): Promise<XServer> {
 
     log("Created browser window", handle);
 
-    const url = path.join(__dirname, "../../renderer-desktop/index.html") + "?screen=" + index;
+    const url = path.join(__dirname, "../../../packages/renderer-desktop/index.html") + "?screen=" + index;
     await win.loadURL("file://" + url);
 
     const zoomLevel = win.webContents.getZoomLevel();
@@ -528,7 +528,7 @@ export async function createServer(): Promise<XServer> {
       transparent: true,
       hasShadow: false,
       webPreferences: {
-        preload: path.resolve(path.join(__dirname, "../../dist/renderer-shared/preload.js")),
+        preload: path.resolve(path.join(__dirname, "../../../packages/renderer-shared/dist/preload.js")),
         nodeIntegration: true,
         contextIsolation: false,
       },
@@ -538,7 +538,7 @@ export async function createServer(): Promise<XServer> {
       win.webContents.setZoomLevel(screen.zoom);
     });
 
-    const url = path.join(__dirname, "../../renderer-frame/index.html") + "?wid=" + wid;
+    const url = path.join(__dirname, "../../../packages/renderer-frame/index.html") + "?wid=" + wid;
     win.loadURL("file://" + url);
 
     frameBrowserWindows[wid] = win;

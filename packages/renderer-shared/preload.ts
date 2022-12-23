@@ -1,1 +1,2 @@
-import "electron-redux/preload";
+import { preload } from "electron-redux/preload";
+preload();

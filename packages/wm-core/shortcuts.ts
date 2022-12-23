@@ -1,8 +1,7 @@
 import { IXDisplay, X11_KEY_MODIFIER } from "../shared/X";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMEventConsumerKeyPressArgs } from "./wm";
-
-const nodeKeySym = require("keysym"); // eslint-disable-line
+import * as nodeKeySym from "@electron-wm/keysym";
 
 export type KeyRegistrationMap = { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void };
 
@@ -84,7 +83,7 @@ export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promis
         }
         const keySymMap = hasShift ? keysymsToKeycodeShift : keysymsToKeycode;
         const keySymMapFallback = hasShift ? keysymsToKeycode : keysymsToKeycodeShift;
-        const keycode = keySymMap[keySym?.keysym] ?? keySymMapFallback[keySym?.keysym];
+        const keycode = keySymMap[keySym?.keysym ?? -1] ?? keySymMapFallback[keySym?.keysym ?? -1];
         if (keycode > 0) {
           processedRegisteredKeys[xModifiers] ||= {};
           processedRegisteredKeys[xModifiers][keycode] = registeredKeys[keyString];
