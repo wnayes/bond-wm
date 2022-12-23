@@ -1,7 +1,7 @@
 import { app, dialog } from "electron";
-import { startX } from "@electron-wm/wm-core";
-import "@electron-wm/wm-core/args";
-import { log } from "@electron-wm/wm-core/log";
+import { startX } from "./wm";
+import "./args";
+import { log } from "./log";
 
 // Disable error dialogs by override
 dialog.showErrorBox = function (title, content) {

@@ -1,7 +1,11 @@
-import { addTrayWindowAction, configureTrayWindowAction, removeTrayWindowAction } from "../shared/redux/traySlice";
-import { IGeometry } from "../shared/types";
-import { numsToBuffer } from "../shared/utils";
-import { IX11Mod, X11_EVENT_TYPE, XCB_COPY_FROM_PARENT, XPropMode } from "../shared/X";
+import {
+  addTrayWindowAction,
+  configureTrayWindowAction,
+  removeTrayWindowAction,
+} from "@electron-wm/shared/redux/traySlice";
+import { IGeometry } from "@electron-wm/shared/types";
+import { numsToBuffer } from "@electron-wm/shared/utils";
+import { IX11Mod, X11_EVENT_TYPE, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared/X";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
 import { changeWindowEventMask, internAtomAsync } from "./xutils";

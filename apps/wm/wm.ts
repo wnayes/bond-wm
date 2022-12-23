@@ -2,10 +2,10 @@
 
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
-import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IGeometry } from "../shared/types";
 import * as path from "path";
 import * as os from "os";
+import { app, ipcMain, BrowserWindow } from "electron";
+import { IBounds, IGeometry } from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
@@ -37,17 +37,17 @@ import {
   IXButtonReleaseEvent,
   WMSizeHints,
   WMHintsStates,
-} from "../shared/X";
+} from "@electron-wm/shared";
 import { Action, Middleware } from "redux";
 import { batch } from "react-redux";
-import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "../shared/utils";
+import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "@electron-wm/shared";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
-import { ContextMenuKind } from "../shared/ContextMenuKind";
+import { ContextMenuKind } from "@electron-wm/shared";
 import { showContextMenu } from "./menus";
 import {
   addWindowAction,
@@ -62,12 +62,12 @@ import {
   setWindowTagsAction,
   setWindowTitleAction,
   setWindowVisibleAction,
-} from "../shared/redux/windowSlice";
-import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "../shared/redux/screenSlice";
-import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } from "../shared/window";
-import { IScreen } from "../shared/screen";
+} from "@electron-wm/shared";
+import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "@electron-wm/shared";
+import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } from "@electron-wm/shared";
+import { IScreen } from "@electron-wm/shared";
 import { setupAutocompleteListener } from "./autocomplete";
-import { switchToNextLayout } from "../shared/layouts";
+import { switchToNextLayout } from "@electron-wm/shared";
 import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
 import { getArgs } from "./args";

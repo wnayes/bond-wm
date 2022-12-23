@@ -1,5 +1,5 @@
-import { geometryContains } from "../shared/utils";
-import { IXClient, XQueryPointerResult } from "../shared/X";
+import { geometryContains } from "@electron-wm/shared/utils";
+import { IXClient, XQueryPointerResult } from "@electron-wm/shared/X";
 import { XWMContext } from "./wm";
 
 export function queryPointer(X: IXClient, relativeWid: number): Promise<XQueryPointerResult> {

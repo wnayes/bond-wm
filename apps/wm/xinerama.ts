@@ -3,7 +3,7 @@
  * If node-x11 adds Xinerama support, this could be removed.
  */
 
-import { IXDisplay, XBuffer, XCbWithErr, XineramaScreenInfo, XXineramaExtension } from "../shared/X";
+import { IXDisplay, XBuffer, XCbWithErr, XineramaScreenInfo, XXineramaExtension } from "@electron-wm/shared/X";
 
 export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXineramaExtension | null]>) {
   const X = display.client;

@@ -15,7 +15,8 @@
     "clean": "rm -rf ./dist node_modules"
   },
   "dependencies": {
-    "@electron-wm/wm-core": "workspace:*",
+    "@electron-wm/keysym": "workspace:*",
+    "@electron-wm/shared": "workspace:*",
     "@reduxjs/toolkit": "^1.9.1",
     "electron": "^22.0.0",
     "electron-redux": "2.0.0-alpha.9",

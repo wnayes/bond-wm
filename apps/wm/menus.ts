@@ -1,5 +1,5 @@
 import { app, BrowserWindow, IpcMainEvent, Menu } from "electron";
-import { ContextMenuKind } from "../shared/ContextMenuKind";
+import { ContextMenuKind } from "@electron-wm/shared/ContextMenuKind";
 import { log } from "./log";
 
 export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind): void {

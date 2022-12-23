@@ -1,4 +1,4 @@
-import { IXClient, WMHints, WMSizeHints, XPropMode } from "../shared/X";
+import { IXClient, WMHints, WMSizeHints, XPropMode } from "@electron-wm/shared/X";
 import { log } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { getPropertyValue, getRawPropertyValue, internAtomAsync } from "./xutils";

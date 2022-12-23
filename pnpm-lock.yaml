@@ -17,7 +17,8 @@ importers:
 
   apps/wm:
     specifiers:
-      '@electron-wm/wm-core': workspace:*
+      '@electron-wm/keysym': workspace:*
+      '@electron-wm/shared': workspace:*
       '@reduxjs/toolkit': ^1.9.1
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
@@ -41,7 +42,8 @@ importers:
       x11: ^2.3.0
       yargs: ^17.6.2
     dependencies:
-      '@electron-wm/wm-core': link:../../packages/wm-core
+      '@electron-wm/keysym': link:../../packages/keysym
+      '@electron-wm/shared': link:../../packages/shared
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
       electron: 22.0.0
       electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
@@ -251,59 +253,6 @@ importers:
       x11: ^2.3.0
       yargs: ^17.6.2
     dependencies:
-      '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
-      electron: 22.0.0
-      electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      react-error-boundary: 3.1.4_react@18.2.0
-      react-redux: 8.0.5_gm3gubmwja4o7q6fr6adx3fpz4
-      redux: 4.2.0
-      tslib: 2.4.1
-      x11: 2.3.0
-      yargs: 17.6.2
-    devDependencies:
-      '@types/react': 18.0.26
-      '@types/react-dom': 18.0.10
-      '@types/yargs': 17.0.17
-      '@typescript-eslint/eslint-plugin': 5.47.0_z6f2pmj6irx4lvzl46kkfxteta
-      '@typescript-eslint/parser': 5.47.0_typescript@4.9.4
-      electron-reloader: 1.2.3
-      esbuild: 0.15.18
-      jest: 29.3.1
-      ts-jest: 29.0.3_pdlnomqpefsbwncgyxvjohzhci
-      type-fest: 3.4.0
-      typescript: 4.9.4
-
-  packages/wm-core:
-    specifiers:
-      '@electron-wm/keysym': workspace:*
-      '@electron-wm/shared': workspace:*
-      '@reduxjs/toolkit': ^1.9.1
-      '@types/react': ^18.0.26
-      '@types/react-dom': ^18.0.9
-      '@types/yargs': ^17.0.15
-      '@typescript-eslint/eslint-plugin': ^5.45.0
-      '@typescript-eslint/parser': ^5.45.0
-      electron: ^22.0.0
-      electron-redux: 2.0.0-alpha.9
-      electron-reloader: ^1.2.3
-      esbuild: ^0.15.16
-      jest: ^29.3.1
-      react: ^18.2.0
-      react-dom: ^18.2.0
-      react-error-boundary: ^3.1.4
-      react-redux: ^8.0.5
-      redux: ^4.2.0
-      ts-jest: ^29.0.3
-      tslib: ^2.4.1
-      type-fest: ^3.3.0
-      typescript: ~4.9.3
-      x11: ^2.3.0
-      yargs: ^17.6.2
-    dependencies:
-      '@electron-wm/keysym': link:../keysym
-      '@electron-wm/shared': link:../shared
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
       electron: 22.0.0
       electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
