@@ -3,11 +3,11 @@ import { useCallback } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { useSelector } from "react-redux";
-import { showContextMenu } from "../../renderer-shared/commands";
-import { RootState } from "../../renderer-shared/configureStore";
-import { selectVisibleWindowsFromCurrentTags, selectWindowsFromCurrentTags } from "../../shared/selectors";
-import { ContextMenuKind } from "../../shared/ContextMenuKind";
-import { ErrorDisplay } from "../../renderer-shared/components/ErrorDisplay";
+import { showContextMenu } from "@electron-wm/renderer-shared";
+import { RootState } from "@electron-wm/renderer-shared";
+import { selectVisibleWindowsFromCurrentTags, selectWindowsFromCurrentTags } from "@electron-wm/shared";
+import { ContextMenuKind } from "@electron-wm/shared";
+import { ErrorDisplay } from "@electron-wm/renderer-shared";
 
 import { Taskbar } from "./taskbar/Taskbar";
 import { WorkArea } from "./WorkArea";

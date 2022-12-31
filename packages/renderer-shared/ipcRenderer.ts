@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { X11_KEY_MODIFIER } from "@electron-wm/shared/X";
+import { X11_KEY_MODIFIER } from "@electron-wm/shared";
 import { Store } from "./configureStore";
 import { focusDesktopBrowser } from "./commands";
 import { showRunFieldAction } from "./redux/taskbarSlice";

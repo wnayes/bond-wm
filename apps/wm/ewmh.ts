@@ -1,13 +1,13 @@
-import { setWindowFullscreenAction } from "@electron-wm/shared/redux/windowSlice";
-import { numsToBuffer } from "@electron-wm/shared/utils";
-import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared/X";
+import { setWindowFullscreenAction } from "@electron-wm/shared";
+import { numsToBuffer } from "@electron-wm/shared";
+import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
 import { pid } from "process";
 import { DragModule } from "./drag";
-import { Coords } from "@electron-wm/shared/types";
-import { IIconInfo, ResizeDirection } from "@electron-wm/shared/window";
+import { Coords } from "@electron-wm/shared";
+import { IIconInfo, ResizeDirection } from "@electron-wm/shared";
 
 enum NetWmStateAction {
   _NET_WM_STATE_REMOVE = 0,

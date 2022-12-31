@@ -7,12 +7,12 @@ import {
   minimizeWindow,
   restoreWindow,
   showContextMenu,
-} from "../../renderer-shared/commands";
-import { RootState } from "../../renderer-shared/configureStore";
-import { useIconInfoDataUri } from "../../renderer-shared/hooks";
-import { ContextMenuKind } from "../../shared/ContextMenuKind";
-import { selectWindowMaximizeCanTakeEffect } from "../../shared/selectors";
-import { IIconInfo, IWindow } from "../../shared/window";
+} from "@electron-wm/renderer-shared";
+import { RootState } from "@electron-wm/renderer-shared";
+import { useIconInfoDataUri } from "@electron-wm/renderer-shared";
+import { ContextMenuKind } from "@electron-wm/shared";
+import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
+import { IIconInfo, IWindow } from "@electron-wm/shared";
 
 interface ITitleBarProps {
   win: IWindow;

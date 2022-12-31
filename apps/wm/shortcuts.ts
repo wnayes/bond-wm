@@ -1,4 +1,4 @@
-import { IXDisplay, X11_KEY_MODIFIER } from "@electron-wm/shared/X";
+import { IXDisplay, X11_KEY_MODIFIER } from "@electron-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMEventConsumerKeyPressArgs } from "./wm";
 import * as nodeKeySym from "@electron-wm/keysym";

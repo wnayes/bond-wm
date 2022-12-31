@@ -1,22 +1,17 @@
 import { batch } from "react-redux";
-import {
-  configureWindowAction,
-  endDragAction,
-  setWindowIntoScreenAction,
-  startDragAction,
-} from "@electron-wm/shared/redux/windowSlice";
-import { IScreen } from "@electron-wm/shared/screen";
-import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared/selectors";
-import { Coords, IGeometry } from "@electron-wm/shared/types";
-import { geometryArea, geometryIntersect } from "@electron-wm/shared/utils";
+import { configureWindowAction, endDragAction, setWindowIntoScreenAction, startDragAction } from "@electron-wm/shared";
+import { IScreen } from "@electron-wm/shared";
+import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
+import { Coords, IGeometry } from "@electron-wm/shared";
+import { geometryArea, geometryIntersect } from "@electron-wm/shared";
 import {
   getAbsoluteWindowGeometry,
   IWindow,
   newHeightForWindow,
   newWidthForWindow,
   ResizeDirection,
-} from "@electron-wm/shared/window";
-import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "@electron-wm/shared/X";
+} from "@electron-wm/shared";
+import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "@electron-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
 

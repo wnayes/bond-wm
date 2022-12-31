@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { Clock } from "./Clock";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../renderer-shared/configureStore";
-import { IWindow } from "../../../shared/window";
+import { RootState } from "@electron-wm/renderer-shared";
+import { IWindow } from "@electron-wm/shared";
 import { RunField } from "./RunField";
 import { LayoutIndicator } from "./LayoutIndicator";
 import { TagList } from "./TagList";

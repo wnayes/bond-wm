@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useCallback, useMemo } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState, Store } from "../../../renderer-shared/configureStore";
-import { switchToNextLayout } from "../../../shared/layouts";
+import { RootState, Store } from "@electron-wm/renderer-shared";
+import { switchToNextLayout } from "@electron-wm/shared";
 import { getLayouts } from "../../layouts";
 
 interface ILayoutIndicatorProps {

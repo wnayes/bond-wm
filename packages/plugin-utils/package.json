@@ -1,40 +1,31 @@
 {
-  "name": "@electron-wm/renderer-frame",
+  "name": "@electron-wm/plugin-utils",
   "version": "1.0.0",
-  "description": "Renderer frame internal package",
+  "description": "Public APIs for electron-wm plugins",
   "exports": "./dist/dist.js",
+  "types": "./index.ts",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./index.ts --bundle --packages=external --outfile=./dist/dist.js"
+    "build": "tsc -b ./tsconfig.json && esbuild ./index.ts --bundle --packages=external --format=cjs --outfile=./dist/dist.js"
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",
-    "@electron-wm/plugin-utils": "workspace:*",
     "@electron-wm/renderer-shared": "workspace:*",
-    "@reduxjs/toolkit": "^1.9.1",
-    "electron": "^22.0.0",
-    "electron-redux": "2.0.0-alpha.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-error-boundary": "^3.1.4",
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
-    "tslib": "^2.4.1",
-    "x11": "^2.3.0",
-    "yargs": "^17.6.2"
+    "tslib": "^2.4.1"
   },
   "devDependencies": {
+    "@types/node": "^18.11.17",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
-    "@types/yargs": "^17.0.15",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
-    "electron-reloader": "^1.2.3",
     "esbuild": "^0.16.12",
-    "jest": "^29.3.1",
-    "ts-jest": "^29.0.3",
     "type-fest": "^3.3.0",
     "typescript": "~4.9.3"
   }

@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import { IScreen } from "../../../shared/screen";
-import { IWindow } from "../../../shared/window";
+import { IScreen, IWindow } from "@electron-wm/shared";
 import { getLayouts } from "../../layouts";
 
 export interface ILayoutProps {

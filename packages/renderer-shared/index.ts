@@ -5,5 +5,3 @@ export * from "./configureStore";
 export * from "./dom";
 export * from "./hooks";
 export * from "./ipcRenderer";
-export * from "./preload";
-export * from "./preload";

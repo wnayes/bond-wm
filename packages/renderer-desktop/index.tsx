@@ -2,8 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { Desktop } from "./components/Desktop";
-import { configureRendererStore } from "../renderer-shared/configureStore";
-import { setupIpc } from "../renderer-shared/ipcRenderer";
+import { configureRendererStore, setupIpc } from "@electron-wm/renderer-shared";
 import { hookShortcuts } from "./shortcuts";
 import { getScreenIndex } from "./utils";
 

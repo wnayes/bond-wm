@@ -1,4 +1,4 @@
-import { configureRendererStore } from "../renderer-shared/configureStore";
+import { configureRendererStore } from "@electron-wm/renderer-shared";
 import { setupWindowComponent } from "./components/WindowSetup";
 
 const store = configureRendererStore();

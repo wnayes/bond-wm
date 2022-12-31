@@ -1,5 +1,5 @@
 import * as React from "react";
-import { windowIsDialog } from "../../../../shared/window";
+import { windowIsDialog } from "@electron-wm/shared";
 import { ILayout } from "../../../layouts";
 import { ILayoutProps } from "../Layout";
 import { Window } from "../Window";

@@ -1,15 +1,15 @@
 import * as React from "react";
 import { useCallback, useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState } from "../../renderer-shared/configureStore";
+import { RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
-import { useWindowSize } from "../../renderer-shared/hooks";
-import { Wallpaper } from "./Wallpaper";
+import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
+import Wallpaper from "@electron-wm/wallpaper";
 import { Dimmer } from "./Dimmer";
-import { IWindow } from "../../shared/window";
-import { geometriesDiffer } from "../../shared/utils";
-import { configureScreenWorkAreaAction } from "../../shared/redux/screenSlice";
-import { focusDesktopBrowser } from "../../renderer-shared/commands";
+import { IWindow } from "@electron-wm/shared";
+import { geometriesDiffer } from "@electron-wm/shared";
+import { configureScreenWorkAreaAction } from "@electron-wm/shared";
+import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
 
 export interface IWorkAreaProps {
   screenIndex: number;
@@ -22,7 +22,7 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
   const store = useStore();
   const screen = useSelector((state: RootState) => state.screens[screenIndex]);
 
-  useWindowSize(); // To trigger size recalculations.
+  useBrowserWindowSize(); // To trigger size recalculations.
 
   useLayoutEffect(() => {
     const clientRect = workAreaDiv.current?.getBoundingClientRect();

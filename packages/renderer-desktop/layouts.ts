@@ -1,5 +1,5 @@
 import { ILayoutProps } from "./components/layout/Layout";
-import { getLayoutNames } from "../shared/layouts";
+import { getLayoutNames } from "@electron-wm/shared";
 
 import { TilingLayout } from "./components/layout/layouts/Tiling";
 import { FloatingLayout } from "./components/layout/layouts/Floating";

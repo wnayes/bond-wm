@@ -7,14 +7,14 @@ import {
   getWindowMinHeight,
   getWindowMinWidth,
   IWindow,
+  IScreen,
   WindowPosition,
-} from "../../../shared/window";
-import { geometriesDiffer } from "../../../shared/utils";
-import { configureWindowAction } from "../../../shared/redux/windowSlice";
-import { IScreen } from "../../../shared/screen";
-import { getBoundingClientRectWithZoom } from "../../../renderer-shared/dom";
-import { selectWindowMaximizeCanTakeEffect } from "../../../shared/selectors";
-import { SharedRootState } from "../../../shared/redux/basicStore";
+} from "@electron-wm/shared";
+import { geometriesDiffer } from "@electron-wm/shared";
+import { configureWindowAction } from "@electron-wm/shared";
+import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
+import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
+import { SharedRootState } from "@electron-wm/shared";
 
 export interface IWindowProps {
   win: IWindow;

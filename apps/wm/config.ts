@@ -3,9 +3,9 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { app } from "electron";
 import { log, logError } from "./log";
-import { setConfigAction } from "@electron-wm/shared/redux/configSlice";
+import { setConfigAction } from "@electron-wm/shared";
 import { ServerStore } from "./configureStore";
-import { IConfig } from "@electron-wm/shared/config";
+import { IConfig } from "@electron-wm/shared";
 
 let _store: ServerStore;
 

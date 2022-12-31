@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
-import { exec, getCompletionOptions } from "../../../renderer-shared/commands";
+import { exec, getCompletionOptions } from "@electron-wm/renderer-shared";
 import { useEffect, useRef, useState } from "react";
-import { showRunFieldAction } from "../../../renderer-shared/redux/taskbarSlice";
+import { showRunFieldAction } from "@electron-wm/renderer-shared";
 
 export function RunField() {
   const field = useRef<HTMLInputElement>(null);

@@ -76,6 +76,11 @@ import { assert } from "./assert";
 import { getConfig, loadConfigFromDisk } from "./config";
 import { createTrayEventConsumer } from "./systray";
 
+// Path constants
+const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../../packages/renderer-desktop/index.html");
+const RENDERER_FRAME_INDEX_HTML = path.join(__dirname, "../../../packages/renderer-frame/index.html");
+const PRELOAD_JS = path.resolve(path.join(__dirname, "../../../packages/renderer-shared/dist/preload.js"));
+
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
   UTF8_STRING: -1,
@@ -481,7 +486,7 @@ export async function createServer(): Promise<XServer> {
       y: props.y,
       type: "desktop",
       webPreferences: {
-        preload: path.resolve(path.join(__dirname, "../../../packages/renderer-shared/dist/preload.js")),
+        preload: PRELOAD_JS,
         nodeIntegration: true,
         contextIsolation: false,
       },
@@ -499,7 +504,7 @@ export async function createServer(): Promise<XServer> {
 
     log("Created browser window", handle);
 
-    const url = path.join(__dirname, "../../../packages/renderer-desktop/index.html") + "?screen=" + index;
+    const url = RENDERER_DESKTOP_INDEX_HTML + "?screen=" + index;
     await win.loadURL("file://" + url);
 
     const zoomLevel = win.webContents.getZoomLevel();
@@ -528,7 +533,7 @@ export async function createServer(): Promise<XServer> {
       transparent: true,
       hasShadow: false,
       webPreferences: {
-        preload: path.resolve(path.join(__dirname, "../../../packages/renderer-shared/dist/preload.js")),
+        preload: PRELOAD_JS,
         nodeIntegration: true,
         contextIsolation: false,
       },
@@ -538,7 +543,7 @@ export async function createServer(): Promise<XServer> {
       win.webContents.setZoomLevel(screen.zoom);
     });
 
-    const url = path.join(__dirname, "../../../packages/renderer-frame/index.html") + "?wid=" + wid;
+    const url = RENDERER_FRAME_INDEX_HTML + "?wid=" + wid;
     win.loadURL("file://" + url);
 
     frameBrowserWindows[wid] = win;

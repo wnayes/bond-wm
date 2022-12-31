@@ -1,5 +1,14 @@
 import * as React from "react";
+import { FallbackProps } from "react-error-boundary";
 
-export function ErrorDisplay() {
-  return <div className="errorDisplay">An error has occurred.</div>;
+/** Error boundary fallback component. */
+export function ErrorDisplay(props: FallbackProps) {
+  return (
+    <div className="errorDisplay">
+      An error has occurred.
+      <br />
+      <br />
+      {props.error?.toString()}
+    </div>
+  );
 }

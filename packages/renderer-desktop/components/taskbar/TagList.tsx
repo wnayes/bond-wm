@@ -2,11 +2,10 @@ import * as React from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
-import { RootState } from "../../../renderer-shared/configureStore";
-import { selectWindowsFromScreen } from "../../../shared/selectors";
-import { setScreenCurrentTagsAction } from "../../../shared/redux/screenSlice";
-import { arraysEqual } from "../../../shared/utils";
-import { isUrgent } from "../../../shared/window";
+import { RootState } from "@electron-wm/renderer-shared";
+import { selectWindowsFromScreen } from "@electron-wm/shared";
+import { setScreenCurrentTagsAction } from "@electron-wm/shared";
+import { arraysEqual, isUrgent } from "@electron-wm/shared";
 
 interface ITagListProps {
   screenIndex: number;

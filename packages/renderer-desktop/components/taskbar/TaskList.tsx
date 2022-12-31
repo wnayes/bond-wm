@@ -1,9 +1,9 @@
 import * as React from "react";
 
-import { minimizeWindow, raiseWindow } from "../../../renderer-shared/commands";
+import { minimizeWindow, raiseWindow } from "@electron-wm/renderer-shared";
 import { useCallback } from "react";
-import { IIconInfo, isUrgent, IWindow } from "../../../shared/window";
-import { useIconInfoDataUri } from "../../../renderer-shared/hooks";
+import { IIconInfo, isUrgent, IWindow } from "@electron-wm/shared";
+import { useIconInfoDataUri } from "@electron-wm/renderer-shared";
 
 interface ITaskListProps {
   windows: IWindow[];

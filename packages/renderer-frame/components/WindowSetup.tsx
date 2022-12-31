@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 
 import { WindowFrame } from "./WindowFrame";
-import { Store } from "../../renderer-shared/configureStore";
+import { Store } from "@electron-wm/renderer-shared";
 
 export function setupWindowComponent(container: HTMLElement, store: Store): void {
   const urlParams = new URLSearchParams(window.location.search);

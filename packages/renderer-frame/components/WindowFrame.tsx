@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../renderer-shared/configureStore";
-import { useWindowSize } from "../../renderer-shared/hooks";
-import { isUrgent } from "../../shared/window";
+import { RootState } from "@electron-wm/renderer-shared";
+import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
+import { isUrgent } from "@electron-wm/shared";
 import { TitleBar } from "./TitleBar";
 import { WindowClientArea } from "./WindowClientArea";
 
@@ -42,7 +42,7 @@ export function WindowFrame(props: IWindowFrameProps) {
     titlebar = <TitleBar win={win} />;
   }
 
-  useWindowSize(); // Triggers re-renders on resize.
+  useBrowserWindowSize(); // Triggers re-renders on resize.
 
   return (
     <div className={className} style={style}>

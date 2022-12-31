@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState } from "../../renderer-shared/configureStore";
-import { setFrameExtentsAction } from "../../shared/redux/windowSlice";
-import { getBoundingClientRectWithZoom } from "../../renderer-shared/dom";
+import { RootState } from "@electron-wm/renderer-shared";
+import { setFrameExtentsAction } from "@electron-wm/shared";
+import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
 
 interface IWindowClientAreaProps {
   wid: number;

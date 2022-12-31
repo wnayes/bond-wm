@@ -1,11 +1,7 @@
 import { applyMiddleware, Middleware } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { composeWithStateSync } from "electron-redux/main";
-import configReducer from "@electron-wm/shared/redux/configSlice";
-import pluginStateReducer from "@electron-wm/shared/redux/pluginStateSlice";
-import screenReducer from "@electron-wm/shared/redux/screenSlice";
-import trayReducer from "@electron-wm/shared/redux/traySlice";
-import windowReducer from "@electron-wm/shared/redux/windowSlice";
+import { configReducer, pluginStateReducer, screenReducer, trayReducer, windowReducer } from "@electron-wm/shared";
 
 export type ServerStore = ReturnType<typeof configureWMStore>;
 export type ServerRootState = ReturnType<ServerStore["getState"]>;
