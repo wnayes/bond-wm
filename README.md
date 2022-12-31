@@ -12,17 +12,20 @@ An X Window Manager built on web technologies, including Electron and React.
 
 ## Development
 
+This repository uses the pnpm package manager. [Install pnpm](https://pnpm.io/installation) for your operating system.
+
 To do prerequisite build steps:
 
-    npm run build
+    pnpm build
+    (Equivalent to `npm run build` if you prefer npm for running scripts.)
 
 To start a test X server (requires Xephyr):
 
-    npm run startx
+    pnpm startx
 
 To start the window manager:
 
-    npm run start
+    pnpm start
 
 ## Usage
 
@@ -43,7 +46,7 @@ For example, you may want to create an `.xinitrc` and run something like the fol
 exec /path/to/electron-wm-checkout/.bin/electron /path/to/electron-wm-checkout
 ```
 
-Make sure to run `npm run build` before attempting to use the window manager from the source checkout.
+Make sure to run `pnpm build` before attempting to use the window manager from the source checkout.
 
 ### Configuration
 
@@ -81,3 +84,5 @@ Shortcuts are currently hard-coded in the wm.ts.
 ## License
 
 [MIT License](LICENSE.md)
+
+Individual packages within the repository sometimes have different licenses.
