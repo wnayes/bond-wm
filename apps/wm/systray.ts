@@ -49,7 +49,7 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
 
   let _registered = false;
   let _trayOwnerWid = 0;
-  let _trayDesktopWid = 0;
+  //let _trayDesktopWid = 0;
 
   const _notificationState: NotificationState = {};
 
@@ -96,7 +96,7 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
         numsToBuffer([SystemTrayOrientation._NET_SYSTEM_TRAY_ORIENTATION_HORZ])
       );
 
-      _trayDesktopWid = args.desktopWindowId;
+      //_trayDesktopWid = args.desktopWindowId;
       const selection = atoms[TraySelectionAtom];
 
       const eventData = Buffer.alloc(32);

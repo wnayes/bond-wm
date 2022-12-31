@@ -1,10 +1,16 @@
 {
-    "name" : "@electron-wm/keysym",
-    "version" : "0.0.6",
-    "description" : "Look up X11 keysyms, unicode positions, and names.",
-    "main" : "./index.js",
-    "types": "./index.d.ts",
-    "keywords": [ "x11", "keysym", "key", "unicode" ],
-    "license": "MIT/X11",
-    "author" : "James Halliday <mail@substack.net>"
+  "private": true,
+  "name": "@electron-wm/keysym",
+  "version": "0.0.6",
+  "description": "Look up X11 keysyms, unicode positions, and names.",
+  "exports": "./index.js",
+  "types": "./index.d.ts",
+  "keywords": [
+    "x11",
+    "keysym",
+    "key",
+    "unicode"
+  ],
+  "license": "MIT/X11",
+  "author": "James Halliday <mail@substack.net>"
 }

@@ -50,9 +50,9 @@ Make sure to run `npm run build` before attempting to use the window manager fro
 A basic config file is read from the following locations:
 
 - `app-path/.ewmrc.js`
-    - The file distributed with the application.
+  - The file distributed with the application.
 - `$XDG_CONFIG_HOME/electron-wm-config/.ewmrc.js`
-    - Typically `$HOME/.config/electron-wm-config/.ewmrc.js`
+  - Typically `$HOME/.config/electron-wm-config/.ewmrc.js`
 
 See the `.ewmrc.js` example included in this repository.
 
@@ -64,17 +64,17 @@ The following shortcuts are supported:
 
 (`Mod4` is typically the Windows key.)
 
-| Shortcut      | Description |
-| ------------- | ----------- |
-| `Mod4 + Enter` | Opens a new instance of your configured default terminal. |
-| `Mod4 + Space` | Swaps between available layouts on the current screen. |
-| `Mod4 + R` | Opens a basic run prompt in the desktop, where you can type a command like `firefox` |
-| `Mod4 + O` | Sends the active window to the next screen. |
-| `Mod4 + 1` ... `Mod4 + 9` | Switches to a different tag by index. |
-| `Mod4 + Shift + 1` ... `Mod4 + Shift + 9` | Sends the active window to a different tag by index. |
-| `Mod4 + Shift + C` | Closes the focused window. |
-| `Mod4 + Shift + Q` | Closes the window manager |
-| `Mod4 + Ctrl + R` | Reloads the window manager |
+| Shortcut                                  | Description                                                                          |
+| ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| `Mod4 + Enter`                            | Opens a new instance of your configured default terminal.                            |
+| `Mod4 + Space`                            | Swaps between available layouts on the current screen.                               |
+| `Mod4 + R`                                | Opens a basic run prompt in the desktop, where you can type a command like `firefox` |
+| `Mod4 + O`                                | Sends the active window to the next screen.                                          |
+| `Mod4 + 1` ... `Mod4 + 9`                 | Switches to a different tag by index.                                                |
+| `Mod4 + Shift + 1` ... `Mod4 + Shift + 9` | Sends the active window to a different tag by index.                                 |
+| `Mod4 + Shift + C`                        | Closes the focused window.                                                           |
+| `Mod4 + Shift + Q`                        | Closes the window manager                                                            |
+| `Mod4 + Ctrl + R`                         | Reloads the window manager                                                           |
 
 Shortcuts are currently hard-coded in the wm.ts.
 

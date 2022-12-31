@@ -5,20 +5,21 @@
     "startx": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1600x900 :1",
     "startx-multi": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1000x700 -screen 1000x600 +xinerama :1",
     "start": "DISPLAY=:1 electron .",
-    "test": "jest",
-    "lintold": "eslint .",
     "prettier": "prettier --write .",
-
+    "lint": "eslint .",
     "setup": "pnpm install",
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint"
+    "test": "turbo run test"
   },
   "dependencies": {
     "electron": "^22.0.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.29.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "2.8.0",
     "turbo": "latest"
   },
