@@ -3,6 +3,7 @@
   "name": "@electron-wm/renderer-frame",
   "version": "1.0.0",
   "description": "Renderer frame internal package",
+  "main": "./dist/dist.js",
   "exports": "./dist/dist.js",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",

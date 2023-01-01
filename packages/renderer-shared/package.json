@@ -3,6 +3,7 @@
   "name": "@electron-wm/renderer-shared",
   "version": "1.0.0",
   "description": "Renderer shared internal functionality",
+  "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "types": "./index.ts",
   "repository": "https://github.com/wnayes/electron-wm",

@@ -3,6 +3,7 @@
   "name": "@electron-wm/keysym",
   "version": "0.0.6",
   "description": "Look up X11 keysyms, unicode positions, and names.",
+  "main": "./index.js",
   "exports": "./index.js",
   "types": "./index.d.ts",
   "keywords": [

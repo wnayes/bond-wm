@@ -1,12 +1,11 @@
 import * as React from "react";
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
 import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
-import Wallpaper from "@electron-wm/wallpaper";
 import { Dimmer } from "./Dimmer";
-import { IWindow } from "@electron-wm/shared";
+import { IWindow, resolvePlugins, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
@@ -21,6 +20,7 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
   const store = useStore();
   const screen = useSelector((state: RootState) => state.screens[screenIndex]);
+  const wallpaperComponents = useWallpaperComponents();
 
   useBrowserWindowSize(); // To trigger size recalculations.
 
@@ -48,9 +48,24 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
   return (
     <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
-      <Wallpaper />
+      {wallpaperComponents}
       <Dimmer />
       <Layout screen={screen} windows={windows} />
     </div>
   );
+}
+
+function useWallpaperComponents() {
+  const wallpaperConfig = useSelector((state: RootState) => state.config.plugins?.wallpaper);
+  return useMemo(() => {
+    if (!wallpaperConfig) {
+      return [];
+    }
+    return resolvePlugins<WallpaperModule>(wallpaperConfig).map((wallpaperModule) => {
+      const wallpaperComponent = wallpaperModule.default;
+      if (typeof wallpaperComponent === "function") {
+        return React.createElement(wallpaperComponent);
+      }
+    });
+  }, [wallpaperConfig]);
 }

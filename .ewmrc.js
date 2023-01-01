@@ -8,6 +8,11 @@ exports.config = {
     /** Virtual desktop names. */
     tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
 
-    /** Default terminal */
+    /** Default terminal. */
     term: "xterm",
+
+    /** Plugin configuration. */
+    plugins: {
+        wallpaper: "./packages/wallpaper"
+    },
 };

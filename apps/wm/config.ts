@@ -1,9 +1,9 @@
 import { env } from "process";
 import { existsSync } from "fs";
-import { join } from "path";
+import { dirname, join, resolve as pathResolve } from "path";
 import { app } from "electron";
 import { log, logError } from "./log";
-import { setConfigAction } from "@electron-wm/shared";
+import { IPluginConfig, setConfigAction } from "@electron-wm/shared";
 import { ServerStore } from "./configureStore";
 import { IConfig } from "@electron-wm/shared";
 
@@ -40,7 +40,8 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
       try {
         const userConfigModule = await import(configPath);
         if (userConfigModule) {
-          processConfigModule(userConfigModule);
+          const configDirectory = dirname(configPath);
+          processConfigModule(userConfigModule, configDirectory);
         }
       } catch (e) {
         logError("Error reading user config file", e);
@@ -55,10 +56,36 @@ interface IConfigModule {
   config?: Partial<IConfig>;
 }
 
-function processConfigModule(userConfigModule: IConfigModule): void {
+function processConfigModule(userConfigModule: IConfigModule, configDirectory: string): void {
   const config = userConfigModule.config;
   if (typeof config === "object") {
     log("Config from module", config);
+
+    if (config.plugins) {
+      // Resolve plugin specifiers, which may be relative to this specific config.
+      for (const pluginType in config.plugins) {
+        const pluginSpecifier = config.plugins[pluginType as keyof IPluginConfig];
+        if (typeof pluginSpecifier === "string") {
+          config.plugins[pluginType as keyof IPluginConfig] = mapPluginSpecifier(pluginSpecifier, configDirectory);
+        } else if (Array.isArray(pluginSpecifier)) {
+          config.plugins[pluginType as keyof IPluginConfig] = pluginSpecifier.map((specifier) =>
+            mapPluginSpecifier(specifier, configDirectory)
+          );
+        } else {
+          logError("Unexpected plugin specifier type: " + typeof pluginSpecifier);
+        }
+      }
+
+      log("Config from module (post path resolution)", config);
+    }
+
     _store.dispatch(setConfigAction(config));
   }
+}
+
+function mapPluginSpecifier(specifier: string, configPath: string): string {
+  if (specifier.startsWith(".")) {
+    return pathResolve(configPath, specifier);
+  }
+  return specifier;
 }

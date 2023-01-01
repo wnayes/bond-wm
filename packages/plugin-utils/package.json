@@ -2,6 +2,7 @@
   "name": "@electron-wm/plugin-utils",
   "version": "1.0.0",
   "description": "Public APIs for electron-wm plugins",
+  "main": "./dist/dist.js",
   "exports": "./dist/dist.js",
   "types": "./index.ts",
   "repository": "https://github.com/wnayes/electron-wm",
