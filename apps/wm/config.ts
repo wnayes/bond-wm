@@ -1,5 +1,5 @@
 import { env } from "process";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { dirname, join, resolve as pathResolve } from "path";
 import { app } from "electron";
 import { log, logError } from "./log";
@@ -15,6 +15,8 @@ export function getConfig(): IConfig {
 
 export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
   _store = store;
+
+  readVersionInfo(store);
 
   let XDG_CONFIG_HOME = env["XDG_CONFIG_HOME"];
   if (!XDG_CONFIG_HOME) {
@@ -88,4 +90,24 @@ function mapPluginSpecifier(specifier: string, configPath: string): string {
     return pathResolve(configPath, specifier);
   }
   return specifier;
+}
+
+interface VersionJson {
+  version: string;
+}
+
+function readVersionInfo(store: ServerStore): void {
+  const versionJsonPath = join(app.getAppPath(), "apps", "wm", "dist", "version.json");
+  if (!existsSync(versionJsonPath)) {
+    logError(`version.json missing at '${versionJsonPath}'`);
+    return;
+  }
+
+  const versionJson: VersionJson = JSON.parse(readFileSync(versionJsonPath, "utf-8"));
+
+  store.dispatch(
+    setConfigAction({
+      version: versionJson.version,
+    })
+  );
 }

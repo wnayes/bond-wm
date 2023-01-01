@@ -19,6 +19,7 @@ export interface IConfig {
   tags: string[];
   term: string;
   plugins?: IPluginConfig;
+  version?: string;
 }
 
 export const defaultConfig: IConfig = {

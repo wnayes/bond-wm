@@ -1,6 +1,7 @@
 import { app, BrowserWindow, IpcMainEvent, Menu } from "electron";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { log } from "./log";
+import { getConfig } from "./config";
 
 export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind): void {
   log("Showing context menu (kind=" + ContextMenuKind[kind]);
@@ -22,7 +23,16 @@ function showDesktopMenu(event: IpcMainEvent) {
     return;
   }
 
+  const version = getConfig().version;
+
   const desktopMenu = Menu.buildFromTemplate([
+    {
+      label: "electron-wm" + (version ? ` — ${version}` : ""),
+      enabled: false,
+    },
+    {
+      type: "separator",
+    },
     {
       label: "Reload Desktop",
       click: () => {
