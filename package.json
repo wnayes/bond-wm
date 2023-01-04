@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "setup": "pnpm install",
     "build": "turbo run build",
+    "clean": "turbo run clean",
     "test": "turbo run test"
   },
   "dependencies": {

@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -b ./tsconfig.json && esbuild ./index.ts --bundle --platform=node --packages=external --format=cjs --outfile=./dist/index.js",
-    "clean": "rm -rf ./dist node_modules",
+    "clean": "rm -rf ./dist ./node_modules",
     "test": "jest"
   },
   "dependencies": {

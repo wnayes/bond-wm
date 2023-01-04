@@ -75,6 +75,7 @@ import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
 import { getConfig, loadConfigFromDisk } from "./config";
 import { createTrayEventConsumer } from "./systray";
+import { setupPackageInstallMessageListener } from "./npmPackageCache";
 
 // Path constants
 const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../../packages/renderer-desktop/index.html");
@@ -357,6 +358,7 @@ export async function createServer(): Promise<XServer> {
     });
 
     setupAutocompleteListener();
+    setupPackageInstallMessageListener();
   })();
 
   async function __setupAtoms(): Promise<void> {

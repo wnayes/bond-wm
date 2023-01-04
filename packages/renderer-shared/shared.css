@@ -1,10 +1,16 @@
 .errorDisplay {
-    background: repeating-linear-gradient(
+    background-image: linear-gradient(
         45deg,
-        #FFCCCC,
-        #FF9999 10px,
-        #FF7777 10px,
-        #FF3333 20px
+        hsl(0deg 88% 84%) 0%,
+        hsl(0deg 79% 82%) 11%,
+        hsl(0deg 72% 80%) 22%,
+        hsl(0deg 66% 78%) 33%,
+        hsl(0deg 62% 76%) 44%,
+        hsl(0deg 57% 74%) 56%,
+        hsl(0deg 54% 72%) 67%,
+        hsl(0deg 51% 70%) 78%,
+        hsl(0deg 48% 68%) 89%,
+        hsl(0deg 45% 66%) 100%
     );
     white-space: pre;
 }

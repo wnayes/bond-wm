@@ -1,7 +1,8 @@
 import { isAbsolute } from "path";
 import { FunctionComponent } from "react";
+import { requirePackage } from "./npmPackageProxy";
 
-type PluginSpecifiers = string | string[];
+export type PluginSpecifiers = string | string[];
 
 export interface IPluginConfig {
   wallpaper: PluginSpecifiers;
@@ -30,19 +31,23 @@ export const defaultConfig: IConfig = {
 };
 
 /** Resolves plugins into their runtime types. */
-export function resolvePlugins<T>(specifiers: PluginSpecifiers): T[] {
+export async function resolvePlugins<T>(specifiers: PluginSpecifiers, installDirectory: string): Promise<T[]> {
   if (typeof specifiers === "string") {
     specifiers = [specifiers];
   }
 
-  return specifiers
-    .map((specifier) => {
-      if (isAbsolute(specifier)) {
-        return require(specifier);
-      } else {
-        console.error("Unsupported/unhandled plugin specifier kind: " + specifier);
-        return null;
-      }
-    })
-    .filter((plugin) => plugin != null);
+  const plugins: T[] = [];
+  for (const specifier of specifiers) {
+    let loadedModule: T;
+    if (isAbsolute(specifier)) {
+      loadedModule = require(specifier);
+    } else {
+      loadedModule = await requirePackage<T>(specifier, installDirectory);
+    }
+
+    if (loadedModule != null) {
+      plugins.push(loadedModule);
+    }
+  }
+  return plugins;
 }

@@ -1,11 +1,10 @@
 import { ipcRenderer } from "electron";
-import { X11_KEY_MODIFIER } from "@electron-wm/shared";
+import { setupNPMPackageProxyListeners, X11_KEY_MODIFIER } from "@electron-wm/shared";
 import { Store } from "./configureStore";
 import { focusDesktopBrowser } from "./commands";
 import { showRunFieldAction } from "./redux/taskbarSlice";
 
 type CompletionOptionsCallback = (options: string[]) => void;
-
 let _onCompletionOptionsResult: CompletionOptionsCallback | undefined;
 
 export function setupIpc(store: Store, screenIndex: number) {
@@ -25,6 +24,8 @@ export function setupIpc(store: Store, screenIndex: number) {
     _onCompletionOptionsResult?.(options);
     _onCompletionOptionsResult = undefined;
   });
+
+  setupNPMPackageProxyListeners(ipcRenderer);
 }
 
 export function setOnCompletionOptionsResult(callback: CompletionOptionsCallback): void {

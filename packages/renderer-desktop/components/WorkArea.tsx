@@ -1,11 +1,10 @@
 import * as React from "react";
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import { FunctionComponentElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState } from "@electron-wm/renderer-shared";
+import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
 import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
-import { Dimmer } from "./Dimmer";
-import { IWindow, resolvePlugins, WallpaperModule } from "@electron-wm/shared";
+import { IWindow, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
@@ -49,7 +48,6 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
   return (
     <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
       {wallpaperComponents}
-      <Dimmer />
       <Layout screen={screen} windows={windows} />
     </div>
   );
@@ -57,15 +55,28 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
 
 function useWallpaperComponents() {
   const wallpaperConfig = useSelector((state: RootState) => state.config.plugins?.wallpaper);
-  return useMemo(() => {
-    if (!wallpaperConfig) {
-      return [];
-    }
-    return resolvePlugins<WallpaperModule>(wallpaperConfig).map((wallpaperModule) => {
-      const wallpaperComponent = wallpaperModule.default;
-      if (typeof wallpaperComponent === "function") {
-        return React.createElement(wallpaperComponent);
+
+  const [wallpaperComponents, setWallpaperComponents] = useState<FunctionComponentElement<{}>[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      if (!wallpaperConfig) {
+        setWallpaperComponents([]);
+        return;
       }
-    });
+
+      const modules = await resolvePluginsFromRenderer<WallpaperModule>(wallpaperConfig);
+      const components = modules
+        .map((wallpaperModule, i) => {
+          const wallpaperComponent = wallpaperModule.default;
+          if (typeof wallpaperComponent === "function") {
+            return React.createElement(wallpaperComponent, { key: i });
+          }
+        })
+        .filter((component) => component != null) as FunctionComponentElement<{}>[];
+      setWallpaperComponents(components);
+    })();
   }, [wallpaperConfig]);
+
+  return wallpaperComponents;
 }

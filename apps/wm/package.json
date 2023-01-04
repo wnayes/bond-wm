@@ -12,7 +12,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -b ./tsconfig.json && esbuild ./main.ts --sourcemap --platform=node --bundle --packages=external --outfile=./dist/dist.js && ./scripts/generate-version-json.mjs",
-    "clean": "rm -rf ./dist node_modules"
+    "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
     "@electron-wm/keysym": "workspace:*",

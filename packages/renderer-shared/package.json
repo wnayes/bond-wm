@@ -10,7 +10,8 @@
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./preload.ts --bundle --packages=external --outfile=./dist/preload.js && esbuild ./index.ts --bundle --packages=external --format=cjs --outfile=./dist/index.js"
+    "build": "tsc -b ./tsconfig.json && esbuild ./preload.ts --bundle --packages=external --outfile=./dist/preload.js && esbuild ./index.ts --bundle --packages=external --format=cjs --outfile=./dist/index.js",
+    "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",

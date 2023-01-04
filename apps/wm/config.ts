@@ -1,6 +1,6 @@
-import { env } from "process";
-import { existsSync, readFileSync } from "fs";
-import { dirname, join, resolve as pathResolve } from "path";
+import { env } from "node:process";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join, resolve as pathResolve } from "node:path";
 import { app } from "electron";
 import { log, logError } from "./log";
 import { IPluginConfig, setConfigAction } from "@electron-wm/shared";

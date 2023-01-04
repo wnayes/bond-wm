@@ -1,5 +1,7 @@
-import { configureRendererStore } from "@electron-wm/renderer-shared";
+import { configureRendererStore, setPluginInstallDirectory } from "@electron-wm/renderer-shared";
 import { setupWindowComponent } from "./components/WindowSetup";
+
+setPluginInstallDirectory(__dirname);
 
 const store = configureRendererStore();
 

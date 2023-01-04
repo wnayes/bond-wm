@@ -13,6 +13,7 @@ export * from "./config";
 export * from "./ContextMenuKind";
 export * from "./exec";
 export * from "./layouts";
+export * from "./npmPackageProxy";
 export * from "./screen";
 export * from "./selectors";
 export * from "./types";

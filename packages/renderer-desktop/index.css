@@ -34,14 +34,6 @@ html, body {
     width: 100%;
 }
 
-.dimmerDiv {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background-color: black;
-    opacity: 0;
-}
-
 .taskbar {
     display: flex;
     height: 20px;

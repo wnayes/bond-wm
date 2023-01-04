@@ -9,7 +9,8 @@
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --packages=external --outfile=./dist/dist.js"
+    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --packages=external --outfile=./dist/dist.js",
+    "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",

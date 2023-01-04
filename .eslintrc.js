@@ -16,6 +16,7 @@ module.exports = {
   ],
   rules: {
     "no-prototype-builtins": 0,
+    "@typescript-eslint/ban-types": 0,
     "@typescript-eslint/no-non-null-assertion": 0,
 
     "react-hooks/rules-of-hooks": "error",
