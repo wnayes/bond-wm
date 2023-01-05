@@ -17,6 +17,7 @@ html, body {
 #desktop {
     display: flex;
     flex-direction: column;
+    background-color: black;
 }
 
 #workarea {
