@@ -26,7 +26,7 @@ export function requirePackage<T>(specifier: string, installDirectory: string): 
   if (!_npmPackagePromises.has(cacheKey)) {
     _npmPackagePromises.set(
       cacheKey,
-      new Promise((resolve) => {
+      new Promise<T>((resolve) => {
         addOnPackageInstalledCallback(cacheKey, (installPath: string) => {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           resolve(require(installPath));
@@ -37,7 +37,7 @@ export function requirePackage<T>(specifier: string, installDirectory: string): 
     );
   }
 
-  return _npmPackagePromises.get(specifier) as Promise<T>;
+  return _npmPackagePromises.get(cacheKey) as Promise<T>;
 }
 
 function addOnPackageInstalledCallback(cacheKey: string, callback: PackageInstalledCallback): void {
