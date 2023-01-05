@@ -13,6 +13,6 @@ exports.config = {
 
     /** Plugin configuration. */
     plugins: {
-        wallpaper: "./packages/wallpaper"
+        wallpaper: "$APP_PATH$/packages/wallpaper"
     },
 };

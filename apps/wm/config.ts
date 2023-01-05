@@ -86,6 +86,10 @@ function processConfigModule(userConfigModule: IConfigModule, configDirectory: s
 }
 
 function mapPluginSpecifier(specifier: string, configPath: string): string {
+  if (specifier.includes("$APP_PATH$")) {
+    specifier = specifier.replaceAll("$APP_PATH$", app.getAppPath());
+  }
+
   if (specifier.startsWith(".")) {
     return pathResolve(configPath, specifier);
   }
