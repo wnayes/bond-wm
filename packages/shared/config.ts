@@ -5,7 +5,7 @@ import { requirePackage } from "./npmPackageProxy";
 export type PluginSpecifiers = string | string[];
 
 export interface IPluginConfig {
-  wallpaper: PluginSpecifiers;
+  wallpaper?: PluginSpecifiers;
 }
 
 /** Expected wallpaper plugin module exports. */
@@ -28,6 +28,7 @@ export const defaultConfig: IConfig = {
   initialTag: "1",
   tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
   term: "xterm",
+  plugins: {},
 };
 
 /** Resolves plugins into their runtime types. */

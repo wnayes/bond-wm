@@ -6,7 +6,18 @@ export const configSlice = createSlice({
   initialState: defaultConfig,
   reducers: {
     setConfigAction: (state, { payload }: PayloadAction<Partial<IConfig>>) => {
-      Object.assign(state, payload);
+      for (const configPropName in payload) {
+        switch (configPropName) {
+          case "plugins":
+            // Overwrite at the level of each plugin, not the entire plugins object.
+            Object.assign(state.plugins!, payload[configPropName]);
+            break;
+          default:
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            state[configPropName as keyof IConfig] = payload[configPropName as keyof Partial<IConfig>] as any;
+            break;
+        }
+      }
     },
   },
 });
