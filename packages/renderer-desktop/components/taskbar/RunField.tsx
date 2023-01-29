@@ -4,6 +4,8 @@ import { exec, getCompletionOptions } from "@electron-wm/renderer-shared";
 import { useEffect, useRef, useState } from "react";
 import { showRunFieldAction } from "@electron-wm/renderer-shared";
 
+let lastEntryText: string | undefined;
+
 export function RunField() {
   const field = useRef<HTMLInputElement>(null);
 
@@ -16,6 +18,12 @@ export function RunField() {
   const reset = () => {
     setText("");
     dispatch(showRunFieldAction(false));
+  };
+
+  const submit = (submitText: string) => {
+    lastEntryText = submitText;
+    exec(submitText);
+    reset();
   };
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -38,8 +46,7 @@ export function RunField() {
         if (freezeTyping.current) {
           enterWhileFrozen.current = true;
         } else if (text) {
-          exec(text);
-          reset();
+          submit(text);
         }
         break;
 
@@ -63,13 +70,20 @@ export function RunField() {
           if (bestOption) {
             setText(bestOption);
             if (enterWhileFrozen.current) {
-              exec(bestOption);
-              reset();
+              submit(bestOption);
             }
           }
           freezeTyping.current = false;
           enterWhileFrozen.current = false;
         });
+        break;
+
+      // Set value to the prior submitted value, if any.
+      case "=":
+        if (text === "") {
+          event.preventDefault();
+          setText(lastEntryText || "");
+        }
         break;
     }
   };
