@@ -13,7 +13,7 @@
     "test": "turbo run test"
   },
   "dependencies": {
-    "electron": "^22.0.0"
+    "electron": "^23.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.45.0",

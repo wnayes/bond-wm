@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@typescript-eslint/eslint-plugin': ^5.45.0
       '@typescript-eslint/parser': ^5.45.0
-      electron: ^22.0.0
+      electron: ^23.0.0
       eslint: ^8.29.0
       eslint-config-prettier: ^8.5.0
       eslint-plugin-react-hooks: ^4.6.0
@@ -14,7 +14,7 @@ importers:
       turbo: latest
       typescript: ~4.9.3
     dependencies:
-      electron: 22.0.0
+      electron: 23.0.0
     devDependencies:
       '@typescript-eslint/eslint-plugin': 5.47.0_ncmi6noazr3nzas7jxykisekym
       '@typescript-eslint/parser': 5.47.0_lzzuuodtsqwxnvqeq4g4likcqa
@@ -22,7 +22,7 @@ importers:
       eslint-config-prettier: 8.5.0_eslint@8.30.0
       eslint-plugin-react-hooks: 4.6.0_eslint@8.30.0
       prettier: 2.8.0
-      turbo: 1.6.3
+      turbo: 1.7.4
       typescript: 4.9.4
 
   apps/wm:
@@ -33,7 +33,7 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@types/yargs': ^17.0.15
-      electron: ^22.0.0
+      electron: ^23.0.0
       electron-redux: 2.0.0-alpha.9
       electron-reloader: ^1.2.3
       esbuild: ^0.16.12
@@ -53,8 +53,8 @@ importers:
       '@electron-wm/keysym': link:../../packages/keysym
       '@electron-wm/shared': link:../../packages/shared
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
-      electron: 22.0.0
-      electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
+      electron: 23.0.0
+      electron-redux: 2.0.0-alpha.9_e3wqamyd2duc36ihehoid7prba
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-error-boundary: 3.1.4_react@18.2.0
@@ -117,7 +117,7 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@types/yargs': ^17.0.15
-      electron: ^22.0.0
+      electron: ^23.0.0
       electron-redux: 2.0.0-alpha.9
       electron-reloader: ^1.2.3
       esbuild: ^0.16.12
@@ -138,8 +138,8 @@ importers:
       '@electron-wm/renderer-shared': link:../renderer-shared
       '@electron-wm/shared': link:../shared
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
-      electron: 22.0.0
-      electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
+      electron: 23.0.0
+      electron-redux: 2.0.0-alpha.9_e3wqamyd2duc36ihehoid7prba
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-error-boundary: 3.1.4_react@18.2.0
@@ -168,7 +168,7 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@types/yargs': ^17.0.15
-      electron: ^22.0.0
+      electron: ^23.0.0
       electron-redux: 2.0.0-alpha.9
       electron-reloader: ^1.2.3
       esbuild: ^0.16.12
@@ -189,8 +189,8 @@ importers:
       '@electron-wm/renderer-shared': link:../renderer-shared
       '@electron-wm/shared': link:../shared
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
-      electron: 22.0.0
-      electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
+      electron: 23.0.0
+      electron-redux: 2.0.0-alpha.9_e3wqamyd2duc36ihehoid7prba
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-error-boundary: 3.1.4_react@18.2.0
@@ -217,7 +217,7 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@types/yargs': ^17.0.15
-      electron: ^22.0.0
+      electron: ^23.0.0
       electron-redux: 2.0.0-alpha.9
       electron-reloader: ^1.2.3
       esbuild: ^0.16.12
@@ -236,8 +236,8 @@ importers:
     dependencies:
       '@electron-wm/shared': link:../shared
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
-      electron: 22.0.0
-      electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
+      electron: 23.0.0
+      electron-redux: 2.0.0-alpha.9_e3wqamyd2duc36ihehoid7prba
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-error-boundary: 3.1.4_react@18.2.0
@@ -265,7 +265,7 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@types/yargs': ^17.0.15
-      electron: ^22.0.0
+      electron: ^23.0.0
       electron-redux: 2.0.0-alpha.9
       electron-reloader: ^1.2.3
       esbuild: ^0.16.12
@@ -283,8 +283,8 @@ importers:
       yargs: ^17.6.2
     dependencies:
       '@reduxjs/toolkit': 1.9.1_k4ae6lp43ej6mezo3ztvx6pykq
-      electron: 22.0.0
-      electron-redux: 2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm
+      electron: 23.0.0
+      electron-redux: 2.0.0-alpha.9_e3wqamyd2duc36ihehoid7prba
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-error-boundary: 3.1.4_react@18.2.0
@@ -1981,14 +1981,14 @@ packages:
     resolution: {integrity: sha512-R1oD5gMBPS7PVU8gJwH6CtT0e6VSoD0+SzSnYpNm+dBkcijgA+K7VAMHDfnRq/lkKPZArpzplTW6jfiMYosdzw==}
     dev: true
 
-  /electron-redux/2.0.0-alpha.9_g6tr5xglnhltr4ziqafdz7lgnm:
+  /electron-redux/2.0.0-alpha.9_e3wqamyd2duc36ihehoid7prba:
     resolution: {integrity: sha512-LEnZC8PgUFb+O7BKQKhI9GqIFRzIV1WT0wCGLHcCnU6tKI5sou8BOTVJFfoJUAKEHlzS+D+NE3X7P2DZjyh1dw==}
     engines: {node: '>= 12'}
     peerDependencies:
       electron: '>=8.0.0'
       redux: '>=4.0.0'
     dependencies:
-      electron: 22.0.0
+      electron: 23.0.0
       lodash.isplainobject: 4.0.6
       lodash.isstring: 4.0.1
       redux: 4.2.0
@@ -2008,8 +2008,8 @@ packages:
     resolution: {integrity: sha512-M8WEXFuKXMYMVr45fo8mq0wUrrJHheiKZf6BArTKk9ZBYCKJEOU5H8cdWgDT+qCVZf7Na4lVUaZsA+h6uA9+PA==}
     dev: true
 
-  /electron/22.0.0:
-    resolution: {integrity: sha512-cgRc4wjyM+81A0E8UGv1HNJjL1HBI5cWNh/DUIjzYvoUuiEM0SS0hAH/zaFQ18xOz2ced6Yih8SybpOiOYJhdg==}
+  /electron/23.0.0:
+    resolution: {integrity: sha512-S6hVtTAjauMiiWP9sBVR5RpcUC464cNZ06I2EMUjeZBq+KooS6tLmNsfw0zLpAXDp1qosjlBP3v71NTZ3gd9iA==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
@@ -4077,65 +4077,65 @@ packages:
       typescript: 4.9.4
     dev: true
 
-  /turbo-darwin-64/1.6.3:
-    resolution: {integrity: sha512-QmDIX0Yh1wYQl0bUS0gGWwNxpJwrzZU2GIAYt3aOKoirWA2ecnyb3R6ludcS1znfNV2MfunP+l8E3ncxUHwtjA==}
+  /turbo-darwin-64/1.7.4:
+    resolution: {integrity: sha512-ZyYrQlUl8K/mYN1e6R7bEhPPYjMakz0DYMaexkyD7TAijQtWmTSd4a+I7VknOYNEssnUZ/v41GU3gPV1JAzxxQ==}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-darwin-arm64/1.6.3:
-    resolution: {integrity: sha512-75DXhFpwE7CinBbtxTxH08EcWrxYSPFow3NaeFwsG8aymkWXF+U2aukYHJA6I12n9/dGqf7yRXzkF0S/9UtdyQ==}
+  /turbo-darwin-arm64/1.7.4:
+    resolution: {integrity: sha512-CKIXg9uqp1a+Yeq/c4U0alPOqvwLUq5SBZf1PGYhGqJsfG0fRBtJfkUjHuBsuJIOGXg8rCmcGSWGIsIF6fqYuw==}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-linux-64/1.6.3:
-    resolution: {integrity: sha512-O9uc6J0yoRPWdPg9THRQi69K6E2iZ98cRHNvus05lZbcPzZTxJYkYGb5iagCmCW/pq6fL4T4oLWAd6evg2LGQA==}
+  /turbo-linux-64/1.7.4:
+    resolution: {integrity: sha512-RIUl4RUFFyzD2T024vL7509Ygwcw+SEa8NOwPfaN6TtJHK7RZV/SBP3fLNVOptG9WRLnOWX3OvsLMbiOqDLLyA==}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-linux-arm64/1.6.3:
-    resolution: {integrity: sha512-dCy667qqEtZIhulsRTe8hhWQNCJO0i20uHXv7KjLHuFZGCeMbWxB8rsneRoY+blf8+QNqGuXQJxak7ayjHLxiA==}
+  /turbo-linux-arm64/1.7.4:
+    resolution: {integrity: sha512-Bg65F0AjYYYxqE6RPf2H5TIGuA/EyWMeGOATHVSZOWAbYcnG3Ly03GZii8AHnUi7ntWBdjwvXf/QbOS1ayNB6A==}
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-windows-64/1.6.3:
-    resolution: {integrity: sha512-lKRqwL3mrVF09b9KySSaOwetehmGknV9EcQTF7d2dxngGYYX1WXoQLjFP9YYH8ZV07oPm+RUOAKSCQuDuMNhiA==}
+  /turbo-windows-64/1.7.4:
+    resolution: {integrity: sha512-rTaV50XZ2BRxRHOHqt1UsWfeDmYLbn8UKE6g2D2ED+uW+kmnTvR9s01nmlGWd2sAuWcRYQyQ2V+O09VfKPKcQw==}
     cpu: [x64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-windows-arm64/1.6.3:
-    resolution: {integrity: sha512-BXY1sDPEA1DgPwuENvDCD8B7Hb0toscjus941WpL8CVd10hg9pk/MWn9CNgwDO5Q9ks0mw+liDv2EMnleEjeNA==}
+  /turbo-windows-arm64/1.7.4:
+    resolution: {integrity: sha512-h8sxdKPvHTnWUPtwnYszFMmSO0P/iUUwmYY9n7iYThA71zSao28UeZ0H0Gw75cY3MPjvkjn2C4EBAUGPjuZJLw==}
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo/1.6.3:
-    resolution: {integrity: sha512-FtfhJLmEEtHveGxW4Ye/QuY85AnZ2ZNVgkTBswoap7UMHB1+oI4diHPNyqrQLG4K1UFtCkjOlVoLsllUh/9QRw==}
+  /turbo/1.7.4:
+    resolution: {integrity: sha512-8RLedDoUL0kkVKWEZ/RMM70BvKLyDFen06QuKKhYC2XNOfNKqFDqzIdcY/vGick869bNIWalChoy4O07k0HLsA==}
     hasBin: true
     requiresBuild: true
     optionalDependencies:
-      turbo-darwin-64: 1.6.3
-      turbo-darwin-arm64: 1.6.3
-      turbo-linux-64: 1.6.3
-      turbo-linux-arm64: 1.6.3
-      turbo-windows-64: 1.6.3
-      turbo-windows-arm64: 1.6.3
+      turbo-darwin-64: 1.7.4
+      turbo-darwin-arm64: 1.7.4
+      turbo-linux-64: 1.7.4
+      turbo-linux-arm64: 1.7.4
+      turbo-windows-64: 1.7.4
+      turbo-windows-arm64: 1.7.4
     dev: true
 
   /type-check/0.4.0:
