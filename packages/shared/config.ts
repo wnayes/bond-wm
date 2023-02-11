@@ -1,17 +1,10 @@
 import { isAbsolute } from "path";
-import { FunctionComponent } from "react";
 import { requirePackage } from "./npmPackageProxy";
 
 export type PluginSpecifiers = string | string[];
 
 export interface IPluginConfig {
   wallpaper?: PluginSpecifiers;
-}
-
-/** Expected wallpaper plugin module exports. */
-export interface WallpaperModule {
-  /** Wallpaper React function component. */
-  default: FunctionComponent;
 }
 
 export interface IConfig {

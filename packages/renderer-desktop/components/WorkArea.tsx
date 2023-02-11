@@ -71,6 +71,8 @@ function useWallpaperComponents() {
           const wallpaperComponent = wallpaperModule.default;
           if (typeof wallpaperComponent === "function") {
             return React.createElement(wallpaperComponent, { key: i });
+          } else if (typeof wallpaperComponent === "object") {
+            return React.createElement(wallpaperComponent.component, { key: i });
           }
         })
         .filter((component) => component != null) as FunctionComponentElement<{}>[];
