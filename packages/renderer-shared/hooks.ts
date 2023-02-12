@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
+import { useStore } from "react-redux";
 import { IIconInfo } from "@electron-wm/shared";
+import { Store } from "./configureStore";
+
+export function useRendererStore(): Store {
+  return useStore() as Store;
+}
 
 export function useIconInfoDataUri(iconInfo: IIconInfo): string | undefined {
   const [dataUri, setDataUri] = useState<string | undefined>();

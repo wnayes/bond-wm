@@ -1,23 +1,27 @@
-import * as React from "react";
+import React from "react";
 import { useCallback, useMemo } from "react";
-import { useSelector, useStore } from "react-redux";
-import { RootState, Store } from "@electron-wm/renderer-shared";
+import { useScreen, RenderPluginConfig } from "@electron-wm/plugin-utils";
 import { switchToNextLayout } from "@electron-wm/shared";
-import { getLayouts } from "../../layouts";
+import { getLayouts } from "@electron-wm/renderer-desktop";
+import { useRendererStore } from "@electron-wm/renderer-shared";
 
-interface ILayoutIndicatorProps {
-  screenIndex: number;
-}
+/** A default layout indicator/toggle for electron-wm. */
+const Plugin: RenderPluginConfig = {
+  component: LayoutIndicator,
+};
+export default Plugin;
 
-export function LayoutIndicator({ screenIndex }: ILayoutIndicatorProps) {
-  const tag = useSelector((state: RootState) => state.screens[screenIndex].currentTags[0]);
-  const currentLayoutName = useSelector((state: RootState) => state.screens[screenIndex].currentLayouts[tag]);
+function LayoutIndicator() {
+  const screen = useScreen();
+  const tag = screen.currentTags[0];
+  const currentLayoutName = screen.currentLayouts[tag];
   const currentLayout = useMemo(() => {
     return getLayouts().find((layout) => layout.name === currentLayoutName);
   }, [currentLayoutName]);
 
-  const store: Store = useStore();
+  const store = useRendererStore();
 
+  const screenIndex = screen.index;
   const onClick = useCallback(() => {
     switchToNextLayout(store, screenIndex);
   }, [store, screenIndex]);

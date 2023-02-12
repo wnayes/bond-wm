@@ -5,11 +5,12 @@
   "description": "Renderer desktop internal package",
   "main": "./dist/dist.js",
   "exports": "./dist/dist.js",
+  "types": "./index.tsx",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --packages=external --outfile=./dist/dist.js",
+    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --packages=external --format=cjs --outfile=./dist/dist.js",
     "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {

@@ -13,6 +13,9 @@ exports.config = {
 
     /** Plugin configuration. */
     plugins: {
+        taskbar: [
+            "$APP_PATH$/packages/taskbar-layout-indicator",
+        ],
         wallpaper: "$APP_PATH$/packages/wallpaper"
     },
 };

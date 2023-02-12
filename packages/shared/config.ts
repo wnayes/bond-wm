@@ -4,6 +4,7 @@ import { requirePackage } from "./npmPackageProxy";
 export type PluginSpecifiers = string | string[];
 
 export interface IPluginConfig {
+  taskbar?: PluginSpecifiers;
   wallpaper?: PluginSpecifiers;
 }
 

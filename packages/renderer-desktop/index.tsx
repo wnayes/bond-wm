@@ -23,3 +23,6 @@ reactRoot.render(
 );
 
 hookShortcuts(document.body);
+
+// For hacky internal plugins
+export { getLayouts } from "./layouts";
