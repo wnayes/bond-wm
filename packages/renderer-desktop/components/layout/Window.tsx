@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
-import { useSelector, useStore } from "react-redux";
+import { useStore } from "react-redux";
 import {
   getWindowMaxHeight,
   getWindowMaxWidth,
@@ -9,26 +9,26 @@ import {
   IWindow,
   IScreen,
   WindowPosition,
+  LayoutPluginConfig,
 } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureWindowAction } from "@electron-wm/shared";
 import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
-import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
-import { SharedRootState } from "@electron-wm/shared";
 
 export interface IWindowProps {
   win: IWindow;
   screen: IScreen;
+  layout: LayoutPluginConfig;
   fill?: boolean;
 }
 
-export function Window({ win, screen, fill }: IWindowProps) {
+export function Window({ win, screen, layout, fill }: IWindowProps) {
   const winElRef = useRef<HTMLDivElement>(null);
 
   const store = useStore();
   const workArea = screen.workArea;
 
-  const maximizeSupported = useSelector((state: SharedRootState) => selectWindowMaximizeCanTakeEffect(state, win.id));
+  const maximizeSupported = layout.supportsMaximize;
 
   const style: React.CSSProperties = {};
 

@@ -6,23 +6,26 @@ import { hookShortcuts } from "./shortcuts";
 import { getScreenIndex } from "./utils";
 import { configureRendererStore, setPluginInstallDirectory, setupIpc } from "@electron-wm/renderer-shared";
 
-const screenIndex = getScreenIndex();
-console.log(screenIndex);
+if (typeof window !== "undefined") {
+  const screenIndex = getScreenIndex();
+  console.log(screenIndex);
 
-setPluginInstallDirectory(__dirname);
+  setPluginInstallDirectory(__dirname);
 
-const store = configureRendererStore();
-(window as any).store = store; // eslint-disable-line
-setupIpc(store, screenIndex);
+  const store = configureRendererStore();
+  (window as any).store = store; // eslint-disable-line
+  setupIpc(store, screenIndex);
 
-const reactRoot = createRoot(document.getElementById("content")!);
-reactRoot.render(
-  <Provider store={store}>
-    <Desktop screenIndex={screenIndex} />
-  </Provider>
-);
+  const reactRoot = createRoot(document.getElementById("content")!);
+  reactRoot.render(
+    <Provider store={store}>
+      <Desktop screenIndex={screenIndex} />
+    </Provider>
+  );
 
-hookShortcuts(document.body);
+  hookShortcuts(document.body);
+}
 
 // For hacky internal plugins
-export { getLayouts } from "./layouts";
+export * from "./components/layout/WindowContainers";
+export { Window } from "./components/layout/Window";

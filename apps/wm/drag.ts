@@ -1,5 +1,11 @@
 import { batch } from "react-redux";
-import { configureWindowAction, endDragAction, setWindowIntoScreenAction, startDragAction } from "@electron-wm/shared";
+import {
+  configureWindowAction,
+  endDragAction,
+  LayoutPluginConfig,
+  setWindowIntoScreenAction,
+  startDragAction,
+} from "@electron-wm/shared";
 import { IScreen } from "@electron-wm/shared";
 import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
 import { Coords, IGeometry } from "@electron-wm/shared";
@@ -21,12 +27,10 @@ export interface DragModule extends IXWMEventConsumer {
   endMoveResize(wid: number): void;
 }
 
-export async function createDragModule({
-  X,
-  store,
-  getFrameIdFromWindowId,
-  getWindowIdFromFrameId,
-}: XWMContext): Promise<DragModule> {
+export async function createDragModule(
+  { X, store, getFrameIdFromWindowId, getWindowIdFromFrameId }: XWMContext,
+  layouts: LayoutPluginConfig[]
+): Promise<DragModule> {
   function endMoveResize(wid: number): void {
     const state = store.getState();
     const win = state.windows[wid];
@@ -112,7 +116,7 @@ export async function createDragModule({
       if (
         !win ||
         win._dragState ||
-        (win.maximized && selectWindowMaximizeCanTakeEffect(state, wid)) ||
+        (win.maximized && selectWindowMaximizeCanTakeEffect(state, layouts, wid)) ||
         win.fullscreen
       ) {
         return;
@@ -131,7 +135,7 @@ export async function createDragModule({
       if (
         !win ||
         win._dragState ||
-        (win.maximized && selectWindowMaximizeCanTakeEffect(state, wid)) ||
+        (win.maximized && selectWindowMaximizeCanTakeEffect(state, layouts, wid)) ||
         win.fullscreen
       ) {
         log("Choosing to not start resize for " + wid, coords, ResizeDirection[direction]);

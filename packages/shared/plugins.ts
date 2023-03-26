@@ -5,6 +5,18 @@ export interface RenderPluginConfig {
   component: ComponentType;
 }
 
+/** Plugin configuration object exported by layout plugin modules. */
+export interface LayoutPluginConfig extends RenderPluginConfig {
+  name: string;
+  icon: string;
+  supportsMaximize: boolean;
+}
+
+/** Expected layout plugin module exports. */
+export interface LayoutModule {
+  default: LayoutPluginConfig;
+}
+
 /** Expected taskbar plugin module exports. */
 export interface TaskbarModule {
   default: FunctionComponent | RenderPluginConfig;

@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { useSelector } from "react-redux";
 import { showContextMenu } from "@electron-wm/renderer-shared";
 import { RootState } from "@electron-wm/renderer-shared";
-import { selectVisibleWindowsFromCurrentTags, selectWindowsFromCurrentTags } from "@electron-wm/shared";
+import { selectWindowsFromCurrentTags } from "@electron-wm/shared";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { ErrorDisplay } from "@electron-wm/renderer-shared";
 
@@ -18,7 +18,6 @@ export interface IDesktopProps {
 
 export function Desktop({ screenIndex }: IDesktopProps) {
   const windows = useSelector((state: RootState) => selectWindowsFromCurrentTags(state, screenIndex));
-  const visibleWindows = useSelector((state: RootState) => selectVisibleWindowsFromCurrentTags(state, screenIndex));
 
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -30,7 +29,7 @@ export function Desktop({ screenIndex }: IDesktopProps) {
     <div id="desktop" onContextMenu={onContextMenu}>
       <Taskbar screenIndex={screenIndex} windows={windows} />
       <ErrorBoundary FallbackComponent={ErrorDisplay}>
-        <WorkArea screenIndex={screenIndex} windows={visibleWindows} />
+        <WorkArea screenIndex={screenIndex} />
       </ErrorBoundary>
     </div>
   );

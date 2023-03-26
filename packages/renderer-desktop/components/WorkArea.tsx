@@ -4,17 +4,16 @@ import { useSelector, useStore } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
 import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
-import { IWindow, WallpaperModule } from "@electron-wm/shared";
+import { WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
 
 export interface IWorkAreaProps {
   screenIndex: number;
-  windows: IWindow[];
 }
 
-export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
+export function WorkArea({ screenIndex }: IWorkAreaProps) {
   const workAreaDiv = useRef<HTMLDivElement>(null);
 
   const store = useStore();
@@ -48,7 +47,7 @@ export function WorkArea({ screenIndex, windows }: IWorkAreaProps) {
   return (
     <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
       {wallpaperComponents}
-      <Layout screen={screen} windows={windows} />
+      <Layout screen={screen} />
     </div>
   );
 }

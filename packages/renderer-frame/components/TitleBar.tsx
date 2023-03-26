@@ -7,6 +7,7 @@ import {
   minimizeWindow,
   restoreWindow,
   showContextMenu,
+  useLayoutPlugins,
 } from "@electron-wm/renderer-shared";
 import { RootState } from "@electron-wm/renderer-shared";
 import { useIconInfoDataUri } from "@electron-wm/renderer-shared";
@@ -21,7 +22,8 @@ interface ITitleBarProps {
 export function TitleBar(props: ITitleBarProps) {
   const { win } = props;
 
-  const supportsMaximize = useSelector((state: RootState) => selectWindowMaximizeCanTakeEffect(state, win.id));
+  const layouts = useLayoutPlugins();
+  const supportsMaximize = useSelector((state: RootState) => selectWindowMaximizeCanTakeEffect(state, layouts, win.id));
   const hasIcons = (win.icons?.length ?? 0) > 0;
 
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {

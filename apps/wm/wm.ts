@@ -5,7 +5,7 @@ const x11: IX11Mod = require("x11"); // eslint-disable-line
 import * as path from "path";
 import * as os from "os";
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IGeometry } from "@electron-wm/shared";
+import { IBounds, IGeometry, LayoutModule, LayoutPluginConfig } from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
@@ -76,6 +76,7 @@ import { assert } from "./assert";
 import { getConfig, loadConfigFromDisk } from "./config";
 import { createTrayEventConsumer } from "./systray";
 import { setupPackageInstallMessageListener } from "./npmPackageCache";
+import { resolvePluginsForWM } from "./plugins";
 
 // Path constants
 const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../../packages/renderer-desktop/index.html");
@@ -211,6 +212,8 @@ export async function createServer(): Promise<XServer> {
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
+  let layouts: LayoutPluginConfig[] = [];
+
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
 
@@ -291,7 +294,12 @@ export async function createServer(): Promise<XServer> {
         getFrameIdFromWindowId,
       };
 
-      dragModule = await createDragModule(context);
+      const layoutPlugins = getConfig().plugins?.layout;
+      if (layoutPlugins) {
+        layouts = (await resolvePluginsForWM<LayoutModule>(layoutPlugins)).map((mod) => mod.default);
+      }
+
+      dragModule = await createDragModule(context, layouts);
       eventConsumers.push(dragModule);
       eventConsumers.push(await createICCCMEventConsumer(context));
       ewmhModule = await createEWMHEventConsumer(context, dragModule);
@@ -1658,7 +1666,7 @@ export async function createServer(): Promise<XServer> {
     if (screens.length > 1) {
       screenIndex = Math.max(0, await getScreenIndexWithCursor(context, screens[0].root));
     }
-    switchToNextLayout(store, screenIndex);
+    switchToNextLayout(store, layouts, screenIndex);
   }
 
   function widLog(wid: number, ...args: unknown[]): void {

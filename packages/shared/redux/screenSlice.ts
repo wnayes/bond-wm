@@ -6,7 +6,11 @@ export type ScreensState = IScreen[];
 
 const initialState: ScreensState = [];
 
-type AddScreenActionPayload = Partial<IScreen> & Pick<IScreen, "tags"> & { initialLayout: string; initialTag: string };
+type AddScreenActionPayload = Partial<IScreen> &
+  Pick<IScreen, "tags"> & {
+    initialLayout: string;
+    initialTag: string;
+  };
 
 export const screensSlice = createSlice({
   name: "screens",
@@ -64,7 +68,13 @@ export const screensSlice = createSlice({
 
     setTagCurrentLayoutAction: (
       state,
-      { payload }: PayloadAction<{ screenIndex: number; tag: string; layoutName: string }>
+      {
+        payload,
+      }: PayloadAction<{
+        screenIndex: number;
+        tag: string;
+        layoutName: string;
+      }>
     ) => {
       state[payload.screenIndex].currentLayouts[payload.tag] = payload.layoutName;
     },
