@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { useScreen, useWindows, LayoutPluginConfig } from "@electron-wm/plugin-utils";
@@ -6,16 +6,16 @@ import { windowIsDialog } from "@electron-wm/shared";
 import { Window } from "@electron-wm/renderer-desktop";
 import { BasicFillContainer, CenteringContainer } from "@electron-wm/renderer-desktop";
 
-/** A floating layout for electron-wm. */
-const Plugin: LayoutPluginConfig = {
-  name: "Floating",
-  icon: pathToFileURL(path.join(__dirname, "floating.png")).toString(),
-  supportsMaximize: true,
-  component: FloatingLayout,
-};
-export default Plugin;
+interface IFloatingLayoutSettings {
+  name?: string;
+  floatRight?: boolean;
+}
 
-function FloatingLayout() {
+interface IFloatingLayoutProps {
+  settings?: IFloatingLayoutSettings;
+}
+
+const FloatingLayout: FC<IFloatingLayoutProps> = ({ settings }) => {
   const screen = useScreen();
   const windows = useWindows();
 
@@ -37,7 +37,9 @@ function FloatingLayout() {
         </CenteringContainer>
       );
     } else {
-      windowComponents.push(<Window key={win.id} win={win} screen={screen} layout={Plugin} />);
+      windowComponents.push(
+        <Window key={win.id} win={win} screen={screen} layout={Plugin} floatRight={settings?.floatRight ?? false} />
+      );
     }
   }
 
@@ -47,4 +49,13 @@ function FloatingLayout() {
       {isolatedWindowComponents}
     </>
   );
-}
+};
+
+/** A floating layout for electron-wm. */
+const Plugin: LayoutPluginConfig = {
+  name: "Floating",
+  icon: pathToFileURL(path.join(__dirname, "floating.png")).toString(),
+  supportsMaximize: true,
+  component: FloatingLayout,
+};
+export default Plugin;

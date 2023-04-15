@@ -5,7 +5,7 @@ const x11: IX11Mod = require("x11"); // eslint-disable-line
 import * as path from "path";
 import * as os from "os";
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IGeometry, LayoutModule, LayoutPluginConfig } from "@electron-wm/shared";
+import { IBounds, IGeometry, LayoutModule, LayoutPluginInstance, PluginInstance } from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
@@ -212,7 +212,7 @@ export async function createServer(): Promise<XServer> {
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
-  let layouts: LayoutPluginConfig[] = [];
+  let layouts: LayoutPluginInstance[] = [];
 
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
@@ -296,7 +296,7 @@ export async function createServer(): Promise<XServer> {
 
       const layoutPlugins = getConfig().plugins?.layout;
       if (layoutPlugins) {
-        layouts = (await resolvePluginsForWM<LayoutModule>(layoutPlugins)).map((mod) => mod.default);
+        layouts = await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins);
       }
 
       dragModule = await createDragModule(context, layouts);

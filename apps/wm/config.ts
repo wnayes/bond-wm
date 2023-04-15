@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve as pathResolve } from "node:path";
 import { app } from "electron";
 import { log, logError } from "./log";
-import { IPluginConfig, setConfigAction } from "@electron-wm/shared";
+import { IPluginConfig, PluginSpecifierObject, setConfigAction } from "@electron-wm/shared";
 import { ServerStore } from "./configureStore";
 import { IConfig } from "@electron-wm/shared";
 
@@ -73,6 +73,11 @@ function processConfigModule(userConfigModule: IConfigModule, configDirectory: s
           config.plugins[pluginType as keyof IPluginConfig] = pluginSpecifier.map((specifier) =>
             mapPluginSpecifier(specifier, configDirectory)
           );
+        } else if (typeof pluginSpecifier === "object") {
+          config.plugins[pluginType as keyof IPluginConfig] = mapPluginSpecifier(
+            pluginSpecifier as PluginSpecifierObject,
+            configDirectory
+          );
         } else {
           logError("Unexpected plugin specifier type: " + typeof pluginSpecifier);
         }
@@ -85,14 +90,25 @@ function processConfigModule(userConfigModule: IConfigModule, configDirectory: s
   }
 }
 
-function mapPluginSpecifier(specifier: string, configPath: string): string {
-  if (specifier.includes("$APP_PATH$")) {
-    specifier = specifier.replaceAll("$APP_PATH$", app.getAppPath());
+function mapPluginSpecifier(
+  specifier: string | PluginSpecifierObject,
+  configPath: string
+): string | PluginSpecifierObject {
+  let id = typeof specifier === "string" ? specifier : specifier.id;
+
+  if (id.includes("$APP_PATH$")) {
+    id = id.replaceAll("$APP_PATH$", app.getAppPath());
   }
 
-  if (specifier.startsWith(".")) {
-    return pathResolve(configPath, specifier);
+  if (id.startsWith(".")) {
+    id = pathResolve(configPath, id);
   }
+
+  if (typeof specifier === "string") {
+    return id;
+  }
+
+  specifier.id = id;
   return specifier;
 }
 

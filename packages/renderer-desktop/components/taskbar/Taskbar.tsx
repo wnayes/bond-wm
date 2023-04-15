@@ -3,7 +3,7 @@ import { FunctionComponentElement, useEffect, useState } from "react";
 import { Clock } from "./Clock";
 import { useSelector } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
-import { IWindow, TaskbarModule } from "@electron-wm/shared";
+import { IWindow, PluginInstance, TaskbarModule } from "@electron-wm/shared";
 import { RunField } from "./RunField";
 import { TagList } from "./TagList";
 import { TaskList } from "./TaskList";
@@ -50,10 +50,10 @@ function useTaskbarComponents() {
         return;
       }
 
-      const modules = await resolvePluginsFromRenderer<TaskbarModule>(taskbarConfig);
-      const components = modules
-        .map((taskbarModule, i) => {
-          const taskbarComponent = taskbarModule.default;
+      const plugins = await resolvePluginsFromRenderer<PluginInstance<TaskbarModule>>(taskbarConfig);
+      const components = plugins
+        .map((taskbarPlugin, i) => {
+          const taskbarComponent = taskbarPlugin.exports.default;
           if (typeof taskbarComponent === "function") {
             return React.createElement(taskbarComponent, { key: i });
           } else if (typeof taskbarComponent === "object") {

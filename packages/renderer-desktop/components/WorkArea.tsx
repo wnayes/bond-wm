@@ -4,7 +4,7 @@ import { useSelector, useStore } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
 import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
-import { WallpaperModule } from "@electron-wm/shared";
+import { PluginInstance, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
@@ -64,10 +64,10 @@ function useWallpaperComponents() {
         return;
       }
 
-      const modules = await resolvePluginsFromRenderer<WallpaperModule>(wallpaperConfig);
-      const components = modules
-        .map((wallpaperModule, i) => {
-          const wallpaperComponent = wallpaperModule.default;
+      const plugins = await resolvePluginsFromRenderer<PluginInstance<WallpaperModule>>(wallpaperConfig);
+      const components = plugins
+        .map((wallpaperPlugins, i) => {
+          const wallpaperComponent = wallpaperPlugins.exports.default;
           if (typeof wallpaperComponent === "function") {
             return React.createElement(wallpaperComponent, { key: i });
           } else if (typeof wallpaperComponent === "object") {

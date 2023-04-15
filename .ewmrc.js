@@ -14,7 +14,13 @@ exports.config = {
     /** Plugin configuration. */
     plugins: {
         layout: [
-            "$APP_PATH$/packages/layout-floating",
+            {
+                id: "$APP_PATH$/packages/layout-floating",
+                settings: {
+                    name: "Floating",
+                    floatRight: false,
+                },
+            },
             "$APP_PATH$/packages/layout-tiling",
         ],
         taskbar: [

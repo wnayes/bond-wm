@@ -1,4 +1,4 @@
-import { PluginSpecifiers, resolvePlugins } from "@electron-wm/shared";
+import { PluginInstance, PluginSpecifiers, resolvePlugins } from "@electron-wm/shared";
 
 let _pluginInstallDirectory: string | undefined;
 
@@ -17,6 +17,8 @@ export function setPluginInstallDirectory(path: string): void {
  * Resolves plugins into their runtime types.
  * This particular API is used by renderers.
  */
-export function resolvePluginsFromRenderer<T>(specifiers: PluginSpecifiers): Promise<T[]> {
+export function resolvePluginsFromRenderer<T extends PluginInstance<unknown>>(
+  specifiers: PluginSpecifiers
+): Promise<T[]> {
   return resolvePlugins<T>(specifiers, getPluginInstallDirectory());
 }

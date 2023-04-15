@@ -2,7 +2,7 @@ import { batch } from "react-redux";
 import {
   configureWindowAction,
   endDragAction,
-  LayoutPluginConfig,
+  LayoutPluginInstance,
   setWindowIntoScreenAction,
   startDragAction,
 } from "@electron-wm/shared";
@@ -29,7 +29,7 @@ export interface DragModule extends IXWMEventConsumer {
 
 export async function createDragModule(
   { X, store, getFrameIdFromWindowId, getWindowIdFromFrameId }: XWMContext,
-  layouts: LayoutPluginConfig[]
+  layouts: LayoutPluginInstance[]
 ): Promise<DragModule> {
   function endMoveResize(wid: number): void {
     const state = store.getState();

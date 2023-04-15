@@ -1,7 +1,8 @@
 import { IWindow } from "./window";
 import { anyIntersect } from "./utils";
 import { SharedRootState } from "./redux/basicStore";
-import { LayoutPluginConfig } from "./plugins";
+import { LayoutPluginInstance } from "./plugins";
+import { getLayoutPluginName } from "./layouts";
 
 export function selectAllWindows(state: SharedRootState): IWindow[] {
   const wins = [];
@@ -48,7 +49,7 @@ export function selectCurrentLayoutForScreen(state: SharedRootState, screenIndex
 
 export function selectWindowMaximizeCanTakeEffect(
   state: SharedRootState,
-  layouts: LayoutPluginConfig[],
+  layoutPlugins: LayoutPluginInstance[],
   wid: number
 ): boolean {
   const win = state.windows[wid];
@@ -56,9 +57,9 @@ export function selectWindowMaximizeCanTakeEffect(
     return false;
   }
   const currentLayoutName = selectCurrentLayoutForScreen(state, win.screenIndex);
-  const currentLayout = layouts.find((layout) => layout.name === currentLayoutName);
+  const currentLayout = layoutPlugins.find((plugin) => getLayoutPluginName(plugin) === currentLayoutName);
   if (currentLayout) {
-    return currentLayout.supportsMaximize;
+    return currentLayout.exports.default.supportsMaximize;
   }
   return false;
 }

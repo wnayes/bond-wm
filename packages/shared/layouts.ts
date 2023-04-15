@@ -1,23 +1,31 @@
 import { batch } from "react-redux";
-import { LayoutPluginConfig } from "./plugins";
+import { LayoutPluginInstance } from "./plugins";
 import { SharedStore } from "./redux/basicStore";
 import { setTagCurrentLayoutAction } from "./redux/screenSlice";
 import { setWindowPositionAction } from "./redux/windowSlice";
 import { selectWindowsFromTag } from "./selectors";
 import { WindowPosition } from "./window";
 
-export function switchToNextLayout(store: SharedStore, layouts: LayoutPluginConfig[], screenIndex: number): void {
+export function getLayoutPluginName(plugin: LayoutPluginInstance): string {
+  return (plugin.settings?.name as string) || plugin.exports.default.name;
+}
+
+export function switchToNextLayout(
+  store: SharedStore,
+  layoutPlugins: LayoutPluginInstance[],
+  screenIndex: number
+): void {
   const state = store.getState();
   const screen = state.screens[screenIndex];
   batch(() => {
     for (const tag of screen.currentTags) {
-      const nextLayout = getNextLayout(layouts, screen.currentLayouts[tag]);
-      if (nextLayout && nextLayout.name !== screen.currentLayouts[tag]) {
+      const nextLayout = getNextLayout(layoutPlugins, screen.currentLayouts[tag]);
+      if (nextLayout && getLayoutPluginName(nextLayout) !== screen.currentLayouts[tag]) {
         store.dispatch(
           setTagCurrentLayoutAction({
             screenIndex,
             tag,
-            layoutName: nextLayout.name,
+            layoutName: getLayoutPluginName(nextLayout),
           })
         );
 
@@ -32,8 +40,8 @@ export function switchToNextLayout(store: SharedStore, layouts: LayoutPluginConf
   });
 }
 
-function getNextLayout(layouts: LayoutPluginConfig[], fromLayoutName: string): LayoutPluginConfig {
-  const currentIndex = layouts.findIndex((layout) => layout.name === fromLayoutName);
-  const nextIndex = (currentIndex + 1) % layouts.length;
-  return layouts[nextIndex];
+function getNextLayout(layoutPlugins: LayoutPluginInstance[], fromLayoutName: string): LayoutPluginInstance {
+  const currentIndex = layoutPlugins.findIndex((layout) => getLayoutPluginName(layout) === fromLayoutName);
+  const nextIndex = (currentIndex + 1) % layoutPlugins.length;
+  return layoutPlugins[nextIndex];
 }

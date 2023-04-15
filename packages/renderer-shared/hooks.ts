@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useStore } from "react-redux";
-import { IIconInfo, LayoutModule, LayoutPluginConfig } from "@electron-wm/shared";
+import { IIconInfo, LayoutPluginInstance } from "@electron-wm/shared";
 import { RootState, Store } from "./configureStore";
 import { resolvePluginsFromRenderer } from "./plugins";
 
@@ -35,16 +35,15 @@ export function useIconInfoDataUri(iconInfo: IIconInfo): string | undefined {
   return dataUri;
 }
 
-export function useLayoutPlugins() {
+export function useLayoutPlugins(): LayoutPluginInstance[] {
   const layoutConfig = useSelector((state: RootState) => state.config.plugins?.layout);
 
-  const [layoutPlugins, setLayoutPlugins] = useState<LayoutPluginConfig[]>([]);
+  const [layoutPlugins, setLayoutPlugins] = useState<LayoutPluginInstance[]>([]);
 
   useEffect(() => {
     (async () => {
       if (layoutConfig) {
-        const modules = await resolvePluginsFromRenderer<LayoutModule>(layoutConfig);
-        const plugins = modules.map((mod) => mod.default);
+        const plugins = await resolvePluginsFromRenderer<LayoutPluginInstance>(layoutConfig);
         setLayoutPlugins(plugins);
       }
     })();

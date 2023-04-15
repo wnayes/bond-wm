@@ -20,9 +20,10 @@ export interface IWindowProps {
   screen: IScreen;
   layout: LayoutPluginConfig;
   fill?: boolean;
+  floatRight?: boolean;
 }
 
-export function Window({ win, screen, layout, fill }: IWindowProps) {
+export function Window({ win, screen, layout, fill, floatRight }: IWindowProps) {
   const winElRef = useRef<HTMLDivElement>(null);
 
   const store = useStore();
@@ -48,7 +49,7 @@ export function Window({ win, screen, layout, fill }: IWindowProps) {
           style.width = "100%";
           style.height = "100%";
         } else {
-          style.float = "left";
+          style.float = floatRight ? "right" : "left";
           style.width = adjustForZoom(win.outer.width);
           style.height = adjustForZoom(win.outer.height);
         }

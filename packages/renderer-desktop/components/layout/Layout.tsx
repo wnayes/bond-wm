@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { IScreen } from "@electron-wm/shared";
+import { getLayoutPluginName, IScreen } from "@electron-wm/shared";
 import { useLayoutPlugins } from "@electron-wm/renderer-shared";
 
 export interface ILayoutProps {
@@ -12,16 +12,18 @@ export const Layout: React.FC<ILayoutProps> = ({ screen }) => {
 
   const tag = screen.currentTags[0];
   const currentLayoutName = screen.currentLayouts[tag];
-  let currentLayout = layouts.find((layout) => layout.name === currentLayoutName);
+  let currentLayout = layouts.find((layout) => getLayoutPluginName(layout) === currentLayoutName);
   if (!currentLayout) {
     if (layouts.length > 0) {
       currentLayout = layouts[0];
-      console.warn(`Layout ${currentLayoutName} was unrecognized. Using fallback layout '${currentLayout.name}'.`);
+      console.warn(
+        `Layout ${currentLayoutName} was unrecognized. Using fallback layout '${getLayoutPluginName(currentLayout)}'.`
+      );
     } else {
       return null; // Not loaded yet (or config listed none?)
     }
   }
 
-  const LayoutComponent = currentLayout.component;
-  return <LayoutComponent />;
+  const LayoutComponent = currentLayout.exports.default.component;
+  return <LayoutComponent settings={currentLayout.settings} />;
 };
