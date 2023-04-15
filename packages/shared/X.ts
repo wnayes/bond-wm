@@ -58,6 +58,7 @@ export const XCB_GRAB_MODE_ASYNC = 1;
 
 // Event masks
 export enum XEventMask {
+  None = 0,
   KeyPress = 1,
   KeyRelease = 2,
   ButtonPress = 4,

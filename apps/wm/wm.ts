@@ -93,7 +93,7 @@ export const ExtraAtoms = {
   _NET_WM_NAME: 340,
 };
 
-const NO_EVENT_MASK = 0;
+const NO_EVENT_MASK = x11.eventMask.None;
 
 const ROOT_WIN_EVENT_MASK =
   x11.eventMask.SubstructureRedirect |
