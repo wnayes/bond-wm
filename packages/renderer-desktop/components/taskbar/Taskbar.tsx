@@ -3,7 +3,7 @@ import { FunctionComponentElement, useEffect, useState } from "react";
 import { Clock } from "./Clock";
 import { useSelector } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
-import { IWindow, PluginInstance, TaskbarModule } from "@electron-wm/shared";
+import { IWindow, PluginInstance, selectConfigWithOverrides, TaskbarModule } from "@electron-wm/shared";
 import { RunField } from "./RunField";
 import { TagList } from "./TagList";
 import { TaskList } from "./TaskList";
@@ -22,7 +22,7 @@ export function Taskbar(props: ITaskbarProps) {
   const showSystemTray = props.screenIndex === 0; // TODO: Configurable
   const trayWindows = useSelector((state: RootState) => (showSystemTray ? state.tray.windows : null));
 
-  const taskbarPluginComponents = useTaskbarComponents();
+  const taskbarPluginComponents = useTaskbarComponents(props.screenIndex);
 
   return (
     <div className="taskbar">
@@ -38,8 +38,10 @@ export function Taskbar(props: ITaskbarProps) {
   );
 }
 
-function useTaskbarComponents() {
-  const taskbarConfig = useSelector((state: RootState) => state.config.plugins?.taskbar);
+function useTaskbarComponents(screenIndex: number) {
+  const taskbarConfig = useSelector(
+    (state: RootState) => selectConfigWithOverrides(state, screenIndex).plugins?.taskbar
+  );
 
   const [taskbarComponents, setTaskbarComponents] = useState<FunctionComponentElement<{}>[]>([]);
 

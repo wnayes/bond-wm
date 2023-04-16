@@ -5,7 +5,7 @@ const x11: IX11Mod = require("x11"); // eslint-disable-line
 import * as path from "path";
 import * as os from "os";
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IGeometry, LayoutModule, LayoutPluginInstance, PluginInstance } from "@electron-wm/shared";
+import { IBounds, IGeometry, LayoutPluginInstance, selectConfigWithOverrides } from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
@@ -212,7 +212,7 @@ export async function createServer(): Promise<XServer> {
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
-  let layouts: LayoutPluginInstance[] = [];
+  let layoutsByScreen: { [screenIndex: number]: LayoutPluginInstance[] };
 
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
@@ -294,12 +294,7 @@ export async function createServer(): Promise<XServer> {
         getFrameIdFromWindowId,
       };
 
-      const layoutPlugins = getConfig().plugins?.layout;
-      if (layoutPlugins) {
-        layouts = await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins);
-      }
-
-      dragModule = await createDragModule(context, layouts);
+      dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen[screenIndex]);
       eventConsumers.push(dragModule);
       eventConsumers.push(await createICCCMEventConsumer(context));
       ewmhModule = await createEWMHEventConsumer(context, dragModule);
@@ -312,6 +307,13 @@ export async function createServer(): Promise<XServer> {
 
       await __setupAtoms();
       await __initDesktop();
+
+      for (let s = 0; s < store.getState().screens.length; s++) {
+        const layoutPlugins = selectConfigWithOverrides(store.getState(), s).plugins?.layout;
+        if (layoutPlugins) {
+          layoutsByScreen[s] = layoutPlugins ? await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins) : [];
+        }
+      }
     });
 
     client.on("error", logError);
@@ -1666,7 +1668,7 @@ export async function createServer(): Promise<XServer> {
     if (screens.length > 1) {
       screenIndex = Math.max(0, await getScreenIndexWithCursor(context, screens[0].root));
     }
-    switchToNextLayout(store, layouts, screenIndex);
+    switchToNextLayout(store, layoutsByScreen[screenIndex], screenIndex);
   }
 
   function widLog(wid: number, ...args: unknown[]): void {

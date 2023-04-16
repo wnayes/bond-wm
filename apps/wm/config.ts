@@ -64,29 +64,42 @@ function processConfigModule(userConfigModule: IConfigModule, configDirectory: s
     log("Config from module", config);
 
     if (config.plugins) {
-      // Resolve plugin specifiers, which may be relative to this specific config.
-      for (const pluginType in config.plugins) {
-        const pluginSpecifier = config.plugins[pluginType as keyof IPluginConfig];
-        if (typeof pluginSpecifier === "string") {
-          config.plugins[pluginType as keyof IPluginConfig] = mapPluginSpecifier(pluginSpecifier, configDirectory);
-        } else if (Array.isArray(pluginSpecifier)) {
-          config.plugins[pluginType as keyof IPluginConfig] = pluginSpecifier.map((specifier) =>
-            mapPluginSpecifier(specifier, configDirectory)
-          );
-        } else if (typeof pluginSpecifier === "object") {
-          config.plugins[pluginType as keyof IPluginConfig] = mapPluginSpecifier(
-            pluginSpecifier as PluginSpecifierObject,
-            configDirectory
-          );
-        } else {
-          logError("Unexpected plugin specifier type: " + typeof pluginSpecifier);
-        }
-      }
+      processPluginsConfig(config.plugins, configDirectory);
 
       log("Config from module (post path resolution)", config);
     }
 
+    if (config.screenOverrides) {
+      for (const screenIndex in config.screenOverrides) {
+        const overridePlugins = config.screenOverrides[screenIndex]?.plugins;
+        if (overridePlugins) {
+          processPluginsConfig(overridePlugins, configDirectory);
+        }
+      }
+    }
+
     _store.dispatch(setConfigAction(config));
+  }
+}
+
+function processPluginsConfig(plugins: IPluginConfig, configDirectory: string): void {
+  // Resolve plugin specifiers, which may be relative to this specific config.
+  for (const pluginType in plugins) {
+    const pluginSpecifier = plugins[pluginType as keyof IPluginConfig];
+    if (typeof pluginSpecifier === "string") {
+      plugins[pluginType as keyof IPluginConfig] = mapPluginSpecifier(pluginSpecifier, configDirectory);
+    } else if (Array.isArray(pluginSpecifier)) {
+      plugins[pluginType as keyof IPluginConfig] = pluginSpecifier.map((specifier) =>
+        mapPluginSpecifier(specifier, configDirectory)
+      );
+    } else if (typeof pluginSpecifier === "object") {
+      plugins[pluginType as keyof IPluginConfig] = mapPluginSpecifier(
+        pluginSpecifier as PluginSpecifierObject,
+        configDirectory
+      );
+    } else {
+      logError("Unexpected plugin specifier type: " + typeof pluginSpecifier);
+    }
   }
 }
 

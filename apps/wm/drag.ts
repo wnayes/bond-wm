@@ -29,7 +29,7 @@ export interface DragModule extends IXWMEventConsumer {
 
 export async function createDragModule(
   { X, store, getFrameIdFromWindowId, getWindowIdFromFrameId }: XWMContext,
-  layouts: LayoutPluginInstance[]
+  getLayoutPlugins: (screenIndex: number) => LayoutPluginInstance[]
 ): Promise<DragModule> {
   function endMoveResize(wid: number): void {
     const state = store.getState();
@@ -116,7 +116,7 @@ export async function createDragModule(
       if (
         !win ||
         win._dragState ||
-        (win.maximized && selectWindowMaximizeCanTakeEffect(state, layouts, wid)) ||
+        (win.maximized && selectWindowMaximizeCanTakeEffect(state, getLayoutPlugins(win.screenIndex), wid)) ||
         win.fullscreen
       ) {
         return;
@@ -135,7 +135,7 @@ export async function createDragModule(
       if (
         !win ||
         win._dragState ||
-        (win.maximized && selectWindowMaximizeCanTakeEffect(state, layouts, wid)) ||
+        (win.maximized && selectWindowMaximizeCanTakeEffect(state, getLayoutPlugins(win.screenIndex), wid)) ||
         win.fullscreen
       ) {
         log("Choosing to not start resize for " + wid, coords, ResizeDirection[direction]);

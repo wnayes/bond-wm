@@ -22,7 +22,7 @@ interface ITitleBarProps {
 export function TitleBar(props: ITitleBarProps) {
   const { win } = props;
 
-  const layouts = useLayoutPlugins();
+  const layouts = useLayoutPlugins(win.screenIndex);
   const supportsMaximize = useSelector((state: RootState) => selectWindowMaximizeCanTakeEffect(state, layouts, win.id));
   const hasIcons = (win.icons?.length ?? 0) > 0;
 

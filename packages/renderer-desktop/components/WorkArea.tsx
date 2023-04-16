@@ -4,7 +4,7 @@ import { useSelector, useStore } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
 import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
-import { PluginInstance, WallpaperModule } from "@electron-wm/shared";
+import { PluginInstance, selectConfigWithOverrides, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
@@ -18,7 +18,7 @@ export function WorkArea({ screenIndex }: IWorkAreaProps) {
 
   const store = useStore();
   const screen = useSelector((state: RootState) => state.screens[screenIndex]);
-  const wallpaperComponents = useWallpaperComponents();
+  const wallpaperComponents = useWallpaperComponents(screenIndex);
 
   useBrowserWindowSize(); // To trigger size recalculations.
 
@@ -52,8 +52,10 @@ export function WorkArea({ screenIndex }: IWorkAreaProps) {
   );
 }
 
-function useWallpaperComponents() {
-  const wallpaperConfig = useSelector((state: RootState) => state.config.plugins?.wallpaper);
+function useWallpaperComponents(screenIndex: number) {
+  const wallpaperConfig = useSelector(
+    (state: RootState) => selectConfigWithOverrides(state, screenIndex).plugins?.wallpaper
+  );
 
   const [wallpaperComponents, setWallpaperComponents] = useState<FunctionComponentElement<{}>[]>([]);
 

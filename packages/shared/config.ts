@@ -21,6 +21,7 @@ export interface IConfig {
   tags: string[];
   term: string;
   plugins?: IPluginConfig;
+  screenOverrides?: { [screenIndex: number]: Partial<IConfig> };
   version?: string;
 }
 
@@ -30,7 +31,29 @@ export const defaultConfig: IConfig = {
   tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
   term: "xterm",
   plugins: {},
+  screenOverrides: {},
 };
+
+export function assignConfig(dest: IConfig, src: Partial<IConfig>): void {
+  for (const configPropName in src) {
+    switch (configPropName) {
+      case "plugins":
+      case "screenOverrides":
+        // Overwrite at the level of each subkey, not the entire object.
+        Object.assign(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dest[configPropName as keyof IConfig] as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          src[configPropName as keyof Partial<IConfig>] as any
+        );
+        break;
+      default:
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dest[configPropName as keyof IConfig] = src[configPropName as keyof Partial<IConfig>] as any;
+        break;
+    }
+  }
+}
 
 /** Resolves plugins into their runtime types. */
 export async function resolvePlugins<T extends PluginInstance<unknown>>(

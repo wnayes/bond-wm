@@ -8,7 +8,7 @@ export interface ILayoutProps {
 }
 
 export const Layout: React.FC<ILayoutProps> = ({ screen }) => {
-  const layouts = useLayoutPlugins();
+  const layouts = useLayoutPlugins(screen.index);
 
   const tag = screen.currentTags[0];
   const currentLayoutName = screen.currentLayouts[tag];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useStore } from "react-redux";
-import { IIconInfo, LayoutPluginInstance } from "@electron-wm/shared";
+import { IIconInfo, LayoutPluginInstance, selectConfigWithOverrides } from "@electron-wm/shared";
 import { RootState, Store } from "./configureStore";
 import { resolvePluginsFromRenderer } from "./plugins";
 
@@ -35,8 +35,8 @@ export function useIconInfoDataUri(iconInfo: IIconInfo): string | undefined {
   return dataUri;
 }
 
-export function useLayoutPlugins(): LayoutPluginInstance[] {
-  const layoutConfig = useSelector((state: RootState) => state.config.plugins?.layout);
+export function useLayoutPlugins(screenIndex: number): LayoutPluginInstance[] {
+  const layoutConfig = useSelector((state: RootState) => selectConfigWithOverrides(state, screenIndex).plugins?.layout);
 
   const [layoutPlugins, setLayoutPlugins] = useState<LayoutPluginInstance[]>([]);
 

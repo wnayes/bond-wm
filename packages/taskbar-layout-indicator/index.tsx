@@ -12,16 +12,16 @@ export default Plugin;
 
 function LayoutIndicator() {
   const screen = useScreen();
+  const screenIndex = screen.index;
   const tag = screen.currentTags[0];
   const currentLayoutName = screen.currentLayouts[tag];
-  const layoutPlugins = useLayoutPlugins();
+  const layoutPlugins = useLayoutPlugins(screenIndex);
   const currentLayout = useMemo(() => {
     return layoutPlugins.find((plugin) => getLayoutPluginName(plugin) === currentLayoutName);
   }, [layoutPlugins, currentLayoutName]);
 
   const store = useRendererStore();
 
-  const screenIndex = screen.index;
   const onClick = useCallback(() => {
     switchToNextLayout(store, layoutPlugins, screenIndex);
   }, [store, layoutPlugins, screenIndex]);
