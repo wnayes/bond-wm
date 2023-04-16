@@ -24,6 +24,7 @@ exports.config = {
             "$APP_PATH$/packages/layout-tiling",
         ],
         taskbar: [
+            "$APP_PATH$/packages/taskbar-clock",
             "$APP_PATH$/packages/taskbar-layout-indicator",
         ],
         wallpaper: "$APP_PATH$/packages/wallpaper"
