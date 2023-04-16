@@ -50,7 +50,7 @@ export function selectCurrentLayoutForScreen(state: SharedRootState, screenIndex
 
 export function selectWindowMaximizeCanTakeEffect(
   state: SharedRootState,
-  layoutPlugins: LayoutPluginInstance[],
+  layoutPlugins: LayoutPluginInstance[] | undefined,
   wid: number
 ): boolean {
   const win = state.windows[wid];
@@ -58,7 +58,7 @@ export function selectWindowMaximizeCanTakeEffect(
     return false;
   }
   const currentLayoutName = selectCurrentLayoutForScreen(state, win.screenIndex);
-  const currentLayout = layoutPlugins.find((plugin) => getLayoutPluginName(plugin) === currentLayoutName);
+  const currentLayout = layoutPlugins?.find((plugin) => getLayoutPluginName(plugin) === currentLayoutName);
   if (currentLayout) {
     return currentLayout.exports.default.supportsMaximize;
   }

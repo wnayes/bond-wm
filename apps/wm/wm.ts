@@ -212,7 +212,7 @@ export async function createServer(): Promise<XServer> {
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
-  let layoutsByScreen: { [screenIndex: number]: LayoutPluginInstance[] };
+  const layoutsByScreen: Map<number, LayoutPluginInstance[]> = new Map();
 
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
@@ -294,7 +294,7 @@ export async function createServer(): Promise<XServer> {
         getFrameIdFromWindowId,
       };
 
-      dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen[screenIndex]);
+      dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
       eventConsumers.push(dragModule);
       eventConsumers.push(await createICCCMEventConsumer(context));
       ewmhModule = await createEWMHEventConsumer(context, dragModule);
@@ -308,10 +308,10 @@ export async function createServer(): Promise<XServer> {
       await __setupAtoms();
       await __initDesktop();
 
-      for (let s = 0; s < store.getState().screens.length; s++) {
+      for (let s = 0; s < desktopBrowsers.length; s++) {
         const layoutPlugins = selectConfigWithOverrides(store.getState(), s).plugins?.layout;
         if (layoutPlugins) {
-          layoutsByScreen[s] = layoutPlugins ? await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins) : [];
+          layoutsByScreen.set(s, layoutPlugins ? await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins) : []);
         }
       }
     });
@@ -1668,7 +1668,10 @@ export async function createServer(): Promise<XServer> {
     if (screens.length > 1) {
       screenIndex = Math.max(0, await getScreenIndexWithCursor(context, screens[0].root));
     }
-    switchToNextLayout(store, layoutsByScreen[screenIndex], screenIndex);
+    const layouts = layoutsByScreen.get(screenIndex);
+    if (layouts) {
+      switchToNextLayout(store, layouts, screenIndex);
+    }
   }
 
   function widLog(wid: number, ...args: unknown[]): void {

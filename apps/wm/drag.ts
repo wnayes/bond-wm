@@ -29,7 +29,7 @@ export interface DragModule extends IXWMEventConsumer {
 
 export async function createDragModule(
   { X, store, getFrameIdFromWindowId, getWindowIdFromFrameId }: XWMContext,
-  getLayoutPlugins: (screenIndex: number) => LayoutPluginInstance[]
+  getLayoutPlugins: (screenIndex: number) => LayoutPluginInstance[] | undefined
 ): Promise<DragModule> {
   function endMoveResize(wid: number): void {
     const state = store.getState();
