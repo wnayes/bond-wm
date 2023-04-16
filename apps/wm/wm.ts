@@ -310,9 +310,7 @@ export async function createServer(): Promise<XServer> {
 
       for (let s = 0; s < desktopBrowsers.length; s++) {
         const layoutPlugins = selectConfigWithOverrides(store.getState(), s).plugins?.layout;
-        if (layoutPlugins) {
-          layoutsByScreen.set(s, layoutPlugins ? await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins) : []);
-        }
+        layoutsByScreen.set(s, layoutPlugins ? await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins) : []);
       }
     });
 

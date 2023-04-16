@@ -22,7 +22,7 @@ export async function resolvePluginsForWM<T extends PluginInstance<unknown>>(
       loadedModule = require(installPath);
     }
 
-    if (loadedModule != null) {
+    if (loadedModule) {
       plugins.push({
         exports: loadedModule,
         settings: typeof specifier === "object" ? specifier.settings : undefined,

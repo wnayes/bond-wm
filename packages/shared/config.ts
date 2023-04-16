@@ -15,13 +15,17 @@ export interface IPluginConfig {
   wallpaper?: PluginSpecifiers;
 }
 
+type ScreenOverridesDict = { [screenIndex: number]: Partial<IConfig> };
+
+type ObjectConfigPropertyType = IPluginConfig | ScreenOverridesDict;
+
 export interface IConfig {
   initialLayout: string;
   initialTag: string;
   tags: string[];
   term: string;
   plugins?: IPluginConfig;
-  screenOverrides?: { [screenIndex: number]: Partial<IConfig> };
+  screenOverrides?: ScreenOverridesDict;
   version?: string;
 }
 
@@ -39,13 +43,21 @@ export function assignConfig(dest: IConfig, src: Partial<IConfig>): void {
     switch (configPropName) {
       case "plugins":
       case "screenOverrides":
-        // Overwrite at the level of each subkey, not the entire object.
-        Object.assign(
+        {
+          // Overwrite at the level of each subkey, not the entire object.
+
+          // Clone the subobject, since sometimes the target is readonly.
+          let subobject = dest[configPropName as keyof IConfig] as ObjectConfigPropertyType;
+          subobject = subobject ? { ...subobject } : {};
+
+          Object.assign(
+            subobject,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            src[configPropName as keyof Partial<IConfig>] as any
+          );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          dest[configPropName as keyof IConfig] as any,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          src[configPropName as keyof Partial<IConfig>] as any
-        );
+          dest[configPropName as keyof IConfig] = subobject as any;
+        }
         break;
       default:
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
