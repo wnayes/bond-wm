@@ -1,7 +1,14 @@
-import * as React from "react";
+import React from "react";
 import { useCallback, useEffect, useRef } from "react";
+import { RenderPluginConfig } from "@electron-wm/plugin-utils";
 
-export function Clock() {
+/** A clock plugin for electron-wm. */
+const Plugin: RenderPluginConfig = {
+  component: Clock,
+};
+export default Plugin;
+
+function Clock() {
   const divRef = useRef<HTMLDivElement>(null);
   const timeSpanRef = useRef<HTMLSpanElement>(null);
   const dateSpanRef = useRef<HTMLSpanElement>(null);

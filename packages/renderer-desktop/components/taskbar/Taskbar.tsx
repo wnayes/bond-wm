@@ -1,6 +1,5 @@
 import * as React from "react";
 import { FunctionComponentElement, useEffect, useState } from "react";
-import { Clock } from "./Clock";
 import { useSelector } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
 import { IWindow, PluginInstance, selectConfigWithOverrides, TaskbarModule } from "@electron-wm/shared";
@@ -31,7 +30,6 @@ export function Taskbar(props: ITaskbarProps) {
         {showingRun && <RunField />}
         <TaskList windows={windows} />
         {showSystemTray && <SystemTray trayWindows={trayWindows} />}
-        <Clock />
         {taskbarPluginComponents}
       </>
     </div>
