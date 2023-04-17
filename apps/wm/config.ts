@@ -9,6 +9,8 @@ import { IConfig } from "@electron-wm/shared";
 
 let _store: ServerStore;
 
+const SupportedConfigExtensions = ["mjs", "cjs", "js"];
+
 export function getConfig(): IConfig {
   return _store.getState().config;
 }
@@ -25,16 +27,22 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
   }
   log("XDG_CONFIG_HOME", XDG_CONFIG_HOME);
 
+  const appPath = app.getAppPath();
+
   // Later paths take precedence.
-  const configPaths = [
-    // The file distributed with the app itself.
-    join(app.getAppPath(), ".ewmrc.js"),
 
-    // Support this once TypeScript emits import() correctly in Node.
-    // join(XDG_CONFIG_HOME, "electron-wm-config/.ewmrc.mjs"),
+  const configPaths = [];
 
-    join(XDG_CONFIG_HOME, "electron-wm-config/.ewmrc.js"),
-  ];
+  // The file distributed with the app itself.
+  for (const ext of SupportedConfigExtensions) {
+    configPaths.push(join(appPath, `.ewmrc.${ext}`));
+  }
+
+  // The user directory config file.
+  for (const ext of SupportedConfigExtensions) {
+    configPaths.push(join(XDG_CONFIG_HOME, `electron-wm-config/.ewmrc.${ext}`));
+  }
+
   for (const configPath of configPaths) {
     if (existsSync(configPath)) {
       log("Reading user config file", configPath);
