@@ -13,7 +13,7 @@
 
   <script>
     require("ts-node").register({
-      cwd: "./packages/renderer-desktop",
+      cwd: __dirname,
       project: "./tsconfig.json"
     });
     require("./index.tsx");
