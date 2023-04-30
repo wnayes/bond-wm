@@ -15,6 +15,9 @@ export function getConfig(): IConfig {
   return _store.getState().config;
 }
 
+// https://github.com/TypeStrong/ts-node/discussions/1290
+const dynamicImport = new Function("specifier", "return import(specifier)");
+
 export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
   _store = store;
 
@@ -48,7 +51,7 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
       log("Reading user config file", configPath);
 
       try {
-        const userConfigModule = await import(configPath);
+        const userConfigModule = await dynamicImport(configPath);
         if (userConfigModule) {
           const configDirectory = dirname(configPath);
           processConfigModule(userConfigModule, configDirectory);

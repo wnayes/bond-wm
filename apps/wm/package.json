@@ -2,7 +2,7 @@
   "name": "electron-wm",
   "version": "1.0.0",
   "description": "An X Window Manager built on web technologies, including Electron and React.",
-  "main": "./dist/main.js",
+  "main": "./index.js",
   "repository": "https://github.com/wnayes/electron-wm",
   "keywords": [
     "X11",
@@ -11,7 +11,7 @@
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./main.ts --sourcemap --platform=node --bundle --packages=external --outfile=./dist/dist.js && ./scripts/generate-version-json.mjs",
+    "build": "tsc -b ./tsconfig.json && ./scripts/generate-version-json.mjs",
     "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
@@ -34,7 +34,6 @@
     "@types/react-dom": "^18.0.9",
     "@types/yargs": "^17.0.15",
     "electron-reloader": "^1.2.3",
-    "esbuild": "^0.16.12",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",
     "type-fest": "^3.3.0",

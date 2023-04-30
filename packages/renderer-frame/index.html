@@ -11,5 +11,11 @@
     <div id="content"></div>
   </body>
 
-  <script src="./dist/dist.js"></script>
+  <script>
+    require("ts-node").register({
+      cwd: "./packages/renderer-frame",
+      project: "./tsconfig.json"
+    });
+    require("./index.ts");
+  </script>
 </html>

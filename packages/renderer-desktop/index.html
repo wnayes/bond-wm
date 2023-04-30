@@ -11,8 +11,11 @@
     <div id="content"></div>
   </body>
 
-  <!-- <script src="./dist/dist.js"></script> -->
   <script>
-    require("./dist/dist.js");
+    require("ts-node").register({
+      cwd: "./packages/renderer-desktop",
+      project: "./tsconfig.json"
+    });
+    require("./index.tsx");
   </script>
 </html>

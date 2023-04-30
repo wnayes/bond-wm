@@ -3,14 +3,14 @@
   "name": "@electron-wm/renderer-desktop",
   "version": "1.0.0",
   "description": "Renderer desktop internal package",
-  "main": "./dist/dist.js",
-  "exports": "./dist/dist.js",
+  "main": "./index.tsx",
+  "exports": "./index.tsx",
   "types": "./index.tsx",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --packages=external --format=cjs --outfile=./dist/dist.js",
+    "build": "tsc -b ./tsconfig.json",
     "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
@@ -34,7 +34,6 @@
     "@types/react-dom": "^18.0.9",
     "@types/yargs": "^17.0.15",
     "electron-reloader": "^1.2.3",
-    "esbuild": "^0.16.12",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",
     "type-fest": "^3.3.0",

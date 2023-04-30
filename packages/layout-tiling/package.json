@@ -2,13 +2,13 @@
   "name": "@electron-wm/layout-tiling",
   "version": "1.0.0",
   "description": "Tiling layout for electron-wm",
-  "main": "./dist/packages/layout-tiling/index.js",
-  "exports": "./dist/packages/layout-tiling/index.js",
+  "main": "./index.tsx",
+  "exports": "./index.tsx",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && cp ./tiling.png ./dist/packages/layout-tiling/tiling.png"
+    "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
     "@electron-wm/plugin-utils": "workspace:*",

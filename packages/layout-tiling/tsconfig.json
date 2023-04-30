@@ -1,9 +1,4 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["**/*"],
-  "compilerOptions": {
-    "module": "CommonJS",
-    "noEmit": false,
-    "outDir": "./dist"
-  }
+  "include": ["**/*"]
 }

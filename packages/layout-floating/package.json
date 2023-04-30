@@ -2,13 +2,13 @@
   "name": "@electron-wm/layout-floating",
   "version": "1.0.0",
   "description": "Floating layout for electron-wm",
-  "main": "./dist/packages/layout-floating/index.js",
-  "exports": "./dist/packages/layout-floating/index.js",
+  "main": "./index.tsx",
+  "exports": "./index.tsx",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && cp ./floating.png ./dist/packages/layout-floating/floating.png"
+    "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
     "@electron-wm/plugin-utils": "workspace:*",

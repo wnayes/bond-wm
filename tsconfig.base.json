@@ -1,4 +1,6 @@
 {
+  "include": [],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "sourceMap": true,
     "rootDir": ".",
@@ -14,6 +16,7 @@
     "esModuleInterop": true,
     "isolatedModules": true
   },
-  "include": [],
-  "exclude": ["node_modules"]
+  "ts-node": {
+    "swc": true
+  }
 }

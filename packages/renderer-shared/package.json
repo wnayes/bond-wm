@@ -3,14 +3,14 @@
   "name": "@electron-wm/renderer-shared",
   "version": "1.0.0",
   "description": "Renderer shared internal functionality",
-  "main": "./dist/index.js",
-  "exports": "./dist/index.js",
+  "main": "./index.ts",
+  "exports": "./index.ts",
   "types": "./index.ts",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./preload.ts --bundle --packages=external --outfile=./dist/preload.js && esbuild ./index.ts --bundle --packages=external --format=cjs --outfile=./dist/index.js",
+    "build": "tsc -b ./tsconfig.json && esbuild ./preload.ts --bundle --packages=external --outfile=./dist/preload.js",
     "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
