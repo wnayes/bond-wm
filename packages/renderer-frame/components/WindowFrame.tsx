@@ -7,7 +7,7 @@ import { TitleBar } from "./TitleBar";
 import { WindowClientArea } from "./WindowClientArea";
 
 interface IWindowFrameProps {
-  wid: number;
+  wid: number | undefined;
 }
 
 /**
@@ -16,7 +16,7 @@ interface IWindowFrameProps {
 export function WindowFrame(props: IWindowFrameProps) {
   const { wid } = props;
 
-  const win = useSelector((state: RootState) => state.windows[wid]);
+  const win = useSelector((state: RootState) => (typeof wid === "number" ? state.windows[wid] : null));
 
   let className = "winWrapper";
   if (win?.focused) {
@@ -47,7 +47,7 @@ export function WindowFrame(props: IWindowFrameProps) {
   return (
     <div className={className} style={style}>
       {titlebar}
-      <WindowClientArea wid={wid} />
+      <WindowClientArea win={win} />
     </div>
   );
 }

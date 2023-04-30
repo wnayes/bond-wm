@@ -225,6 +225,7 @@ export async function createServer(): Promise<XServer> {
   const frameBrowserWindows: { [wid: number]: BrowserWindow | undefined } = {};
   const frameBrowserWinIdToFrameId: { [wid: number]: number | undefined } = {};
   const frameBrowserFrameIdToWinId: { [fid: number]: number | undefined } = {};
+  let frameBrowserOnDeck: { win: BrowserWindow; fid: number } | null = null;
 
   const initializingWins: { [win: number]: boolean } = {};
 
@@ -462,16 +463,16 @@ export async function createServer(): Promise<XServer> {
     );
   }
 
-  function isDesktopBrowserWin(win: number): boolean {
-    return desktopBrowserHandles.hasOwnProperty(win);
+  function isDesktopBrowserWin(wid: number): boolean {
+    return desktopBrowserHandles.hasOwnProperty(wid);
   }
 
-  function isFrameBrowserWin(win: number): boolean {
-    return frameBrowserFrameIdToWinId.hasOwnProperty(win);
+  function isFrameBrowserWin(wid: number): boolean {
+    return frameBrowserFrameIdToWinId.hasOwnProperty(wid) || frameBrowserOnDeck?.fid === wid;
   }
 
-  function isTrayWin(win: number): boolean {
-    return win in store.getState().tray.windows;
+  function isTrayWin(wid: number): boolean {
+    return wid in store.getState().tray.windows;
   }
 
   function getFrameIdFromWindowId(wid: number): number | undefined {
@@ -532,40 +533,81 @@ export async function createServer(): Promise<XServer> {
     return handle;
   }
 
-  function createFrameBrowser(wid: number, screen: IScreen, geometry: IGeometry) {
+  const FrameBrowserBaseProperties: Electron.BrowserWindowConstructorOptions = {
+    frame: false,
+    backgroundColor: "#00000000",
+    transparent: true,
+    hasShadow: false,
+    webPreferences: {
+      preload: PRELOAD_JS,
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  };
+
+  function createFrameBrowserOnDeck() {
+    if (frameBrowserOnDeck) {
+      return;
+    }
+
     const win = new BrowserWindow({
-      frame: false,
-      width: geometry.width,
-      height: geometry.height,
-      x: geometry.x,
-      y: geometry.y,
-      backgroundColor: "#00000000",
-      transparent: true,
-      hasShadow: false,
-      webPreferences: {
-        preload: PRELOAD_JS,
-        nodeIntegration: true,
-        contextIsolation: false,
-      },
+      ...FrameBrowserBaseProperties,
+      show: false,
     });
-
-    win.webContents.on("did-finish-load", () => {
-      win.webContents.setZoomLevel(screen.zoom);
-    });
-
-    const url = RENDERER_FRAME_INDEX_HTML + "?wid=" + wid;
-    win.loadURL("file://" + url);
-
-    frameBrowserWindows[wid] = win;
+    win.loadURL(`file://${RENDERER_FRAME_INDEX_HTML}`);
 
     const fid = getNativeWindowHandleInt(win);
     if (!fid) {
       logError("Frame window handle was null");
     }
+
+    frameBrowserOnDeck = { win, fid };
+  }
+
+  function createFrameBrowser(wid: number, screen: IScreen, geometry: IGeometry) {
+    // If we have a pre-made frame window, use it. Otherwise, create one.
+    let win: BrowserWindow;
+    let fid: number;
+    if (frameBrowserOnDeck) {
+      const onDeckInfo = frameBrowserOnDeck;
+      frameBrowserOnDeck = null;
+      win = onDeckInfo.win;
+      fid = onDeckInfo.fid;
+
+      win.setSize(geometry.width, geometry.height, false);
+      win.setPosition(geometry.x, geometry.y, false);
+      win.webContents.send("set-frame-wid", wid);
+      win.webContents.setZoomLevel(screen.zoom);
+      win.show();
+    } else {
+      win = new BrowserWindow({
+        ...FrameBrowserBaseProperties,
+        width: geometry.width,
+        height: geometry.height,
+        x: geometry.x,
+        y: geometry.y,
+      });
+      win.webContents.on("did-finish-load", () => {
+        win.webContents.setZoomLevel(screen.zoom);
+      });
+      win.loadURL(`file://${RENDERER_FRAME_INDEX_HTML}?wid=${wid}`);
+
+      fid = getNativeWindowHandleInt(win);
+      if (!fid) {
+        logError("Frame window handle was null");
+      }
+    }
+
+    frameBrowserWindows[wid] = win;
+
     frameBrowserWinIdToFrameId[wid] = fid;
     frameBrowserFrameIdToWinId[fid] = wid;
 
-    log("Created frame window", fid, url);
+    log("Created frame window", fid);
+
+    if (!frameBrowserOnDeck) {
+      setTimeout(() => createFrameBrowserOnDeck(), 0);
+    }
 
     return fid;
   }

@@ -1,24 +1,22 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
-import { useSelector, useStore } from "react-redux";
-import { RootState } from "@electron-wm/renderer-shared";
-import { setFrameExtentsAction } from "@electron-wm/shared";
+import { useStore } from "react-redux";
+import { IWindow, setFrameExtentsAction } from "@electron-wm/shared";
 import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
 
 interface IWindowClientAreaProps {
-  wid: number;
+  win: IWindow | null;
 }
 
 /**
  * When this component renders, it reports its size as the client area for the window.
  */
 export function WindowClientArea(props: IWindowClientAreaProps) {
-  const { wid } = props;
+  const { win } = props;
 
   const winBox = useRef<HTMLDivElement>(null);
 
   const store = useStore();
-  const win = useSelector((state: RootState) => state.windows[wid]);
 
   useLayoutEffect(() => {
     const box = winBox.current;
@@ -40,7 +38,7 @@ export function WindowClientArea(props: IWindowClientAreaProps) {
         win.frameExtents.right !== right ||
         win.frameExtents.bottom !== bottom
       ) {
-        store.dispatch(setFrameExtentsAction({ wid, top, left, right, bottom }));
+        store.dispatch(setFrameExtentsAction({ wid: win.id, top, left, right, bottom }));
       }
     }
   });
