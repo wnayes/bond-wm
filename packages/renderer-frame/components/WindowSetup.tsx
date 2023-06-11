@@ -2,7 +2,7 @@ import * as React from "react";
 import { Root, createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { WindowFrame } from "./WindowFrame";
-import { Store } from "@electron-wm/renderer-shared";
+import { Store, frameWindowMouseEnter } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
 
 let _reactRoot: Root;
@@ -19,10 +19,17 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
     wid = parseInt(widParam, 10);
     console.log("wid", wid);
   } else {
-    ipcRenderer.on("set-frame-wid", (event, wid: number) => {
-      renderWindowFrame(wid);
+    ipcRenderer.on("set-frame-wid", (event, newWid: number) => {
+      wid = newWid;
+      renderWindowFrame(newWid);
     });
   }
+
+  container.ownerDocument.addEventListener("mouseenter", () => {
+    if (wid) {
+      frameWindowMouseEnter(wid);
+    }
+  });
 
   renderWindowFrame(wid);
 }

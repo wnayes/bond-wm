@@ -32,6 +32,10 @@ export function focusDesktopBrowser({
   ipcRenderer.send("focus-desktop-browser", { screenIndex, takeVisualFocus });
 }
 
+export function frameWindowMouseEnter(wid: number) {
+  ipcRenderer.send("frame-window-mouse-enter", wid);
+}
+
 export function desktopZoomIn(screenIndex: number): void {
   ipcRenderer.send("desktop-zoom-in", { screenIndex });
 }

@@ -342,6 +342,14 @@ export async function createServer(): Promise<XServer> {
       setFocusToDesktopWindow(args.screenIndex, args.takeVisualFocus);
     });
 
+    ipcMain.on("frame-window-mouse-enter", (event, wid) => {
+      // Alternative in case we don't receive PointerMotion over a window.
+      if (ignoreEnterLeave) {
+        widLog(wid, "frame-window-mouse-enter", "clearing enterleave ignore");
+        ignoreEnterLeave = false;
+      }
+    });
+
     ipcMain.on("desktop-zoom-in", (event, args: { screenIndex: number }) => {
       desktopZoomIn(args.screenIndex);
     });
