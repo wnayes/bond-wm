@@ -36,7 +36,6 @@
     "electron-reloader": "^1.2.3",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",
-    "type-fest": "^3.3.0",
-    "typescript": "~5.0.4"
+    "type-fest": "^3.3.0"
   }
 }
