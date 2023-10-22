@@ -463,11 +463,12 @@ export async function createServer(): Promise<XServer> {
 
     X.SetInputFocus(PointerRoot, XFocusRevertTo.PointerRoot);
 
-    eventConsumers.forEach((consumer) =>
-      consumer.onScreenCreated?.({
-        root,
-        desktopWindowId: screenIndexToDesktopId[0],
-      })
+    eventConsumers.forEach(
+      (consumer) =>
+        consumer.onScreenCreated?.({
+          root,
+          desktopWindowId: screenIndexToDesktopId[0],
+        })
     );
   }
 
@@ -1113,13 +1114,14 @@ export async function createServer(): Promise<XServer> {
       focusWindowOnEnter(wid); // In case we don't get onEnterNotify
     }
 
-    eventConsumers.forEach((consumer) =>
-      consumer.onPointerMotion?.({
-        wid,
-        windowType: getWindowType(wid),
-        rootx: ev.rootx,
-        rooty: ev.rooty,
-      })
+    eventConsumers.forEach(
+      (consumer) =>
+        consumer.onPointerMotion?.({
+          wid,
+          windowType: getWindowType(wid),
+          rootx: ev.rootx,
+          rooty: ev.rooty,
+        })
     );
   }
 
@@ -1161,11 +1163,12 @@ export async function createServer(): Promise<XServer> {
 
     raiseWindow(wid);
 
-    eventConsumers.forEach((consumer) =>
-      consumer.onButtonRelease?.({
-        wid,
-        windowType: getWindowType(wid),
-      })
+    eventConsumers.forEach(
+      (consumer) =>
+        consumer.onButtonRelease?.({
+          wid,
+          windowType: getWindowType(wid),
+        })
     );
   }
 
@@ -1175,13 +1178,14 @@ export async function createServer(): Promise<XServer> {
     widLog(wid, "onClientMessage", ev);
     X.GetAtomName(ev.message_type, (err, name) => log(`(Client message message_type ${ev.message_type} == ${name})`));
 
-    eventConsumers.forEach((consumer) =>
-      consumer.onClientMessage?.({
-        wid,
-        windowType: getWindowType(wid),
-        messageType: ev.message_type,
-        data: ev.data,
-      })
+    eventConsumers.forEach(
+      (consumer) =>
+        consumer.onClientMessage?.({
+          wid,
+          windowType: getWindowType(wid),
+          messageType: ev.message_type,
+          data: ev.data,
+        })
     );
   }
 

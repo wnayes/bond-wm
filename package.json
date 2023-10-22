@@ -19,12 +19,12 @@
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "eslint": "^8.29.0",
-    "eslint-config-prettier": "^8.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "2.8.0",
+    "prettier": "3.0.3",
     "turbo": "latest",
     "typescript": "~5.2.2"
   },

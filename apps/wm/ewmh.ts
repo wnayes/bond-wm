@@ -22,7 +22,7 @@ type NetWmMoveResizeData = [
   yRoot: number,
   direction: NetWmMoveResizeType,
   button: number,
-  sourceIndication: number
+  sourceIndication: number,
 ];
 
 enum NetWmMoveResizeType {
