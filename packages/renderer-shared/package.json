@@ -16,7 +16,6 @@
   "dependencies": {
     "@electron-wm/shared": "workspace:*",
     "@reduxjs/toolkit": "^1.9.1",
-    "electron": "^26.2.1",
     "electron-redux": "2.0.0-alpha.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
