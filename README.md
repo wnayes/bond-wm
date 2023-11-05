@@ -82,6 +82,19 @@ The following shortcuts are supported:
 
 Shortcuts are currently hard-coded in the wm.ts.
 
+### Transparency
+
+If you want to have rounded frame window edges with transparency, try using an X11 compositor. The [picom](https://github.com/wnayes/electron-wm) compositor has been found to work well.
+
+As typical with X11 compositors, they are often ran before the WM itself:
+
+```
+picom &
+exec /path/to/electron-wm-checkout/.bin/electron /path/to/electron-wm-checkout
+```
+
+Picom enables several effects by default (shadows, fading) which you may want to disable via picom.conf.
+
 ## License
 
 [MIT License](LICENSE.md)
