@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { WindowFrame } from "./WindowFrame";
 import { Store, frameWindowMouseEnter } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
-import { WidContext } from "../hooks/useWindow";
+import { WidContext } from "@electron-wm/plugin-utils";
 import {
   TitleBar,
   TitleBarCloseButton,
@@ -12,7 +12,7 @@ import {
   TitleBarMaximizeButton,
   TitleBarMinimizeButton,
   TitleBarText,
-} from "./TitleBar";
+} from "@electron-wm/titlebar";
 import { WindowClientArea } from "./WindowClientArea";
 
 let _reactRoot: Root;
