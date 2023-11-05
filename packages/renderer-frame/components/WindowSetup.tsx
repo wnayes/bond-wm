@@ -4,6 +4,16 @@ import { Provider } from "react-redux";
 import { WindowFrame } from "./WindowFrame";
 import { Store, frameWindowMouseEnter } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
+import { WidContext } from "../hooks/useWindow";
+import {
+  TitleBar,
+  TitleBarCloseButton,
+  TitleBarIcon,
+  TitleBarMaximizeButton,
+  TitleBarMinimizeButton,
+  TitleBarText,
+} from "./TitleBar";
+import { WindowClientArea } from "./WindowClientArea";
 
 let _reactRoot: Root;
 let _store: Store;
@@ -35,9 +45,28 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
 }
 
 function renderWindowFrame(wid?: number): void {
-  _reactRoot.render(
+  _reactRoot.render(<WindowFrameWrapper wid={wid} />);
+}
+
+interface WindowFrameWrapperProps {
+  wid?: number;
+}
+
+function WindowFrameWrapper({ wid }: WindowFrameWrapperProps) {
+  return (
     <Provider store={_store}>
-      <WindowFrame wid={wid} />
+      <WidContext.Provider value={wid}>
+        <WindowFrame>
+          <TitleBar>
+            <TitleBarIcon />
+            <TitleBarText />
+            <TitleBarMinimizeButton />
+            <TitleBarMaximizeButton />
+            <TitleBarCloseButton />
+          </TitleBar>
+          <WindowClientArea />
+        </WindowFrame>
+      </WidContext.Provider>
     </Provider>
   );
 }

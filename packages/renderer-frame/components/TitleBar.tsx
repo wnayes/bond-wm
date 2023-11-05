@@ -13,27 +13,59 @@ import { RootState } from "@electron-wm/renderer-shared";
 import { useIconInfoDataUri } from "@electron-wm/renderer-shared";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
-import { IIconInfo, IWindow } from "@electron-wm/shared";
+import { IWindow } from "@electron-wm/shared";
+import { useWindow } from "../hooks/useWindow";
 
-interface ITitleBarProps {
-  win: IWindow;
-}
+interface ITitleBarProps extends React.PropsWithChildren<{}> {}
 
-export function TitleBar(props: ITitleBarProps) {
-  const { win } = props;
-
-  const layouts = useLayoutPlugins(win.screenIndex);
-  const supportsMaximize = useSelector((state: RootState) => selectWindowMaximizeCanTakeEffect(state, layouts, win.id));
-  const hasIcons = (win.icons?.length ?? 0) > 0;
-
+export function TitleBar({ children }: ITitleBarProps) {
+  const win = useWindow();
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     showContextMenu(ContextMenuKind.Frame);
   }, []);
 
+  if (!win || win.decorated || win.fullscreen) {
+    return null;
+  }
+
+  return (
+    <div className="winTitleBar" onContextMenu={onContextMenu}>
+      {children}
+    </div>
+  );
+}
+
+export function TitleBarIcon() {
+  const win = useWindow();
+  const icons = win?.icons;
+  const icon = icons?.[0]; // TODO: Pick "best" icon.
+  const dataUri = useIconInfoDataUri(icon);
+
+  // If there was no icon info, return null.
+  // We expect dataUri to be absent the initial render; still render the img in preparation in this case.
+  if (!icon) {
+    return null;
+  }
+
+  return <img className="winTitleBarIcon" src={dataUri} />;
+}
+
+function useSupportsMaximize(win: IWindow | null): boolean {
+  const layouts = useLayoutPlugins(win?.screenIndex);
+  return useSelector((state: RootState) => {
+    if (!win) {
+      return false;
+    }
+    return selectWindowMaximizeCanTakeEffect(state, layouts, win.id);
+  });
+}
+
+function useMaximizeHandler(win: IWindow | null) {
+  const supportsMaximize = useSupportsMaximize(win);
   const onMaximizeClick = useCallback(() => {
-    if (!supportsMaximize) {
+    if (!win || !supportsMaximize) {
       return;
     }
 
@@ -43,32 +75,37 @@ export function TitleBar(props: ITitleBarProps) {
       maximizeWindow(win.id);
     }
   }, [win, supportsMaximize]);
+  return onMaximizeClick;
+}
 
+export function TitleBarText() {
+  const win = useWindow();
+  const onMaximizeClick = useMaximizeHandler(win);
+
+  if (!win) {
+    return null;
+  }
+
+  // FIXME: The double click doesn't work due to -webkit-app-region: drag.
   return (
-    <div className="winTitleBar" onContextMenu={onContextMenu}>
-      {hasIcons && <TitleBarIcon icons={win.icons!} />}
-      {/* FIXME: The double click doesn't work due to -webkit-app-region: drag */}
-      <span className="winTitleBarText" onDoubleClick={onMaximizeClick}>
-        {win.title}
-      </span>
-      <TitleBarMinimizeButton win={win} />
-      {supportsMaximize && <TitleBarMaximizeButton win={win} onClick={onMaximizeClick} />}
-      <TitleBarCloseButton win={win} />
-    </div>
+    <span className="winTitleBarText" onDoubleClick={onMaximizeClick}>
+      {win.title}
+    </span>
   );
 }
 
-interface ITitleBarCloseButtonProps {
-  win: IWindow;
-}
-
-function TitleBarCloseButton(props: ITitleBarCloseButtonProps) {
-  const { win } = props;
-
-  const winId = win.id;
+export function TitleBarCloseButton() {
+  const win = useWindow();
+  const winId = win?.id;
   const onClick = useCallback(() => {
-    closeWindow(winId);
+    if (typeof winId === "number") {
+      closeWindow(winId);
+    }
   }, [winId]);
+
+  if (!win) {
+    return null;
+  }
 
   return (
     <div className="winTitleBarBtn winTitleBarCloseBtn" onClick={onClick} title="Close">
@@ -77,13 +114,13 @@ function TitleBarCloseButton(props: ITitleBarCloseButtonProps) {
   );
 }
 
-interface ITitleBarMaximizeButtonProps {
-  win: IWindow;
-  onClick(): void;
-}
+export function TitleBarMaximizeButton() {
+  const win = useWindow();
+  const onClick = useMaximizeHandler(win);
 
-function TitleBarMaximizeButton(props: ITitleBarMaximizeButtonProps) {
-  const { win, onClick } = props;
+  if (!win) {
+    return null;
+  }
 
   const graphic = win.maximized ? "./assets/restore.svg" : "./assets/maximize.svg";
   const tooltip = win.maximized ? "Restore" : "Maximize";
@@ -95,40 +132,22 @@ function TitleBarMaximizeButton(props: ITitleBarMaximizeButtonProps) {
   );
 }
 
-interface ITitleBarMinimizeButtonProps {
-  win: IWindow;
-}
-
-function TitleBarMinimizeButton(props: ITitleBarMinimizeButtonProps) {
-  const { win } = props;
-
-  const winId = win.id;
+export function TitleBarMinimizeButton() {
+  const win = useWindow();
+  const winId = win?.id;
   const onClick = useCallback(() => {
-    minimizeWindow(winId);
+    if (typeof winId === "number") {
+      minimizeWindow(winId);
+    }
   }, [winId]);
+
+  if (!win) {
+    return null;
+  }
 
   return (
     <div className="winTitleBarBtn winTitleBarMinimizeBtn" onClick={onClick} title="Minimize">
       <img className="winTitleBarBtnIcon" src="./assets/minimize.svg" />
     </div>
   );
-}
-
-interface ITitleBarIconProps {
-  icons: IIconInfo[];
-}
-
-function TitleBarIcon(props: ITitleBarIconProps) {
-  const { icons } = props;
-
-  const icon = icons[0]; // TODO: Pick "best" icon.
-  const dataUri = useIconInfoDataUri(icon);
-
-  // If there was no icon info, return null.
-  // We expect dataUri to be absent the initial render; still render the img in preparation in this case.
-  if (!icon) {
-    return null;
-  }
-
-  return <img className="winTitleBarIcon" src={dataUri} />;
 }

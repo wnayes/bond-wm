@@ -8,7 +8,7 @@ export function useRendererStore(): Store {
   return useStore() as Store;
 }
 
-export function useIconInfoDataUri(iconInfo: IIconInfo): string | undefined {
+export function useIconInfoDataUri(iconInfo: IIconInfo | null | undefined): string | undefined {
   const [dataUri, setDataUri] = useState<string | undefined>();
 
   useEffect(() => {
@@ -35,8 +35,13 @@ export function useIconInfoDataUri(iconInfo: IIconInfo): string | undefined {
   return dataUri;
 }
 
-export function useLayoutPlugins(screenIndex: number): LayoutPluginInstance[] {
-  const layoutConfig = useSelector((state: RootState) => selectConfigWithOverrides(state, screenIndex).plugins?.layout);
+export function useLayoutPlugins(screenIndex: number | undefined): LayoutPluginInstance[] {
+  const layoutConfig = useSelector((state: RootState) => {
+    if (typeof screenIndex !== "number") {
+      return undefined;
+    }
+    return selectConfigWithOverrides(state, screenIndex).plugins?.layout;
+  });
 
   const [layoutPlugins, setLayoutPlugins] = useState<LayoutPluginInstance[]>([]);
 
