@@ -26,7 +26,7 @@ export function TitleBar({ children }: ITitleBarProps) {
     showContextMenu(ContextMenuKind.Frame);
   }, []);
 
-  if (!win || win.decorated || win.fullscreen) {
+  if (!win || !win.decorated || win.fullscreen) {
     return null;
   }
 
