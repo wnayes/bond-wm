@@ -1,10 +1,24 @@
+:root {
+    --window-base-bg-color: transparent;
+    --window-inactive-bg-color: #333333;
+    --window-inactive-border-color: black;
+    --window-active-bg-color: #7269D2;
+    --window-active-border-color: #7269D2;
+    --window-urgent-bg-color: #C3723D;
+    --window-urgent-border-color: #C3723D;
+    --window-titlebar-text-color: white;
+    --window-titlebar-close-hover-bg-color: #FF6961;
+    --window-titlebar-minimize-hover-bg-color: #CEA32F;
+    --window-titlebar-maximize-hover-bg-color: #0DAA49;
+}
+
 html, body {
     height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: transparent;
+    background-color: var(--window-base-bg-color);
 
     -webkit-user-select: none;
     user-select: none;
@@ -16,7 +30,7 @@ html, body {
     height: 100%;
     width: 100%;
     overflow: hidden;
-    background-color: transparent;
+    background-color: var(--window-base-bg-color);
 }
 
 .winWrapper {
@@ -26,17 +40,17 @@ html, body {
     display: flex;
     flex-direction: column;
     position: absolute;
-    background-color: #333333;
-    border: 1px solid black;
+    background-color: var(--window-inactive-bg-color);
+    border: 1px solid var(--window-inactive-border-color);
     overflow: hidden;
 }
 .winWrapper.focused {
-    background-color: #7269d2;
-    border-color: #7269d2;
+    background-color: var(--window-active-bg-color);
+    border-color: var(--window-active-border-color);
 }
 .winWrapper.urgent {
-    background-color: #c3723d;
-    border-color: #c3723d;
+    background-color: var(--window-urgent-bg-color);
+    border-color: var(--window-urgent-border-color);
 }
 .winWrapper.fullscreen, .winWrapper.maximized {
     border-width: 0;
@@ -47,7 +61,7 @@ html, body {
     height: 20px;
     display: flex;
     flex-shrink: 0;
-    color: white;
+    color: var(--window-titlebar-text-color);
     font-size: 12px;
     line-height: 18px;
 
@@ -89,7 +103,7 @@ html, body {
 }
 .winTitleBarCloseBtn:hover {
     font-weight: bold;
-    background-color: #FF6961;
+    background-color: var(--window-titlebar-close-hover-bg-color);
 }
 
 .winTitleBarMinimizeBtn {
@@ -97,7 +111,7 @@ html, body {
 }
 .winTitleBarMinimizeBtn:hover {
     font-weight: bold;
-    background-color: #cea32f;
+    background-color: var(--window-titlebar-minimize-hover-bg-color);
 }
 
 .winTitleBarMaximizeBtn {
@@ -105,7 +119,7 @@ html, body {
 }
 .winTitleBarMaximizeBtn:hover {
     font-weight: bold;
-    background-color: #0daa49;
+    background-color: var(--window-titlebar-maximize-hover-bg-color);
 }
 
 .winTitleBarBtnIcon {
