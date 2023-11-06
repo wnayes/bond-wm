@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Root, createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { WindowFrame } from "./WindowFrame";
+
 import { Store, frameWindowMouseEnter } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
 import { WidContext } from "@electron-wm/plugin-utils";
@@ -13,13 +13,11 @@ import {
   TitleBarMinimizeButton,
   TitleBarText,
 } from "@electron-wm/titlebar";
-import { WindowClientArea } from "./WindowClientArea";
+import { WindowFrame, WindowClientArea } from "@electron-wm/plugin-utils";
 
-let _reactRoot: Root;
 let _store: Store;
 
 export function setupWindowComponent(container: HTMLElement, store: Store): void {
-  _reactRoot = createRoot(container);
   _store = store;
 
   let wid: number | undefined;
@@ -31,7 +29,7 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
   } else {
     ipcRenderer.on("set-frame-wid", (event, newWid: number) => {
       wid = newWid;
-      renderWindowFrame(newWid);
+      renderWindowFrame(container, newWid);
     });
   }
 
@@ -41,10 +39,15 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
     }
   });
 
-  renderWindowFrame(wid);
+  renderWindowFrame(container, wid);
 }
 
-function renderWindowFrame(wid?: number): void {
+let _reactRoot: Root;
+
+function renderWindowFrame(container: HTMLElement, wid?: number): void {
+  if (!_reactRoot) {
+    _reactRoot = createRoot(container);
+  }
   _reactRoot.render(<WindowFrameWrapper wid={wid} />);
 }
 

@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { useStore } from "react-redux";
 import { setFrameExtentsAction } from "@electron-wm/shared";
 import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
-import { useWindow } from "@electron-wm/plugin-utils";
+import { useWindow } from "../useWindow";
 
 /**
  * When this component renders, it reports its size as the client area for the window.

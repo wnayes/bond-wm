@@ -1,6 +1,7 @@
 import * as React from "react";
-import { useBrowserWindowSize, useWindow } from "@electron-wm/plugin-utils";
 import { isUrgent } from "@electron-wm/shared";
+import { useBrowserWindowSize } from "../useBrowserWindowSize";
+import { useWindow } from "../useWindow";
 
 interface IWindowFrameProps extends React.PropsWithChildren<{}> {}
 
