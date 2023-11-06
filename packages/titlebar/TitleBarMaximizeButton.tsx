@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useWindow } from "@electron-wm/plugin-utils";
 import { useMaximizeHandler } from "./TitleBar";
+import maximizeImg from "./assets/maximize.svg";
+import restoreImg from "./assets/restore.svg";
 
 export function TitleBarMaximizeButton() {
   const win = useWindow();
@@ -10,7 +12,7 @@ export function TitleBarMaximizeButton() {
     return null;
   }
 
-  const graphic = win.maximized ? "./assets/restore.svg" : "./assets/maximize.svg";
+  const graphic = win.maximized ? restoreImg : maximizeImg;
   const tooltip = win.maximized ? "Restore" : "Maximize";
 
   return (

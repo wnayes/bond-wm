@@ -266,6 +266,8 @@ export async function createServer(): Promise<XServer> {
     "Mod4 + Shift + M": () => startDragFocusedWindow(),
     "Mod4 + Shift + Q": () => app.quit(),
 
+    "Mod4 + Shift + F12": () => showDevtoolsForFocusedWindowFrame(),
+
     "Mod4 + Ctrl + r": () => {
       app.relaunch();
       app.exit(0);
@@ -1311,6 +1313,16 @@ export async function createServer(): Promise<XServer> {
     return null;
   }
 
+  /** Returns a window id if there is only one window in existence. */
+  function getOnlyWindowId(): number | null {
+    const windows = store.getState().windows;
+    const wids = Object.keys(windows);
+    if (wids.length === 1) {
+      return parseInt(wids[0], 10);
+    }
+    return null;
+  }
+
   function anyWindowHasFocus(screenIndex?: number): boolean {
     return typeof getFocusedWindowId(screenIndex) === "number";
   }
@@ -1346,6 +1358,14 @@ export async function createServer(): Promise<XServer> {
       if (pointerInfo) {
         dragModule.startMove(wid, [pointerInfo.rootX, pointerInfo.rootY]);
       }
+    }
+  }
+
+  function showDevtoolsForFocusedWindowFrame(): void {
+    const wid = getFocusedWindowId() ?? getOnlyWindowId();
+    if (typeof wid === "number") {
+      log(`Opening dev tools for ${wid}`);
+      frameBrowserWindows[wid]?.webContents?.openDevTools({ mode: "detach" });
     }
   }
 

@@ -2,6 +2,7 @@ import * as React from "react";
 import { useCallback } from "react";
 import { minimizeWindow } from "@electron-wm/renderer-shared";
 import { useWindow } from "@electron-wm/plugin-utils";
+import minimizeImg from "./assets/minimize.svg";
 
 export function TitleBarMinimizeButton() {
   const win = useWindow();
@@ -18,7 +19,7 @@ export function TitleBarMinimizeButton() {
 
   return (
     <div className="winTitleBarBtn winTitleBarMinimizeBtn" onClick={onClick} title="Minimize">
-      <img className="winTitleBarBtnIcon" src="./assets/minimize.svg" />
+      <img className="winTitleBarBtnIcon" src={minimizeImg} />
     </div>
   );
 }

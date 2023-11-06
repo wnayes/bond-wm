@@ -571,6 +571,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.0.9
         version: 18.0.10
+      esbuild:
+        specifier: ^0.16.12
+        version: 0.16.12
       type-fest:
         specifier: ^3.3.0
         version: 3.4.0
