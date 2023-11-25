@@ -38,7 +38,7 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
 
   // The file distributed with the app itself.
   for (const ext of SupportedConfigExtensions) {
-    configPaths.push(join(appPath, `.ewmrc.${ext}`));
+    configPaths.push(join(appPath, "packages", "config", `.ewmrc.${ext}`));
   }
 
   // The user directory config file.
