@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "name": "@electron-wm/config-frame",
+  "version": "1.0.0",
+  "description": "Default frame configuration",
+  "main": "./index.tsx",
+  "exports": "./index.tsx",
+  "repository": "https://github.com/wnayes/electron-wm",
+  "author": "Will Nayes",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json",
+    "clean": "rm -rf ./node_modules"
+  },
+  "dependencies": {
+    "@electron-wm/plugin-utils": "workspace:*",
+    "@electron-wm/titlebar": "workspace:*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tslib": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.9"
+  }
+}

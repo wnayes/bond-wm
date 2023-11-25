@@ -1,19 +1,12 @@
 import * as React from "react";
 import { Root, createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 
-import { Store, frameWindowMouseEnter } from "@electron-wm/renderer-shared";
+import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
 import { WidContext } from "@electron-wm/plugin-utils";
-import {
-  TitleBar,
-  TitleBarCloseButton,
-  TitleBarIcon,
-  TitleBarMaximizeButton,
-  TitleBarMinimizeButton,
-  TitleBarText,
-} from "@electron-wm/titlebar";
-import { WindowFrame, WindowClientArea } from "@electron-wm/plugin-utils";
+import { FrameModule, PluginInstance } from "@electron-wm/shared";
+import { FunctionComponentElement, useEffect, useState } from "react";
 
 let _store: Store;
 
@@ -59,17 +52,35 @@ function WindowFrameWrapper({ wid }: WindowFrameWrapperProps) {
   return (
     <Provider store={_store}>
       <WidContext.Provider value={wid}>
-        <WindowFrame>
-          <TitleBar>
-            <TitleBarIcon />
-            <TitleBarText />
-            <TitleBarMinimizeButton />
-            <TitleBarMaximizeButton />
-            <TitleBarCloseButton />
-          </TitleBar>
-          <WindowClientArea />
-        </WindowFrame>
+        <WindowFrameComponentWrapper />
       </WidContext.Provider>
     </Provider>
   );
+}
+
+function WindowFrameComponentWrapper() {
+  const frameConfig = useSelector((state: RootState) => state.config.plugins?.frame);
+
+  const [frameComponent, setFrameComponent] = useState<FunctionComponentElement<{}> | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (!frameConfig) {
+        return;
+      }
+
+      const plugins = await resolvePluginsFromRenderer<PluginInstance<FrameModule>>(frameConfig);
+      const components = plugins
+        .map((wallpaperPlugins, i) => {
+          const wallpaperComponent = wallpaperPlugins.exports.default;
+          if (typeof wallpaperComponent === "function") {
+            return React.createElement(wallpaperComponent, { key: i });
+          }
+        })
+        .filter((component) => component != null) as FunctionComponentElement<{}>[];
+      setFrameComponent(components[0]);
+    })();
+  }, [frameConfig]);
+
+  return frameComponent;
 }

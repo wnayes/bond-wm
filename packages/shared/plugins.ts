@@ -1,5 +1,10 @@
 import { ComponentType, FunctionComponent } from "react";
 
+/** Expect module contents for a "frame" config module. */
+export interface FrameModule {
+  default: FunctionComponent;
+}
+
 /** Plugin configuration object exported by plugin modules. */
 export interface RenderPluginConfig {
   component: ComponentType<{ settings?: object }>;
