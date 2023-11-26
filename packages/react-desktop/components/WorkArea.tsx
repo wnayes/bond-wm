@@ -1,22 +1,29 @@
 import * as React from "react";
-import { FunctionComponentElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  FunctionComponentElement,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useSelector, useStore } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
 import { Layout } from "./layout/Layout";
-import { useBrowserWindowSize } from "@electron-wm/plugin-utils";
+import { useBrowserWindowSize, useScreenIndex } from "@electron-wm/plugin-utils";
 import { PluginInstance, selectConfigWithOverrides, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
 
-export interface IWorkAreaProps {
-  screenIndex: number;
-}
+export interface IWorkAreaProps extends PropsWithChildren {}
 
-export function WorkArea({ screenIndex }: IWorkAreaProps) {
+export function WorkArea({ children }: IWorkAreaProps) {
   const workAreaDiv = useRef<HTMLDivElement>(null);
 
   const store = useStore();
+  const screenIndex = useScreenIndex();
   const screen = useSelector((state: RootState) => state.screens[screenIndex]);
   const wallpaperComponents = useWallpaperComponents(screenIndex);
 
@@ -46,6 +53,7 @@ export function WorkArea({ screenIndex }: IWorkAreaProps) {
 
   return (
     <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
+      {children}
       {wallpaperComponents}
       <Layout screen={screen} />
     </div>

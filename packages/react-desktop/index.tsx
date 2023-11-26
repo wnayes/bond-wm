@@ -40,7 +40,7 @@ if (typeof window !== "undefined" && window.location.href.includes("/react-deskt
           <LayoutIndicator />
         </Taskbar>
         <ErrorBoundary FallbackComponent={ErrorDisplay}>
-          <WorkArea screenIndex={screenIndex} />
+          <WorkArea />
         </ErrorBoundary>
       </Desktop>
     </Provider>
