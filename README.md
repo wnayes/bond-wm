@@ -53,7 +53,7 @@ Make sure to run `pnpm build` before attempting to use the window manager from t
 
 A basic config file is read from the following locations:
 
-- `app-path/.ewmrc.js`
+- `app-path/packages/react-config/.ewmrc.js`
   - The file distributed with the application.
 - `$XDG_CONFIG_HOME/electron-wm-config/.ewmrc.js`
   - Typically `$HOME/.config/electron-wm-config/.ewmrc.js`

@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "@electron-wm/config-frame",
+  "name": "@electron-wm/react-config-frame",
   "version": "1.0.0",
-  "description": "Default frame configuration",
+  "description": "Default React frame configuration",
   "main": "./index.tsx",
   "exports": "./index.tsx",
   "repository": "https://github.com/wnayes/electron-wm",
