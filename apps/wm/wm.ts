@@ -86,7 +86,7 @@ import { setupPackageInstallMessageListener } from "./npmPackageCache";
 import { resolvePluginsForWM } from "./plugins";
 
 // Path constants
-const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../packages/renderer-desktop/index.html");
+const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../packages/react-desktop/index.html");
 const PRELOAD_JS = path.resolve(path.join(__dirname, "../../packages/renderer-shared/dist/preload.js"));
 
 // The values here are arbitrary; we call InternAtom to get the true constants.

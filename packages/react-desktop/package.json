@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "@electron-wm/renderer-desktop",
+  "name": "@electron-wm/react-desktop",
   "version": "1.0.0",
-  "description": "Renderer desktop internal package",
+  "description": "React implementation of an electron-wm desktop",
   "main": "./index.tsx",
   "exports": "./index.tsx",
   "types": "./index.tsx",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -b ./tsconfig.json",
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",

@@ -3,8 +3,8 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { useScreen, useWindows, LayoutPluginConfig } from "@electron-wm/plugin-utils";
 import { windowIsDialog } from "@electron-wm/shared";
-import { Window } from "@electron-wm/renderer-desktop";
-import { BasicFillContainer, CenteringContainer } from "@electron-wm/renderer-desktop";
+import { Window } from "@electron-wm/react-desktop";
+import { BasicFillContainer, CenteringContainer } from "@electron-wm/react-desktop";
 
 interface IFloatingLayoutSettings {
   name?: string;

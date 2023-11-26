@@ -3,8 +3,8 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { useScreen, useWindows, LayoutPluginConfig } from "@electron-wm/plugin-utils";
 import { windowIsDialog } from "@electron-wm/shared";
-import { Window } from "@electron-wm/renderer-desktop";
-import { CenteringContainer } from "@electron-wm/renderer-desktop";
+import { Window } from "@electron-wm/react-desktop";
+import { CenteringContainer } from "@electron-wm/react-desktop";
 
 /** A tiling layout for electron-wm. */
 const Plugin: LayoutPluginConfig = {

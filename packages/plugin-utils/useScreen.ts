@@ -1,4 +1,4 @@
-import { getScreenIndex } from "../renderer-desktop/utils";
+import { getScreenIndex } from "../react-desktop/utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@electron-wm/renderer-shared";
 import { IScreen } from "@electron-wm/shared";
