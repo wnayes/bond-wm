@@ -13,6 +13,9 @@ export const config = {
 
   /** Plugin configuration. */
   plugins: {
+    desktop: {
+      id: "$APP_PATH$/packages/react-desktop",
+    },
     frame: {
       id: "$APP_PATH$/packages/react-frame",
       settings: {

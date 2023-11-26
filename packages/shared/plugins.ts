@@ -1,5 +1,11 @@
 import { ComponentType, FunctionComponent } from "react";
 
+/** Expect module contents for a "desktop" module. */
+export interface DesktopModule {
+  /** Returns the source path to use for the desktop window. */
+  getDesktopWindowSrc(): string;
+}
+
 /** Expect module contents for a "frame" module. */
 export interface FrameModule {
   /** Returns the source path to use for the frame window. */

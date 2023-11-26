@@ -6,6 +6,7 @@ import * as path from "path";
 import * as os from "os";
 import { app, ipcMain, BrowserWindow } from "electron";
 import {
+  DesktopModule,
   FrameModule,
   IBounds,
   IGeometry,
@@ -86,7 +87,6 @@ import { setupPackageInstallMessageListener } from "./npmPackageCache";
 import { resolvePluginsForWM } from "./plugins";
 
 // Path constants
-const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../packages/react-desktop/index.html");
 const PRELOAD_JS = path.resolve(path.join(__dirname, "../../packages/renderer-shared/dist/preload.js"));
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
@@ -542,8 +542,18 @@ export async function createServer(): Promise<XServer> {
 
     log("Created browser window", handle);
 
-    const url = RENDERER_DESKTOP_INDEX_HTML + "?screen=" + index;
-    await win.loadURL("file://" + url);
+    let desktopWindowSrc;
+    const desktopConfig = selectConfigWithOverrides(store.getState(), index)?.plugins?.desktop;
+    if (desktopConfig) {
+      const desktopModule = await resolvePluginsForWM<PluginInstance<DesktopModule>>(desktopConfig);
+      desktopWindowSrc = desktopModule[0]?.exports?.getDesktopWindowSrc();
+    }
+    if (!desktopWindowSrc) {
+      throw new Error("Missing desktop config. Desktop windows cannot be created without a desktop plugin.");
+    }
+
+    const url = desktopWindowSrc + "?screen=" + index;
+    await win.loadURL(url);
 
     const zoomLevel = win.webContents.getZoomLevel();
     if (zoomLevel !== 1) {

@@ -1,3 +1,4 @@
+import * as path from "node:path";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
@@ -24,6 +25,11 @@ if (typeof window !== "undefined" && window.location.href.includes("/react-deskt
   );
 
   hookShortcuts(document.body);
+}
+
+/** Returns the source path to use for the desktop window. */
+export function getDesktopWindowSrc(): string {
+  return `file://${path.join(__dirname, "./index.html")}`;
 }
 
 // For hacky internal plugins

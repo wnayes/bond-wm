@@ -10,6 +10,7 @@ export interface PluginSpecifierObject {
 export type PluginSpecifiers = string | PluginSpecifierObject | readonly (string | PluginSpecifierObject)[];
 
 export interface IPluginConfig {
+  desktop?: PluginSpecifiers;
   frame?: PluginSpecifiers;
   layout?: PluginSpecifiers;
   taskbar?: PluginSpecifiers;
