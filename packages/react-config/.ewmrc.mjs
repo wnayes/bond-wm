@@ -13,7 +13,13 @@ export const config = {
 
   /** Plugin configuration. */
   plugins: {
-    frame: "$APP_PATH$/packages/react-config/frame",
+    frame: {
+      id: "$APP_PATH$/packages/react-frame",
+      settings: {
+        $modules: ["config"],
+        config: "$APP_PATH$/packages/react-config/frame",
+      },
+    },
     layout: [
       {
         id: "$APP_PATH$/packages/layout-floating",

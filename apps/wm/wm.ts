@@ -5,7 +5,14 @@ const x11: IX11Mod = require("x11"); // eslint-disable-line
 import * as path from "path";
 import * as os from "os";
 import { app, ipcMain, BrowserWindow } from "electron";
-import { IBounds, IGeometry, LayoutPluginInstance, selectConfigWithOverrides } from "@electron-wm/shared";
+import {
+  FrameModule,
+  IBounds,
+  IGeometry,
+  LayoutPluginInstance,
+  PluginInstance,
+  selectConfigWithOverrides,
+} from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
@@ -80,7 +87,6 @@ import { resolvePluginsForWM } from "./plugins";
 
 // Path constants
 const RENDERER_DESKTOP_INDEX_HTML = path.join(__dirname, "../../packages/renderer-desktop/index.html");
-const RENDERER_FRAME_INDEX_HTML = path.join(__dirname, "../../packages/renderer-frame/index.html");
 const PRELOAD_JS = path.resolve(path.join(__dirname, "../../packages/renderer-shared/dist/preload.js"));
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
@@ -212,6 +218,7 @@ export async function createServer(): Promise<XServer> {
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
+  let frameWindowSrc: string;
   const layoutsByScreen: Map<number, LayoutPluginInstance[]> = new Map();
 
   const knownWids = new Set<number>();
@@ -307,6 +314,15 @@ export async function createServer(): Promise<XServer> {
       motif = await createMotifModule(context);
       shortcuts = await createShortcutsModule(context);
       eventConsumers.push(shortcuts);
+
+      const frameConfig = store.getState().config.plugins?.frame;
+      if (frameConfig) {
+        const frameModule = await resolvePluginsForWM<PluginInstance<FrameModule>>(frameConfig);
+        frameWindowSrc = frameModule[0]?.exports?.getFrameWindowSrc();
+      }
+      if (!frameWindowSrc) {
+        throw new Error("Missing frame config. Frame windows cannot be created without frame config.");
+      }
 
       await __setupAtoms();
       await __initDesktop();
@@ -565,7 +581,7 @@ export async function createServer(): Promise<XServer> {
       ...FrameBrowserBaseProperties,
       show: false,
     });
-    win.loadURL(`file://${RENDERER_FRAME_INDEX_HTML}`);
+    win.loadURL(frameWindowSrc);
 
     const fid = getNativeWindowHandleInt(win);
     if (!fid) {
@@ -601,7 +617,7 @@ export async function createServer(): Promise<XServer> {
       win.webContents.on("did-finish-load", () => {
         win.webContents.setZoomLevel(screen.zoom);
       });
-      win.loadURL(`file://${RENDERER_FRAME_INDEX_HTML}?wid=${wid}`);
+      win.loadURL(`${frameWindowSrc}?wid=${wid}`);
 
       fid = getNativeWindowHandleInt(win);
       if (!fid) {

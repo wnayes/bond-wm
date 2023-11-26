@@ -1,8 +1,9 @@
 import { ComponentType, FunctionComponent } from "react";
 
-/** Expect module contents for a "frame" config module. */
+/** Expect module contents for a "frame" module. */
 export interface FrameModule {
-  default: FunctionComponent;
+  /** Returns the source path to use for the frame window. */
+  getFrameWindowSrc(): string;
 }
 
 /** Plugin configuration object exported by plugin modules. */

@@ -1,16 +1,16 @@
 {
   "private": true,
-  "name": "@electron-wm/renderer-frame",
+  "name": "@electron-wm/react-frame",
   "version": "1.0.0",
-  "description": "Renderer frame internal package",
-  "main": "./index.ts",
-  "exports": "./index.ts",
+  "description": "React implementation of an electron-wm frame window",
+  "main": "./package.ts",
+  "exports": "./package.ts",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
     "build": "tsc -b ./tsconfig.json",
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",

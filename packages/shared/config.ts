@@ -4,7 +4,7 @@ import { PluginInstance } from "./plugins";
 
 export interface PluginSpecifierObject {
   id: string;
-  settings?: object;
+  settings?: Record<string, unknown>;
 }
 
 export type PluginSpecifiers = string | PluginSpecifierObject | readonly (string | PluginSpecifierObject)[];

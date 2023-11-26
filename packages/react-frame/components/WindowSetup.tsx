@@ -5,8 +5,16 @@ import { Provider, useSelector } from "react-redux";
 import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
 import { WidContext } from "@electron-wm/plugin-utils";
-import { FrameModule, PluginInstance } from "@electron-wm/shared";
-import { FunctionComponentElement, useEffect, useState } from "react";
+import { FrameModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
+import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
+
+interface ReactFrameSettings {
+  config: PluginSpecifiers;
+}
+
+interface ReactFrameConfigModule {
+  default: FunctionComponent;
+}
 
 let _store: Store;
 
@@ -60,27 +68,37 @@ function WindowFrameWrapper({ wid }: WindowFrameWrapperProps) {
 
 function WindowFrameComponentWrapper() {
   const frameConfig = useSelector((state: RootState) => state.config.plugins?.frame);
+  const [frameConfigSpecifier, setFrameConfigSpecifiers] = useState<PluginSpecifiers | null | undefined>(null);
 
   const [frameComponent, setFrameComponent] = useState<FunctionComponentElement<{}> | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (!frameConfig) {
-        return;
+      if (frameConfig) {
+        const plugins = await resolvePluginsFromRenderer<PluginInstance<FrameModule, ReactFrameSettings>>(frameConfig);
+        plugins.forEach((frameModule) => {
+          setFrameConfigSpecifiers(frameModule.settings?.config);
+        });
       }
-
-      const plugins = await resolvePluginsFromRenderer<PluginInstance<FrameModule>>(frameConfig);
-      const components = plugins
-        .map((wallpaperPlugins, i) => {
-          const wallpaperComponent = wallpaperPlugins.exports.default;
-          if (typeof wallpaperComponent === "function") {
-            return React.createElement(wallpaperComponent, { key: i });
-          }
-        })
-        .filter((component) => component != null) as FunctionComponentElement<{}>[];
-      setFrameComponent(components[0]);
     })();
   }, [frameConfig]);
+
+  useEffect(() => {
+    (async () => {
+      if (frameConfigSpecifier) {
+        const plugins = await resolvePluginsFromRenderer<PluginInstance<ReactFrameConfigModule>>(frameConfigSpecifier);
+        const components = plugins
+          .map((frameModule, i) => {
+            const frameComponent = frameModule.exports.default;
+            if (typeof frameComponent === "function") {
+              return React.createElement(frameComponent, { key: i });
+            }
+          })
+          .filter((component) => component != null) as FunctionComponentElement<{}>[];
+        setFrameComponent(components[0]);
+      }
+    })();
+  }, [frameConfigSpecifier]);
 
   return frameComponent;
 }

@@ -118,6 +118,10 @@ function mapPluginSpecifier(
   specifier: string | PluginSpecifierObject,
   configPath: string
 ): string | PluginSpecifierObject {
+  if (specifier && typeof specifier === "object" && specifier.settings) {
+    processPluginSettingsObject(specifier.settings, configPath);
+  }
+
   let id = typeof specifier === "string" ? specifier : specifier.id;
 
   if (id.includes("$APP_PATH$")) {
@@ -134,6 +138,20 @@ function mapPluginSpecifier(
 
   specifier.id = id;
   return specifier;
+}
+
+// Processes any module paths within the settings object of a plugin specifier.
+// The settings object indicates module properties via a $modules array of string property names.
+function processPluginSettingsObject(settings: Record<string, unknown>, configPath: string) {
+  const modulesArr = settings["$modules"];
+  if (Array.isArray(modulesArr)) {
+    for (const propName of modulesArr) {
+      const propValue = settings[propName];
+      if (propValue != null) {
+        settings[propName] = mapPluginSpecifier(propValue as string | PluginSpecifierObject, configPath);
+      }
+    }
+  }
 }
 
 interface VersionJson {

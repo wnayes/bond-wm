@@ -1,7 +1,7 @@
 import { configureRendererStore, setPluginInstallDirectory } from "@electron-wm/renderer-shared";
 import { setupWindowComponent } from "./components/WindowSetup";
 
-if (typeof window !== "undefined" && window.location.href.includes("/renderer-frame/index")) {
+if (typeof window !== "undefined" && window.location.href.includes("/react-frame/index")) {
   setPluginInstallDirectory(__dirname);
 
   const store = configureRendererStore();
