@@ -1,12 +1,14 @@
 import * as React from "react";
-import { useDispatch } from "react-redux";
-import { exec, getCompletionOptions } from "@electron-wm/renderer-shared";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, exec, getCompletionOptions } from "@electron-wm/renderer-shared";
 import { useEffect, useRef, useState } from "react";
 import { showRunFieldAction } from "@electron-wm/renderer-shared";
 
 let lastEntryText: string | undefined;
 
 export function RunField() {
+  const showingRun = useSelector((state: RootState) => state.taskbar.showingRun);
+
   const field = useRef<HTMLInputElement>(null);
 
   const [text, setText] = useState("");
@@ -93,8 +95,14 @@ export function RunField() {
   };
 
   useEffect(() => {
-    field.current?.focus();
-  }, []);
+    if (showingRun) {
+      field.current?.focus();
+    }
+  }, [showingRun]);
+
+  if (!showingRun) {
+    return null;
+  }
 
   return (
     <input

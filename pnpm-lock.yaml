@@ -253,6 +253,12 @@ importers:
       '@electron-wm/shared':
         specifier: workspace:*
         version: link:../shared
+      '@electron-wm/taskbar-clock':
+        specifier: workspace:*
+        version: link:../taskbar-clock
+      '@electron-wm/taskbar-layout-indicator':
+        specifier: workspace:*
+        version: link:../taskbar-layout-indicator
       '@reduxjs/toolkit':
         specifier: ^1.9.1
         version: 1.9.1(react-redux@8.0.5)(react@18.2.0)
@@ -525,9 +531,6 @@ importers:
       '@electron-wm/plugin-utils':
         specifier: workspace:*
         version: link:../plugin-utils
-      '@electron-wm/react-desktop':
-        specifier: workspace:*
-        version: link:../react-desktop
       '@electron-wm/renderer-shared':
         specifier: workspace:*
         version: link:../renderer-shared

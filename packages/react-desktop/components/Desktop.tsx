@@ -1,24 +1,11 @@
 import * as React from "react";
-import { useCallback } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-
-import { useSelector } from "react-redux";
+import { PropsWithChildren, useCallback } from "react";
 import { showContextMenu } from "@electron-wm/renderer-shared";
-import { RootState } from "@electron-wm/renderer-shared";
-import { selectWindowsFromCurrentTags } from "@electron-wm/shared";
 import { ContextMenuKind } from "@electron-wm/shared";
-import { ErrorDisplay } from "@electron-wm/renderer-shared";
 
-import { Taskbar } from "./taskbar/Taskbar";
-import { WorkArea } from "./WorkArea";
+export interface IDesktopProps extends PropsWithChildren {}
 
-export interface IDesktopProps {
-  screenIndex: number;
-}
-
-export function Desktop({ screenIndex }: IDesktopProps) {
-  const windows = useSelector((state: RootState) => selectWindowsFromCurrentTags(state, screenIndex));
-
+export function Desktop({ children }: IDesktopProps) {
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -27,10 +14,7 @@ export function Desktop({ screenIndex }: IDesktopProps) {
 
   return (
     <div id="desktop" onContextMenu={onContextMenu}>
-      <Taskbar screenIndex={screenIndex} windows={windows} />
-      <ErrorBoundary FallbackComponent={ErrorDisplay}>
-        <WorkArea screenIndex={screenIndex} />
-      </ErrorBoundary>
+      {children}
     </div>
   );
 }

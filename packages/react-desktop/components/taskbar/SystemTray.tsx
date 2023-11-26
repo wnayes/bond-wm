@@ -1,16 +1,12 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
-import { useStore } from "react-redux";
-import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
-import { configureTrayWindowAction, ITrayEntry, TrayWindowDict } from "@electron-wm/shared";
+import { useSelector, useStore } from "react-redux";
+import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
+import { configureTrayWindowAction, ITrayEntry } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 
-interface ISystemTrayProps {
-  trayWindows: TrayWindowDict | null;
-}
-
-export function SystemTray(props: ISystemTrayProps) {
-  const trayWindows = props.trayWindows;
+export function SystemTray() {
+  const trayWindows = useSelector((state: RootState) => state.tray.windows);
   if (!trayWindows) {
     return null;
   }

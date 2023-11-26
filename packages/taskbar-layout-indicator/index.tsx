@@ -1,16 +1,11 @@
 import React from "react";
 import { useCallback, useMemo } from "react";
-import { useScreen, RenderPluginConfig } from "@electron-wm/plugin-utils";
+import { useScreen } from "@electron-wm/plugin-utils";
 import { getLayoutPluginName, switchToNextLayout } from "@electron-wm/shared";
 import { useLayoutPlugins, useRendererStore } from "@electron-wm/renderer-shared";
 
 /** A default layout indicator/toggle for electron-wm. */
-const Plugin: RenderPluginConfig = {
-  component: LayoutIndicator,
-};
-export default Plugin;
-
-function LayoutIndicator() {
+export function LayoutIndicator() {
   const screen = useScreen();
   const screenIndex = screen.index;
   const tag = screen.currentTags[0];

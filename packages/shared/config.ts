@@ -13,7 +13,6 @@ export interface IPluginConfig {
   desktop?: PluginSpecifiers;
   frame?: PluginSpecifiers;
   layout?: PluginSpecifiers;
-  taskbar?: PluginSpecifiers;
   wallpaper?: PluginSpecifiers;
 }
 

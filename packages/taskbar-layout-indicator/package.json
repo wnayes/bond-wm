@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@electron-wm/plugin-utils": "workspace:*",
-    "@electron-wm/react-desktop": "workspace:*",
     "@electron-wm/renderer-shared": "workspace:*",
     "@electron-wm/shared": "workspace:*",
     "react": "^18.2.0",

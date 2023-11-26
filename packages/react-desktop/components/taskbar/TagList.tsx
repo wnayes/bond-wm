@@ -6,13 +6,10 @@ import { RootState } from "@electron-wm/renderer-shared";
 import { selectWindowsFromScreen } from "@electron-wm/shared";
 import { setScreenCurrentTagsAction } from "@electron-wm/shared";
 import { arraysEqual, isUrgent } from "@electron-wm/shared";
+import { useScreenIndex } from "@electron-wm/plugin-utils";
 
-interface ITagListProps {
-  screenIndex: number;
-}
-
-export function TagList(props: ITagListProps) {
-  const screenIndex = props.screenIndex;
+export function TagList() {
+  const screenIndex = useScreenIndex();
   const tags = useSelector<RootState>((state) => state.screens[screenIndex].tags) as string[];
   const currentTags = useSelector<RootState>((state) => state.screens[screenIndex].currentTags) as string[];
 

@@ -34,11 +34,6 @@ export interface LayoutPluginSettings {
   name?: string;
 }
 
-/** Expected taskbar plugin module exports. */
-export interface TaskbarModule {
-  default: FunctionComponent | RenderPluginConfig;
-}
-
 /** Expected wallpaper plugin module exports. */
 export interface WallpaperModule {
   default: FunctionComponent | RenderPluginConfig;
