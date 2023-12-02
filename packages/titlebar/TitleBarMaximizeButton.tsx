@@ -1,14 +1,16 @@
 import * as React from "react";
 import { useWindow } from "@electron-wm/plugin-utils";
+import { useSupportsMaximize } from "@electron-wm/renderer-shared";
 import { useMaximizeHandler } from "./TitleBar";
 import maximizeImg from "./assets/maximize.svg";
 import restoreImg from "./assets/restore.svg";
 
 export function TitleBarMaximizeButton() {
   const win = useWindow();
+  const supportsMaximize = useSupportsMaximize(win);
   const onClick = useMaximizeHandler(win);
 
-  if (!win) {
+  if (!win || !supportsMaximize) {
     return null;
   }
 

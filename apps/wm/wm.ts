@@ -12,7 +12,10 @@ import {
   IGeometry,
   LayoutPluginInstance,
   PluginInstance,
+  geometriesDiffer,
+  getLayoutPluginName,
   selectConfigWithOverrides,
+  selectVisibleWindowsFromCurrentTags,
 } from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
@@ -1855,6 +1858,37 @@ export async function createServer(): Promise<XServer> {
       };
     };
 
+    function performLayout(): void {
+      const state = store.getState();
+      for (let s = 0; s < state.screens.length; s++) {
+        const screen = state.screens[s];
+        const screenLayouts = layoutsByScreen.get(s);
+        const tag = screen.currentTags[0];
+        const currentLayoutName = screen.currentLayouts[tag];
+        let currentLayout = screenLayouts?.find((layout) => getLayoutPluginName(layout) === currentLayoutName);
+        if (!currentLayout) {
+          currentLayout = screenLayouts?.[0];
+        }
+        if (!currentLayout) {
+          continue; // ?
+        }
+
+        const windows = selectVisibleWindowsFromCurrentTags(state, s);
+        const results = currentLayout.exports.default.fn({ screen, windows, settings: currentLayout.settings });
+        results.forEach((nextWinPos, wid) => {
+          const curWinPos = state.windows[wid]?.outer;
+          if (geometriesDiffer(curWinPos, nextWinPos)) {
+            store.dispatch(
+              configureWindowAction({
+                wid,
+                ...nextWinPos,
+              })
+            );
+          }
+        });
+      }
+    }
+
     const x11Middleware: Middleware<unknown, ServerRootState> = function ({ getState }) {
       return (next) => (action) => {
         const returnValue = next(action);
@@ -1988,6 +2022,8 @@ export async function createServer(): Promise<XServer> {
             eventConsumers.forEach((consumer) => consumer.onReduxAction?.({ action, getState }));
             break;
         }
+
+        performLayout();
 
         return returnValue;
       };

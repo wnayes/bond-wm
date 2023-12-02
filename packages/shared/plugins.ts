@@ -1,4 +1,7 @@
 import { ComponentType, FunctionComponent } from "react";
+import { IWindow } from "./window";
+import { IScreen } from "./screen";
+import { IGeometry } from "./types";
 
 /** Expect module contents for a "desktop" module. */
 export interface DesktopModule {
@@ -17,16 +20,27 @@ export interface RenderPluginConfig {
   component: ComponentType<{ settings?: object }>;
 }
 
+export interface ILayoutFunctionProps<TSettings> {
+  windows: readonly IWindow[];
+  screen: IScreen;
+  settings?: TSettings;
+}
+
+export interface LayoutFunction<TSettings> {
+  (props: ILayoutFunctionProps<TSettings>): Map<number, IGeometry>;
+}
+
 /** Plugin configuration object exported by layout plugin modules. */
-export interface LayoutPluginConfig extends RenderPluginConfig {
+export interface LayoutPluginConfig<TSettings> {
   name: string;
   icon: string;
   supportsMaximize: boolean;
+  fn: LayoutFunction<TSettings>;
 }
 
 /** Expected layout plugin module exports. */
-export interface LayoutModule {
-  default: LayoutPluginConfig;
+export interface LayoutModule<TSettings = unknown> {
+  default: LayoutPluginConfig<TSettings>;
 }
 
 /** Settings accepted by all layout plugins. */

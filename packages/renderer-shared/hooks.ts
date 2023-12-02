@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector, useStore } from "react-redux";
-import { IIconInfo, LayoutPluginInstance, selectConfigWithOverrides } from "@electron-wm/shared";
+import {
+  IIconInfo,
+  IWindow,
+  LayoutPluginInstance,
+  selectConfigWithOverrides,
+  selectWindowMaximizeCanTakeEffect,
+} from "@electron-wm/shared";
 import { RootState, Store } from "./configureStore";
 import { resolvePluginsFromRenderer } from "./plugins";
 
@@ -55,4 +61,14 @@ export function useLayoutPlugins(screenIndex: number | undefined): LayoutPluginI
   }, [layoutConfig]);
 
   return layoutPlugins;
+}
+
+export function useSupportsMaximize(win: IWindow | null): boolean {
+  const layouts = useLayoutPlugins(win?.screenIndex);
+  return useSelector((state: RootState) => {
+    if (!win) {
+      return false;
+    }
+    return selectWindowMaximizeCanTakeEffect(state, layouts, win.id);
+  });
 }

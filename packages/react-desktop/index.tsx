@@ -53,7 +53,3 @@ if (typeof window !== "undefined" && window.location.href.includes("/react-deskt
 export function getDesktopWindowSrc(): string {
   return `file://${path.join(__dirname, "./index.html")}`;
 }
-
-// For hacky internal plugins
-export * from "./components/layout/WindowContainers";
-export { Window } from "./components/layout/Window";

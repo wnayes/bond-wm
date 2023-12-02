@@ -1,10 +1,7 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { useSelector } from "react-redux";
-import { maximizeWindow, restoreWindow, showContextMenu, useLayoutPlugins } from "@electron-wm/renderer-shared";
-import { RootState } from "@electron-wm/renderer-shared";
+import { maximizeWindow, restoreWindow, showContextMenu, useSupportsMaximize } from "@electron-wm/renderer-shared";
 import { ContextMenuKind } from "@electron-wm/shared";
-import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
 import { IWindow } from "@electron-wm/shared";
 import { useWindow } from "@electron-wm/plugin-utils";
 
@@ -27,16 +24,6 @@ export function TitleBar({ children }: ITitleBarProps) {
       {children}
     </div>
   );
-}
-
-function useSupportsMaximize(win: IWindow | null): boolean {
-  const layouts = useLayoutPlugins(win?.screenIndex);
-  return useSelector((state: RootState) => {
-    if (!win) {
-      return false;
-    }
-    return selectWindowMaximizeCanTakeEffect(state, layouts, win.id);
-  });
 }
 
 export function useMaximizeHandler(win: IWindow | null) {
