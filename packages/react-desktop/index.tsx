@@ -8,10 +8,8 @@ import { getScreenIndex } from "./utils";
 import { configureRendererStore, setPluginInstallDirectory, setupIpc } from "@electron-wm/renderer-shared";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorDisplay } from "@electron-wm/renderer-shared";
-import { Taskbar, TagList, TaskList, RunField, SystemTray } from "@electron-wm/taskbar";
+import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/taskbar";
 import { WorkArea } from "./components/WorkArea";
-import { Clock } from "@electron-wm/taskbar-clock";
-import { LayoutIndicator } from "@electron-wm/taskbar-layout-indicator";
 
 if (typeof window !== "undefined" && window.location.href.includes("/react-desktop/index")) {
   const screenIndex = getScreenIndex();
