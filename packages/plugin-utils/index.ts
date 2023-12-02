@@ -11,5 +11,3 @@ export { WindowFrame } from "./frame/WindowFrame";
 
 export { Desktop } from "./desktop/Desktop";
 export { WorkArea } from "./desktop/WorkArea";
-
-export type { LayoutPluginConfig, RenderPluginConfig } from "@electron-wm/shared";

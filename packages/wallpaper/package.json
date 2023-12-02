@@ -11,6 +11,7 @@
     "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
+    "@electron-wm/shared": "workspace:*",
     "@electron-wm/plugin-utils": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

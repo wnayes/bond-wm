@@ -11,9 +11,6 @@
     "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@electron-wm/plugin-utils": "workspace:*",
-    "@electron-wm/react-desktop": "workspace:*",
-    "@electron-wm/renderer-shared": "workspace:*",
     "@electron-wm/shared": "workspace:*",
     "tslib": "^2.4.1"
   },

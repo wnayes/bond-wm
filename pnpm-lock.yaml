@@ -111,15 +111,6 @@ importers:
 
   packages/layout-floating:
     dependencies:
-      '@electron-wm/plugin-utils':
-        specifier: workspace:*
-        version: link:../plugin-utils
-      '@electron-wm/react-desktop':
-        specifier: workspace:*
-        version: link:../react-desktop
-      '@electron-wm/renderer-shared':
-        specifier: workspace:*
-        version: link:../renderer-shared
       '@electron-wm/shared':
         specifier: workspace:*
         version: link:../shared
@@ -136,15 +127,6 @@ importers:
 
   packages/layout-tiling:
     dependencies:
-      '@electron-wm/plugin-utils':
-        specifier: workspace:*
-        version: link:../plugin-utils
-      '@electron-wm/react-desktop':
-        specifier: workspace:*
-        version: link:../react-desktop
-      '@electron-wm/renderer-shared':
-        specifier: workspace:*
-        version: link:../renderer-shared
       '@electron-wm/shared':
         specifier: workspace:*
         version: link:../shared
@@ -569,6 +551,9 @@ importers:
       '@electron-wm/plugin-utils':
         specifier: workspace:*
         version: link:../plugin-utils
+      '@electron-wm/shared':
+        specifier: workspace:*
+        version: link:../shared
       react:
         specifier: ^18.2.0
         version: 18.2.0

@@ -1,7 +1,13 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { LayoutPluginConfig } from "@electron-wm/plugin-utils";
-import { IGeometry, LayoutFunction, WindowPosition, addLayoutResult, windowIsDialog } from "@electron-wm/shared";
+import {
+  IGeometry,
+  LayoutFunction,
+  LayoutPluginConfig,
+  WindowPosition,
+  addLayoutResult,
+  windowIsDialog,
+} from "@electron-wm/shared";
 
 const TilingLayout: LayoutFunction<{}> = ({ windows, screen }) => {
   const results = new Map<number, IGeometry>();

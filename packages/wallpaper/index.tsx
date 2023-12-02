@@ -1,12 +1,7 @@
 import * as React from "react";
 import { useLayoutEffect, useRef, useState } from "react";
-import {
-  usePluginState,
-  useBrowserWindowSize,
-  useCompositeScreenSize,
-  useScreen,
-  RenderPluginConfig,
-} from "@electron-wm/plugin-utils";
+import { usePluginState, useBrowserWindowSize, useCompositeScreenSize, useScreen } from "@electron-wm/plugin-utils";
+import { RenderPluginConfig } from "@electron-wm/shared";
 
 const PackageName = "@electron-wm/wallpaper";
 
