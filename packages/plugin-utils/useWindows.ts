@@ -1,4 +1,3 @@
-import { getScreenIndex } from "../react-desktop/utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@electron-wm/renderer-shared";
 import {
@@ -8,6 +7,7 @@ import {
   selectWindowsFromCurrentTags,
   selectWindowsFromScreen,
 } from "@electron-wm/shared";
+import { useScreenIndex } from "./useScreenIndex";
 
 export interface IUseWindowsProps {
   currentScreenOnly?: boolean;
@@ -21,7 +21,7 @@ export function useWindows(props?: IUseWindowsProps): readonly IWindow[] {
   const currentTagsOnly = props?.currentTagsOnly ?? true;
   const visibleOnly = props?.visibleOnly ?? true;
 
-  const screenIndex = getScreenIndex();
+  const screenIndex = useScreenIndex();
   return useSelector((state: RootState) => {
     if (currentScreenOnly) {
       if (currentTagsOnly) {

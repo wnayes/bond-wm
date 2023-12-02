@@ -1,5 +1,5 @@
 import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@electron-wm/renderer-shared";
-import { getScreenIndex } from "./utils";
+import { getScreenIndex } from "@electron-wm/plugin-utils";
 
 export function hookShortcuts(el: HTMLElement): void {
   el.addEventListener("keydown", onKeydown);
