@@ -2,14 +2,13 @@ import * as path from "node:path";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { Desktop } from "./components/Desktop";
 import { hookShortcuts } from "./shortcuts";
 import { getScreenIndex } from "./utils";
 import { configureRendererStore, setPluginInstallDirectory, setupIpc } from "@electron-wm/renderer-shared";
+import { Desktop, WorkArea } from "@electron-wm/plugin-utils";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorDisplay } from "@electron-wm/renderer-shared";
 import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/taskbar";
-import { WorkArea } from "./components/WorkArea";
 
 if (typeof window !== "undefined" && window.location.href.includes("/react-desktop/index")) {
   const screenIndex = getScreenIndex();

@@ -10,7 +10,8 @@ import {
 } from "react";
 import { useSelector, useStore } from "react-redux";
 import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
-import { useBrowserWindowSize, useScreenIndex } from "@electron-wm/plugin-utils";
+import { useBrowserWindowSize } from "../useBrowserWindowSize";
+import { useScreenIndex } from "../useScreenIndex";
 import { PluginInstance, selectConfigWithOverrides, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
