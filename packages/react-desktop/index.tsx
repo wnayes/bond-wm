@@ -1,12 +1,17 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { hookShortcuts } from "./shortcuts";
-import { configureRendererStore, setPluginInstallDirectory, setupIpc } from "@electron-wm/renderer-shared";
-import { Desktop, WorkArea, setScreenIndex } from "@electron-wm/plugin-utils";
-import { ErrorBoundary } from "react-error-boundary";
-import { ErrorDisplay } from "@electron-wm/renderer-shared";
-import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/taskbar";
+import {
+  RootState,
+  configureRendererStore,
+  resolvePluginsFromRenderer,
+  setPluginInstallDirectory,
+  setupIpc,
+} from "@electron-wm/renderer-shared";
+import { setScreenIndex } from "@electron-wm/plugin-utils";
+import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
+import { DesktopModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
 
 const screenIndex = getScreenIndex();
 console.log(screenIndex);
@@ -21,19 +26,7 @@ setupIpc(store, screenIndex);
 const reactRoot = createRoot(document.getElementById("content")!);
 reactRoot.render(
   <Provider store={store}>
-    <Desktop>
-      <Taskbar>
-        <TagList />
-        <RunField />
-        <TaskList />
-        {screenIndex === 0 && <SystemTray />}
-        <Clock />
-        <LayoutIndicator />
-      </Taskbar>
-      <ErrorBoundary FallbackComponent={ErrorDisplay}>
-        <WorkArea />
-      </ErrorBoundary>
-    </Desktop>
+    <DesktopComponentWrapper />
   </Provider>
 );
 
@@ -46,4 +39,51 @@ function getScreenIndex(): number {
     return -1;
   }
   return screenIndex;
+}
+
+interface ReactDesktopSettings {
+  config: PluginSpecifiers;
+}
+
+interface ReactDesktopConfigModule {
+  default: FunctionComponent;
+}
+
+function DesktopComponentWrapper() {
+  const desktopConfig = useSelector((state: RootState) => state.config.plugins?.desktop);
+  const [desktopConfigSpecifier, setDesktopConfigSpecifiers] = useState<PluginSpecifiers | null | undefined>(null);
+
+  const [desktopComponent, setDesktopComponent] = useState<FunctionComponentElement<{}> | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (desktopConfig) {
+        const plugins =
+          await resolvePluginsFromRenderer<PluginInstance<DesktopModule, ReactDesktopSettings>>(desktopConfig);
+        plugins.forEach((desktopModule) => {
+          setDesktopConfigSpecifiers(desktopModule.settings?.config);
+        });
+      }
+    })();
+  }, [desktopConfig]);
+
+  useEffect(() => {
+    (async () => {
+      if (desktopConfigSpecifier) {
+        const plugins =
+          await resolvePluginsFromRenderer<PluginInstance<ReactDesktopConfigModule>>(desktopConfigSpecifier);
+        const components = plugins
+          .map((desktopModule, i) => {
+            const desktopComponent = desktopModule.exports.default;
+            if (typeof desktopComponent === "function") {
+              return React.createElement(desktopComponent, { key: i });
+            }
+          })
+          .filter((component) => component != null) as FunctionComponentElement<{}>[];
+        setDesktopComponent(components[0]);
+      }
+    })();
+  }, [desktopConfigSpecifier]);
+
+  return desktopComponent;
 }

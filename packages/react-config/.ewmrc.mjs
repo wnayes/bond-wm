@@ -15,6 +15,10 @@ export const config = {
   plugins: {
     desktop: {
       id: "$APP_PATH$/packages/react-desktop",
+      settings: {
+        $modules: ["config"],
+        config: "$APP_PATH$/packages/react-config/desktop",
+      },
     },
     frame: {
       id: "$APP_PATH$/packages/react-frame",
