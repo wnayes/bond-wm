@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/plugin-utils",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Public APIs for electron-wm plugins",
   "main": "./index.ts",
   "exports": "./index.ts",

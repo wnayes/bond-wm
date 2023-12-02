@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@electron-wm/react-desktop",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "React implementation of an electron-wm desktop",
   "main": "./index.tsx",
   "exports": "./index.tsx",

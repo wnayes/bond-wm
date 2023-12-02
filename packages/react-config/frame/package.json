@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@electron-wm/react-config-frame",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Default React frame configuration",
   "main": "./index.tsx",
   "exports": "./index.tsx",

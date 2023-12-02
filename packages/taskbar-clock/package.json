@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/taskbar-clock",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Taskbar clock for electron-wm",
   "main": "./index.tsx",
   "exports": "./index.tsx",

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@electron-wm/renderer-shared",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Renderer shared internal functionality",
   "main": "./index.ts",
   "exports": "./index.ts",
