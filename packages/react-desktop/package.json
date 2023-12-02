@@ -17,6 +17,7 @@
     "@electron-wm/shared": "workspace:*",
     "@electron-wm/plugin-utils": "workspace:*",
     "@electron-wm/renderer-shared": "workspace:*",
+    "@electron-wm/taskbar": "workspace:*",
     "@electron-wm/taskbar-clock": "workspace:*",
     "@electron-wm/taskbar-layout-indicator": "workspace:*",
     "@reduxjs/toolkit": "^1.9.1",

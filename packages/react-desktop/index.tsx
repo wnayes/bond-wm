@@ -8,12 +8,8 @@ import { getScreenIndex } from "./utils";
 import { configureRendererStore, setPluginInstallDirectory, setupIpc } from "@electron-wm/renderer-shared";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorDisplay } from "@electron-wm/renderer-shared";
-import { Taskbar } from "./components/taskbar/Taskbar";
+import { Taskbar, TagList, TaskList, RunField, SystemTray } from "@electron-wm/taskbar";
 import { WorkArea } from "./components/WorkArea";
-import { TagList } from "./components/taskbar/TagList";
-import { RunField } from "./components/taskbar/RunField";
-import { TaskList } from "./components/taskbar/TaskList";
-import { SystemTray } from "./components/taskbar/SystemTray";
 import { Clock } from "@electron-wm/taskbar-clock";
 import { LayoutIndicator } from "@electron-wm/taskbar-layout-indicator";
 

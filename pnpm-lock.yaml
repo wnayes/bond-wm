@@ -229,6 +229,9 @@ importers:
       '@electron-wm/shared':
         specifier: workspace:*
         version: link:../shared
+      '@electron-wm/taskbar':
+        specifier: workspace:*
+        version: link:../taskbar
       '@electron-wm/taskbar-clock':
         specifier: workspace:*
         version: link:../taskbar-clock
@@ -470,6 +473,43 @@ importers:
       ts-jest:
         specifier: ^29.0.3
         version: 29.0.3(@babel/core@7.23.2)(jest@29.3.1)(typescript@5.2.2)
+      type-fest:
+        specifier: ^3.3.0
+        version: 3.4.0
+
+  packages/taskbar:
+    dependencies:
+      '@electron-wm/plugin-utils':
+        specifier: workspace:*
+        version: link:../plugin-utils
+      '@electron-wm/renderer-shared':
+        specifier: workspace:*
+        version: link:../renderer-shared
+      '@electron-wm/shared':
+        specifier: workspace:*
+        version: link:../shared
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      react-redux:
+        specifier: ^8.0.5
+        version: 8.0.5(@types/react-dom@18.0.10)(@types/react@18.0.26)(react-dom@18.2.0)(react@18.2.0)(redux@4.2.0)
+      tslib:
+        specifier: ^2.4.1
+        version: 2.4.1
+    devDependencies:
+      '@types/node':
+        specifier: ^18.11.17
+        version: 18.15.11
+      '@types/react':
+        specifier: ^18.0.26
+        version: 18.0.26
+      '@types/react-dom':
+        specifier: ^18.0.9
+        version: 18.0.10
       type-fest:
         specifier: ^3.3.0
         version: 3.4.0
