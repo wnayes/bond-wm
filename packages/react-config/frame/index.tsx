@@ -7,7 +7,7 @@ import {
   TitleBarMaximizeButton,
   TitleBarMinimizeButton,
   TitleBarText,
-} from "@electron-wm/titlebar";
+} from "@electron-wm/react-titlebar";
 
 export default () => {
   return (

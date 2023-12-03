@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@electron-wm/react": "workspace:*",
-    "@electron-wm/titlebar": "workspace:*"
+    "@electron-wm/react-titlebar": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.2.0",

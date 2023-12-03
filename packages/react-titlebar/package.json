@@ -1,10 +1,10 @@
 {
-  "name": "@electron-wm/titlebar",
+  "name": "@electron-wm/react-titlebar",
   "version": "0.1.0",
-  "description": "Frame window titlebar for electron-wm",
+  "description": "React frame window titlebar for electron-wm",
   "main": "./dist/index.js",
   "exports": "./dist/index.js",
-  "types": "./dist/packages/titlebar/index.d.ts",
+  "types": "./dist/packages/react-titlebar/index.d.ts",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
