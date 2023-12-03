@@ -1,4 +1,4 @@
-import { RootState, resolvePluginsFromRenderer } from "@electron-wm/renderer-shared";
+import { RootState, resolvePluginsFromRenderer } from "@electron-wm/shared-renderer";
 import { LayoutPluginInstance, selectConfigWithOverrides } from "@electron-wm/shared";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";

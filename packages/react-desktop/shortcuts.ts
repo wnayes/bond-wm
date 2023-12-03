@@ -1,4 +1,4 @@
-import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@electron-wm/renderer-shared";
+import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@electron-wm/shared-renderer";
 import { getScreenIndex } from "@electron-wm/react";
 
 export function hookShortcuts(el: HTMLElement): void {

@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Root, createRoot } from "react-dom/client";
 import { Provider, useSelector } from "react-redux";
-
-import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/renderer-shared";
+import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/shared-renderer";
 import { ipcRenderer } from "electron";
 import { WidContext } from "@electron-wm/react";
 import { FrameModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";

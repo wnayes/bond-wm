@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState } from "@electron-wm/renderer-shared";
+import { RootState } from "@electron-wm/shared-renderer";
 import { setPluginState } from "@electron-wm/shared";
 
 type PluginStateUpdater<T> = (newValue: T) => void;

@@ -90,7 +90,7 @@ import { setupPackageInstallMessageListener } from "./npmPackageCache";
 import { resolvePluginsForWM } from "./plugins";
 
 // Path constants
-const PRELOAD_JS = path.resolve(path.join(__dirname, "../../packages/renderer-shared/dist/preload.js"));
+const PRELOAD_JS = path.resolve(path.join(__dirname, "../../packages/shared-renderer/dist/preload.js"));
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {

@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { RootState } from "@electron-wm/renderer-shared";
+import { RootState } from "@electron-wm/shared-renderer";
 import { IGeometry, ISize } from "@electron-wm/shared";
 
 export function useCompositeScreenSize(): ISize {

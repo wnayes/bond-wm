@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, exec, getCompletionOptions } from "@electron-wm/renderer-shared";
+import { RootState, exec, getCompletionOptions } from "@electron-wm/shared-renderer";
 import { useEffect, useRef, useState } from "react";
-import { showRunFieldAction } from "@electron-wm/renderer-shared";
+import { showRunFieldAction } from "@electron-wm/shared-renderer";
 
 let lastEntryText: string | undefined;
 

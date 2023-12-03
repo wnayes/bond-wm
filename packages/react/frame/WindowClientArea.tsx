@@ -2,7 +2,7 @@ import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useStore } from "react-redux";
 import { setFrameExtentsAction } from "@electron-wm/shared";
-import { getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
+import { getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
 import { useWindow } from "../useWindow";
 
 /**

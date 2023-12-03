@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { RootState } from "@electron-wm/renderer-shared";
+import { RootState } from "@electron-wm/shared-renderer";
 import { IScreen } from "@electron-wm/shared";
 import { useScreenIndex } from "./useScreenIndex";
 

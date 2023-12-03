@@ -1,7 +1,7 @@
 import { IWindow } from "@electron-wm/shared";
 import { createContext, useContext } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@electron-wm/renderer-shared";
+import { RootState } from "@electron-wm/shared-renderer";
 
 export const WidContext = createContext<number | undefined>(undefined);
 

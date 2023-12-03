@@ -9,13 +9,13 @@ import {
   useState,
 } from "react";
 import { useSelector, useStore } from "react-redux";
-import { resolvePluginsFromRenderer, RootState } from "@electron-wm/renderer-shared";
+import { resolvePluginsFromRenderer, RootState } from "@electron-wm/shared-renderer";
 import { useBrowserWindowSize } from "../useBrowserWindowSize";
 import { useScreenIndex } from "../useScreenIndex";
 import { PluginInstance, selectConfigWithOverrides, WallpaperModule } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
-import { focusDesktopBrowser } from "@electron-wm/renderer-shared";
+import { focusDesktopBrowser } from "@electron-wm/shared-renderer";
 
 export interface IWorkAreaProps extends PropsWithChildren {}
 

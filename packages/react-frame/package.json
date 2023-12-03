@@ -15,7 +15,7 @@
   "dependencies": {
     "@electron-wm/shared": "workspace:*",
     "@electron-wm/react": "workspace:*",
-    "@electron-wm/renderer-shared": "workspace:*",
+    "@electron-wm/shared-renderer": "workspace:*",
     "@reduxjs/toolkit": "^1.9.1",
     "electron-redux": "2.0.0-alpha.9",
     "react": "^18.2.0",

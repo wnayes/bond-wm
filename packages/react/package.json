@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",
-    "@electron-wm/renderer-shared": "workspace:*",
+    "@electron-wm/shared-renderer": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",

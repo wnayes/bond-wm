@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { closeWindow } from "@electron-wm/renderer-shared";
+import { closeWindow } from "@electron-wm/shared-renderer";
 import { useWindow } from "@electron-wm/react";
 import closeImg from "./assets/close.svg";
 

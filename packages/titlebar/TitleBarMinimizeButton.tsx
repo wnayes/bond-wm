@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { minimizeWindow } from "@electron-wm/renderer-shared";
+import { minimizeWindow } from "@electron-wm/shared-renderer";
 import { useWindow } from "@electron-wm/react";
 import minimizeImg from "./assets/minimize.svg";
 

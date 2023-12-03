@@ -1,6 +1,6 @@
 import * as React from "react";
 import { PropsWithChildren, useCallback } from "react";
-import { showContextMenu } from "@electron-wm/renderer-shared";
+import { showContextMenu } from "@electron-wm/shared-renderer";
 import { ContextMenuKind } from "@electron-wm/shared";
 
 export interface IDesktopProps extends PropsWithChildren {}

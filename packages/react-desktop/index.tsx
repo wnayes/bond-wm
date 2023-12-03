@@ -8,7 +8,7 @@ import {
   resolvePluginsFromRenderer,
   setPluginInstallDirectory,
   setupIpc,
-} from "@electron-wm/renderer-shared";
+} from "@electron-wm/shared-renderer";
 import { setScreenIndex } from "@electron-wm/react";
 import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
 import { DesktopModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";

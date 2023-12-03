@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/renderer-shared";
+import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
 import { configureTrayWindowAction, ITrayEntry } from "@electron-wm/shared";
 import { geometriesDiffer } from "@electron-wm/shared";
 

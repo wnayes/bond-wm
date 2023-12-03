@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@electron-wm/react": "workspace:*",
-    "@electron-wm/renderer-shared": "workspace:*",
+    "@electron-wm/shared-renderer": "workspace:*",
     "@electron-wm/taskbar": "workspace:*",
     "react-error-boundary": "^3.1.4"
   },
