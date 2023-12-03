@@ -1,7 +1,7 @@
 import React from "react";
 import { Desktop, ErrorDisplay, WorkArea, useScreenIndex } from "@electron-wm/react";
 import { ErrorBoundary } from "react-error-boundary";
-import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/taskbar";
+import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/react-taskbar";
 
 export default () => {
   const screenIndex = useScreenIndex();

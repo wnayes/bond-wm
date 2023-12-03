@@ -15,7 +15,7 @@
   "dependencies": {
     "@electron-wm/react": "workspace:*",
     "@electron-wm/shared-renderer": "workspace:*",
-    "@electron-wm/taskbar": "workspace:*",
+    "@electron-wm/react-taskbar": "workspace:*",
     "react-error-boundary": "^3.1.4"
   },
   "peerDependencies": {
