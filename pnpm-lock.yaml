@@ -141,7 +141,7 @@ importers:
         specifier: ^3.3.0
         version: 3.4.0
 
-  packages/plugin-utils:
+  packages/react:
     dependencies:
       '@electron-wm/renderer-shared':
         specifier: workspace:*
@@ -170,7 +170,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^18.11.17
-        version: 18.11.17
+        version: 18.15.11
       '@types/react':
         specifier: ^18.0.26
         version: 18.0.26
@@ -183,9 +183,9 @@ importers:
 
   packages/react-config/desktop:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../../plugin-utils
+        version: link:../../react
       '@electron-wm/renderer-shared':
         specifier: workspace:*
         version: link:../../renderer-shared
@@ -211,9 +211,9 @@ importers:
 
   packages/react-config/frame:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../../plugin-utils
+        version: link:../../react
       '@electron-wm/titlebar':
         specifier: workspace:*
         version: link:../../titlebar
@@ -233,9 +233,9 @@ importers:
 
   packages/react-desktop:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../plugin-utils
+        version: link:../react
       '@electron-wm/renderer-shared':
         specifier: workspace:*
         version: link:../renderer-shared
@@ -288,9 +288,9 @@ importers:
 
   packages/react-frame:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../plugin-utils
+        version: link:../react
       '@electron-wm/renderer-shared':
         specifier: workspace:*
         version: link:../renderer-shared
@@ -447,9 +447,9 @@ importers:
 
   packages/taskbar:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../plugin-utils
+        version: link:../react
       '@electron-wm/renderer-shared':
         specifier: workspace:*
         version: link:../renderer-shared
@@ -484,9 +484,9 @@ importers:
 
   packages/titlebar:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../plugin-utils
+        version: link:../react
       '@electron-wm/renderer-shared':
         specifier: workspace:*
         version: link:../renderer-shared
@@ -524,9 +524,9 @@ importers:
 
   packages/wallpaper:
     dependencies:
-      '@electron-wm/plugin-utils':
+      '@electron-wm/react':
         specifier: workspace:*
-        version: link:../plugin-utils
+        version: link:../react
       '@electron-wm/shared':
         specifier: workspace:*
         version: link:../shared

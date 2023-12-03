@@ -9,7 +9,7 @@ import {
   setPluginInstallDirectory,
   setupIpc,
 } from "@electron-wm/renderer-shared";
-import { setScreenIndex } from "@electron-wm/plugin-utils";
+import { setScreenIndex } from "@electron-wm/react";
 import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
 import { DesktopModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
 

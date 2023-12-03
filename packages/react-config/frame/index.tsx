@@ -1,5 +1,5 @@
 import React from "react";
-import { WindowFrame, WindowClientArea } from "@electron-wm/plugin-utils";
+import { WindowFrame, WindowClientArea } from "@electron-wm/react";
 import {
   TitleBar,
   TitleBarCloseButton,

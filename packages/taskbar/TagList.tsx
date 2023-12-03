@@ -5,7 +5,7 @@ import { RootState } from "@electron-wm/renderer-shared";
 import { selectWindowsFromScreen } from "@electron-wm/shared";
 import { setScreenCurrentTagsAction } from "@electron-wm/shared";
 import { arraysEqual, isUrgent } from "@electron-wm/shared";
-import { useScreenIndex } from "@electron-wm/plugin-utils";
+import { useScreenIndex } from "@electron-wm/react";
 
 export function TagList() {
   const screenIndex = useScreenIndex();

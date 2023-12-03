@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useWindow } from "@electron-wm/plugin-utils";
+import { useWindow } from "@electron-wm/react";
 import { useMaximizeHandler } from "./TitleBar";
 
 export function TitleBarText() {

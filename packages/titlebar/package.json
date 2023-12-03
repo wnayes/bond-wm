@@ -14,7 +14,7 @@
   "dependencies": {
     "@electron-wm/shared": "workspace:*",
     "@electron-wm/renderer-shared": "workspace:*",
-    "@electron-wm/plugin-utils": "workspace:*",
+    "@electron-wm/react": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",

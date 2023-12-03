@@ -13,7 +13,7 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
-    "@electron-wm/plugin-utils": "workspace:*",
+    "@electron-wm/react": "workspace:*",
     "@electron-wm/titlebar": "workspace:*"
   },
   "peerDependencies": {

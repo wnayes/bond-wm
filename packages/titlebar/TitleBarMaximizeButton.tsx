@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useSupportsMaximize, useWindow } from "@electron-wm/plugin-utils";
+import { useSupportsMaximize, useWindow } from "@electron-wm/react";
 import { useMaximizeHandler } from "./TitleBar";
 import maximizeImg from "./assets/maximize.svg";
 import restoreImg from "./assets/restore.svg";

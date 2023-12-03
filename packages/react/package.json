@@ -1,5 +1,5 @@
 {
-  "name": "@electron-wm/plugin-utils",
+  "name": "@electron-wm/react",
   "version": "0.1.0",
   "description": "Public APIs for electron-wm plugins",
   "main": "./index.ts",

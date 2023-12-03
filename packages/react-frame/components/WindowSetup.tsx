@@ -4,7 +4,7 @@ import { Provider, useSelector } from "react-redux";
 
 import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/renderer-shared";
 import { ipcRenderer } from "electron";
-import { WidContext } from "@electron-wm/plugin-utils";
+import { WidContext } from "@electron-wm/react";
 import { FrameModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
 import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
 

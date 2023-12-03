@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { maximizeWindow, restoreWindow, showContextMenu } from "@electron-wm/renderer-shared";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { IWindow } from "@electron-wm/shared";
-import { useSupportsMaximize, useWindow } from "@electron-wm/plugin-utils";
+import { useSupportsMaximize, useWindow } from "@electron-wm/react";
 
 interface ITitleBarProps extends React.PropsWithChildren<{}> {}
 

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useCallback } from "react";
 import { minimizeWindow } from "@electron-wm/renderer-shared";
-import { useWindow } from "@electron-wm/plugin-utils";
+import { useWindow } from "@electron-wm/react";
 import minimizeImg from "./assets/minimize.svg";
 
 export function TitleBarMinimizeButton() {
