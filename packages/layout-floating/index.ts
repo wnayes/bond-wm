@@ -14,12 +14,13 @@ interface IFloatingLayoutSettings {
   floatRight?: boolean;
 }
 
-const FloatingLayout: LayoutFunction<IFloatingLayoutSettings> = ({ windows, screen }) => {
+const FloatingLayout: LayoutFunction<IFloatingLayoutSettings> = ({ windows, screen, settings }) => {
   const results = new Map<number, IGeometry>();
 
   const { workArea } = screen;
+  const floatRight = settings?.floatRight ?? false;
 
-  let curX = workArea.x;
+  let curX = floatRight ? workArea.x + workArea.width : workArea.x;
   let curY = workArea.y;
   let rowMaxHeight = 0;
 
@@ -53,6 +54,21 @@ const FloatingLayout: LayoutFunction<IFloatingLayoutSettings> = ({ windows, scre
         width: win.outer.width,
         height: win.outer.height,
       });
+    } else if (floatRight) {
+      if (curX - win.outer.width < workArea.x) {
+        // Wrap around to new row.
+        curX = workArea.x + workArea.width;
+        curY += rowMaxHeight;
+        rowMaxHeight = 0;
+      }
+      addLayoutResult(results, win, screen, {
+        x: curX - win.outer.width,
+        y: curY,
+        width: win.outer.width,
+        height: win.outer.height,
+      });
+      curX -= win.outer.width;
+      rowMaxHeight = Math.max(rowMaxHeight, win.outer.height);
     } else {
       if (curX + win.outer.width > workArea.x + workArea.width) {
         // Wrap around to new row.
