@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useIconInfoDataUri } from "@electron-wm/renderer-shared";
-import { useWindow } from "@electron-wm/plugin-utils";
+import { useIconInfoDataUri, useWindow } from "@electron-wm/plugin-utils";
 
 export function TitleBarIcon() {
   const win = useWindow();

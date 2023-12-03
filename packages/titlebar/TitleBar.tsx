@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { maximizeWindow, restoreWindow, showContextMenu, useSupportsMaximize } from "@electron-wm/renderer-shared";
+import { maximizeWindow, restoreWindow, showContextMenu } from "@electron-wm/renderer-shared";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { IWindow } from "@electron-wm/shared";
-import { useWindow } from "@electron-wm/plugin-utils";
+import { useSupportsMaximize, useWindow } from "@electron-wm/plugin-utils";
 
 interface ITitleBarProps extends React.PropsWithChildren<{}> {}
 

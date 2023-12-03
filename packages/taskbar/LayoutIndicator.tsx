@@ -1,8 +1,7 @@
 import React from "react";
 import { useCallback, useMemo } from "react";
-import { useScreen } from "@electron-wm/plugin-utils";
+import { useLayoutPlugins, useRendererStore, useScreen } from "@electron-wm/plugin-utils";
 import { getLayoutPluginName, switchToNextLayout } from "@electron-wm/shared";
-import { useLayoutPlugins, useRendererStore } from "@electron-wm/renderer-shared";
 
 /** A default layout indicator/toggle for electron-wm. */
 export function LayoutIndicator() {

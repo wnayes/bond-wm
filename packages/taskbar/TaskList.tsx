@@ -1,10 +1,8 @@
 import * as React from "react";
-
 import { minimizeWindow, raiseWindow } from "@electron-wm/renderer-shared";
 import { useCallback } from "react";
 import { IIconInfo, isUrgent, IWindow } from "@electron-wm/shared";
-import { useIconInfoDataUri } from "@electron-wm/renderer-shared";
-import { useWindows } from "@electron-wm/plugin-utils";
+import { useIconInfoDataUri, useWindows } from "@electron-wm/plugin-utils";
 
 export function TaskList() {
   const windows = useWindows({ currentScreenOnly: true, currentTagsOnly: true, visibleOnly: false });

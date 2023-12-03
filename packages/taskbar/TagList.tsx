@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 import { RootState } from "@electron-wm/renderer-shared";
