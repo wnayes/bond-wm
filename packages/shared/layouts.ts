@@ -22,22 +22,22 @@ export function getLayoutPluginName(plugin: LayoutPluginInstance): string {
 export function addLayoutResult(results: Map<number, IGeometry>, win: IWindow, screen: IScreen, pos: IGeometry): void {
   const minWidth = getWindowMinWidth(win);
   if (minWidth > 0) {
-    pos.width = Math.min(pos.width, minWidth + win.frameExtents.left + win.frameExtents.right);
+    pos.width = Math.max(pos.width, minWidth + win.frameExtents.left + win.frameExtents.right);
   }
 
   const maxWidth = getWindowMaxWidth(win);
   if (Number.isFinite(maxWidth)) {
-    pos.width = Math.max(pos.width, maxWidth + win.frameExtents.left + win.frameExtents.right);
+    pos.width = Math.min(pos.width, maxWidth + win.frameExtents.left + win.frameExtents.right);
   }
 
   const minHeight = getWindowMinHeight(win);
   if (minHeight > 0) {
-    pos.height = Math.min(pos.height, minHeight + win.frameExtents.top + win.frameExtents.bottom);
+    pos.height = Math.max(pos.height, minHeight + win.frameExtents.top + win.frameExtents.bottom);
   }
 
   const maxHeight = getWindowMaxHeight(win);
   if (Number.isFinite(maxHeight)) {
-    pos.height = Math.max(pos.height, maxHeight + win.frameExtents.top + win.frameExtents.bottom);
+    pos.height = Math.min(pos.height, maxHeight + win.frameExtents.top + win.frameExtents.bottom);
   }
 
   if (win.position !== WindowPosition.UserPositioned) {
