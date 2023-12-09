@@ -11,6 +11,7 @@ export { useWindows } from "./useWindows";
 export { useBrowserWindowSize } from "./useBrowserWindowSize";
 
 export { ErrorDisplay } from "./components/ErrorDisplay";
+export { Stylesheet } from "./components/Stylesheet";
 
 export { WindowClientArea } from "./frame/WindowClientArea";
 export { WindowFrame } from "./frame/WindowFrame";

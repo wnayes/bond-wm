@@ -9,7 +9,7 @@
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --platform=node --packages=external --loader:.svg=dataurl --outfile=./dist/index.js"
+    "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --platform=node --packages=external --loader:.svg=dataurl --loader:.css=dataurl --outfile=./dist/index.js"
   },
   "dependencies": {
     "@electron-wm/shared": "workspace:*",

@@ -3,9 +3,20 @@ import { useCallback } from "react";
 import { maximizeWindow, restoreWindow, showContextMenu } from "@electron-wm/shared-renderer";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { IWindow } from "@electron-wm/shared";
-import { useSupportsMaximize, useWindow } from "@electron-wm/react";
+import { Stylesheet, useSupportsMaximize, useTheme, useWindow } from "@electron-wm/react";
+import styles from "./TitleBar.css";
 
 interface ITitleBarProps extends React.PropsWithChildren<{}> {}
+
+interface TitleBarStyle extends React.CSSProperties {
+  "--window-titlebar-text-color": string;
+  "--window-titlebar-close-bg-color": string;
+  "--window-titlebar-close-hover-bg-color": string;
+  "--window-titlebar-minimize-bg-color": string;
+  "--window-titlebar-minimize-hover-bg-color": string;
+  "--window-titlebar-maximize-bg-color": string;
+  "--window-titlebar-maximize-hover-bg-color": string;
+}
 
 export function TitleBar({ children }: ITitleBarProps) {
   const win = useWindow();
@@ -14,15 +25,35 @@ export function TitleBar({ children }: ITitleBarProps) {
     e.stopPropagation();
     showContextMenu(ContextMenuKind.Frame);
   }, []);
+  const theme = useTheme();
 
   if (!win || !win.decorated || win.fullscreen) {
     return null;
   }
 
+  const style: TitleBarStyle = {
+    "--window-titlebar-text-color": theme.window?.titlebar?.textColor ?? theme.window?.foreColor ?? "white",
+    "--window-titlebar-close-bg-color":
+      theme.window?.titlebar?.closeButtonColor ?? theme.window?.titlebar?.buttonColor ?? "transparent",
+    "--window-titlebar-close-hover-bg-color":
+      theme.window?.titlebar?.closeButtonHoverColor ?? theme.window?.titlebar?.buttonHoverColor ?? "transparent",
+    "--window-titlebar-minimize-bg-color":
+      theme.window?.titlebar?.minimizeButtonColor ?? theme.window?.titlebar?.buttonColor ?? "transparent",
+    "--window-titlebar-minimize-hover-bg-color":
+      theme.window?.titlebar?.minimizeButtonHoverColor ?? theme.window?.titlebar?.buttonHoverColor ?? "transparent",
+    "--window-titlebar-maximize-bg-color":
+      theme.window?.titlebar?.maximizeButtonColor ?? theme.window?.titlebar?.buttonColor ?? "transparent",
+    "--window-titlebar-maximize-hover-bg-color":
+      theme.window?.titlebar?.maximizeButtonHoverColor ?? theme.window?.titlebar?.buttonHoverColor ?? "transparent",
+  };
+
   return (
-    <div className="winTitleBar" onContextMenu={onContextMenu}>
-      {children}
-    </div>
+    <>
+      <Stylesheet href={styles} />
+      <div className="winTitleBar" style={style} onContextMenu={onContextMenu}>
+        {children}
+      </div>
+    </>
   );
 }
 

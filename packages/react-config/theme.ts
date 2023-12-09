@@ -4,7 +4,13 @@ export const MyTheme: Theme = {
   primaryColor: "#7269d2",
   urgentColor: "#C3723D",
   window: {
+    foreColor: "#FFFFFF",
     inactiveColor: "#333333",
-    inactiveBorderColor: "black",
+    inactiveBorderColor: "#000000",
+    titlebar: {
+      closeButtonHoverColor: "#FF6961",
+      minimizeButtonHoverColor: "#CEA32F",
+      maximizeButtonHoverColor: "#0DAA49",
+    },
   },
 };

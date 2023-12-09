@@ -5,12 +5,25 @@ export interface Theme {
   primaryColor: string;
   urgentColor: string;
   window?: {
+    foreColor?: string;
     activeColor?: string;
     activeBorderColor?: string;
     inactiveColor?: string;
     inactiveBorderColor?: string;
     urgentColor?: string;
     urgentBorderColor?: string;
+    titlebar?: {
+      textColor?: string;
+      buttonColor?: string;
+      buttonHoverColor?: string;
+      buttonIconColor?: string;
+      closeButtonColor?: string;
+      closeButtonHoverColor?: string;
+      minimizeButtonColor?: string;
+      minimizeButtonHoverColor?: string;
+      maximizeButtonColor?: string;
+      maximizeButtonHoverColor?: string;
+    };
   };
 }
 
