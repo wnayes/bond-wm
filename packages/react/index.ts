@@ -17,3 +17,7 @@ export { WindowFrame } from "./frame/WindowFrame";
 
 export { Desktop } from "./desktop/Desktop";
 export { WorkArea } from "./desktop/WorkArea";
+
+export type { ReactConfigModule } from "./plugins";
+
+export { type Theme, ThemeContextProvider, useTheme } from "./theming";

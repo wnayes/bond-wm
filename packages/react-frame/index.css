@@ -1,11 +1,5 @@
 :root {
     --window-base-bg-color: transparent;
-    --window-inactive-bg-color: #333333;
-    --window-inactive-border-color: black;
-    --window-active-bg-color: #7269D2;
-    --window-active-border-color: #7269D2;
-    --window-urgent-bg-color: #C3723D;
-    --window-urgent-border-color: #C3723D;
     --window-titlebar-text-color: white;
     --window-titlebar-close-hover-bg-color: #FF6961;
     --window-titlebar-minimize-hover-bg-color: #CEA32F;

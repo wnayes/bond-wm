@@ -9,8 +9,8 @@ import {
   setPluginInstallDirectory,
   setupIpc,
 } from "@electron-wm/shared-renderer";
-import { setScreenIndex } from "@electron-wm/react";
-import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
+import { ReactConfigModule, setScreenIndex } from "@electron-wm/react";
+import { FunctionComponentElement, useEffect, useState } from "react";
 import { DesktopModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
 
 const screenIndex = getScreenIndex();
@@ -45,10 +45,6 @@ interface ReactDesktopSettings {
   config: PluginSpecifiers;
 }
 
-interface ReactDesktopConfigModule {
-  default: FunctionComponent;
-}
-
 function DesktopComponentWrapper() {
   const desktopConfig = useSelector((state: RootState) => state.config.plugins?.desktop);
   const [desktopConfigSpecifier, setDesktopConfigSpecifiers] = useState<PluginSpecifiers | null | undefined>(null);
@@ -70,11 +66,10 @@ function DesktopComponentWrapper() {
   useEffect(() => {
     (async () => {
       if (desktopConfigSpecifier) {
-        const plugins =
-          await resolvePluginsFromRenderer<PluginInstance<ReactDesktopConfigModule>>(desktopConfigSpecifier);
+        const plugins = await resolvePluginsFromRenderer<PluginInstance<ReactConfigModule>>(desktopConfigSpecifier);
         const components = plugins
-          .map((desktopModule, i) => {
-            const desktopComponent = desktopModule.exports.default;
+          .map((configModule, i) => {
+            const desktopComponent = configModule.exports.Desktop;
             if (typeof desktopComponent === "function") {
               return React.createElement(desktopComponent, { key: i });
             }

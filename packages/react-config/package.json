@@ -1,10 +1,10 @@
 {
   "private": true,
-  "name": "@electron-wm/react-config-desktop",
+  "name": "@electron-wm/react-config",
   "version": "0.1.0",
-  "description": "Default React desktop configuration",
-  "main": "./index.tsx",
-  "exports": "./index.tsx",
+  "description": "Default React user configuration",
+  "main": "./index.ts",
+  "exports": "./index.ts",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
@@ -14,9 +14,10 @@
   },
   "dependencies": {
     "@electron-wm/react": "workspace:*",
-    "@electron-wm/shared-renderer": "workspace:*",
     "@electron-wm/react-taskbar": "workspace:*",
-    "react-error-boundary": "^3.1.4"
+    "@electron-wm/react-titlebar": "workspace:*",
+    "react-error-boundary": "^3.1.4",
+    "tslib": "^2.4.1"
   },
   "peerDependencies": {
     "react": "^18.2.0",

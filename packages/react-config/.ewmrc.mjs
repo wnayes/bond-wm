@@ -17,14 +17,14 @@ export const config = {
       id: "$APP_PATH$/packages/react-desktop",
       settings: {
         $modules: ["config"],
-        config: "$APP_PATH$/packages/react-config/desktop",
+        config: "$APP_PATH$/packages/react-config",
       },
     },
     frame: {
       id: "$APP_PATH$/packages/react-frame",
       settings: {
         $modules: ["config"],
-        config: "$APP_PATH$/packages/react-config/frame",
+        config: "$APP_PATH$/packages/react-config",
       },
     },
     layout: [

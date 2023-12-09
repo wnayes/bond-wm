@@ -3,16 +3,12 @@ import { Root, createRoot } from "react-dom/client";
 import { Provider, useSelector } from "react-redux";
 import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/shared-renderer";
 import { ipcRenderer } from "electron";
-import { WidContext } from "@electron-wm/react";
+import { ReactConfigModule, WidContext } from "@electron-wm/react";
 import { FrameModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
-import { FunctionComponent, FunctionComponentElement, useEffect, useState } from "react";
+import { FunctionComponentElement, useEffect, useState } from "react";
 
 interface ReactFrameSettings {
   config: PluginSpecifiers;
-}
-
-interface ReactFrameConfigModule {
-  default: FunctionComponent;
 }
 
 let _store: Store;
@@ -85,10 +81,10 @@ function WindowFrameComponentWrapper() {
   useEffect(() => {
     (async () => {
       if (frameConfigSpecifier) {
-        const plugins = await resolvePluginsFromRenderer<PluginInstance<ReactFrameConfigModule>>(frameConfigSpecifier);
+        const plugins = await resolvePluginsFromRenderer<PluginInstance<ReactConfigModule>>(frameConfigSpecifier);
         const components = plugins
-          .map((frameModule, i) => {
-            const frameComponent = frameModule.exports.default;
+          .map((configModule, i) => {
+            const frameComponent = configModule.exports.Frame;
             if (typeof frameComponent === "function") {
               return React.createElement(frameComponent, { key: i });
             }

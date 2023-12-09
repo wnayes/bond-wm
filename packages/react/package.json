@@ -13,6 +13,7 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
+    "@callstack/react-theme-provider": "^3.0.9",
     "@electron-wm/shared": "workspace:*",
     "@electron-wm/shared-renderer": "workspace:*",
     "react": "^18.2.0",
