@@ -44,7 +44,18 @@ function Wallpaper() {
     paintWallpaperToScreen(wallpaper, ctx, screenWidth, screenHeight, screen.x, screen.y);
   }, [wallpaper, screenWidth, screenHeight, screen.x, screen.y]);
 
-  return <canvas className="wallpaper" ref={canvasRef} width={screenWidth} height={screenHeight}></canvas>;
+  return (
+    <canvas
+      style={{
+        position: "absolute",
+        height: "100%",
+        width: "100%",
+      }}
+      ref={canvasRef}
+      width={screenWidth}
+      height={screenHeight}
+    ></canvas>
+  );
 }
 
 interface IWallpaperSeed {
