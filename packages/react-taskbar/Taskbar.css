@@ -1,24 +1,3 @@
-:root {
-    --desktop-taskbar-bg-color: #CCCCCC;
-
-    --desktop-tasklist-active-bg-color: #7269d2;
-    --desktop-tasklist-active-text-color: #EEEEEE;
-    --desktop-tasklist-urgent-bg-color: #C3723D;
-    --desktop-tasklist-urgent-text-color: #EEEEEE;
-    --desktop-tasklist-hover-bg-color: #BBBBBB;
-
-    --desktop-taglist-selected-bg-color: #7269d2;
-    --desktop-taglist-selected-text-color: #EEEEEE;
-    --desktop-taglist-hover-bg-color: #BBBBBB;
-    --desktop-taglist-urgent-bg-color: #C3723D;
-    --desktop-taglist-urgent-text-color: #EEEEEE;
-    --desktop-taglist-badge-color: var(--desktop-taglist-selected-bg-color);
-
-    --desktop-layouts-hover-bg-color: #BBBBBB;
-
-    --desktop-clock-date-text-color: #444444;
-}
-
 .taskbar {
     display: flex;
     height: 20px;
@@ -161,6 +140,10 @@
 .clockDate {
     color: var(--desktop-clock-date-text-color);
     padding-right: 0.5em;
+}
+
+.clockTime {
+    color: var(--desktop-clock-time-text-color);
 }
 
 .layoutIndicator {

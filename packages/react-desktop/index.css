@@ -1,7 +1,3 @@
-:root {
-    --desktop-workarea-bg-color: #EEEEEE;
-}
-
 html, body {
     height: 100%;
     width: 100%;
@@ -30,7 +26,6 @@ html, body {
     position: relative;
     flex: 1;
     overflow: hidden;
-    background-color: var(--desktop-workarea-bg-color);
 }
 
 .errorDisplay {

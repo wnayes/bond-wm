@@ -16,6 +16,7 @@ import { PluginInstance, selectConfigWithOverrides, WallpaperModule } from "@ele
 import { geometriesDiffer } from "@electron-wm/shared";
 import { configureScreenWorkAreaAction } from "@electron-wm/shared";
 import { focusDesktopBrowser } from "@electron-wm/shared-renderer";
+import { useTheme } from "../theming";
 
 export interface IWorkAreaProps extends PropsWithChildren {}
 
@@ -51,8 +52,17 @@ export function WorkArea({ children }: IWorkAreaProps) {
     focusDesktopBrowser({ screenIndex, takeVisualFocus: true });
   }, [screenIndex]);
 
+  const theme = useTheme();
+
   return (
-    <div id="workarea" ref={workAreaDiv} onClickCapture={onWorkAreaClick}>
+    <div
+      id="workarea"
+      ref={workAreaDiv}
+      onClickCapture={onWorkAreaClick}
+      style={{
+        backgroundColor: theme.desktop?.workareaColor ?? "#EEEEEE",
+      }}
+    >
       {children}
       {wallpaperComponents}
     </div>

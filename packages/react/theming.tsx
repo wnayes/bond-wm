@@ -25,11 +25,46 @@ export interface Theme {
       maximizeButtonHoverColor?: string;
     };
   };
+  desktop?: {
+    workareaColor?: string;
+  };
+  taskbar: {
+    foreColor: string;
+    backgroundColor: string;
+    activeForeColor?: string;
+    activeBackgroundColor?: string;
+    hoverColor: string;
+    taglist?: {
+      selectedBackgroundColor?: string;
+      selectedForeColor?: string;
+      urgentBackgroundColor?: string;
+      urgentForeColor?: string;
+      hoverBackgroundColor?: string;
+      badgeColor?: string;
+    };
+    tasklist?: {
+      activeBackgroundColor?: string;
+      activeForeColor?: string;
+      urgentBackgroundColor?: string;
+      urgentForeColor?: string;
+      hoverBackgroundColor?: string;
+    };
+    clock?: {
+      dateColor?: string;
+      timeColor?: string;
+    };
+  };
 }
 
 const DefaultTheme: Theme = {
   primaryColor: "#7269d2",
   urgentColor: "#C3723D",
+  taskbar: {
+    foreColor: "black",
+    backgroundColor: "#CCCCCC",
+    activeForeColor: "#EEEEEE",
+    hoverColor: "#BBBBBB",
+  },
 };
 
 const { ThemeProvider, useTheme: useThemeInternal } = createTheming(DefaultTheme);

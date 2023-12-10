@@ -29,7 +29,9 @@ export function Clock() {
       <span ref={dateSpanRef} className="clockDate">
         {getFormattedSecondaryDate()}
       </span>
-      <span ref={timeSpanRef}>{getFormattedCurrentTime()}</span>
+      <span ref={timeSpanRef} className="clockTime">
+        {getFormattedCurrentTime()}
+      </span>
     </div>
   );
 }

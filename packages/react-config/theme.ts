@@ -13,4 +13,13 @@ export const MyTheme: Theme = {
       maximizeButtonHoverColor: "#0DAA49",
     },
   },
+  taskbar: {
+    foreColor: "black",
+    backgroundColor: "#CCCCCC",
+    hoverColor: "#BBBBBB",
+    activeForeColor: "#EEEEEE",
+    clock: {
+      dateColor: "#444444",
+    },
+  },
 };
