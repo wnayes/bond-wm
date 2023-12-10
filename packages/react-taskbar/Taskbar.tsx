@@ -28,11 +28,15 @@ interface TaskbarStyle extends React.CSSProperties {
   "--desktop-clock-time-text-color": string;
 }
 
-interface ITaskbarProps extends PropsWithChildren {}
+interface ITaskbarProps extends PropsWithChildren {
+  height?: number;
+}
 
-export function Taskbar({ children }: ITaskbarProps) {
+export function Taskbar({ height, children }: ITaskbarProps) {
   const theme = useTheme();
   const taskbarStyle: TaskbarStyle = {
+    height: height ?? 20,
+
     "--desktop-taskbar-bg-color": theme.taskbar?.backgroundColor,
 
     "--desktop-tasklist-active-bg-color": theme.taskbar?.tasklist?.activeBackgroundColor ?? theme.primaryColor,

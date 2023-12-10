@@ -1,15 +1,17 @@
 .taskbar {
     display: flex;
-    height: 20px;
     flex-shrink: 0;
+    align-items: center;
     font-size: 11px;
     background-color: var(--desktop-taskbar-bg-color);
 }
 
 .tasklist {
+    height: 100%;
     white-space: nowrap;
     vertical-align: middle;
     display: flex;
+    align-items: center;
     flex-grow: 1;
     font-size: 10px;
     overflow: hidden;
@@ -18,12 +20,12 @@
 .tasklistentry {
     display: flex;
     flex: 1 1 0;
+    align-items: center;
     vertical-align: middle;
     min-width: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     height: 100%;
-    line-height: 22px;
     padding: 0 3px;
     cursor: default;
     -webkit-user-select: none;
@@ -51,7 +53,6 @@
 .tasklistentryicon {
     height: 16px;
     width: 16px;
-    margin-top: 2px;
     margin-right: 3px;
 }
 
@@ -59,16 +60,19 @@
     white-space: nowrap;
     vertical-align: middle;
     display: flex;
+    align-items: center;
+    height: 100%;
 }
 .taglistentry {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
     position: relative;
     flex-grow: 1;
     vertical-align: middle;
     text-align: center;
     overflow: hidden;
     font-size: 11px;
-    line-height: 20px;
     text-overflow: ellipsis;
     padding: 0 1em;
     cursor: default;
@@ -109,7 +113,6 @@
     flex-grow: 0;
     flex-shrink: 0;
     font-size: 12px;
-    line-height: 20px;
     padding: 0 0.25em;
 
     display: flex;
@@ -132,7 +135,6 @@
     flex-grow: 0;
     flex-shrink: 0;
     font-size: 12px;
-    line-height: 20px;
     padding: 0 0.5em;
     cursor: default;
 }
@@ -147,9 +149,12 @@
 }
 
 .layoutIndicator {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex-shrink: 0;
     flex-grow: 0;
     font-size: 12px;
-    line-height: 20px;
     padding: 0 0.5em;
     cursor: default;
 }
@@ -159,5 +164,4 @@
 
 .layoutIndicatorIcon {
     height: 16px;
-    padding-top: 2px;
 }

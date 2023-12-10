@@ -9,7 +9,7 @@ export default () => {
   return (
     <ThemeContextProvider theme={MyTheme}>
       <Desktop>
-        <Taskbar>
+        <Taskbar height={20}>
           <TagList />
           <RunField />
           <TaskList />
