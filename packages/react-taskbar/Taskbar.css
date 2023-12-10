@@ -1,0 +1,180 @@
+:root {
+    --desktop-taskbar-bg-color: #CCCCCC;
+
+    --desktop-tasklist-active-bg-color: #7269d2;
+    --desktop-tasklist-active-text-color: #EEEEEE;
+    --desktop-tasklist-urgent-bg-color: #C3723D;
+    --desktop-tasklist-urgent-text-color: #EEEEEE;
+    --desktop-tasklist-hover-bg-color: #BBBBBB;
+
+    --desktop-taglist-selected-bg-color: #7269d2;
+    --desktop-taglist-selected-text-color: #EEEEEE;
+    --desktop-taglist-hover-bg-color: #BBBBBB;
+    --desktop-taglist-urgent-bg-color: #C3723D;
+    --desktop-taglist-urgent-text-color: #EEEEEE;
+    --desktop-taglist-badge-color: var(--desktop-taglist-selected-bg-color);
+
+    --desktop-layouts-hover-bg-color: #BBBBBB;
+
+    --desktop-clock-date-text-color: #444444;
+}
+
+.taskbar {
+    display: flex;
+    height: 20px;
+    flex-shrink: 0;
+    font-size: 11px;
+    background-color: var(--desktop-taskbar-bg-color);
+}
+
+.tasklist {
+    white-space: nowrap;
+    vertical-align: middle;
+    display: flex;
+    flex-grow: 1;
+    font-size: 10px;
+    overflow: hidden;
+}
+
+.tasklistentry {
+    display: flex;
+    flex: 1 1 0;
+    vertical-align: middle;
+    min-width: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 100%;
+    line-height: 22px;
+    padding: 0 3px;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.tasklistentry.focused {
+    font-weight: bold;
+    background-color: var(--desktop-tasklist-active-bg-color);
+    color: var(--desktop-tasklist-active-text-color);
+}
+.tasklistentry.urgent {
+    background-color: var(--desktop-tasklist-urgent-bg-color);
+    color: var(--desktop-tasklist-urgent-text-color);
+}
+.tasklistentry:not(.focused):hover {
+    background-color: var(--desktop-tasklist-hover-bg-color);
+}
+
+.tasklistentrytext {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tasklistentryicon {
+    height: 16px;
+    width: 16px;
+    margin-top: 2px;
+    margin-right: 3px;
+}
+
+.taglist {
+    white-space: nowrap;
+    vertical-align: middle;
+    display: flex;
+}
+.taglistentry {
+    display: inline-block;
+    position: relative;
+    flex-grow: 1;
+    vertical-align: middle;
+    text-align: center;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    padding: 0 1em;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.taglistentry:hover {
+    background-color: var(--desktop-taglist-hover-bg-color);
+}
+.taglistentry.selected {
+    font-weight: bold;
+    background-color: var(--desktop-taglist-selected-bg-color);
+    color: var(--desktop-taglist-selected-text-color);
+}
+.taglistentry.urgent {
+    background-color: var(--desktop-taglist-urgent-bg-color);
+    color: var(--desktop-taglist-urgent-text-color);
+}
+.taglistEntryBadge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background-color: var(--desktop-taglist-badge-color);
+}
+.taglistentry.selected .taglistEntryBadge {
+    background-color: transparent;
+}
+
+.taskbarRunField {
+    height: 11px;
+    font-size: 10px;
+    margin-top: 1px;
+}
+
+.sysTray {
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 0.25em;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+}
+.sysTray:empty {
+    padding: 0;
+}
+
+.sysTrayIcon {
+    height: 16px;
+    width: 16px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.clock {
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 0.5em;
+    cursor: default;
+}
+
+.clockDate {
+    color: var(--desktop-clock-date-text-color);
+    padding-right: 0.5em;
+}
+
+.layoutIndicator {
+    flex-grow: 0;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 0.5em;
+    cursor: default;
+}
+.layoutIndicator:hover {
+    background-color: var(--desktop-layouts-hover-bg-color);
+}
+
+.layoutIndicatorIcon {
+    height: 16px;
+    padding-top: 2px;
+}
