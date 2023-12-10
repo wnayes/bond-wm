@@ -4,13 +4,13 @@ import { createTheming } from "@callstack/react-theme-provider";
 export interface Theme {
   primaryColor: string;
   urgentColor: string;
-  window?: {
+  window: {
     foreColor?: string;
-    activeColor?: string;
+    activeBackgroundColor?: string;
     activeBorderColor?: string;
-    inactiveColor?: string;
+    inactiveBackgroundColor: string;
     inactiveBorderColor?: string;
-    urgentColor?: string;
+    urgentBackgroundColor?: string;
     urgentBorderColor?: string;
     titlebar?: {
       textColor?: string;
@@ -59,8 +59,11 @@ export interface Theme {
 const DefaultTheme: Theme = {
   primaryColor: "#7269d2",
   urgentColor: "#C3723D",
+  window: {
+    inactiveBackgroundColor: "#333333",
+  },
   taskbar: {
-    foreColor: "black",
+    foreColor: "#000000",
     backgroundColor: "#CCCCCC",
     activeForeColor: "#EEEEEE",
     hoverColor: "#BBBBBB",

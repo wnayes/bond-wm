@@ -39,12 +39,14 @@ export function WindowFrame({ children }: IWindowFrameProps) {
   const theme = useTheme();
 
   const style: WindowFrameStyle = {
-    "--window-active-bg-color": theme.window?.activeColor ?? theme.primaryColor,
-    "--window-active-border-color": theme.window?.activeBorderColor ?? theme.window?.activeColor ?? theme.primaryColor,
-    "--window-inactive-bg-color": theme.window?.inactiveColor ?? "#333333",
-    "--window-inactive-border-color": theme.window?.inactiveBorderColor ?? theme.window?.inactiveColor ?? "black",
-    "--window-urgent-bg-color": theme.window?.urgentColor ?? theme.urgentColor,
-    "--window-urgent-border-color": theme.window?.urgentBorderColor ?? theme.window?.urgentColor ?? theme.urgentColor,
+    "--window-active-bg-color": theme.window?.activeBackgroundColor ?? theme.primaryColor,
+    "--window-active-border-color":
+      theme.window?.activeBorderColor ?? theme.window?.activeBackgroundColor ?? theme.primaryColor,
+    "--window-inactive-bg-color": theme.window?.inactiveBackgroundColor,
+    "--window-inactive-border-color": theme.window?.inactiveBorderColor ?? theme.window?.inactiveBackgroundColor,
+    "--window-urgent-bg-color": theme.window?.urgentBackgroundColor ?? theme.urgentColor,
+    "--window-urgent-border-color":
+      theme.window?.urgentBorderColor ?? theme.window?.urgentBackgroundColor ?? theme.urgentColor,
   };
   if (typeof win?.borderWidth === "number") {
     style.borderWidth = win.borderWidth;

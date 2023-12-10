@@ -5,7 +5,7 @@ export const MyTheme: Theme = {
   urgentColor: "#C3723D",
   window: {
     foreColor: "#FFFFFF",
-    inactiveColor: "#333333",
+    inactiveBackgroundColor: "#333333",
     inactiveBorderColor: "#000000",
     titlebar: {
       closeButtonHoverColor: "#FF6961",
