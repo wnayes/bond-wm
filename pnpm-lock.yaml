@@ -459,9 +459,6 @@ importers:
       '@types/yargs':
         specifier: ^17.0.15
         version: 17.0.17
-      electron-reloader:
-        specifier: ^1.2.3
-        version: 1.2.3
       jest:
         specifier: ^29.3.1
         version: 29.3.1(@types/node@18.11.17)(ts-node@10.9.1)
@@ -490,9 +487,6 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
-      electron-reloader:
-        specifier: ^1.2.3
-        version: 1.2.3
       esbuild:
         specifier: ^0.16.12
         version: 0.16.12

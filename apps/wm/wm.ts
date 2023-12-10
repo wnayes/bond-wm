@@ -174,6 +174,7 @@ export interface XWMEventConsumerPointerMotionArgs extends XWMEventConsumerArgsW
 export interface XWMEventConsumerKeyPressArgs extends XWMEventConsumerArgsWithType {
   modifiers: X11_KEY_MODIFIER;
   keycode: number;
+  originalKeyString?: string;
 }
 
 export interface IXWMEventConsumer {
@@ -259,15 +260,13 @@ export async function createServer(): Promise<XServer> {
     const browser = desktopBrowsers[screenIndex];
     if (browser) {
       browser.webContents.send("x-keypress", {
-        buttons: args.modifiers,
-        keycode: args.keycode,
+        keyString: args.originalKeyString,
       });
     }
   };
 
   const registeredKeys: { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void } = {
     "Mod4 + o": () => sendActiveWindowToNextScreen(),
-    "Mod4 + r": sendKeyToBrowser,
 
     "Mod4 + Return": () => launchProcess(getConfig().term),
     "Mod4 + space": () => switchToNextLayoutWM(),
@@ -394,6 +393,15 @@ export async function createServer(): Promise<XServer> {
     ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
       desktopBrowsers[args.screenIndex]?.webContents?.openDevTools();
     });
+
+    ipcMain.on("register-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
+      const screen = store.getState().screens[args.screenIndex];
+      shortcuts.registerShortcut(screen.root, args.keyString, sendKeyToBrowser);
+    });
+
+    // ipcMain.on("unregister-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
+    //   // Not implemented yet.
+    // });
 
     setupAutocompleteListener();
     setupPackageInstallMessageListener();

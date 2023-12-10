@@ -60,6 +60,14 @@ export function showContextMenu(menuKind: ContextMenuKind): void {
   ipcRenderer.send("show-context-menu", { menuKind });
 }
 
+export function sendRegisterDesktopShortcut(keyString: string, screenIndex: number): void {
+  ipcRenderer.send("register-desktop-shortcut", { keyString, screenIndex });
+}
+
+export function sendUnregisterDesktopShortcut(keyString: string, screenIndex: number): void {
+  ipcRenderer.send("unregister-desktop-shortcut", { keyString, screenIndex });
+}
+
 let _completionOptionsPromise: Promise<string[]> | undefined;
 
 export function getCompletionOptions(): Promise<string[]> {

@@ -1,13 +1,11 @@
-import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, exec, getCompletionOptions } from "@electron-wm/shared-renderer";
-import { useEffect, useRef, useState } from "react";
-import { showRunFieldAction } from "@electron-wm/shared-renderer";
+import React, { useEffect, useRef, useState } from "react";
+import { exec, getCompletionOptions } from "@electron-wm/shared-renderer";
+import { useDesktopShortcut } from "@electron-wm/react";
 
 let lastEntryText: string | undefined;
 
 export function RunField() {
-  const showingRun = useSelector((state: RootState) => state.taskbar.showingRun);
+  const [showingRun, setShowingRun] = useState(false);
 
   const field = useRef<HTMLInputElement>(null);
 
@@ -15,11 +13,13 @@ export function RunField() {
   const freezeTyping = useRef<boolean>(false);
   const enterWhileFrozen = useRef<boolean>(false);
 
-  const dispatch = useDispatch();
+  useDesktopShortcut("Mod4 + r", { desktopTakesFocus: true }, () => {
+    setShowingRun(true);
+  });
 
   const reset = () => {
     setText("");
-    dispatch(showRunFieldAction(false));
+    setShowingRun(false);
   };
 
   const submit = (submitText: string) => {

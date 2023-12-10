@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/renderer";
 import { configReducer, pluginStateReducer, screenReducer, trayReducer, windowReducer } from "@electron-wm/shared";
-import taskbarReducer from "./redux/taskbarSlice";
 
 export function configureRendererStore() {
   return configureStore({
@@ -9,7 +8,6 @@ export function configureRendererStore() {
       config: configReducer,
       pluginState: pluginStateReducer,
       screens: screenReducer,
-      taskbar: taskbarReducer,
       tray: trayReducer,
       windows: windowReducer,
     },

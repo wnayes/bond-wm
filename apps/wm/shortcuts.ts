@@ -5,8 +5,14 @@ import * as nodeKeySym from "@electron-wm/keysym";
 
 export type KeyRegistrationMap = { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void };
 
+interface KeyRegistrationInfo {
+  originalKeyString: string;
+  callback: (args: XWMEventConsumerKeyPressArgs) => void;
+}
+
 export interface ShortcutsModule extends IXWMEventConsumer {
   setupKeyShortcuts(rootWid: number, registeredKeys: KeyRegistrationMap): void;
+  registerShortcut(rootWid: number, keyString: string, callback: (args: XWMEventConsumerKeyPressArgs) => void): void;
 }
 
 export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promise<ShortcutsModule> {
@@ -29,7 +35,7 @@ export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promis
   }
 
   const processedRegisteredKeys: {
-    [keyModifiers: number]: { [keyCode: number]: (args: XWMEventConsumerKeyPressArgs) => void };
+    [keyModifiers: number]: { [keyCode: number]: KeyRegistrationInfo };
   } = {};
 
   function getXModifierForShortcutPiece(piece: string): number | null {
@@ -48,52 +54,67 @@ export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promis
     }
   }
 
+  function registerShortcut(
+    rootWid: number,
+    keyString: string,
+    callback: (args: XWMEventConsumerKeyPressArgs) => void
+  ): void {
+    const pieces = keyString
+      .split("+")
+      .map((s) => s.trim())
+      .filter((s) => !!s);
+    if (pieces.length === 0) {
+      return;
+    }
+
+    let xModifiers = 0;
+    for (let i = 0; i < pieces.length - 1; i++) {
+      const xModifier = getXModifierForShortcutPiece(pieces[i]);
+      if (typeof xModifier === "number") {
+        xModifiers |= xModifier;
+      } else {
+        logError("Unrecognized key modifier: " + pieces[i]);
+      }
+    }
+
+    const lastPiece = pieces[pieces.length - 1];
+    if (!lastPiece) {
+      return;
+    }
+
+    // TODO: This is pretty messy / uncertain, just trying pretty much every combination...
+    // Just not sure exactly how shift factors in.
+    const hasShift = !!(xModifiers & X11_KEY_MODIFIER.ShiftMask);
+    let keySym = nodeKeySym.fromName(hasShift ? toUpper(lastPiece) : toLower(lastPiece));
+    if (!keySym) {
+      keySym = nodeKeySym.fromName(lastPiece);
+    }
+    const keySymMap = hasShift ? keysymsToKeycodeShift : keysymsToKeycode;
+    const keySymMapFallback = hasShift ? keysymsToKeycode : keysymsToKeycodeShift;
+    const keycode = keySymMap[keySym?.keysym ?? -1] ?? keySymMapFallback[keySym?.keysym ?? -1];
+    if (keycode > 0) {
+      processedRegisteredKeys[xModifiers] ||= {};
+      if (!processedRegisteredKeys[xModifiers][keycode]) {
+        processedRegisteredKeys[xModifiers][keycode] = {
+          originalKeyString: keyString,
+          callback,
+        };
+        X.GrabKey(rootWid, true, xModifiers, keycode, 1 /* Async */, 1 /* Async */);
+        log(`Registered modifiers: ${xModifiers}, keycode: ${keycode} for ${keyString}`);
+      }
+    } else {
+      logError("Could not register " + keyString);
+    }
+  }
+
   return {
     setupKeyShortcuts(rootWid: number, registeredKeys: KeyRegistrationMap): void {
       for (const keyString in registeredKeys) {
-        const pieces = keyString
-          .split("+")
-          .map((s) => s.trim())
-          .filter((s) => !!s);
-        if (pieces.length === 0) {
-          continue;
-        }
-
-        let xModifiers = 0;
-        for (let i = 0; i < pieces.length - 1; i++) {
-          const xModifier = getXModifierForShortcutPiece(pieces[i]);
-          if (typeof xModifier === "number") {
-            xModifiers |= xModifier;
-          } else {
-            logError("Unrecognized key modifier: " + pieces[i]);
-          }
-        }
-
-        const lastPiece = pieces[pieces.length - 1];
-        if (!lastPiece) {
-          continue;
-        }
-
-        // TODO: This is pretty messy / uncertain, just trying pretty much every combination...
-        // Just not sure exactly how shift factors in.
-        const hasShift = !!(xModifiers & X11_KEY_MODIFIER.ShiftMask);
-        let keySym = nodeKeySym.fromName(hasShift ? toUpper(lastPiece) : toLower(lastPiece));
-        if (!keySym) {
-          keySym = nodeKeySym.fromName(lastPiece);
-        }
-        const keySymMap = hasShift ? keysymsToKeycodeShift : keysymsToKeycode;
-        const keySymMapFallback = hasShift ? keysymsToKeycode : keysymsToKeycodeShift;
-        const keycode = keySymMap[keySym?.keysym ?? -1] ?? keySymMapFallback[keySym?.keysym ?? -1];
-        if (keycode > 0) {
-          processedRegisteredKeys[xModifiers] ||= {};
-          processedRegisteredKeys[xModifiers][keycode] = registeredKeys[keyString];
-          X.GrabKey(rootWid, true, xModifiers, keycode, 1 /* Async */, 1 /* Async */);
-          log(`Registered modifiers: ${xModifiers}, keycode: ${keycode} for ${keyString}`);
-        } else {
-          logError("Could not register " + keyString);
-        }
+        registerShortcut(rootWid, keyString, registeredKeys[keyString]);
       }
     },
+
+    registerShortcut,
 
     onKeyPress(args) {
       const { keycode, modifiers } = args;
@@ -108,10 +129,11 @@ export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promis
       }
 
       if (processedRegisteredKeys[args.modifiers]) {
-        const entry = processedRegisteredKeys[args.modifiers][args.keycode];
-        if (typeof entry === "function") {
-          log("Running shortcut handler");
-          entry(args);
+        const info = processedRegisteredKeys[args.modifiers][args.keycode];
+        if (typeof info === "object" && typeof info.callback === "function") {
+          log(`Running ${info.originalKeyString} shortcut handler`);
+          args.originalKeyString = info.originalKeyString;
+          info.callback(args);
           return true;
         }
       }
