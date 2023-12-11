@@ -9,7 +9,6 @@
     "target": "ESNext",
     "jsx": "react",
     "noEmit": true,
-    "importHelpers": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,

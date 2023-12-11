@@ -1,21 +1,19 @@
-import { configureRendererStore, setPluginInstallDirectory } from "@electron-wm/shared-renderer";
+import { configureRendererStore } from "@electron-wm/shared-renderer";
 import { setupWindowComponent } from "./components/WindowSetup";
+import { setConfigPath } from "@electron-wm/shared";
 
-if (typeof window !== "undefined" && window.location.href.includes("/react-frame/index")) {
-  setPluginInstallDirectory(__dirname);
+const store = configureRendererStore();
+setConfigPath(store.getState().config.configPath);
 
-  const store = configureRendererStore();
+// Debug code, remove eventually.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).store = store;
+// store.subscribe(() => {
+//   console.log(store.getState());
+// });
 
-  // Debug code, remove eventually.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).store = store;
-  // store.subscribe(() => {
-  //   console.log(store.getState());
-  // });
-
-  const container = document.getElementById("content");
-  if (!container) {
-    throw new Error("Missing container element in frame");
-  }
-  setupWindowComponent(container, store);
+const container = document.getElementById("content");
+if (!container) {
+  throw new Error("Missing container element in frame");
 }
+setupWindowComponent(container, store);

@@ -1,18 +1,11 @@
 import * as React from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { usePluginState, useBrowserWindowSize, useCompositeScreenSize, useScreen } from "@electron-wm/react";
-import { RenderPluginConfig } from "@electron-wm/shared";
 
 const PackageName = "@electron-wm/wallpaper";
 
-/** A dynamic wallpaper plugin for electron-wm. */
-const Plugin: RenderPluginConfig = {
-  component: Wallpaper,
-};
-export default Plugin;
-
-/** A dynamic wallpaper component. */
-function Wallpaper() {
+/** A dynamic wallpaper for electron-wm. */
+export function Wallpaper() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { width: screenWidth, height: screenHeight } = useBrowserWindowSize();
   const { width: totalWidth, height: totalHeight } = useCompositeScreenSize();

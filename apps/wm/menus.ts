@@ -1,14 +1,13 @@
 import { app, BrowserWindow, IpcMainEvent, Menu } from "electron";
 import { ContextMenuKind } from "@electron-wm/shared";
 import { log } from "./log";
-import { getConfig } from "./config";
 
-export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind): void {
+export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind, version: string | undefined): void {
   log("Showing context menu (kind=" + ContextMenuKind[kind]);
 
   switch (kind) {
     case ContextMenuKind.Desktop:
-      showDesktopMenu(event);
+      showDesktopMenu(event, version);
       break;
 
     case ContextMenuKind.Frame:
@@ -17,13 +16,11 @@ export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind): voi
   }
 }
 
-function showDesktopMenu(event: IpcMainEvent) {
+function showDesktopMenu(event: IpcMainEvent, version: string | undefined) {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) {
     return;
   }
-
-  const version = getConfig().version;
 
   const desktopMenu = Menu.buildFromTemplate([
     {

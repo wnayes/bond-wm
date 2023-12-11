@@ -2,11 +2,16 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
 interface IArgs {
+  config: string | undefined;
   consoleLogging: boolean;
   fileLogging: string | undefined;
 }
 
 const argv = yargs(hideBin(process.argv))
+  .nargs("config", 1)
+  .option("config", {
+    describe: "Config package specifier to load",
+  })
   .boolean("console-logging")
   .default("console-logging", false)
   .option("console-logging", {

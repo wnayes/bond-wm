@@ -26,7 +26,9 @@ To start a test X server (requires Xephyr):
 
 To start the window manager:
 
-    pnpm start
+    pnpm start --config ./packages/react-config
+
+Substitute your own config package with the default one above as desired.
 
 ## Usage
 
@@ -36,6 +38,7 @@ At this time, there is no distributed release. To try out the window manager, ch
 
 ```
 Command line flags:
+  --config           Path to a configuration package
   --console-logging  Enable console log output        [boolean] [default: false]
   --file-logging     Enable logging output to a file
   --help
@@ -51,16 +54,14 @@ Make sure to run `pnpm build` before attempting to use the window manager from t
 
 ### Configuration
 
-A basic config file is read from the following locations:
+The window manager must be configured with a "config package" that defines your personal setup.
 
-- `app-path/packages/react-config/.ewmrc.js`
-  - The file distributed with the application.
-- `$XDG_CONFIG_HOME/electron-wm-config/.ewmrc.js`
-  - Typically `$HOME/.config/electron-wm-config/.ewmrc.js`
+A default config package is found within this repository at `./packages/react-config`. You could use it directly by passing `--config ./packages/react-config` when running the window manager.
 
-See the `.ewmrc.js` example included in this repository.
+If you don't pass an explicit config path, a config package is attempted to be found here:
 
-Possible locations are probed in the order listed above. If config files are found in each location, the values set by later config files override those from prior config files.
+- `$XDG_CONFIG_HOME/electron-wm-config`
+  - Typically `$HOME/.config/electron-wm-config`
 
 ### Keyboard Shortcuts
 

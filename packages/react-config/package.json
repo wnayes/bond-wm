@@ -13,9 +13,14 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
+    "@electron-wm/layout-floating": "workspace:*",
+    "@electron-wm/layout-tiling": "workspace:*",
     "@electron-wm/react": "workspace:*",
+    "@electron-wm/react-desktop": "workspace:*",
+    "@electron-wm/react-frame": "workspace:*",
     "@electron-wm/react-taskbar": "workspace:*",
     "@electron-wm/react-titlebar": "workspace:*",
+    "@electron-wm/react-wallpaper": "workspace:*",
     "react-error-boundary": "^3.1.4",
     "tslib": "^2.4.1"
   },
@@ -25,6 +30,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.9"
+    "@types/react-dom": "^18.0.9",
+    "typescript": "~5.3.2"
   }
 }

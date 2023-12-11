@@ -2,7 +2,8 @@ import React from "react";
 import { Desktop, ErrorDisplay, WorkArea, ThemeContextProvider, useScreenIndex } from "@electron-wm/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/react-taskbar";
-import { MyTheme } from "../theme";
+import { Wallpaper } from "@electron-wm/react-wallpaper";
+import { MyTheme } from "../shared/theme";
 
 export default () => {
   const screenIndex = useScreenIndex();
@@ -18,7 +19,9 @@ export default () => {
           <LayoutIndicator />
         </Taskbar>
         <ErrorBoundary FallbackComponent={ErrorDisplay}>
-          <WorkArea />
+          <WorkArea>
+            <Wallpaper />
+          </WorkArea>
         </ErrorBoundary>
       </Desktop>
     </ThemeContextProvider>

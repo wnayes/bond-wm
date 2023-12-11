@@ -1,27 +1,20 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { hookShortcuts } from "./shortcuts";
-import {
-  RootState,
-  configureRendererStore,
-  resolvePluginsFromRenderer,
-  setPluginInstallDirectory,
-  setupIpc,
-} from "@electron-wm/shared-renderer";
-import { ReactConfigModule, setScreenIndex } from "@electron-wm/react";
+import { configureRendererStore, setupIpc } from "@electron-wm/shared-renderer";
+import { setScreenIndex } from "@electron-wm/react";
 import { FunctionComponentElement, useEffect, useState } from "react";
-import { DesktopModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
+import { getConfigAsync, setConfigPath } from "@electron-wm/shared";
 
 const screenIndex = getScreenIndex();
 console.log(screenIndex);
 setScreenIndex(screenIndex);
 
-setPluginInstallDirectory(__dirname);
-
 const store = configureRendererStore();
 (window as any).store = store; // eslint-disable-line
 setupIpc(store, screenIndex);
+setConfigPath(store.getState().config.configPath);
 
 const reactRoot = createRoot(document.getElementById("content")!);
 reactRoot.render(
@@ -42,43 +35,22 @@ function getScreenIndex(): number {
 }
 
 interface ReactDesktopSettings {
-  config: PluginSpecifiers;
+  desktopComponent: React.FunctionComponent;
 }
 
 function DesktopComponentWrapper() {
-  const desktopConfig = useSelector((state: RootState) => state.config.plugins?.desktop);
-  const [desktopConfigSpecifier, setDesktopConfigSpecifiers] = useState<PluginSpecifiers | null | undefined>(null);
-
   const [desktopComponent, setDesktopComponent] = useState<FunctionComponentElement<{}> | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (desktopConfig) {
-        const plugins =
-          await resolvePluginsFromRenderer<PluginInstance<DesktopModule, ReactDesktopSettings>>(desktopConfig);
-        plugins.forEach((desktopModule) => {
-          setDesktopConfigSpecifiers(desktopModule.settings?.config);
-        });
+      const config = await getConfigAsync();
+      if (config.desktop.settings) {
+        const desktopComponent = (config.desktop.settings as ReactDesktopSettings).desktopComponent;
+        const desktopElement = React.createElement(desktopComponent, {});
+        setDesktopComponent(desktopElement);
       }
     })();
-  }, [desktopConfig]);
-
-  useEffect(() => {
-    (async () => {
-      if (desktopConfigSpecifier) {
-        const plugins = await resolvePluginsFromRenderer<PluginInstance<ReactConfigModule>>(desktopConfigSpecifier);
-        const components = plugins
-          .map((configModule, i) => {
-            const desktopComponent = configModule.exports.Desktop;
-            if (typeof desktopComponent === "function") {
-              return React.createElement(desktopComponent, { key: i });
-            }
-          })
-          .filter((component) => component != null) as FunctionComponentElement<{}>[];
-        setDesktopComponent(components[0]);
-      }
-    })();
-  }, [desktopConfigSpecifier]);
+  }, []);
 
   return desktopComponent;
 }

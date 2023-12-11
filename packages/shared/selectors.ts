@@ -1,9 +1,7 @@
 import { IWindow } from "./window";
 import { anyIntersect } from "./utils";
 import { SharedRootState } from "./redux/basicStore";
-import { LayoutPluginInstance } from "./plugins";
-import { getLayoutPluginName } from "./layouts";
-import { assignConfig, IConfig } from "./config";
+import { LayoutPluginConfig, getLayoutPluginName } from "./layouts";
 
 export function selectAllWindows(state: SharedRootState): IWindow[] {
   const wins = [];
@@ -50,7 +48,7 @@ export function selectCurrentLayoutForScreen(state: SharedRootState, screenIndex
 
 export function selectWindowMaximizeCanTakeEffect(
   state: SharedRootState,
-  layoutPlugins: LayoutPluginInstance[] | undefined,
+  layoutPlugins: readonly LayoutPluginConfig[] | undefined,
   wid: number
 ): boolean {
   const win = state.windows[wid];
@@ -60,16 +58,7 @@ export function selectWindowMaximizeCanTakeEffect(
   const currentLayoutName = selectCurrentLayoutForScreen(state, win.screenIndex);
   const currentLayout = layoutPlugins?.find((plugin) => getLayoutPluginName(plugin) === currentLayoutName);
   if (currentLayout) {
-    return currentLayout.exports.default.supportsMaximize;
+    return currentLayout.supportsMaximize;
   }
   return false;
-}
-
-export function selectConfigWithOverrides(state: SharedRootState, screenIndex: number): IConfig {
-  const config = { ...state.config };
-  const overrides = config.screenOverrides?.[screenIndex];
-  if (overrides) {
-    assignConfig(config, overrides);
-  }
-  return config;
 }

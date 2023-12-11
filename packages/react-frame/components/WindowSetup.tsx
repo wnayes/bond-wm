@@ -1,14 +1,14 @@
 import * as React from "react";
 import { Root, createRoot } from "react-dom/client";
-import { Provider, useSelector } from "react-redux";
-import { RootState, Store, frameWindowMouseEnter, resolvePluginsFromRenderer } from "@electron-wm/shared-renderer";
+import { Provider } from "react-redux";
+import { Store, frameWindowMouseEnter } from "@electron-wm/shared-renderer";
 import { ipcRenderer } from "electron";
-import { ReactConfigModule, WidContext } from "@electron-wm/react";
-import { FrameModule, PluginInstance, PluginSpecifiers } from "@electron-wm/shared";
+import { WidContext } from "@electron-wm/react";
+import { getConfigAsync } from "@electron-wm/shared";
 import { FunctionComponentElement, useEffect, useState } from "react";
 
 interface ReactFrameSettings {
-  config: PluginSpecifiers;
+  frameComponent: React.FunctionComponent;
 }
 
 let _store: Store;
@@ -62,38 +62,18 @@ function WindowFrameWrapper({ wid }: WindowFrameWrapperProps) {
 }
 
 function WindowFrameComponentWrapper() {
-  const frameConfig = useSelector((state: RootState) => state.config.plugins?.frame);
-  const [frameConfigSpecifier, setFrameConfigSpecifiers] = useState<PluginSpecifiers | null | undefined>(null);
-
   const [frameComponent, setFrameComponent] = useState<FunctionComponentElement<{}> | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (frameConfig) {
-        const plugins = await resolvePluginsFromRenderer<PluginInstance<FrameModule, ReactFrameSettings>>(frameConfig);
-        plugins.forEach((frameModule) => {
-          setFrameConfigSpecifiers(frameModule.settings?.config);
-        });
+      const config = await getConfigAsync();
+      if (config.frame.settings) {
+        const frameComponent = (config.frame.settings as ReactFrameSettings).frameComponent;
+        const frameElement = React.createElement(frameComponent, {});
+        setFrameComponent(frameElement);
       }
     })();
-  }, [frameConfig]);
-
-  useEffect(() => {
-    (async () => {
-      if (frameConfigSpecifier) {
-        const plugins = await resolvePluginsFromRenderer<PluginInstance<ReactConfigModule>>(frameConfigSpecifier);
-        const components = plugins
-          .map((configModule, i) => {
-            const frameComponent = configModule.exports.Frame;
-            if (typeof frameComponent === "function") {
-              return React.createElement(frameComponent, { key: i });
-            }
-          })
-          .filter((component) => component != null) as FunctionComponentElement<{}>[];
-        setFrameComponent(components[0]);
-      }
-    })();
-  }, [frameConfigSpecifier]);
+  }, []);
 
   return frameComponent;
 }

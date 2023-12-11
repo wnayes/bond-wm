@@ -6,15 +6,13 @@ import * as path from "path";
 import * as os from "os";
 import { app, ipcMain, BrowserWindow } from "electron";
 import {
-  DesktopModule,
-  FrameModule,
   IBounds,
   IGeometry,
-  LayoutPluginInstance,
-  PluginInstance,
+  LayoutPluginConfig,
   geometriesDiffer,
+  getConfigAsync,
+  getConfigWithOverrides,
   getLayoutPluginName,
-  selectConfigWithOverrides,
   selectVisibleWindowsFromCurrentTags,
 } from "@electron-wm/shared";
 import { spawn } from "child_process";
@@ -84,10 +82,8 @@ import { createDragModule } from "./drag";
 import { getArgs } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
-import { getConfig, loadConfigFromDisk } from "./config";
+import { loadConfigFromDisk } from "./config";
 import { createTrayEventConsumer } from "./systray";
-import { setupPackageInstallMessageListener } from "./npmPackageCache";
-import { resolvePluginsForWM } from "./plugins";
 
 // Path constants
 const PRELOAD_JS = path.resolve(path.join(__dirname, "../../packages/shared-renderer/dist/preload.js"));
@@ -223,7 +219,7 @@ export async function createServer(): Promise<XServer> {
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
   let frameWindowSrc: string;
-  const layoutsByScreen: Map<number, LayoutPluginInstance[]> = new Map();
+  const layoutsByScreen: Map<number, readonly LayoutPluginConfig[]> = new Map();
 
   const knownWids = new Set<number>();
   const winIdToRootId: { [wid: number]: number } = {};
@@ -252,6 +248,7 @@ export async function createServer(): Promise<XServer> {
   const store = __setupStore();
 
   await loadConfigFromDisk(store);
+  const config = await getConfigAsync();
 
   let context: XWMContext;
 
@@ -268,7 +265,7 @@ export async function createServer(): Promise<XServer> {
   const registeredKeys: { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void } = {
     "Mod4 + o": () => sendActiveWindowToNextScreen(),
 
-    "Mod4 + Return": () => launchProcess(getConfig().term),
+    "Mod4 + Return": () => launchProcess(config.term),
     "Mod4 + space": () => switchToNextLayoutWM(),
 
     "Mod4 + Shift + C": () => closeFocusedWindow(),
@@ -317,11 +314,7 @@ export async function createServer(): Promise<XServer> {
       shortcuts = await createShortcutsModule(context);
       eventConsumers.push(shortcuts);
 
-      const frameConfig = store.getState().config.plugins?.frame;
-      if (frameConfig) {
-        const frameModule = await resolvePluginsForWM<PluginInstance<FrameModule>>(frameConfig);
-        frameWindowSrc = frameModule[0]?.exports?.getFrameWindowSrc();
-      }
+      frameWindowSrc = config.frame?.module?.getFrameWindowSrc();
       if (!frameWindowSrc) {
         throw new Error("Missing frame config. Frame windows cannot be created without frame config.");
       }
@@ -330,8 +323,8 @@ export async function createServer(): Promise<XServer> {
       await __initDesktop();
 
       for (let s = 0; s < desktopBrowsers.length; s++) {
-        const layoutPlugins = selectConfigWithOverrides(store.getState(), s).plugins?.layout;
-        layoutsByScreen.set(s, layoutPlugins ? await resolvePluginsForWM<LayoutPluginInstance>(layoutPlugins) : []);
+        const layoutPlugins = getConfigWithOverrides(s).layouts;
+        layoutsByScreen.set(s, layoutPlugins ?? []);
       }
     });
 
@@ -387,7 +380,7 @@ export async function createServer(): Promise<XServer> {
     });
 
     ipcMain.on("show-context-menu", (event, args: { menuKind: ContextMenuKind }) => {
-      showContextMenu(event, args.menuKind);
+      showContextMenu(event, args.menuKind, store.getState().config.version);
     });
 
     ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
@@ -404,7 +397,6 @@ export async function createServer(): Promise<XServer> {
     // });
 
     setupAutocompleteListener();
-    setupPackageInstallMessageListener();
   })();
 
   async function __setupAtoms(): Promise<void> {
@@ -449,8 +441,6 @@ export async function createServer(): Promise<XServer> {
 
     const logicalScreens = await getScreenGeometries(screen);
     log("Obtained logical screens", logicalScreens);
-
-    const config = getConfig();
 
     for (const logicalScreen of logicalScreens) {
       store.dispatch(
@@ -554,10 +544,9 @@ export async function createServer(): Promise<XServer> {
     log("Created browser window", handle);
 
     let desktopWindowSrc;
-    const desktopConfig = selectConfigWithOverrides(store.getState(), index)?.plugins?.desktop;
+    const desktopConfig = getConfigWithOverrides(index)?.desktop;
     if (desktopConfig) {
-      const desktopModule = await resolvePluginsForWM<PluginInstance<DesktopModule>>(desktopConfig);
-      desktopWindowSrc = desktopModule[0]?.exports?.getDesktopWindowSrc();
+      desktopWindowSrc = desktopConfig.module.getDesktopWindowSrc();
     }
     if (!desktopWindowSrc) {
       throw new Error("Missing desktop config. Desktop windows cannot be created without a desktop plugin.");
@@ -1882,7 +1871,7 @@ export async function createServer(): Promise<XServer> {
         }
 
         const windows = selectVisibleWindowsFromCurrentTags(state, s);
-        const results = currentLayout.exports.default.fn({ screen, windows, settings: currentLayout.settings });
+        const results = currentLayout.fn({ screen, windows });
         results.forEach((nextWinPos, wid) => {
           const curWinPos = state.windows[wid]?.outer;
           if (geometriesDiffer(curWinPos, nextWinPos)) {

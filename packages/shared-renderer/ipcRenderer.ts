@@ -1,5 +1,4 @@
 import { ipcRenderer } from "electron";
-import { setupNPMPackageProxyListeners } from "@electron-wm/shared";
 import { Store } from "./configureStore";
 import { invokeDesktopShortcutHandler } from "./shortcuts";
 
@@ -16,8 +15,6 @@ export function setupIpc(store: Store, screenIndex: number) {
     _onCompletionOptionsResult?.(options);
     _onCompletionOptionsResult = undefined;
   });
-
-  setupNPMPackageProxyListeners(ipcRenderer);
 }
 
 export function setOnCompletionOptionsResult(callback: CompletionOptionsCallback): void {

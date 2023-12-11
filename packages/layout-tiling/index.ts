@@ -9,7 +9,7 @@ import {
   windowIsDialog,
 } from "@electron-wm/shared";
 
-const TilingLayout: LayoutFunction<{}> = ({ windows, screen }) => {
+const TilingLayout: LayoutFunction = ({ windows, screen }) => {
   const results = new Map<number, IGeometry>();
 
   const { workArea } = screen;
@@ -83,7 +83,7 @@ const TilingLayout: LayoutFunction<{}> = ({ windows, screen }) => {
 };
 
 /** A tiling layout for electron-wm. */
-const Plugin: LayoutPluginConfig<{}> = {
+const Plugin: LayoutPluginConfig = {
   name: "Tiling",
   icon: pathToFileURL(path.join(__dirname, "tiling.png")).toString(),
   supportsMaximize: false,

@@ -1,31 +1,35 @@
-import { isAbsolute } from "path";
-import { requirePackage } from "./npmPackageProxy";
-import { PluginInstance } from "./plugins";
+import { LayoutPluginConfig } from "./layouts";
 
-export interface PluginSpecifierObject {
-  id: string;
-  settings?: Record<string, unknown>;
+/** Expect module contents for a "desktop" module. */
+export interface DesktopModule {
+  /** Returns the source path to use for the desktop window. */
+  getDesktopWindowSrc(): string;
 }
 
-export type PluginSpecifiers = string | PluginSpecifierObject | readonly (string | PluginSpecifierObject)[];
-
-export interface IPluginConfig {
-  desktop?: PluginSpecifiers;
-  frame?: PluginSpecifiers;
-  layout?: PluginSpecifiers;
-  wallpaper?: PluginSpecifiers;
+/** Expect module contents for a "frame" module. */
+export interface FrameModule {
+  /** Returns the source path to use for the frame window. */
+  getFrameWindowSrc(): string;
 }
 
 type ScreenOverridesDict = { [screenIndex: number]: Partial<IConfig> };
 
-type ObjectConfigPropertyType = IPluginConfig | ScreenOverridesDict;
+type ObjectConfigPropertyType = ScreenOverridesDict;
 
 export interface IConfig {
   initialLayout: string;
   initialTag: string;
   tags: string[];
   term: string;
-  plugins?: IPluginConfig;
+  desktop: {
+    module: DesktopModule;
+    settings?: unknown;
+  };
+  frame: {
+    module: FrameModule;
+    settings?: unknown;
+  };
+  layouts: readonly LayoutPluginConfig[];
   screenOverrides?: ScreenOverridesDict;
   version?: string;
 }
@@ -35,14 +39,59 @@ export const defaultConfig: IConfig = {
   initialTag: "1",
   tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
   term: "xterm",
-  plugins: {},
+  desktop: {
+    module: {
+      getDesktopWindowSrc: () => {
+        throw new Error("No desktop module specified.");
+      },
+    },
+  },
+  frame: {
+    module: {
+      getFrameWindowSrc: () => {
+        throw new Error("No frame module specified.");
+      },
+    },
+  },
+  layouts: [],
   screenOverrides: {},
 };
+
+// https://github.com/TypeStrong/ts-node/discussions/1290
+//const dynamicImport = new Function("specifier", "return import(specifier)");
+
+let _config: IConfig | null = null;
+let _configPath: string | null = null;
+
+export function setConfigPath(configPath: string): void {
+  _configPath = configPath;
+}
+
+export async function getConfigAsync(): Promise<IConfig> {
+  if (!_config) {
+    if (!_configPath) {
+      throw new Error("Config path was not determined.");
+    }
+    _config = (await import(_configPath)).default;
+  }
+  return _config!;
+}
+
+export function getConfigWithOverrides(screenIndex: number): IConfig {
+  if (!_config) {
+    throw new Error("Missing config");
+  }
+  const config = { ..._config };
+  const overrides = config.screenOverrides?.[screenIndex];
+  if (overrides) {
+    assignConfig(config, overrides);
+  }
+  return config;
+}
 
 export function assignConfig(dest: IConfig, src: Partial<IConfig>): void {
   for (const configPropName in src) {
     switch (configPropName) {
-      case "plugins":
       case "screenOverrides":
         {
           // Overwrite at the level of each subkey, not the entire object.
@@ -66,31 +115,4 @@ export function assignConfig(dest: IConfig, src: Partial<IConfig>): void {
         break;
     }
   }
-}
-
-/** Resolves plugins into their runtime types. */
-export async function resolvePlugins<T extends PluginInstance<unknown>>(
-  specifiers: PluginSpecifiers,
-  installDirectory: string
-): Promise<T[]> {
-  const specifiersArr = Array.isArray(specifiers) ? specifiers : [specifiers];
-
-  const plugins: T[] = [];
-  for (const specifier of specifiersArr) {
-    const moduleId = typeof specifier === "string" ? specifier : specifier.id;
-    let loadedModule: unknown;
-    if (isAbsolute(moduleId)) {
-      loadedModule = require(moduleId);
-    } else {
-      loadedModule = await requirePackage<T>(moduleId, installDirectory);
-    }
-
-    if (typeof loadedModule === "object") {
-      plugins.push({
-        exports: loadedModule,
-        settings: typeof specifier === "object" ? specifier.settings : undefined,
-      } as T);
-    }
-  }
-  return plugins;
 }

@@ -8,7 +8,7 @@ import {
   TitleBarMinimizeButton,
   TitleBarText,
 } from "@electron-wm/react-titlebar";
-import { MyTheme } from "../theme";
+import { MyTheme } from "../shared/theme";
 
 export default () => {
   return (

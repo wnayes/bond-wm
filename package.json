@@ -1,22 +1,15 @@
 {
   "private": true,
-  "main": "./apps/wm/index.js",
   "scripts": {
     "startx": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1600x900 :1",
     "startx-multi": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1000x700 -screen 1000x600 +xinerama :1",
-    "start": "DISPLAY=:1 electron .",
+    "start": "pnpm -C ./apps/wm run start",
     "prettier": "prettier --write .",
     "lint": "eslint .",
     "setup": "pnpm install",
     "build": "turbo run build",
     "clean": "turbo run clean",
     "test": "turbo run test"
-  },
-  "dependencies": {
-    "@swc/core": "^1.3.94",
-    "@swc/helpers": "^0.5.3",
-    "electron": "^28.0.0",
-    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.8.0",

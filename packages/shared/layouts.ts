@@ -1,5 +1,4 @@
 import { batch } from "react-redux";
-import { LayoutPluginInstance } from "./plugins";
 import { SharedStore } from "./redux/basicStore";
 import { setTagCurrentLayoutAction } from "./redux/screenSlice";
 import { setWindowPositionAction } from "./redux/windowSlice";
@@ -15,8 +14,25 @@ import {
 import { IGeometry } from "./types";
 import { IScreen } from "./screen";
 
-export function getLayoutPluginName(plugin: LayoutPluginInstance): string {
-  return (plugin.settings?.name as string) || plugin.exports.default.name;
+export interface ILayoutFunctionProps {
+  windows: readonly IWindow[];
+  screen: IScreen;
+}
+
+export interface LayoutFunction {
+  (props: ILayoutFunctionProps): Map<number, IGeometry>;
+}
+
+/** Plugin configuration object exported by layout plugin modules. */
+export interface LayoutPluginConfig {
+  name: string;
+  icon: string;
+  supportsMaximize: boolean;
+  fn: LayoutFunction;
+}
+
+export function getLayoutPluginName(plugin: LayoutPluginConfig): string {
+  return plugin.name;
 }
 
 export function addLayoutResult(results: Map<number, IGeometry>, win: IWindow, screen: IScreen, pos: IGeometry): void {
@@ -58,7 +74,7 @@ export function addLayoutResult(results: Map<number, IGeometry>, win: IWindow, s
 
 export function switchToNextLayout(
   store: SharedStore,
-  layoutPlugins: LayoutPluginInstance[],
+  layoutPlugins: readonly LayoutPluginConfig[],
   screenIndex: number
 ): void {
   const state = store.getState();
@@ -86,7 +102,7 @@ export function switchToNextLayout(
   });
 }
 
-function getNextLayout(layoutPlugins: LayoutPluginInstance[], fromLayoutName: string): LayoutPluginInstance {
+function getNextLayout(layoutPlugins: readonly LayoutPluginConfig[], fromLayoutName: string): LayoutPluginConfig {
   const currentIndex = layoutPlugins.findIndex((layout) => getLayoutPluginName(layout) === fromLayoutName);
   const nextIndex = (currentIndex + 1) % layoutPlugins.length;
   return layoutPlugins[nextIndex];

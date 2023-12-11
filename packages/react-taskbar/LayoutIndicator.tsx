@@ -25,8 +25,8 @@ export function LayoutIndicator() {
   }
 
   let layoutIcon;
-  if (currentLayout.exports.default.icon) {
-    layoutIcon = <img className="layoutIndicatorIcon" src={currentLayout.exports.default.icon} />;
+  if (currentLayout.icon) {
+    layoutIcon = <img className="layoutIndicatorIcon" src={currentLayout.icon} />;
   }
 
   return (
