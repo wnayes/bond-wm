@@ -106,6 +106,16 @@ importers:
         specifier: ^3.3.0
         version: 3.4.0
 
+  packages/init:
+    dependencies:
+      '@electron-wm/react-config':
+        specifier: workspace:*
+        version: link:../react-config
+    devDependencies:
+      '@types/node':
+        specifier: ^18.11.17
+        version: 18.15.11
+
   packages/keysym: {}
 
   packages/layout-floating:
