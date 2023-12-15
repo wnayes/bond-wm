@@ -8,7 +8,7 @@ const PackageName = "@electron-wm/wallpaper";
 export function Wallpaper() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { width: screenWidth, height: screenHeight } = useBrowserWindowSize();
-  const { width: totalWidth, height: totalHeight } = useCompositeScreenSize();
+  const { width: totalWidth, height: totalHeight } = useCompositeScreenSize({ cssPixels: true });
   const screen = useScreen();
 
   const [seed, setSeed] = usePluginState<IWallpaperSeed>(PackageName);

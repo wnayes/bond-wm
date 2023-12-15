@@ -2,7 +2,16 @@ import { useSelector } from "react-redux";
 import { RootState } from "@electron-wm/shared-renderer";
 import { IGeometry, ISize } from "@electron-wm/shared";
 
-export function useCompositeScreenSize(): ISize {
+/**
+ * Returns the "composite size" of all screens together.
+ * For example, if you have two monitors at 1920px wide each, the composite
+ * width is 3840.
+ * @param opts Additional options.
+ * @param opts.cssPixels If true, adjust the composite size to account for zoom.
+ * For example, when zoomed out, the size will be larger.
+ * @returns A size object containing `width` and `height` integers.
+ */
+export function useCompositeScreenSize(opts?: { cssPixels?: boolean }): ISize {
   const compositeGeometry: IGeometry = {
     x: 0,
     y: 0,
@@ -23,10 +32,12 @@ export function useCompositeScreenSize(): ISize {
     height: compositeGeometry.height - compositeGeometry.y,
   };
 
-  const zoomRatio = window.devicePixelRatio;
-  if (zoomRatio !== 1) {
-    size.width = Math.ceil(size.width * (1 / zoomRatio));
-    size.height = Math.ceil(size.height * (1 / zoomRatio));
+  if (opts?.cssPixels) {
+    const zoomRatio = window.devicePixelRatio;
+    if (zoomRatio !== 1) {
+      size.width = Math.ceil(size.width * (1 / zoomRatio));
+      size.height = Math.ceil(size.height * (1 / zoomRatio));
+    }
   }
 
   return size;
