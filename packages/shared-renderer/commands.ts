@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { ContextMenuKind } from "../shared/ContextMenuKind";
+import { ContextMenuKind } from "@electron-wm/shared";
 import { setOnCompletionOptionsResult } from "./ipcRenderer";
 
 export function raiseWindow(wid: number) {

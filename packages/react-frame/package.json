@@ -26,11 +26,12 @@
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
     "tslib": "^2.4.1",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "x11": "^2.3.0",
     "yargs": "^17.6.2"
   },
   "devDependencies": {
+    "@electron-wm/tsconfig": "workspace:*",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "@types/yargs": "^17.0.15",

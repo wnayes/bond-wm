@@ -69,8 +69,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
+        specifier: ^10.9.2
+        version: 10.9.2(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
       tslib:
         specifier: ^2.4.1
         version: 2.4.1
@@ -84,6 +84,9 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       '@types/react':
         specifier: ^18.0.26
         version: 18.0.26
@@ -98,7 +101,7 @@ importers:
         version: 1.2.3
       jest:
         specifier: ^29.3.1
-        version: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+        version: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       ts-jest:
         specifier: ^29.0.3
         version: 29.0.3(@babel/core@7.23.2)(jest@29.3.1)(typescript@5.3.2)
@@ -127,6 +130,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
         version: 18.11.17
@@ -146,6 +152,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
         version: 18.11.17
@@ -186,6 +195,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
         version: 18.15.11
@@ -241,6 +253,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/react':
         specifier: ^18.0.26
         version: 18.0.26
@@ -290,12 +305,15 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
+        specifier: ^10.9.2
+        version: 10.9.2(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
       tslib:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/react':
         specifier: ^18.0.26
         version: 18.0.26
@@ -307,7 +325,7 @@ importers:
         version: 1.2.3
       jest:
         specifier: ^29.3.1
-        version: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+        version: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       ts-jest:
         specifier: ^29.0.3
         version: 29.0.3(@babel/core@7.23.2)(jest@29.3.1)(typescript@5.3.2)
@@ -357,8 +375,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
+        specifier: ^10.9.2
+        version: 10.9.2(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
       tslib:
         specifier: ^2.4.1
         version: 2.4.1
@@ -369,6 +387,9 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/react':
         specifier: ^18.0.26
         version: 18.0.26
@@ -383,7 +404,7 @@ importers:
         version: 1.2.3
       jest:
         specifier: ^29.3.1
-        version: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+        version: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       ts-jest:
         specifier: ^29.0.3
         version: 29.0.3(@babel/core@7.23.2)(jest@29.3.1)(typescript@5.3.2)
@@ -418,6 +439,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
         version: 18.15.11
@@ -458,6 +482,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
         version: 18.15.11
@@ -492,6 +519,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
         version: 18.15.11
@@ -544,6 +574,9 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@jest/globals':
         specifier: ^29.3.1
         version: 29.3.1
@@ -593,6 +626,9 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
+      '@electron-wm/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       esbuild:
         specifier: ^0.16.12
         version: 0.16.12
@@ -608,6 +644,8 @@ importers:
       typescript:
         specifier: ~5.3.2
         version: 5.3.2
+
+  packages/tsconfig: {}
 
 packages:
 
@@ -1312,7 +1350,7 @@ packages:
       slash: 3.0.0
     dev: true
 
-  /@jest/core@29.3.1(ts-node@10.9.1):
+  /@jest/core@29.3.1(ts-node@10.9.2):
     resolution: {integrity: sha512-0ohVjjRex985w5MmO5L3u5GR1O30DexhBSpuwx2P+9ftyqHdJXnk7IUWiP80oHMvt7ubHCJHxV0a0vlKVuZirw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     peerDependencies:
@@ -1333,7 +1371,7 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.10
       jest-changed-files: 29.2.0
-      jest-config: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+      jest-config: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       jest-haste-map: 29.3.1
       jest-message-util: 29.3.1
       jest-regex-util: 29.2.0
@@ -1525,11 +1563,11 @@ packages:
   /@jridgewell/resolve-uri@3.1.0:
     resolution: {integrity: sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w==}
     engines: {node: '>=6.0.0'}
+    dev: true
 
   /@jridgewell/resolve-uri@3.1.1:
     resolution: {integrity: sha512-dSYZh7HhCDtCKm4QakX0xFpsRDqjjtZf/kjI/v3T3Nwt5r8/qz/M19F9ySyOqU94SXBmeG9ttTul+YnR4LOxFA==}
     engines: {node: '>=6.0.0'}
-    dev: true
 
   /@jridgewell/set-array@1.1.2:
     resolution: {integrity: sha512-xnkseuNADM0gt2bs+BvhO0p78Mk762YnZdsuzFV018NoG1Sj1SCQvpSqa7XUaTam5vAGasABV9qXASMKnFMwMw==}
@@ -1538,10 +1576,10 @@ packages:
 
   /@jridgewell/sourcemap-codec@1.4.14:
     resolution: {integrity: sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==}
+    dev: true
 
   /@jridgewell/sourcemap-codec@1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
-    dev: true
 
   /@jridgewell/trace-mapping@0.3.17:
     resolution: {integrity: sha512-MCNzAp77qzKca9+W/+I0+sEpaUnZoeasnghNeVc41VZCEKaCH73Vq3BZZ/SzWIgrqE4H4ceI+p+b6C0mHf9T4g==}
@@ -1560,8 +1598,8 @@ packages:
   /@jridgewell/trace-mapping@0.3.9:
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
     dependencies:
-      '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.4.14
+      '@jridgewell/resolve-uri': 3.1.1
+      '@jridgewell/sourcemap-codec': 1.4.15
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3264,14 +3302,14 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 29.3.1(ts-node@10.9.1)
+      '@jest/core': 29.3.1(ts-node@10.9.2)
       '@jest/test-result': 29.3.1
       '@jest/types': 29.3.1
       chalk: 4.1.2
       exit: 0.1.2
       graceful-fs: 4.2.10
       import-local: 3.1.0
-      jest-config: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+      jest-config: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       jest-util: 29.3.1
       jest-validate: 29.3.1
       prompts: 2.4.2
@@ -3292,7 +3330,7 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 29.3.1(ts-node@10.9.1)
+      '@jest/core': 29.3.1(ts-node@10.9.2)
       '@jest/test-result': 29.3.1
       '@jest/types': 29.3.1
       chalk: 4.1.2
@@ -3310,7 +3348,7 @@ packages:
       - ts-node
     dev: true
 
-  /jest-cli@29.3.1(@types/node@18.15.11)(ts-node@10.9.1):
+  /jest-cli@29.3.1(@types/node@18.15.11)(ts-node@10.9.2):
     resolution: {integrity: sha512-TO/ewvwyvPOiBBuWZ0gm04z3WWP8TIK8acgPzE4IxgsLKQgb377NYGrQLc3Wl/7ndWzIH2CDNNsUjGxwLL43VQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -3320,14 +3358,14 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 29.3.1(ts-node@10.9.1)
+      '@jest/core': 29.3.1(ts-node@10.9.2)
       '@jest/test-result': 29.3.1
       '@jest/types': 29.3.1
       chalk: 4.1.2
       exit: 0.1.2
       graceful-fs: 4.2.10
       import-local: 3.1.0
-      jest-config: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+      jest-config: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       jest-util: 29.3.1
       jest-validate: 29.3.1
       prompts: 2.4.2
@@ -3377,7 +3415,7 @@ packages:
       - supports-color
     dev: true
 
-  /jest-config@29.3.1(@types/node@18.15.11)(ts-node@10.9.1):
+  /jest-config@29.3.1(@types/node@18.15.11)(ts-node@10.9.2):
     resolution: {integrity: sha512-y0tFHdj2WnTEhxmGUK1T7fgLen7YK4RtfvpLFBXfQkh2eMJAQq24Vx9472lvn5wg0MAO6B+iPfJfzdR9hJYalg==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     peerDependencies:
@@ -3412,7 +3450,7 @@ packages:
       pretty-format: 29.3.1
       slash: 3.0.0
       strip-json-comments: 3.1.1
-      ts-node: 10.9.1(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
+      ts-node: 10.9.2(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3714,7 +3752,7 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 29.3.1(ts-node@10.9.1)
+      '@jest/core': 29.3.1(ts-node@10.9.2)
       '@jest/types': 29.3.1
       import-local: 3.1.0
       jest-cli: 29.3.1
@@ -3734,7 +3772,7 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 29.3.1(ts-node@10.9.1)
+      '@jest/core': 29.3.1(ts-node@10.9.2)
       '@jest/types': 29.3.1
       import-local: 3.1.0
       jest-cli: 29.3.1(@types/node@18.11.17)
@@ -3744,7 +3782,7 @@ packages:
       - ts-node
     dev: true
 
-  /jest@29.3.1(@types/node@18.15.11)(ts-node@10.9.1):
+  /jest@29.3.1(@types/node@18.15.11)(ts-node@10.9.2):
     resolution: {integrity: sha512-6iWfL5DTT0Np6UYs/y5Niu7WIfNv/wRTtN5RSXt2DIEft3dx3zPuw/3WJQBCJfmEzvDiEKwoqMbGD9n49+qLSA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -3754,10 +3792,10 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 29.3.1(ts-node@10.9.1)
+      '@jest/core': 29.3.1(ts-node@10.9.2)
       '@jest/types': 29.3.1
       import-local: 3.1.0
-      jest-cli: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+      jest-cli: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
     transitivePeerDependencies:
       - '@types/node'
       - supports-color
@@ -4641,7 +4679,7 @@ packages:
       '@babel/core': 7.23.2
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 29.3.1(@types/node@18.15.11)(ts-node@10.9.1)
+      jest: 29.3.1(@types/node@18.15.11)(ts-node@10.9.2)
       jest-util: 29.3.1
       json5: 2.2.2
       lodash.memoize: 4.1.2
@@ -4651,8 +4689,8 @@ packages:
       yargs-parser: 21.1.1
     dev: true
 
-  /ts-node@10.9.1(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2):
-    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
+  /ts-node@10.9.2(@swc/core@1.3.94)(@types/node@18.15.11)(typescript@5.3.2):
+    resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
       '@swc/core': '>=1.2.50'
