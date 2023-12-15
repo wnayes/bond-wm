@@ -1,7 +1,7 @@
 import * as React from "react";
 import { PropsWithChildren, useCallback, useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState } from "@electron-wm/shared-renderer";
+import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
 import { useBrowserWindowSize } from "../useBrowserWindowSize";
 import { useScreenIndex } from "../useScreenIndex";
 import { geometriesDiffer } from "@electron-wm/shared";
@@ -21,7 +21,7 @@ export function WorkArea({ children }: IWorkAreaProps) {
   useBrowserWindowSize(); // To trigger size recalculations.
 
   useLayoutEffect(() => {
-    const clientRect = workAreaDiv.current?.getBoundingClientRect();
+    const clientRect = workAreaDiv.current && getBoundingClientRectWithZoom(workAreaDiv.current);
 
     if (screen && clientRect) {
       if (geometriesDiffer(screen.workArea, clientRect)) {
