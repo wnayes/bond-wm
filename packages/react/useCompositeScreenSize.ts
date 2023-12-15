@@ -18,8 +18,16 @@ export function useCompositeScreenSize(): ISize {
     compositeGeometry.height = Math.max(compositeGeometry.height, screen.y + screen.height);
   }
 
-  return {
+  const size: ISize = {
     width: compositeGeometry.width - compositeGeometry.x,
     height: compositeGeometry.height - compositeGeometry.y,
   };
+
+  const zoomRatio = window.devicePixelRatio;
+  if (zoomRatio !== 1) {
+    size.width = Math.ceil(size.width * (1 / zoomRatio));
+    size.height = Math.ceil(size.height * (1 / zoomRatio));
+  }
+
+  return size;
 }
