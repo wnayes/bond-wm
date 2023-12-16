@@ -3,15 +3,13 @@
   "name": "@electron-wm/init",
   "version": "0.1.0",
   "description": "Configuration initialization scripts for electron-wm",
-  "bin": "./init.cjs",
+  "bin": "./init.mjs",
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {},
   "dependencies": {
-    "@electron-wm/react-config": "workspace:*"
+    "prompts": "^2.4.2"
   },
-  "devDependencies": {
-    "@types/node": "^18.11.17"
-  }
+  "devDependencies": {}
 }
