@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "name": "@electron-wm/react-config",
+  "version": "0.1.0",
+  "description": "Default React user configuration",
+  "main": "./index.ts",
+  "exports": "./index.ts",
+  "repository": "https://github.com/wnayes/electron-wm",
+  "author": "Will Nayes",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json",
+    "clean": "rm -rf ./node_modules"
+  },
+  "dependencies": {
+    "@electron-wm/layout-floating": "^0.1.0",
+    "@electron-wm/layout-tiling": "^0.1.0",
+    "@electron-wm/react": "^0.1.0",
+    "@electron-wm/react-desktop": "^0.1.0",
+    "@electron-wm/react-frame": "^0.1.0",
+    "@electron-wm/react-taskbar": "^0.1.0",
+    "@electron-wm/react-titlebar": "^0.1.0",
+    "@electron-wm/react-wallpaper": "^0.1.0",
+    "react-error-boundary": "^3.1.4",
+    "tslib": "^2.4.1"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@electron-wm/tsconfig": "^0.1.0",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.9",
+    "typescript": "~5.3.2"
+  }
+}
