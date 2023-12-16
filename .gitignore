@@ -1,7 +1,5 @@
 node_modules
 dist
-.electron-wm-plugin-cache
-
+.branches
 .turbo
-
 .vscode
