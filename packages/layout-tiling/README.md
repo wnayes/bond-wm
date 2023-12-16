@@ -1,7 +1,18 @@
 # @electron-wm/layout-tiling
 
-A default layout for the `electron-wm` window manager.
+A default tiling layout for the `electron-wm` window manager.
 
-This is provided as a separate plugin in order to allow for customization
-of the available layouts, but is not yet a good example to fork from.
-It accesses WM internals still.
+## Usage
+
+Import and add a tiling layout in your config module:
+
+```ts
+import LayoutTiling from "@electron-wm/layout-tiling";
+
+export default {
+  // ...
+
+  /** Layouts available to cycle through. */
+  layouts: [LayoutTiling],
+};
+```

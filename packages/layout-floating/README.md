@@ -1,7 +1,22 @@
 # @electron-wm/layout-floating
 
-A default layout for the `electron-wm` window manager.
+A default floating layout for the `electron-wm` window manager.
 
-This is provided as a separate plugin in order to allow for customization
-of the available layouts, but is not yet a good example to fork from.
-It accesses WM internals still.
+## Usage
+
+Import and add floating layouts in your config module:
+
+```ts
+import { createFloatingLayout } from "@electron-wm/layout-floating";
+
+export default {
+  // ...
+
+  /** Layouts available to cycle through. */
+  layouts: [createFloatingLayout({ floatRight: false })],
+};
+```
+
+## Configuration
+
+- `floatRight`: If true, windows start on the right side of the screen.

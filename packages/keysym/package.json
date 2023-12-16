@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@electron-wm/keysym",
   "version": "0.0.6",
   "description": "Look up X11 keysyms, unicode positions, and names.",

@@ -1,9 +1,23 @@
-# @electron-wm/wallpaper
+# @electron-wm/react-wallpaper
 
-A dynamic wallpaper component for the `electron-wm` window manager.
+A dynamic React wallpaper component for the `electron-wm` window manager.
 
 The rendering algorithm is modified from
 https://github.com/roytanck/wallpaper-generator
+
+## Usage
+
+Use the `Wallpaper` component within your desktop's work area.
+
+```tsx
+import { Wallpaper } from "@electron-wm/react-wallpaper";
+
+<Desktop>
+  <WorkArea>
+    <Wallpaper />
+  </WorkArea>
+</Desktop>;
+```
 
 ## License
 

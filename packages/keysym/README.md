@@ -1,12 +1,11 @@
+> [!NOTE]
+> This is an electron-wm fork of the npm `keysym` to remove use of Node `fs` APIs and `__dirname`.
+
 # Keysym
 
 This library converts among X11 keysyms, unicodes, and string names in node.js.
 
 Why would anybody want to do that? Why indeed, dear reader. Why indeed.
-
-**electron-wm note**
-
-This is a local fork of the npm `keysym` to remove use of Node `fs` APIs and `__dirname`.
 
 ## Methods
 
