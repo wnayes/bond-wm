@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@electron-wm/shared-renderer",
   "version": "0.1.0",
   "description": "Renderer shared internal functionality",

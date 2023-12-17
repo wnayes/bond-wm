@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@electron-wm/init",
   "version": "0.1.0",
   "description": "Configuration initialization scripts for electron-wm",

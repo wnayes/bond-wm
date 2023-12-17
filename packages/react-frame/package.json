@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@electron-wm/react-frame",
   "version": "0.1.0",
   "description": "React implementation of an electron-wm frame window",

@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@electron-wm/react-config",
   "version": "0.1.0",
   "description": "Default React user configuration",

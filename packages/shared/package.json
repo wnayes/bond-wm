@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@electron-wm/shared",
   "version": "0.1.0",
   "description": "Shared internal functionality",
