@@ -16,6 +16,7 @@ const config: Config = {
   // GitHub pages deployment config.
   organizationName: "wnayes",
   projectName: "electron-wm",
+  trailingSlash: false,
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
