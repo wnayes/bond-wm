@@ -1,0 +1,32 @@
+name: Test docs deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+    # Review gh actions docs if you want to further define triggers, paths, etc
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+
+jobs:
+  docs-test-deploy:
+    name: Test docs deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+        version: 8
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test build docs website
+        run: pnpm -C ./docs run build
