@@ -10,6 +10,9 @@
   ],
   "author": "Will Nayes",
   "license": "MIT",
+  "bin": {
+    "electron-wm": "./bin/electron-wm"
+  },
   "scripts": {
     "start": "DISPLAY=:1 electron .",
     "build": "tsc -b ./tsconfig.json && ./scripts/generate-version-json.mjs",

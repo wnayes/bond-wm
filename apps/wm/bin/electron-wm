@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+// Script approach copied from electron's cli.js.
+
+const proc = require("child_process");
+const path = require("path");
+
+const electron = require("electron");
+const electronWMPath = path.resolve(__dirname, "..");
+
+const electronArgs = [electronWMPath].concat(process.argv.slice(2));
+const child = proc.spawn(electron, electronArgs, { stdio: "inherit", windowsHide: false });
+child.on("close", function (code, signal) {
+  if (code === null) {
+    console.error(electron, "exited with signal", signal);
+    process.exit(1);
+  }
+  process.exit(code);
+});
+
+const handleTerminationSignal = function (signal) {
+  process.on(signal, function signalHandler() {
+    if (!child.killed) {
+      child.kill(signal);
+    }
+  });
+};
+
+handleTerminationSignal("SIGINT");
+handleTerminationSignal("SIGTERM");
