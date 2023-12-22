@@ -13,7 +13,8 @@
   <script>
     require("ts-node").register({
       cwd: __dirname,
-      project: "./tsconfig.json"
+      project: "./tsconfig.json",
+      skipIgnore: true,
     });
     require("./index.tsx");
   </script>
