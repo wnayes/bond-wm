@@ -74,7 +74,7 @@ const packageVersions = getPackageVersions();
 
 function replaceWorkspaceDependencies(collectionName) {
   for (const depName in checkoutPackageJson[collectionName]) {
-    if (checkoutPackageJson[collectionName][depName] === "workspace:*") {
+    if (checkoutPackageJson[collectionName][depName] === "workspace:^") {
       if (depName in packageVersions) {
         checkoutPackageJson[collectionName][depName] = `^${packageVersions[depName]}`;
       } else {

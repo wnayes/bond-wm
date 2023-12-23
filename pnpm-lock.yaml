@@ -36,13 +36,13 @@ importers:
   apps/wm:
     dependencies:
       '@electron-wm/keysym':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/keysym
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/shared
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/tsconfig
       '@reduxjs/toolkit':
         specifier: ^1.9.1
@@ -160,14 +160,14 @@ importers:
   packages/layout-floating:
     dependencies:
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       tslib:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
@@ -182,14 +182,14 @@ importers:
   packages/layout-tiling:
     dependencies:
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       tslib:
         specifier: ^2.4.1
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
@@ -207,10 +207,10 @@ importers:
         specifier: ^3.0.9
         version: 3.0.9(react@18.2.0)
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       '@electron-wm/shared-renderer':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared-renderer
       react:
         specifier: ^18.2.0
@@ -232,7 +232,7 @@ importers:
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
@@ -253,28 +253,28 @@ importers:
   packages/react-config:
     dependencies:
       '@electron-wm/layout-floating':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../layout-floating
       '@electron-wm/layout-tiling':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../layout-tiling
       '@electron-wm/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       '@electron-wm/react-desktop':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react-desktop
       '@electron-wm/react-frame':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react-frame
       '@electron-wm/react-taskbar':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react-taskbar
       '@electron-wm/react-titlebar':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react-titlebar
       '@electron-wm/react-wallpaper':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react-wallpaper
       react:
         specifier: ^18.2.0
@@ -290,7 +290,7 @@ importers:
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/react':
         specifier: ^18.0.26
@@ -305,19 +305,19 @@ importers:
   packages/react-desktop:
     dependencies:
       '@electron-wm/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       '@electron-wm/react-taskbar':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react-taskbar
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       '@electron-wm/shared-renderer':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared-renderer
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@reduxjs/toolkit':
         specifier: ^1.9.1
@@ -375,16 +375,16 @@ importers:
   packages/react-frame:
     dependencies:
       '@electron-wm/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       '@electron-wm/shared-renderer':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared-renderer
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@reduxjs/toolkit':
         specifier: ^1.9.1
@@ -454,13 +454,13 @@ importers:
   packages/react-taskbar:
     dependencies:
       '@electron-wm/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       '@electron-wm/shared-renderer':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared-renderer
       react:
         specifier: ^18.2.0
@@ -476,7 +476,7 @@ importers:
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
@@ -497,13 +497,13 @@ importers:
   packages/react-titlebar:
     dependencies:
       '@electron-wm/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       '@electron-wm/shared-renderer':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared-renderer
       react:
         specifier: ^18.2.0
@@ -519,7 +519,7 @@ importers:
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
@@ -543,7 +543,7 @@ importers:
   packages/react-wallpaper:
     dependencies:
       '@electron-wm/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       react:
         specifier: ^18.2.0
@@ -556,7 +556,7 @@ importers:
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@types/node':
         specifier: ^18.11.17
@@ -611,7 +611,7 @@ importers:
         version: 17.6.2
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       '@jest/globals':
         specifier: ^29.3.1
@@ -644,7 +644,7 @@ importers:
   packages/shared-renderer:
     dependencies:
       '@electron-wm/shared':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../shared
       '@reduxjs/toolkit':
         specifier: ^1.9.1
@@ -663,7 +663,7 @@ importers:
         version: 2.4.1
     devDependencies:
       '@electron-wm/tsconfig':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../tsconfig
       jest:
         specifier: ^29.3.1

@@ -11,11 +11,11 @@
     "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@electron-wm/shared": "workspace:*",
+    "@electron-wm/shared": "workspace:^",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@electron-wm/tsconfig": "workspace:*",
+    "@electron-wm/tsconfig": "workspace:^",
     "@types/node": "^18.11.17",
     "type-fest": "^3.3.0",
     "typescript": "~5.3.2"
