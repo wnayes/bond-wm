@@ -32,36 +32,8 @@ Substitute your own config package with the default one above as desired.
 
 ## Usage
 
-The window manager is stable enough for basic daily usage.
-
-At this time, there is no distributed release. To try out the window manager, check out this repository, built it, and invoke `electron` against the repository root directory.
-
-```
-Command line flags:
-  --config           Path to a configuration package
-  --console-logging  Enable console log output        [boolean] [default: false]
-  --file-logging     Enable logging output to a file
-  --help
-```
-
-For example, you may want to create an `.xinitrc` and run something like the following at the end:
-
-```
-exec /path/to/electron-wm-checkout/.bin/electron /path/to/electron-wm-checkout
-```
-
-Make sure to run `pnpm build` before attempting to use the window manager from the source checkout.
-
-### Configuration
-
-The window manager must be configured with a "config package" that defines your personal setup.
-
-A default config package is found within this repository at `./packages/react-config`. You could use it directly by passing `--config ./packages/react-config` when running the window manager.
-
-If you don't pass an explicit config path, a config package is attempted to be found here:
-
-- `$XDG_CONFIG_HOME/electron-wm-config`
-  - Typically `$HOME/.config/electron-wm-config`
+The window manager is stable enough for basic daily usage. See the [docs site](https://wnayes.github.io/electron-wm/)
+for details on how to install and configure the window manager.
 
 ### Keyboard Shortcuts
 
