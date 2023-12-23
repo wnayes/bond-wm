@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/react-titlebar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React frame window titlebar for electron-wm",
   "main": "./dist/index.js",
   "exports": "./dist/index.js",

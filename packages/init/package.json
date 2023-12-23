@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/init",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Configuration initialization scripts for electron-wm",
   "bin": "./init.mjs",
   "repository": "https://github.com/wnayes/electron-wm",

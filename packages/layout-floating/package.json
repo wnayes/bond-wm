@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/layout-floating",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Floating layout for electron-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
