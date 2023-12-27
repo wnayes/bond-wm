@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { Store, frameWindowMouseEnter } from "@electron-wm/shared-renderer";
 import { ipcRenderer } from "electron";
 import { WidContext } from "@electron-wm/react";
-import { getConfigAsync } from "@electron-wm/shared";
+import { getFrameConfigAsync } from "@electron-wm/shared";
 import { FunctionComponentElement, useEffect, useState } from "react";
 
 interface ReactFrameSettings {
@@ -66,9 +66,9 @@ function WindowFrameComponentWrapper() {
 
   useEffect(() => {
     (async () => {
-      const config = await getConfigAsync();
-      if (config.frame.settings) {
-        const frameComponent = (config.frame.settings as ReactFrameSettings).frameComponent;
+      const frameConfig = await getFrameConfigAsync();
+      if (frameConfig.settings) {
+        const frameComponent = (frameConfig.settings as ReactFrameSettings).frameComponent;
         const frameElement = React.createElement(frameComponent, {});
         setFrameComponent(frameElement);
       }

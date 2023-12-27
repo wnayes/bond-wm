@@ -3,7 +3,7 @@ import { LayoutPluginConfig } from "./layouts";
 /** Expect module contents for a "desktop" module. */
 export interface DesktopModule {
   /** Returns the source path to use for the desktop window. */
-  getDesktopWindowSrc(): string;
+  getDesktopWindowSrc(screenIndex: number): string;
 }
 
 /** Expect module contents for a "frame" module. */
@@ -21,17 +21,19 @@ export interface IConfig {
   initialTag: string;
   tags: string[];
   term: string;
-  desktop: {
-    module: DesktopModule;
-    settings?: unknown;
-  };
-  frame: {
-    module: FrameModule;
-    settings?: unknown;
-  };
   layouts: readonly LayoutPluginConfig[];
   screenOverrides?: ScreenOverridesDict;
   version?: string;
+}
+
+export interface IDesktopConfig {
+  module: DesktopModule;
+  settings?: unknown;
+}
+
+export interface IFrameConfig {
+  module: FrameModule;
+  settings?: unknown;
 }
 
 export const defaultConfig: IConfig = {
@@ -39,20 +41,6 @@ export const defaultConfig: IConfig = {
   initialTag: "1",
   tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
   term: "xterm",
-  desktop: {
-    module: {
-      getDesktopWindowSrc: () => {
-        throw new Error("No desktop module specified.");
-      },
-    },
-  },
-  frame: {
-    module: {
-      getFrameWindowSrc: () => {
-        throw new Error("No frame module specified.");
-      },
-    },
-  },
   layouts: [],
   screenOverrides: {},
 };
@@ -61,6 +49,8 @@ export const defaultConfig: IConfig = {
 //const dynamicImport = new Function("specifier", "return import(specifier)");
 
 let _config: IConfig | null = null;
+let _configDesktop: IDesktopConfig | null = null;
+let _configFrame: IFrameConfig | null = null;
 let _configPath: string | null = null;
 
 export function setConfigPath(configPath: string): void {
@@ -75,6 +65,26 @@ export async function getConfigAsync(): Promise<IConfig> {
     _config = (await import(_configPath)).default;
   }
   return _config!;
+}
+
+export async function getDesktopConfigAsync(): Promise<IDesktopConfig> {
+  if (!_configDesktop) {
+    if (!_configPath) {
+      throw new Error("Config path was not determined.");
+    }
+    _configDesktop = (await import(_configPath + "/desktop")).default;
+  }
+  return _configDesktop!;
+}
+
+export async function getFrameConfigAsync(): Promise<IFrameConfig> {
+  if (!_configFrame) {
+    if (!_configPath) {
+      throw new Error("Config path was not determined.");
+    }
+    _configFrame = (await import(_configPath + "/frame")).default;
+  }
+  return _configFrame!;
 }
 
 export function getConfigWithOverrides(screenIndex: number): IConfig {

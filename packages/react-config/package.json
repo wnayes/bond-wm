@@ -2,8 +2,11 @@
   "name": "@electron-wm/react-config",
   "version": "0.1.1",
   "description": "Default React user configuration",
-  "main": "./index.ts",
-  "exports": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./desktop": "./desktop.tsx",
+    "./frame": "./frame.tsx"
+  },
   "repository": "https://github.com/wnayes/electron-wm",
   "author": "Will Nayes",
   "license": "MIT",

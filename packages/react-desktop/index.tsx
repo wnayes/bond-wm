@@ -5,7 +5,7 @@ import { hookShortcuts } from "./shortcuts";
 import { configureRendererStore, setupIpc } from "@electron-wm/shared-renderer";
 import { setScreenIndex } from "@electron-wm/react";
 import { FunctionComponentElement, useEffect, useState } from "react";
-import { getConfigAsync, setConfigPath } from "@electron-wm/shared";
+import { getDesktopConfigAsync, setConfigPath } from "@electron-wm/shared";
 
 const screenIndex = getScreenIndex();
 console.log(screenIndex);
@@ -43,9 +43,9 @@ function DesktopComponentWrapper() {
 
   useEffect(() => {
     (async () => {
-      const config = await getConfigAsync();
-      if (config.desktop.settings) {
-        const desktopComponent = (config.desktop.settings as ReactDesktopSettings).desktopComponent;
+      const desktopConfig = await getDesktopConfigAsync();
+      if (desktopConfig.settings) {
+        const desktopComponent = (desktopConfig.settings as ReactDesktopSettings).desktopComponent;
         const desktopElement = React.createElement(desktopComponent, {});
         setDesktopComponent(desktopElement);
       }

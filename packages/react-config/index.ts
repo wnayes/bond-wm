@@ -1,7 +1,3 @@
-import * as ReactDesktop from "@electron-wm/react-desktop";
-import * as ReactFrame from "@electron-wm/react-frame";
-import Desktop from "./desktop/index";
-import Frame from "./frame/index";
 import { createFloatingLayout } from "@electron-wm/layout-floating";
 import LayoutTiling from "@electron-wm/layout-tiling";
 
@@ -17,22 +13,6 @@ export default {
 
   /** Default terminal. */
   term: "xterm",
-
-  /** Desktop configuration. */
-  desktop: {
-    module: ReactDesktop,
-    settings: {
-      desktopComponent: Desktop,
-    },
-  },
-
-  /** Window frame configuration. */
-  frame: {
-    module: ReactFrame,
-    settings: {
-      frameComponent: Frame,
-    },
-  },
 
   /** Layouts available to cycle through. */
   layouts: [createFloatingLayout({ floatRight: false }), LayoutTiling],

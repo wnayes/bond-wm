@@ -12,6 +12,8 @@ import {
   geometriesDiffer,
   getConfigAsync,
   getConfigWithOverrides,
+  getDesktopConfigAsync,
+  getFrameConfigAsync,
   getLayoutPluginName,
   selectVisibleWindowsFromCurrentTags,
 } from "@electron-wm/shared";
@@ -249,6 +251,8 @@ export async function createServer(): Promise<XServer> {
 
   await loadConfigFromDisk(store);
   const config = await getConfigAsync();
+  const desktopConfig = await getDesktopConfigAsync();
+  const frameConfig = await getFrameConfigAsync();
 
   let context: XWMContext;
 
@@ -314,7 +318,7 @@ export async function createServer(): Promise<XServer> {
       shortcuts = await createShortcutsModule(context);
       eventConsumers.push(shortcuts);
 
-      frameWindowSrc = config.frame?.module?.getFrameWindowSrc();
+      frameWindowSrc = frameConfig?.module?.getFrameWindowSrc();
       if (!frameWindowSrc) {
         throw new Error("Missing frame config. Frame windows cannot be created without frame config.");
       }
@@ -543,11 +547,7 @@ export async function createServer(): Promise<XServer> {
 
     log("Created browser window", handle);
 
-    let desktopWindowSrc;
-    const desktopConfig = getConfigWithOverrides(index)?.desktop;
-    if (desktopConfig) {
-      desktopWindowSrc = desktopConfig.module.getDesktopWindowSrc();
-    }
+    const desktopWindowSrc = desktopConfig?.module?.getDesktopWindowSrc(index);
     if (!desktopWindowSrc) {
       throw new Error("Missing desktop config. Desktop windows cannot be created without a desktop plugin.");
     }

@@ -1,11 +1,12 @@
 import React from "react";
+import * as ReactDesktop from "@electron-wm/react-desktop";
 import { Desktop, ErrorDisplay, WorkArea, ThemeContextProvider, useScreenIndex } from "@electron-wm/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/react-taskbar";
 import { Wallpaper } from "@electron-wm/react-wallpaper";
-import { MyTheme } from "../shared/theme";
+import { MyTheme } from "./theme";
 
-export default () => {
+const MyDesktop = () => {
   const screenIndex = useScreenIndex();
   return (
     <ThemeContextProvider theme={MyTheme}>
@@ -26,4 +27,12 @@ export default () => {
       </Desktop>
     </ThemeContextProvider>
   );
+};
+
+/** Desktop configuration. */
+export default {
+  module: ReactDesktop,
+  settings: {
+    desktopComponent: MyDesktop,
+  },
 };
