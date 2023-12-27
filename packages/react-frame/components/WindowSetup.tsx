@@ -25,6 +25,12 @@ export function setupWindowComponent(container: HTMLElement, store: Store): void
   } else {
     ipcRenderer.on("set-frame-wid", (event, newWid: number) => {
       wid = newWid;
+
+      // Update URL so that frame reload doesn't break the frame.
+      const url = new URL(window.location.href);
+      url.searchParams.set("wid", wid + "");
+      window.history.pushState({}, "", url);
+
       renderWindowFrame(container, newWid);
     });
   }
