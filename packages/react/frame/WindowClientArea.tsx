@@ -4,6 +4,8 @@ import { useStore } from "react-redux";
 import { setFrameExtentsAction } from "@electron-wm/shared";
 import { getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
 import { useWindow } from "../useWindow";
+import { useElementSize } from "../useElementSize";
+import { useCombinedRef } from "../useCombinedRef";
 
 /**
  * When this component renders, it reports its size as the client area for the window.
@@ -12,6 +14,11 @@ export function WindowClientArea() {
   const win = useWindow();
   const winBox = useRef<HTMLDivElement>(null);
   const store = useStore();
+
+  // Trigger frame extents update on element resize.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, resizeRef] = useElementSize();
+  const finalWinBoxRef = useCombinedRef(winBox, resizeRef);
 
   useLayoutEffect(() => {
     const box = winBox.current;
@@ -38,5 +45,5 @@ export function WindowClientArea() {
     }
   });
 
-  return <div className="winBox" ref={winBox}></div>;
+  return <div className="winBox" ref={finalWinBoxRef}></div>;
 }

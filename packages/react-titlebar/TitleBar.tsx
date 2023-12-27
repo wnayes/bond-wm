@@ -6,7 +6,11 @@ import { IWindow } from "@electron-wm/shared";
 import { Stylesheet, useSupportsMaximize, useTheme, useWindow } from "@electron-wm/react";
 import styles from "./TitleBar.css";
 
-interface ITitleBarProps extends React.PropsWithChildren<{}> {}
+const DefaultHeight = 20;
+
+interface ITitleBarProps extends React.PropsWithChildren<{}> {
+  height?: number;
+}
 
 interface TitleBarStyle extends React.CSSProperties {
   "--window-titlebar-text-color": string;
@@ -18,7 +22,7 @@ interface TitleBarStyle extends React.CSSProperties {
   "--window-titlebar-maximize-hover-bg-color": string;
 }
 
-export function TitleBar({ children }: ITitleBarProps) {
+export function TitleBar({ children, height }: ITitleBarProps) {
   const win = useWindow();
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -32,6 +36,8 @@ export function TitleBar({ children }: ITitleBarProps) {
   }
 
   const style: TitleBarStyle = {
+    height: height ?? DefaultHeight,
+
     "--window-titlebar-text-color": theme.window?.titlebar?.textColor ?? theme.window?.foreColor ?? "white",
     "--window-titlebar-close-bg-color":
       theme.window?.titlebar?.closeButtonColor ?? theme.window?.titlebar?.buttonColor ?? "transparent",
