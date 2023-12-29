@@ -4,6 +4,9 @@
 
 An X Window Manager built on web technologies, including Electron and React.
 
+See the [docs site](https://wnayes.github.io/electron-wm/)
+for details on how to install and configure the window manager.
+
 <br /><br /><br />
 
 ## Screenshot
@@ -32,9 +35,6 @@ Substitute your own config package with the default one above as desired.
 
 ## Usage
 
-The window manager is stable enough for basic daily usage. See the [docs site](https://wnayes.github.io/electron-wm/)
-for details on how to install and configure the window manager.
-
 ### Keyboard Shortcuts
 
 The following shortcuts are supported:
@@ -54,19 +54,6 @@ The following shortcuts are supported:
 | `Mod4 + Ctrl + R`                         | Reloads the window manager                                                                                                                  |
 
 Shortcuts are currently hard-coded in the wm.ts.
-
-### Transparency
-
-If you want to have rounded frame window edges with transparency, try using an X11 compositor. The [picom](https://github.com/wnayes/electron-wm) compositor has been found to work well.
-
-As typical with X11 compositors, they are often ran before the WM itself:
-
-```
-picom &
-exec /path/to/electron-wm-checkout/.bin/electron /path/to/electron-wm-checkout
-```
-
-Picom enables several effects by default (shadows, fading) which you may want to disable via picom.conf.
 
 ## License
 
