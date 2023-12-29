@@ -7,9 +7,9 @@ sidebar_position: 3
 After installation and configuration, you can run the window manager and try it
 out.
 
-As with other X11 window managers, you probably want to edit your `.xinitrc` file
-and add `electron-wm` to the end, making it the last executable invoked when
-starting your X server.
+As with other X11 window managers, you probably want to edit your `.xinitrc`
+file and add `electron-wm` to the end, making it the last executable invoked
+when starting your X server.
 
 If your configuration package is in a non-default location, specify it via the
 `--config` command line parameter.
@@ -29,8 +29,9 @@ pass `--config @electron-wm/react-config`.
 
 ## Transparency
 
-If you want to have rounded frame window edges with transparency, try using an X11 compositor.
-The [picom](https://github.com/yshui/picom) compositor has been found to work well.
+If you want to have rounded frame window edges with transparency, try using an
+X11 compositor. The [picom](https://github.com/yshui/picom) compositor has been
+found to work well.
 
 As typical with X11 compositors, they are often ran before the WM itself:
 
@@ -39,4 +40,5 @@ picom &
 exec electron-wm
 ```
 
-Picom enables several effects by default (shadows, fading) which you may want to disable via picom.conf.
+Picom enables several effects by default (shadows, fading) which you may want to
+disable via picom.conf.
