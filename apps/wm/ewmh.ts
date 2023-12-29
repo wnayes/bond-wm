@@ -1,8 +1,8 @@
-import { setWindowFullscreenAction } from "@electron-wm/shared";
+import { XWMWindowType, setWindowFullscreenAction } from "@electron-wm/shared";
 import { numsToBuffer } from "@electron-wm/shared";
 import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared";
 import { log, logError } from "./log";
-import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
+import { IXWMEventConsumer, XWMContext } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
 import { pid } from "process";
 import { DragModule } from "./drag";

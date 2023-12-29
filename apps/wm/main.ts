@@ -1,5 +1,5 @@
 import { app, dialog } from "electron";
-import { startX } from "./wm";
+import { startWindowManager } from "./wm";
 import "./args";
 import { log } from "./log";
 
@@ -34,5 +34,5 @@ app.on("window-all-closed", () => {
 });
 
 app.on("ready", async () => {
-  startX();
+  startWindowManager();
 });

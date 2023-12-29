@@ -1,5 +1,3 @@
-// This file is pretty messy, it is just a prototype for now!
-
 const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import * as path from "path";
@@ -8,7 +6,13 @@ import { app, ipcMain, BrowserWindow } from "electron";
 import {
   IBounds,
   IGeometry,
+  IWindowManagerServer,
+  KeyRegistrationMap,
   LayoutPluginConfig,
+  XWMEventConsumerArgs,
+  XWMEventConsumerArgsWithType,
+  XWMEventConsumerKeyPressArgs,
+  XWMWindowType,
   geometriesDiffer,
   getConfigAsync,
   getConfigWithOverrides,
@@ -23,7 +27,6 @@ import { log, logDir, logError } from "./log";
 import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
 import {
   X11_EVENT_TYPE,
-  X11_KEY_MODIFIER,
   IXEvent,
   IXConfigureEvent,
   IXScreen,
@@ -128,21 +131,6 @@ const CLIENT_WIN_EVENT_MASK =
   x11.eventMask.FocusChange |
   x11.eventMask.PointerMotion;
 
-export enum XWMWindowType {
-  Other = 0,
-  Client = 1,
-  Frame = 2,
-  Desktop = 3,
-}
-
-export interface XWMEventConsumerArgs {
-  wid: number;
-}
-
-export interface XWMEventConsumerArgsWithType extends XWMEventConsumerArgs {
-  windowType: XWMWindowType;
-}
-
 export interface XWMEventConsumerSetFrameExtentsArgs extends XWMEventConsumerArgs {
   frameExtents: IBounds;
 }
@@ -169,12 +157,6 @@ export interface XWMEventConsumerPointerMotionArgs extends XWMEventConsumerArgsW
   rooty: number;
 }
 
-export interface XWMEventConsumerKeyPressArgs extends XWMEventConsumerArgsWithType {
-  modifiers: X11_KEY_MODIFIER;
-  keycode: number;
-  originalKeyString?: string;
-}
-
 export interface IXWMEventConsumer {
   onScreenCreated?(args: XWMEventConsumerScreenCreatedArgs): void;
   onReduxAction?(args: XWMEventConsumerReduxActionArgs): void;
@@ -198,18 +180,11 @@ export interface XWMContext {
   getFrameIdFromWindowId(wid: number): number | undefined;
 }
 
-export function startX(): Promise<XServer> {
+export function startWindowManager(): Promise<IWindowManagerServer> {
   return createServer();
 }
 
-export class XServer {
-  // Could put a teardown method here.
-}
-
-export async function createServer(): Promise<XServer> {
-  const server = new XServer();
-  let client: IX11Client;
-
+export async function createServer(): Promise<IWindowManagerServer> {
   let XDisplay: IXDisplay;
   let X: IXClient;
 
@@ -266,142 +241,155 @@ export async function createServer(): Promise<XServer> {
     }
   };
 
-  const registeredKeys: { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void } = {
-    "Mod4 + o": () => sendActiveWindowToNextScreen(),
-
-    "Mod4 + Return": () => launchProcess(config.term),
-    "Mod4 + space": () => switchToNextLayoutWM(),
-
-    "Mod4 + Shift + C": () => closeFocusedWindow(),
-    "Mod4 + Shift + M": () => startDragFocusedWindow(),
-    "Mod4 + Shift + Q": () => app.quit(),
-
-    "Mod4 + Shift + F12": () => showDevtoolsForFocusedWindowFrame(),
-
-    "Mod4 + Ctrl + r": () => {
+  const wmServer: IWindowManagerServer = {
+    restart: () => {
       app.relaunch();
       app.exit(0);
     },
+
+    quit: () => {
+      app.quit();
+    },
+
+    closeFocusedWindow,
+    launchProcess,
+
+    registerShortcuts: (registrationMap: KeyRegistrationMap) => {
+      const screens = store.getState().screens;
+      const registeredRootWids = new Set<number>();
+      for (const screen of screens) {
+        const { root } = screen;
+        if (!registeredRootWids.has(root)) {
+          registeredRootWids.add(root);
+          shortcuts.registerShortcuts(root, registrationMap);
+        }
+      }
+    },
+
+    sendActiveWindowToNextScreen,
+    sendActiveWindowToTag,
+    setTagIndexForActiveDesktop,
+    showDevtoolsForFocusedWindowFrame,
+    startDragFocusedWindow,
+    switchToNextLayout: switchToNextLayoutWM,
   };
-  for (let i = 1; i <= 9; i++) {
-    registeredKeys[`Mod4 + ${i}`] = async (args) => setTagIndexForActiveDesktop(i - 1, args.wid);
-    registeredKeys[`Mod4 + Shift + ${i}`] = () => sendActiveWindowToTag(i - 1);
-  }
 
   // Initialization.
-  (() => {
-    client = x11.createClient(async (err: unknown, display: IXDisplay) => {
-      if (err || !display) {
-        logError(err ?? "No display available.");
-        process.exit(1);
-      }
+  const client: IX11Client = x11.createClient(async (err: unknown, display: IXDisplay) => {
+    if (err || !display) {
+      logError(err ?? "No display available.");
+      process.exit(1);
+    }
 
-      XDisplay = display;
-      X = display.client;
+    XDisplay = display;
+    X = display.client;
 
-      context = {
-        X,
-        XDisplay,
-        store,
-        getWindowIdFromFrameId,
-        getFrameIdFromWindowId,
-      };
+    context = {
+      X,
+      XDisplay,
+      store,
+      getWindowIdFromFrameId,
+      getFrameIdFromWindowId,
+    };
 
-      dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
-      eventConsumers.push(dragModule);
-      eventConsumers.push(await createICCCMEventConsumer(context));
-      ewmhModule = await createEWMHEventConsumer(context, dragModule);
-      eventConsumers.push(ewmhModule);
-      eventConsumers.push(await createTrayEventConsumer(context));
+    dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
+    eventConsumers.push(dragModule);
+    eventConsumers.push(await createICCCMEventConsumer(context));
+    ewmhModule = await createEWMHEventConsumer(context, dragModule);
+    eventConsumers.push(ewmhModule);
+    eventConsumers.push(await createTrayEventConsumer(context));
 
-      motif = await createMotifModule(context);
-      shortcuts = await createShortcutsModule(context);
-      eventConsumers.push(shortcuts);
+    motif = await createMotifModule(context);
+    shortcuts = await createShortcutsModule(context);
+    eventConsumers.push(shortcuts);
 
-      frameWindowSrc = frameConfig?.module?.getFrameWindowSrc();
-      if (!frameWindowSrc) {
-        throw new Error("Missing frame config. Frame windows cannot be created without frame config.");
-      }
+    frameWindowSrc = frameConfig?.module?.getFrameWindowSrc();
+    if (!frameWindowSrc) {
+      throw new Error("Missing frame config. Frame windows cannot be created without frame config.");
+    }
 
-      await __setupAtoms();
-      await __initDesktop();
+    await __setupAtoms();
+    await __initDesktop();
 
-      for (let s = 0; s < desktopBrowsers.length; s++) {
-        const layoutPlugins = getConfigWithOverrides(s).layouts;
-        layoutsByScreen.set(s, layoutPlugins ?? []);
-      }
-    });
+    for (let s = 0; s < desktopBrowsers.length; s++) {
+      const layoutPlugins = getConfigWithOverrides(s).layouts;
+      layoutsByScreen.set(s, layoutPlugins ?? []);
+    }
 
-    client.on("error", logError);
-    client.on("event", __onXEvent);
+    if (typeof config.onWindowManagerReady === "function") {
+      await config.onWindowManagerReady({ wm: wmServer });
+    }
+  });
 
-    ipcMain.on("raise-window", (event, wid) => {
-      raiseWindow(wid);
-    });
+  client.on("error", logError);
+  client.on("event", __onXEvent);
 
-    ipcMain.on("minimize-window", (event, wid) => {
-      minimize(wid);
-    });
+  ipcMain.on("raise-window", (event, wid) => {
+    raiseWindow(wid);
+  });
 
-    ipcMain.on("maximize-window", (event, wid) => {
-      maximize(wid);
-    });
+  ipcMain.on("minimize-window", (event, wid) => {
+    minimize(wid);
+  });
 
-    ipcMain.on("restore-window", (event, wid) => {
-      restore(wid);
-    });
+  ipcMain.on("maximize-window", (event, wid) => {
+    maximize(wid);
+  });
 
-    ipcMain.on("close-window", (event, wid) => {
-      closeWindow(wid);
-    });
+  ipcMain.on("restore-window", (event, wid) => {
+    restore(wid);
+  });
 
-    ipcMain.on("focus-desktop-browser", (event, args: { screenIndex: number; takeVisualFocus?: boolean }) => {
-      setFocusToDesktopWindow(args.screenIndex, args.takeVisualFocus);
-    });
+  ipcMain.on("close-window", (event, wid) => {
+    closeWindow(wid);
+  });
 
-    ipcMain.on("frame-window-mouse-enter", (event, wid) => {
-      // Alternative in case we don't receive PointerMotion over a window.
-      if (ignoreEnterLeave) {
-        widLog(wid, "frame-window-mouse-enter", "clearing enterleave ignore");
-        ignoreEnterLeave = false;
-      }
-    });
+  ipcMain.on("focus-desktop-browser", (event, args: { screenIndex: number; takeVisualFocus?: boolean }) => {
+    setFocusToDesktopWindow(args.screenIndex, args.takeVisualFocus);
+  });
 
-    ipcMain.on("desktop-zoom-in", (event, args: { screenIndex: number }) => {
-      desktopZoomIn(args.screenIndex);
-    });
+  ipcMain.on("frame-window-mouse-enter", (event, wid) => {
+    // Alternative in case we don't receive PointerMotion over a window.
+    if (ignoreEnterLeave) {
+      widLog(wid, "frame-window-mouse-enter", "clearing enterleave ignore");
+      ignoreEnterLeave = false;
+    }
+  });
 
-    ipcMain.on("desktop-zoom-out", (event, args: { screenIndex: number }) => {
-      desktopZoomOut(args.screenIndex);
-    });
+  ipcMain.on("desktop-zoom-in", (event, args: { screenIndex: number }) => {
+    desktopZoomIn(args.screenIndex);
+  });
 
-    ipcMain.on("desktop-zoom-reset", (event, args: { screenIndex: number }) => {
-      desktopZoomReset(args.screenIndex);
-    });
+  ipcMain.on("desktop-zoom-out", (event, args: { screenIndex: number }) => {
+    desktopZoomOut(args.screenIndex);
+  });
 
-    ipcMain.on("exec", (event, args) => {
-      launchProcess(args.executable);
-    });
+  ipcMain.on("desktop-zoom-reset", (event, args: { screenIndex: number }) => {
+    desktopZoomReset(args.screenIndex);
+  });
 
-    ipcMain.on("show-context-menu", (event, args: { menuKind: ContextMenuKind }) => {
-      showContextMenu(event, args.menuKind, store.getState().config.version);
-    });
+  ipcMain.on("exec", (event, args) => {
+    launchProcess(args.executable);
+  });
 
-    ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
-      desktopBrowsers[args.screenIndex]?.webContents?.openDevTools();
-    });
+  ipcMain.on("show-context-menu", (event, args: { menuKind: ContextMenuKind }) => {
+    showContextMenu(event, args.menuKind, store.getState().config.version);
+  });
 
-    ipcMain.on("register-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
-      const screen = store.getState().screens[args.screenIndex];
-      shortcuts.registerShortcut(screen.root, args.keyString, sendKeyToBrowser);
-    });
+  ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
+    desktopBrowsers[args.screenIndex]?.webContents?.openDevTools();
+  });
 
-    // ipcMain.on("unregister-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
-    //   // Not implemented yet.
-    // });
+  ipcMain.on("register-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
+    const screen = store.getState().screens[args.screenIndex];
+    shortcuts.registerShortcut(screen.root, args.keyString, sendKeyToBrowser);
+  });
 
-    setupAutocompleteListener();
-  })();
+  // ipcMain.on("unregister-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
+  //   // Not implemented yet.
+  // });
+
+  setupAutocompleteListener();
 
   async function __setupAtoms(): Promise<void> {
     // TODO: Typings are a little awkward here.
@@ -481,8 +469,6 @@ export async function createServer(): Promise<XServer> {
     X.QueryTree(root, (err, tree) => {
       tree.children.forEach((childWid) => manageWindow(childWid, { screenIndex: 0, checkUnmappedState: true }));
     });
-
-    shortcuts.setupKeyShortcuts(root, registeredKeys);
 
     X.SetInputFocus(PointerRoot, XFocusRevertTo.PointerRoot);
 
@@ -1240,10 +1226,10 @@ export async function createServer(): Promise<XServer> {
     }
   }
 
-  function launchProcess(name: string) {
-    log("launchProcess", name);
+  function launchProcess(command: string): void {
+    log("launchProcess", command);
 
-    const child = spawn(name, [], {
+    const child = spawn(command, [], {
       detached: true,
       stdio: "ignore",
     });
@@ -2036,7 +2022,7 @@ export async function createServer(): Promise<XServer> {
     return store;
   }
 
-  return server;
+  return wmServer;
 }
 
 function getNativeWindowHandleInt(win: BrowserWindow): number {

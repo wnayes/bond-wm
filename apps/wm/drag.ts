@@ -5,6 +5,7 @@ import {
   LayoutPluginConfig,
   setWindowIntoScreenAction,
   startDragAction,
+  XWMWindowType,
 } from "@electron-wm/shared";
 import { IScreen } from "@electron-wm/shared";
 import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
@@ -19,7 +20,7 @@ import {
 } from "@electron-wm/shared";
 import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "@electron-wm/shared";
 import { log, logError } from "./log";
-import { IXWMEventConsumer, XWMContext, XWMWindowType } from "./wm";
+import { IXWMEventConsumer, XWMContext } from "./wm";
 
 export interface DragModule extends IXWMEventConsumer {
   startMove(wid: number, coords: Coords): void;

@@ -23,6 +23,7 @@
     "@electron-wm/react-taskbar": "workspace:^",
     "@electron-wm/react-titlebar": "workspace:^",
     "@electron-wm/react-wallpaper": "workspace:^",
+    "@electron-wm/shared": "workspace:^",
     "react-error-boundary": "^3.1.4",
     "tslib": "^2.4.1"
   },

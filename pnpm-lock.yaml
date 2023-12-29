@@ -276,6 +276,9 @@ importers:
       '@electron-wm/react-wallpaper':
         specifier: workspace:^
         version: link:../react-wallpaper
+      '@electron-wm/shared':
+        specifier: workspace:^
+        version: link:../shared
       react:
         specifier: ^18.2.0
         version: 18.2.0

@@ -1,9 +1,7 @@
-import { IXDisplay, X11_KEY_MODIFIER } from "@electron-wm/shared";
+import { IXDisplay, KeyRegistrationMap, X11_KEY_MODIFIER, XWMEventConsumerKeyPressArgs } from "@electron-wm/shared";
 import { log, logError } from "./log";
-import { IXWMEventConsumer, XWMContext, XWMEventConsumerKeyPressArgs } from "./wm";
+import { IXWMEventConsumer, XWMContext } from "./wm";
 import * as nodeKeySym from "@electron-wm/keysym";
-
-export type KeyRegistrationMap = { [keyString: string]: (args: XWMEventConsumerKeyPressArgs) => void };
 
 interface KeyRegistrationInfo {
   originalKeyString: string;
@@ -11,7 +9,7 @@ interface KeyRegistrationInfo {
 }
 
 export interface ShortcutsModule extends IXWMEventConsumer {
-  setupKeyShortcuts(rootWid: number, registeredKeys: KeyRegistrationMap): void;
+  registerShortcuts(rootWid: number, registeredKeys: KeyRegistrationMap): void;
   registerShortcut(rootWid: number, keyString: string, callback: (args: XWMEventConsumerKeyPressArgs) => void): void;
 }
 
@@ -108,7 +106,7 @@ export async function createShortcutsModule({ X, XDisplay }: XWMContext): Promis
   }
 
   return {
-    setupKeyShortcuts(rootWid: number, registeredKeys: KeyRegistrationMap): void {
+    registerShortcuts(rootWid: number, registeredKeys: KeyRegistrationMap): void {
       for (const keyString in registeredKeys) {
         registerShortcut(rootWid, keyString, registeredKeys[keyString]);
       }

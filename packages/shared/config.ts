@@ -1,4 +1,5 @@
 import { LayoutPluginConfig } from "./layouts";
+import { IWindowManagerServer } from "./server";
 
 /** Expect module contents for a "desktop" module. */
 export interface DesktopModule {
@@ -16,14 +17,18 @@ type ScreenOverridesDict = { [screenIndex: number]: Partial<IConfig> };
 
 type ObjectConfigPropertyType = ScreenOverridesDict;
 
+interface WindowManagerReadyArgs {
+  wm: IWindowManagerServer;
+}
+
+/** Window manager configuration. */
 export interface IConfig {
   initialLayout: string;
   initialTag: string;
   tags: string[];
-  term: string;
   layouts: readonly LayoutPluginConfig[];
+  onWindowManagerReady?: (args: WindowManagerReadyArgs) => Promise<void> | void;
   screenOverrides?: ScreenOverridesDict;
-  version?: string;
 }
 
 export interface IDesktopConfig {
@@ -40,7 +45,6 @@ export const defaultConfig: IConfig = {
   initialLayout: "Floating",
   initialTag: "1",
   tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-  term: "xterm",
   layouts: [],
   screenOverrides: {},
 };
