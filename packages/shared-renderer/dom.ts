@@ -4,10 +4,6 @@
 export function getBoundingClientRectWithZoom(el: HTMLElement): DOMRect {
   const rect = el.getBoundingClientRect();
   const zoomRatio = window.devicePixelRatio;
-  if (zoomRatio === 1) {
-    return rect;
-  }
-
   return {
     top: Math.round(rect.top * zoomRatio),
     bottom: Math.round(rect.bottom * zoomRatio),
