@@ -1,6 +1,7 @@
 {
-  "label": "Setup",
+  "label": "Getting Started",
   "position": 2,
+  "collapsed": false,
   "link": {
     "type": "generated-index",
     "description": "Steps to get started with electron-wm."

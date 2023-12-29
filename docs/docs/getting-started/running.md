@@ -7,7 +7,7 @@ sidebar_position: 3
 After installation and configuration, you can run the window manager and try it
 out.
 
-As with other X11 window managers, you probably want to edit your `.xinitrc`
+As with other X11 window managers, it is common to edit your `.xinitrc`
 file and add `electron-wm` to the end, making it the last executable invoked
 when starting your X server.
 
@@ -19,7 +19,7 @@ electron-wm --config ~/my-desktop-config
 ```
 
 If you omit `--config` it is assumed that your configuration resides in the
-default `electron-wm-config` folder that the init script creates.
+`electron-wm-config` folder that the init script creates by default.
 
 Note that `--config` doesn't have to refer to a local folder. This can be any
 "package identifier" that Node.js can `require` at runtime, provided you have

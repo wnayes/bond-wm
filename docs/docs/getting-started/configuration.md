@@ -22,13 +22,21 @@ What does this script do?
   - The default is `$XDG_CONFIG_HOME/electron-wm-config/`, which is typically `~/.config/electron-wm-config/`
 - It prompts you for a template to base your configuration from.
   - The only template available currently is `react`.
-- It performs a `git clone` of your chosen template into the folder you chose.
+- It performs a `git clone` of the template into the folder chosen earlier.
   - For the `react` template, you get a local clone of
     `https://github.com/wnayes/electron-wm/tree/react-config-release`
 
 At this point, you have a local git repository that configures electron-wm.
 You'll want to [get the window manager running](./running), but you're
 otherwise free to start making tweaks inside the configuration.
+
+Be sure to perform an `npm install` within the configuration folder to
+set up dependencies, and repeat any time after you make package.json changes.
+
+```
+cd ~/.config/electron-wm-config
+npm install
+```
 
 ## Optional Git Branch Setup
 
