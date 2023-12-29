@@ -209,7 +209,11 @@ export async function createServer(): Promise<IWindowManagerServer> {
   const frameBrowserWindows: { [wid: number]: BrowserWindow | undefined } = {};
   const frameBrowserWinIdToFrameId: { [wid: number]: number | undefined } = {};
   const frameBrowserFrameIdToWinId: { [fid: number]: number | undefined } = {};
-  let frameBrowserOnDeck: { win: BrowserWindow; fid: number } | null = null;
+  let frameBrowserOnDeck: {
+    win: BrowserWindow;
+    fid: number;
+    winLoadPromise: Promise<void>;
+  } | null = null;
 
   const initializingWins: { [win: number]: boolean } = {};
 
@@ -577,14 +581,14 @@ export async function createServer(): Promise<IWindowManagerServer> {
       ...FrameBrowserBaseProperties,
       show: false,
     });
-    win.loadURL(frameWindowSrc);
+    const winLoadPromise = win.loadURL(frameWindowSrc);
 
     const fid = getNativeWindowHandleInt(win);
     if (!fid) {
       logError("Frame window handle was null");
     }
 
-    frameBrowserOnDeck = { win, fid };
+    frameBrowserOnDeck = { win, fid, winLoadPromise };
   }
 
   function createFrameBrowser(wid: number, screen: IScreen, geometry: IGeometry) {
@@ -596,11 +600,12 @@ export async function createServer(): Promise<IWindowManagerServer> {
       frameBrowserOnDeck = null;
       win = onDeckInfo.win;
       fid = onDeckInfo.fid;
-
       win.setSize(geometry.width, geometry.height, false);
       win.setPosition(geometry.x, geometry.y, false);
-      win.webContents.send("set-frame-wid", wid);
-      win.webContents.setZoomLevel(screen.zoom);
+      onDeckInfo.winLoadPromise.then(() => {
+        win.webContents.send("set-frame-wid", wid);
+        win.webContents.setZoomLevel(screen.zoom);
+      });
       win.show();
     } else {
       win = new BrowserWindow({
