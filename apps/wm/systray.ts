@@ -1,4 +1,9 @@
-import { addTrayWindowAction, configureTrayWindowAction, removeTrayWindowAction } from "@electron-wm/shared";
+import {
+  ConfigureTrayPayload,
+  addTrayWindowAction,
+  configureTrayWindowAction,
+  removeTrayWindowAction,
+} from "@electron-wm/shared";
 import { IGeometry } from "@electron-wm/shared";
 import { numsToBuffer } from "@electron-wm/shared";
 import { IX11Mod, X11_EVENT_TYPE, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared";
@@ -199,13 +204,15 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
         case configureTrayWindowAction.type:
           {
             const state = args.getState();
-            const payload = args.action.payload as Partial<IGeometry> & { wid: number };
+            const payload = args.action.payload as ConfigureTrayPayload;
             const wid = payload.wid;
             const win = state.tray.windows[wid];
             if (!win) {
               break;
             }
-            const screen = state.screens[0];
+
+            // Should always be sent now; fallback until next major version.
+            const screen = state.screens[payload.screenIndex ?? 0];
 
             const trayConfig: Partial<IGeometry> = {};
             if (typeof payload.x === "number") {

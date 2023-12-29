@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
 import { configureTrayWindowAction, ITrayEntry, geometriesDiffer } from "@electron-wm/shared";
-import { useBrowserWindowSize } from "@electron-wm/react";
+import { useBrowserWindowSize, useScreenIndex } from "@electron-wm/react";
 
 export function SystemTray() {
   useBrowserWindowSize(); // Triggers re-renders on resize.
@@ -28,6 +28,7 @@ function SystemTrayIcon(props: ISystemTrayIconProps) {
   const { win } = props;
   const iconBox = useRef<HTMLDivElement>(null);
   const store = useStore();
+  const screenIndex = useScreenIndex();
 
   useLayoutEffect(() => {
     const box = iconBox.current;
@@ -47,6 +48,7 @@ function SystemTrayIcon(props: ISystemTrayIconProps) {
       store.dispatch(
         configureTrayWindowAction({
           wid: win.id,
+          screenIndex,
           ...finalRect,
         })
       );

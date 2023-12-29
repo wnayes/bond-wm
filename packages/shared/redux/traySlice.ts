@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IGeometry } from "../types";
 
+export type ConfigureTrayPayload = { wid: number; screenIndex: number } & Partial<IGeometry>;
+
 export interface ITrayEntry {
   id: number;
   location: IGeometry;
@@ -36,7 +38,7 @@ export const traySlice = createSlice({
       delete state.windows[payload];
     },
 
-    configureTrayWindowAction: (state, action: PayloadAction<{ wid: number } & Partial<IGeometry>>) => {
+    configureTrayWindowAction: (state, action: PayloadAction<ConfigureTrayPayload>) => {
       const { payload } = action;
       if (state.windows[payload.wid]) {
         if (typeof payload.x === "number") {
