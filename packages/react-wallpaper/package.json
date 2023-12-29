@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/react-wallpaper",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Default wallpaper for electron-wm",
   "main": "./index.tsx",
   "exports": "./index.tsx",
