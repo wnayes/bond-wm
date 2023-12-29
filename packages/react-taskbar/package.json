@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/react-taskbar",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React desktop taskbar for electron-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
