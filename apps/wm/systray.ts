@@ -230,6 +230,10 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
 
             log(`Configuring tray window ${wid}`, trayConfig);
             X.ConfigureWindow(wid, trayConfig);
+
+            // Sometimes tray windows that existed prior to the window manager
+            // starting up will be behind the desktop. Raise them just in case.
+            X.RaiseWindow(wid);
           }
           break;
       }
