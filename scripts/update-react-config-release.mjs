@@ -1,6 +1,15 @@
 #!/usr/bin/env node
 "use strict";
 
+// A release script that prepares the react-config-release git branch.
+// 1. Run this script.
+// 2. `cd .branches/react-config-release`
+// 3. `git status` and confirm staged changes are appropriate.
+// 4. Commit the changes.
+// 5. `git push` will push into the top level electron-wm .git repo.
+// 6. `cd ../..`
+// 7. `git push origin react-config-release`
+
 import * as ChildProcess from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
