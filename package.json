@@ -1,6 +1,6 @@
 {
   "name": "@electron-wm/react-config",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Default React user configuration",
   "exports": {
     ".": "./index.ts",
@@ -15,14 +15,14 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
-    "@electron-wm/layout-floating": "^0.1.1",
-    "@electron-wm/layout-tiling": "^0.1.1",
+    "@electron-wm/layout-floating": "^0.2.0",
+    "@electron-wm/layout-tiling": "^0.2.0",
     "@electron-wm/react": "^0.2.0",
     "@electron-wm/react-desktop": "^0.2.0",
     "@electron-wm/react-frame": "^0.2.0",
     "@electron-wm/react-taskbar": "^0.2.0",
     "@electron-wm/react-titlebar": "^0.2.0",
-    "@electron-wm/react-wallpaper": "^0.1.1",
+    "@electron-wm/react-wallpaper": "^0.2.0",
     "@electron-wm/shared": "^0.2.0",
     "react-error-boundary": "^3.1.4",
     "tslib": "^2.4.1"
