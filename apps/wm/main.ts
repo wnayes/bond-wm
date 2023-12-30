@@ -1,7 +1,8 @@
 import { app, dialog } from "electron";
 import { startWindowManager } from "./wm";
-import "./args";
+import { loggingEnabled } from "./args";
 import { log } from "./log";
+import { electronIpcLog } from "./electronLog";
 
 // Disable error dialogs by override
 dialog.showErrorBox = function (title, content) {
@@ -22,6 +23,10 @@ try {
 
 log("electron-wm main");
 log("user data path: ", app.getPath("userData"));
+
+if (loggingEnabled()) {
+  electronIpcLog(log);
+}
 
 // Possibly could help with transparency?
 // app.commandLine.appendSwitch("enable-transparent-visuals");

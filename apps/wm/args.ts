@@ -34,3 +34,8 @@ console.log(argv);
 export function getArgs(): typeof argv {
   return argv;
 }
+
+/** True if any form of logging is enabled. */
+export function loggingEnabled(): boolean {
+  return argv.consoleLogging || !!argv.fileLogging;
+}
