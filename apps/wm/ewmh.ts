@@ -1,4 +1,4 @@
-import { XWMWindowType, setWindowFullscreenAction } from "@electron-wm/shared";
+import { XWMWindowType, setWindowFullscreenAction, setWindowUrgentAction } from "@electron-wm/shared";
 import { numsToBuffer } from "@electron-wm/shared";
 import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared";
 import { log, logError } from "./log";
@@ -81,6 +81,7 @@ export async function createEWMHEventConsumer(
 
     _NET_WM_STATE: await internAtomAsync(X, "_NET_WM_STATE"),
     _NET_WM_STATE_FULLSCREEN: await internAtomAsync(X, "_NET_WM_STATE_FULLSCREEN"),
+    _NET_WM_STATE_DEMANDS_ATTENTION: await internAtomAsync(X, "_NET_WM_STATE_DEMANDS_ATTENTION"),
 
     _NET_FRAME_EXTENTS: await internAtomAsync(X, "_NET_FRAME_EXTENTS"),
     _NET_WM_PID: await internAtomAsync(X, "_NET_WM_PID"),
@@ -99,6 +100,9 @@ export async function createEWMHEventConsumer(
     if (win.fullscreen) {
       hintAtoms.push(atoms._NET_WM_STATE_FULLSCREEN);
     }
+    if (win.urgent) {
+      hintAtoms.push(atoms._NET_WM_STATE_DEMANDS_ATTENTION);
+    }
 
     X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_STATE, X.atoms.ATOM, 32, numsToBuffer(hintAtoms));
   }
@@ -112,11 +116,23 @@ export async function createEWMHEventConsumer(
   }
 
   function processWindowStateChange(wid: number, action: NetWmStateAction, atom: Atom): void {
+    let handled = true;
     switch (atom) {
       case atoms._NET_WM_STATE_FULLSCREEN:
         processWindowFullscreenChange(wid, action);
-        updateWindowStateHints(wid);
         break;
+
+      case atoms._NET_WM_STATE_DEMANDS_ATTENTION:
+        processWindowUrgentChange(wid, action);
+        break;
+
+      default:
+        handled = false;
+        break;
+    }
+
+    if (handled) {
+      updateWindowStateHints(wid);
     }
   }
 
@@ -141,6 +157,31 @@ export async function createEWMHEventConsumer(
 
       case NetWmStateAction._NET_WM_STATE_TOGGLE:
         store.dispatch(setWindowFullscreenAction({ wid, fullscreen: !win.fullscreen }));
+        break;
+    }
+  }
+
+  function processWindowUrgentChange(wid: number, action: NetWmStateAction): void {
+    const win = store.getState().windows[wid];
+    if (!win) {
+      return;
+    }
+
+    switch (action) {
+      case NetWmStateAction._NET_WM_STATE_ADD:
+        if (!win.urgent) {
+          store.dispatch(setWindowUrgentAction({ wid, urgent: true }));
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_REMOVE:
+        if (win.urgent) {
+          store.dispatch(setWindowUrgentAction({ wid, urgent: false }));
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_TOGGLE:
+        store.dispatch(setWindowUrgentAction({ wid, urgent: !win.urgent }));
         break;
     }
   }
