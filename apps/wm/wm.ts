@@ -84,7 +84,7 @@ import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "@electron-wm/shared";
 import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
-import { getArgs } from "./args";
+import { loggingEnabled } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
 import { loadConfigFromDisk } from "./config";
@@ -1837,8 +1837,26 @@ export async function createServer(): Promise<IWindowManagerServer> {
         // Call the next dispatch method in the middleware chain.
         const returnValue = next(action);
 
-        log("state after dispatch:");
-        logDir(getState(), { depth: 3 });
+        const stateAfterDispatch = getState();
+
+        let affectedSlice: string | undefined;
+        if (typeof action?.type === "string") {
+          const actionTypeParts = action.type.split("/");
+          if (actionTypeParts.length > 1) {
+            affectedSlice = actionTypeParts[0];
+            if (!(affectedSlice! in stateAfterDispatch)) {
+              affectedSlice = undefined; // Not a slice?
+            }
+          }
+        }
+
+        if (affectedSlice) {
+          log(affectedSlice, " state slice after dispatch:");
+          logDir(stateAfterDispatch[affectedSlice], { depth: 2 });
+        } else {
+          log("state after dispatch:");
+          logDir(stateAfterDispatch, { depth: 3 });
+        }
 
         // This will likely be the action itself, unless
         // a middleware further in chain changed it.
@@ -2018,8 +2036,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
     };
 
     const middleware = [x11Middleware];
-    const { consoleLogging, fileLogging } = getArgs();
-    if (consoleLogging || fileLogging) {
+    if (loggingEnabled()) {
       middleware.unshift(loggerMiddleware);
     }
 
