@@ -9,7 +9,7 @@ Import and add a tiling layout in your config module:
 ```ts
 import LayoutTiling from "@electron-wm/layout-tiling";
 
-export default {
+const config: IConfig = {
   // ...
 
   /** Layouts available to cycle through. */

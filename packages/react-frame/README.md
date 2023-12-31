@@ -4,22 +4,16 @@ A React-based window frame implementation for electron-wm.
 
 ## Usage
 
-In your electron-wm config module, pass this module as the frame implementation to use:
+In your electron-wm frame config module, pass this module as the frame implementation to use:
 
 ```ts
 import * as ReactFrame from "@electron-wm/react-frame";
 
+/** Window frame configuration. */
 export default {
-  // ...
-
-  /** Window frame configuration. */
-  frame: {
-    module: ReactFrame,
-    settings: {
-      // This `Frame` React component is defined elsewhere in your config module,
-      // not in this react-frame package.
-      frameComponent: Frame,
-    },
+  module: ReactFrame,
+  settings: {
+    frameComponent: MyFrame,
   },
 };
 ```

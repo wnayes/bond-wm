@@ -16,18 +16,16 @@ import {
   TitleBarText,
 } from "@electron-wm/react-titlebar";
 
-export default () => {
-  return (
-    <WindowFrame>
-      <TitleBar>
-        <TitleBarIcon />
-        <TitleBarText />
-        <TitleBarMinimizeButton />
-        <TitleBarMaximizeButton />
-        <TitleBarCloseButton />
-      </TitleBar>
-      <WindowClientArea />
-    </WindowFrame>
-  );
-};
+return (
+  <WindowFrame>
+    <TitleBar>
+      <TitleBarIcon />
+      <TitleBarText />
+      <TitleBarMinimizeButton />
+      <TitleBarMaximizeButton />
+      <TitleBarCloseButton />
+    </TitleBar>
+    <WindowClientArea />
+  </WindowFrame>
+);
 ```

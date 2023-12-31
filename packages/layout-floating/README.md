@@ -9,7 +9,7 @@ Import and add floating layouts in your config module:
 ```ts
 import { createFloatingLayout } from "@electron-wm/layout-floating";
 
-export default {
+const config: IConfig = {
   // ...
 
   /** Layouts available to cycle through. */
