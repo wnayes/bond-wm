@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import configReducer from "./configSlice";
+import desktopReducer from "./desktopSlice";
 import windowReducer from "./windowSlice";
 import screenReducer from "./screenSlice";
 import trayReducer from "./traySlice";
@@ -9,6 +10,7 @@ function configureBasicStore() {
   return configureStore({
     reducer: {
       config: configReducer,
+      desktop: desktopReducer,
       windows: windowReducer,
       screens: screenReducer,
       tray: trayReducer,

@@ -1,0 +1,1 @@
+export { DesktopEntries } from "./DesktopEntries";

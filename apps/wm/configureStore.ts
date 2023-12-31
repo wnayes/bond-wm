@@ -1,7 +1,14 @@
 import { applyMiddleware, Middleware } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { composeWithStateSync } from "electron-redux/main";
-import { configReducer, pluginStateReducer, screenReducer, trayReducer, windowReducer } from "@electron-wm/shared";
+import {
+  configReducer,
+  desktopReducer,
+  pluginStateReducer,
+  screenReducer,
+  trayReducer,
+  windowReducer,
+} from "@electron-wm/shared";
 
 export type ServerStore = ReturnType<typeof configureWMStore>;
 export type ServerRootState = ReturnType<ServerStore["getState"]>;
@@ -13,6 +20,7 @@ export function configureWMStore(middleware: Middleware[]) {
   const store = configureStore({
     reducer: {
       config: configReducer,
+      desktop: desktopReducer,
       pluginState: pluginStateReducer,
       screens: screenReducer,
       tray: trayReducer,

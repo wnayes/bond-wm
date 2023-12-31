@@ -1,11 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/renderer";
-import { configReducer, pluginStateReducer, screenReducer, trayReducer, windowReducer } from "@electron-wm/shared";
+import {
+  configReducer,
+  desktopReducer,
+  pluginStateReducer,
+  screenReducer,
+  trayReducer,
+  windowReducer,
+} from "@electron-wm/shared";
 
 export function configureRendererStore() {
   return configureStore({
     reducer: {
       config: configReducer,
+      desktop: desktopReducer,
       pluginState: pluginStateReducer,
       screens: screenReducer,
       tray: trayReducer,

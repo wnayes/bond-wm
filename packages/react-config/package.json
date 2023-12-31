@@ -19,6 +19,7 @@
     "@electron-wm/layout-tiling": "workspace:^",
     "@electron-wm/react": "workspace:^",
     "@electron-wm/react-desktop": "workspace:^",
+    "@electron-wm/react-desktop-entries": "workspace:^",
     "@electron-wm/react-frame": "workspace:^",
     "@electron-wm/react-taskbar": "workspace:^",
     "@electron-wm/react-titlebar": "workspace:^",

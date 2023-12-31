@@ -89,6 +89,7 @@ import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
 import { loadConfigFromDisk } from "./config";
 import { createTrayEventConsumer } from "./systray";
+import { createDesktopEntriesModule } from "./desktopEntries";
 
 // Path constants
 const PRELOAD_JS = path.resolve(path.join(__dirname, "dist", "preload.js"));
@@ -175,6 +176,7 @@ export interface XWMContext {
   X: IXClient;
   XDisplay: IXDisplay;
   store: ServerStore;
+  wmServer: IWindowManagerServer;
 
   getWindowIdFromFrameId(wid: number): number | undefined;
   getFrameIdFromWindowId(wid: number): number | undefined;
@@ -190,6 +192,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   const eventConsumers: IXWMEventConsumer[] = [];
 
+  let desktopEntriesModule: AsyncReturnType<typeof createDesktopEntriesModule>;
   let ewmhModule: AsyncReturnType<typeof createEWMHEventConsumer>;
   let dragModule: AsyncReturnType<typeof createDragModule>;
   let motif: AsyncReturnType<typeof createMotifModule>;
@@ -292,10 +295,12 @@ export async function createServer(): Promise<IWindowManagerServer> {
       X,
       XDisplay,
       store,
+      wmServer,
       getWindowIdFromFrameId,
       getFrameIdFromWindowId,
     };
 
+    desktopEntriesModule = await createDesktopEntriesModule(context);
     dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
     eventConsumers.push(dragModule);
     eventConsumers.push(await createICCCMEventConsumer(context));
@@ -374,6 +379,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   ipcMain.on("exec", (event, args) => {
     launchProcess(args.executable);
+  });
+
+  ipcMain.on("exec-desktop-entry", (event, args: { entryName: string }) => {
+    desktopEntriesModule.launchDesktopEntry(args.entryName);
   });
 
   ipcMain.on("show-context-menu", (event, args: { menuKind: ContextMenuKind }) => {

@@ -1,6 +1,7 @@
 export { usePluginState } from "./usePluginState";
 export { useCombinedRef } from "./useCombinedRef";
 export { useCompositeScreenSize } from "./useCompositeScreenSize";
+export { useDesktopEntries } from "./useDesktopEntries";
 export { useDesktopShortcut } from "./useDesktopShortcut";
 export { useElementSize } from "./useElementSize";
 export { useIconInfoDataUri } from "./useIconInfoDataUri";

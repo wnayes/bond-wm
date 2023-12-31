@@ -48,8 +48,12 @@ export function desktopZoomReset(screenIndex: number): void {
   ipcRenderer.send("desktop-zoom-reset", { screenIndex });
 }
 
-export function exec(executable: string, args?: string) {
+export function exec(executable: string, args?: string): void {
   ipcRenderer.send("exec", { executable, args });
+}
+
+export function executeDesktopEntry(entryName: string): void {
+  ipcRenderer.send("exec-desktop-entry", { entryName });
 }
 
 export function showDevTools(screenIndex: number): void {

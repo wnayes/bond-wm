@@ -1,4 +1,3 @@
-import { env } from "node:process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { app } from "electron";
@@ -6,6 +5,7 @@ import { log, logError } from "./log";
 import { getConfigAsync, setConfigPath, setConfigPathAction, setVersionAction } from "@electron-wm/shared";
 import { ServerStore } from "./configureStore";
 import { getArgs } from "./args";
+import { getXDGConfigHome } from "./xdg";
 
 export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
   readVersionInfo(store);
@@ -19,7 +19,7 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
       logError(`The --config path ${configPath} failed to resolve or does not exist.`);
     }
   } else {
-    const XDG_CONFIG_HOME = getXDGHome();
+    const XDG_CONFIG_HOME = getXDGConfigHome();
     log("XDG_CONFIG_HOME", XDG_CONFIG_HOME);
 
     configPath = join(XDG_CONFIG_HOME, "electron-wm-config", "index.ts");
@@ -34,15 +34,6 @@ export async function loadConfigFromDisk(store: ServerStore): Promise<void> {
 
   const config = await getConfigAsync();
   log("Initial config", config);
-}
-
-function getXDGHome(): string {
-  let XDG_CONFIG_HOME = env["XDG_CONFIG_HOME"];
-  if (!XDG_CONFIG_HOME) {
-    const HOME = env["HOME"] || "~";
-    XDG_CONFIG_HOME = join(HOME, ".config");
-  }
-  return XDG_CONFIG_HOME;
 }
 
 interface VersionJson {

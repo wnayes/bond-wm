@@ -1,7 +1,7 @@
 {
-  "name": "@electron-wm/react-taskbar",
-  "version": "0.2.1",
-  "description": "React desktop taskbar for electron-wm",
+  "name": "@electron-wm/react-desktop-entries",
+  "version": "0.2.0",
+  "description": "React desktop icon display for electron-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
   "types": "./index.ts",
@@ -17,8 +17,6 @@
     "@electron-wm/react": "workspace:^",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
-    "redux": "^4.2.0",
     "tslib": "^2.4.1"
   },
   "devDependencies": {

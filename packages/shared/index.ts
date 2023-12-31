@@ -1,6 +1,8 @@
 export * from "./redux/basicStore";
 export * from "./redux/configSlice";
 export { default as configReducer } from "./redux/configSlice";
+export * from "./redux/desktopSlice";
+export { default as desktopReducer } from "./redux/desktopSlice";
 export * from "./redux/pluginStateSlice";
 export { default as pluginStateReducer } from "./redux/pluginStateSlice";
 export * from "./redux/screenSlice";
