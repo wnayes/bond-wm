@@ -1,25 +1,29 @@
-import { ipcRenderer } from "electron";
-import { ContextMenuKind } from "@electron-wm/shared";
-import { setOnCompletionOptionsResult } from "./ipcRenderer";
+import { ContextMenuKind, ElectronWMIPCInterface, ISetupIPCCallbacks } from "@electron-wm/shared";
+
+declare global {
+  interface Window {
+    ElectronWM: ElectronWMIPCInterface;
+  }
+}
 
 export function raiseWindow(wid: number) {
-  ipcRenderer.send("raise-window", wid);
+  window.ElectronWM.raiseWindow(wid);
 }
 
 export function minimizeWindow(wid: number) {
-  ipcRenderer.send("minimize-window", wid);
+  window.ElectronWM.minimizeWindow(wid);
 }
 
 export function maximizeWindow(wid: number) {
-  ipcRenderer.send("maximize-window", wid);
+  window.ElectronWM.maximizeWindow(wid);
 }
 
 export function restoreWindow(wid: number) {
-  ipcRenderer.send("restore-window", wid);
+  window.ElectronWM.restoreWindow(wid);
 }
 
 export function closeWindow(wid: number) {
-  ipcRenderer.send("close-window", wid);
+  window.ElectronWM.closeWindow(wid);
 }
 
 export function focusDesktopBrowser({
@@ -29,47 +33,51 @@ export function focusDesktopBrowser({
   screenIndex: number;
   takeVisualFocus?: boolean;
 }): void {
-  ipcRenderer.send("focus-desktop-browser", { screenIndex, takeVisualFocus });
+  window.ElectronWM.focusDesktopBrowser({ screenIndex, takeVisualFocus });
 }
 
 export function frameWindowMouseEnter(wid: number) {
-  ipcRenderer.send("frame-window-mouse-enter", wid);
+  window.ElectronWM.frameWindowMouseEnter(wid);
 }
 
 export function desktopZoomIn(screenIndex: number): void {
-  ipcRenderer.send("desktop-zoom-in", { screenIndex });
+  window.ElectronWM.desktopZoomIn(screenIndex);
 }
 
 export function desktopZoomOut(screenIndex: number): void {
-  ipcRenderer.send("desktop-zoom-out", { screenIndex });
+  window.ElectronWM.desktopZoomOut(screenIndex);
 }
 
 export function desktopZoomReset(screenIndex: number): void {
-  ipcRenderer.send("desktop-zoom-reset", { screenIndex });
+  window.ElectronWM.desktopZoomReset(screenIndex);
 }
 
 export function exec(executable: string, args?: string): void {
-  ipcRenderer.send("exec", { executable, args });
+  window.ElectronWM.exec(executable, args);
 }
 
 export function executeDesktopEntry(entryName: string): void {
-  ipcRenderer.send("exec-desktop-entry", { entryName });
+  window.ElectronWM.executeDesktopEntry(entryName);
 }
 
 export function showDevTools(screenIndex: number): void {
-  ipcRenderer.send("show-desktop-dev-tools", { screenIndex });
+  window.ElectronWM.showDevTools(screenIndex);
 }
 
 export function showContextMenu(menuKind: ContextMenuKind): void {
-  ipcRenderer.send("show-context-menu", { menuKind });
+  window.ElectronWM.showContextMenu(menuKind);
 }
 
 export function sendRegisterDesktopShortcut(keyString: string, screenIndex: number): void {
-  ipcRenderer.send("register-desktop-shortcut", { keyString, screenIndex });
+  window.ElectronWM.sendRegisterDesktopShortcut(keyString, screenIndex);
 }
 
 export function sendUnregisterDesktopShortcut(keyString: string, screenIndex: number): void {
-  ipcRenderer.send("unregister-desktop-shortcut", { keyString, screenIndex });
+  window.ElectronWM.sendUnregisterDesktopShortcut(keyString, screenIndex);
+}
+
+export function setupIpc(callbacks: ISetupIPCCallbacks): void {
+  window.ElectronWM.setupIpc(callbacks);
 }
 
 let _completionOptionsPromise: Promise<string[]> | undefined;
@@ -77,14 +85,18 @@ let _completionOptionsPromise: Promise<string[]> | undefined;
 export function getCompletionOptions(): Promise<string[]> {
   if (!_completionOptionsPromise) {
     _completionOptionsPromise = new Promise((resolve) => {
-      setOnCompletionOptionsResult((options) => {
+      window.ElectronWM.setOnCompletionOptionsResult((options) => {
         _completionOptionsPromise = undefined;
         resolve(options);
       });
 
-      ipcRenderer.send("completion-options-get");
+      window.ElectronWM.getCompletionOptionsInit();
     });
   }
 
   return _completionOptionsPromise;
+}
+
+export function registerFrameWidListener(callback: (newWid: number) => void): void {
+  window.ElectronWM.registerFrameWidListener(callback);
 }

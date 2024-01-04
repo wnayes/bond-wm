@@ -1,5 +1,4 @@
 import React from "react";
-import * as ReactFrame from "@electron-wm/react-frame";
 import { WindowFrame, WindowClientArea, ThemeContextProvider } from "@electron-wm/react";
 import {
   TitleBar,
@@ -9,9 +8,9 @@ import {
   TitleBarMinimizeButton,
   TitleBarText,
 } from "@electron-wm/react-titlebar";
-import { MyTheme } from "./theme";
+import { MyTheme } from "../theme";
 
-const MyFrame = () => {
+export default () => {
   return (
     <ThemeContextProvider theme={MyTheme}>
       <WindowFrame>
@@ -26,12 +25,4 @@ const MyFrame = () => {
       </WindowFrame>
     </ThemeContextProvider>
   );
-};
-
-/** Window frame configuration. */
-export default {
-  module: ReactFrame,
-  settings: {
-    frameComponent: MyFrame,
-  },
 };

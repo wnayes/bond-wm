@@ -200,42 +200,38 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
     },
 
     onReduxAction(args) {
-      switch (args.action.type) {
-        case configureTrayWindowAction.type:
-          {
-            const state = args.getState();
-            const payload = args.action.payload as ConfigureTrayPayload;
-            const wid = payload.wid;
-            const win = state.tray.windows[wid];
-            if (!win) {
-              break;
-            }
+      if (configureTrayWindowAction.match(args.action)) {
+        const state = args.getState();
+        const payload = args.action.payload as ConfigureTrayPayload;
+        const wid = payload.wid;
+        const win = state.tray.windows[wid];
+        if (!win) {
+          return;
+        }
 
-            // Should always be sent now; fallback until next major version.
-            const screen = state.screens[payload.screenIndex ?? 0];
+        // Should always be sent now; fallback until next major version.
+        const screen = state.screens[payload.screenIndex ?? 0];
 
-            const trayConfig: Partial<IGeometry> = {};
-            if (typeof payload.x === "number") {
-              trayConfig.x = screen.x + payload.x;
-            }
-            if (typeof payload.y === "number") {
-              trayConfig.y = screen.y + payload.y;
-            }
-            if (typeof payload.width === "number") {
-              trayConfig.width = payload.width;
-            }
-            if (typeof payload.height === "number") {
-              trayConfig.height = payload.height;
-            }
+        const trayConfig: Partial<IGeometry> = {};
+        if (typeof payload.x === "number") {
+          trayConfig.x = screen.x + payload.x;
+        }
+        if (typeof payload.y === "number") {
+          trayConfig.y = screen.y + payload.y;
+        }
+        if (typeof payload.width === "number") {
+          trayConfig.width = payload.width;
+        }
+        if (typeof payload.height === "number") {
+          trayConfig.height = payload.height;
+        }
 
-            log(`Configuring tray window ${wid}`, trayConfig);
-            X.ConfigureWindow(wid, trayConfig);
+        log(`Configuring tray window ${wid}`, trayConfig);
+        X.ConfigureWindow(wid, trayConfig);
 
-            // Sometimes tray windows that existed prior to the window manager
-            // starting up will be behind the desktop. Raise them just in case.
-            X.RaiseWindow(wid);
-          }
-          break;
+        // Sometimes tray windows that existed prior to the window manager
+        // starting up will be behind the desktop. Raise them just in case.
+        X.RaiseWindow(wid);
       }
     },
   };

@@ -1,10 +1,7 @@
-import { Stylesheet, useTheme } from "@electron-wm/react";
-import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { useTheme } from "@electron-wm/react";
 import * as React from "react";
 import { PropsWithChildren } from "react";
-
-const styles = pathToFileURL(path.join(__dirname, "Taskbar.css")).toString();
+import "./Taskbar.css";
 
 interface TaskbarStyle extends React.CSSProperties {
   "--desktop-taskbar-bg-color": string;
@@ -71,7 +68,6 @@ export function Taskbar({ height, children }: ITaskbarProps) {
 
   return (
     <>
-      <Stylesheet href={styles} />
       <div className="taskbar" style={taskbarStyle}>
         {children}
       </div>

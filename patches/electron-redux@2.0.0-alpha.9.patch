@@ -1,0 +1,128 @@
+diff --git a/es/actions-9a73391e.js b/es/actions-9a73391e.mjs
+similarity index 100%
+rename from es/actions-9a73391e.js
+rename to es/actions-9a73391e.mjs
+diff --git a/es/composeWithStateSync-f8bc21f4.js b/es/composeWithStateSync-f8bc21f4.mjs
+similarity index 100%
+rename from es/composeWithStateSync-f8bc21f4.js
+rename to es/composeWithStateSync-f8bc21f4.mjs
+diff --git a/es/index.js b/es/index.js
+deleted file mode 100644
+index b46ceff490d081335cbfbb1d1d73fc0718187775..0000000000000000000000000000000000000000
+diff --git a/es/index.mjs b/es/index.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..61846f6d5f0698ac2b30b999edf78e75987efea9
+--- /dev/null
++++ b/es/index.mjs
+@@ -0,0 +1,3 @@
++import 'lodash.isplainobject';
++import 'lodash.isstring';
++export { s as stopForwarding } from './actions-9a73391e.mjs';
+diff --git a/es/main.js b/es/main.mjs
+similarity index 96%
+rename from es/main.js
+rename to es/main.mjs
+index b607c514dad98ccf06a9b6c7416b8642193aec11..41b7d110f633db05aabdb36c73b1193ed897b7f8 100644
+--- a/es/main.js
++++ b/es/main.mjs
+@@ -1,9 +1,9 @@
+ import 'lodash.isplainobject';
+ import 'lodash.isstring';
+-import { v as validateAction, s as stopForwarding } from './actions-9a73391e.js';
++import { v as validateAction, s as stopForwarding } from './actions-9a73391e.mjs';
+ import { webContents, ipcMain } from 'electron';
+-import { I as IPCEvents, f as forwardAction, c as createComposer } from './composeWithStateSync-f8bc21f4.js';
+-import { p as preventDoubleInitialization } from './misc-f1d565fd.js';
++import { I as IPCEvents, f as forwardAction, c as createComposer } from './composeWithStateSync-f8bc21f4.mjs';
++import { p as preventDoubleInitialization } from './misc-f1d565fd.mjs';
+ 
+ const forwardActionToRenderers = (action, options = {}) => {
+   if (validateAction(action, options.denyList)) {
+diff --git a/es/misc-f1d565fd.js b/es/misc-f1d565fd.mjs
+similarity index 100%
+rename from es/misc-f1d565fd.js
+rename to es/misc-f1d565fd.mjs
+diff --git a/es/preload.js b/es/preload.mjs
+similarity index 97%
+rename from es/preload.js
+rename to es/preload.mjs
+index 8612863a01fdfae7624eee4a98f237156d02b77a..d09d44d572262df73c0edaff891f862efdc23739 100644
+--- a/es/preload.js
++++ b/es/preload.mjs
+@@ -1,9 +1,9 @@
+ import 'lodash.isplainobject';
+ import 'lodash.isstring';
+-import { v as validateAction, s as stopForwarding } from './actions-9a73391e.js';
++import { v as validateAction, s as stopForwarding } from './actions-9a73391e.mjs';
+ import { ipcRenderer, contextBridge } from 'electron';
+-import { I as IPCEvents, f as forwardAction, c as createComposer } from './composeWithStateSync-f8bc21f4.js';
+-import { p as preventDoubleInitialization } from './misc-f1d565fd.js';
++import { I as IPCEvents, f as forwardAction, c as createComposer } from './composeWithStateSync-f8bc21f4.mjs';
++import { p as preventDoubleInitialization } from './misc-f1d565fd.mjs';
+ 
+ function fetchInitialState(options) {
+   const state = ipcRenderer.sendSync(IPCEvents.INIT_STATE);
+diff --git a/es/renderer.js b/es/renderer.mjs
+similarity index 98%
+rename from es/renderer.js
+rename to es/renderer.mjs
+index 14ad123bde2723cb3114a23c9e4c476450f6dce0..cee26a47487de6013b1138d23137bd735934f768 100644
+--- a/es/renderer.js
++++ b/es/renderer.mjs
+@@ -1,6 +1,6 @@
+ import 'lodash.isplainobject';
+ import 'lodash.isstring';
+-import { p as preventDoubleInitialization } from './misc-f1d565fd.js';
++import { p as preventDoubleInitialization } from './misc-f1d565fd.mjs';
+ 
+ /**
+  * Creates new instance of renderer process redux enhancer.
+diff --git a/main/package.json b/main/package.json
+index c8b5d6c577739a695ba2dc803ab0a9e5db4bc710..ed274fea14852c81d76d2ba889800b12203c26c0 100644
+--- a/main/package.json
++++ b/main/package.json
+@@ -1,6 +1,5 @@
+ {
+-    "internal": true,
+     "main": "../lib/main.js",
+-    "module": "../es/main.js",
++    "module": "../es/main.mjs",
+     "types": "../types/main.d.ts"
+ }
+diff --git a/package.json b/package.json
+index d9ce3bd179cd8357c4a7574c382869ebe25ec80c..e237fa4c89434e7b59a586e763c15622a2f46ac1 100644
+--- a/package.json
++++ b/package.json
+@@ -11,7 +11,7 @@
+     "license": "MIT",
+     "private": false,
+     "main": "lib/index.js",
+-    "module": "es/index.js",
++    "module": "es/index.mjs",
+     "types": "types/index.d.ts",
+     "files": [
+         "lib",
+diff --git a/preload/package.json b/preload/package.json
+index 15ef931263d1bfd59f7627e0adec3d8c02961ff0..04fc1ce447397e2f59bf9d6d42291552ca9f9272 100644
+--- a/preload/package.json
++++ b/preload/package.json
+@@ -1,6 +1,5 @@
+ {
+-    "internal": true,
+     "main": "../lib/preload.js",
+-    "module": "../es/preload.js",
++    "module": "../es/preload.mjs",
+     "types": "../types/preload.d.ts"
+ }
+diff --git a/renderer/package.json b/renderer/package.json
+index 481546ab561de537677b25169884466d17b9209d..03e567cec3f1ed7d2e4588f2151e739ee967fb98 100644
+--- a/renderer/package.json
++++ b/renderer/package.json
+@@ -1,6 +1,5 @@
+ {
+-    "internal": true,
+     "main": "../lib/renderer.js",
+-    "module": "../es/renderer.js",
++    "module": "../es/renderer.mjs",
+     "types": "../types/renderer.d.ts"
+ }

@@ -1,5 +1,5 @@
-import path from "node:path";
-import { pathToFileURL } from "node:url";
+/// <reference types="vite/client" />
+
 import {
   IGeometry,
   LayoutFunction,
@@ -8,6 +8,7 @@ import {
   addLayoutResult,
   windowIsDialog,
 } from "@electron-wm/shared";
+import FloatingIcon from "./floating.png";
 
 interface IFloatingLayoutSettings {
   floatRight?: boolean;
@@ -92,7 +93,7 @@ export function createFloatingLayout(settings?: IFloatingLayoutSettings): Layout
   /** A floating layout for electron-wm. */
   const plugin: LayoutPluginConfig = {
     name: "Floating",
-    icon: pathToFileURL(path.join(__dirname, "floating.png")).toString(),
+    icon: FloatingIcon,
     supportsMaximize: true,
     fn: floatingLayout,
   };

@@ -1,11 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { Stylesheet, useDesktopEntries, useElementSize } from "@electron-wm/react";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { useDesktopEntries, useElementSize } from "@electron-wm/react";
 import { DesktopEntry as DesktopEntryType } from "@electron-wm/shared";
 import { executeDesktopEntry } from "@electron-wm/shared-renderer";
-
-const styles = pathToFileURL(join(__dirname, "DesktopEntries.css")).toString();
+import "./DesktopEntries.css";
 
 const DesktopEntryHeight = 110;
 const DesktopEntryWidth = 80;
@@ -62,7 +59,6 @@ export function DesktopEntries({ flowDirection }: IDesktopEntriesProps) {
 
   return (
     <>
-      <Stylesheet href={styles} />
       <div
         ref={containerSizeRef}
         className="desktopEntriesContainer"

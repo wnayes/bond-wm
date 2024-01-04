@@ -23,15 +23,27 @@ export interface LayoutFunction {
   (props: ILayoutFunctionProps): Map<number, IGeometry>;
 }
 
-/** Plugin configuration object exported by layout plugin modules. */
-export interface LayoutPluginConfig {
+/** Basic (serializable) info about a layout. */
+export interface LayoutInfo {
   name: string;
   icon: string;
   supportsMaximize: boolean;
+}
+
+/** Plugin configuration object exported by layout plugin modules. */
+export interface LayoutPluginConfig extends LayoutInfo {
   fn: LayoutFunction;
 }
 
-export function getLayoutPluginName(plugin: LayoutPluginConfig): string {
+export function cloneLayoutInfo(layoutInfo: LayoutInfo): LayoutInfo {
+  return {
+    name: layoutInfo.name,
+    icon: layoutInfo.icon,
+    supportsMaximize: layoutInfo.supportsMaximize,
+  };
+}
+
+export function getLayoutPluginName(plugin: LayoutInfo): string {
   return plugin.name;
 }
 
@@ -74,7 +86,7 @@ export function addLayoutResult(results: Map<number, IGeometry>, win: IWindow, s
 
 export function switchToNextLayout(
   store: SharedStore,
-  layoutPlugins: readonly LayoutPluginConfig[],
+  layoutPlugins: readonly LayoutInfo[],
   screenIndex: number
 ): void {
   const state = store.getState();
@@ -102,7 +114,10 @@ export function switchToNextLayout(
   });
 }
 
-function getNextLayout(layoutPlugins: readonly LayoutPluginConfig[], fromLayoutName: string): LayoutPluginConfig {
+function getNextLayout<TLayoutInfo extends LayoutInfo>(
+  layoutPlugins: readonly TLayoutInfo[],
+  fromLayoutName: string
+): TLayoutInfo {
   const currentIndex = layoutPlugins.findIndex((layout) => getLayoutPluginName(layout) === fromLayoutName);
   const nextIndex = (currentIndex + 1) % layoutPlugins.length;
   return layoutPlugins[nextIndex];

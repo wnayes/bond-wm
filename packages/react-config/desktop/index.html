@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Electron WM</title>
+  </head>
+  <body>
+    <div id="content"></div>
+  </body>
+  <script type="module">
+    import MyDesktop from "./desktop.tsx";
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    import { setScreenIndex } from "@electron-wm/react";
+
+    function obtainScreenIndex() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const screenIndex = parseInt(urlParams.get("screen") || "", 10);
+      if (typeof screenIndex !== "number") {
+        return -1;
+      }
+      return screenIndex;
+    }
+    setScreenIndex(obtainScreenIndex());
+
+    const reactRoot = createRoot(document.getElementById("content"));
+    reactRoot.render(React.createElement(MyDesktop));
+  </script>
+</html>

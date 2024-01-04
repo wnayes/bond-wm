@@ -1,4 +1,4 @@
-import { LayoutPluginConfig } from "./layouts";
+import { LayoutInfo, LayoutPluginConfig, cloneLayoutInfo } from "./layouts";
 import { IWindowManagerServer } from "./server";
 
 /** Expect module contents for a "desktop" module. */
@@ -13,22 +13,25 @@ export interface FrameModule {
   getFrameWindowSrc(): string;
 }
 
-type ScreenOverridesDict = { [screenIndex: number]: Partial<IConfig> };
+type ScreenOverridesDict<TConfig> = { [screenIndex: number]: Partial<TConfig> };
 
-type ObjectConfigPropertyType = ScreenOverridesDict;
+type ObjectConfigPropertyType = ScreenOverridesDict<ISerializableConfig<LayoutInfo>>;
 
 interface WindowManagerReadyArgs {
   wm: IWindowManagerServer;
 }
 
-/** Window manager configuration. */
-export interface IConfig {
+export interface ISerializableConfig<TLayouts extends LayoutInfo> {
   initialLayout: string;
   initialTag: string;
   tags: string[];
-  layouts: readonly LayoutPluginConfig[];
+  layouts: TLayouts[];
+  screenOverrides?: ScreenOverridesDict<this>;
+}
+
+/** Window manager configuration. */
+export interface IConfig extends ISerializableConfig<LayoutPluginConfig> {
   onWindowManagerReady?: (args: WindowManagerReadyArgs) => Promise<void> | void;
-  screenOverrides?: ScreenOverridesDict;
 }
 
 export interface IDesktopConfig {
@@ -53,7 +56,6 @@ export const defaultConfig: IConfig = {
 //const dynamicImport = new Function("specifier", "return import(specifier)");
 
 let _config: IConfig | null = null;
-let _configDesktop: IDesktopConfig | null = null;
 let _configFrame: IFrameConfig | null = null;
 let _configPath: string | null = null;
 
@@ -61,24 +63,26 @@ export function setConfigPath(configPath: string): void {
   _configPath = configPath;
 }
 
-export async function getConfigAsync(): Promise<IConfig> {
-  if (!_config) {
-    if (!_configPath) {
-      throw new Error("Config path was not determined.");
-    }
-    _config = (await import(_configPath)).default;
+export function getConfigPath(subpath?: string): string {
+  if (!_configPath) {
+    throw new Error("Config path not available yet.");
   }
+  if (subpath) {
+    return _configPath + "/" + subpath;
+  }
+  return _configPath;
+}
+
+export function setConfig(config: IConfig): void {
+  _config = config;
+}
+
+export function getConfig(): IConfig {
   return _config!;
 }
 
-export async function getDesktopConfigAsync(): Promise<IDesktopConfig> {
-  if (!_configDesktop) {
-    if (!_configPath) {
-      throw new Error("Config path was not determined.");
-    }
-    _configDesktop = (await import(_configPath + "/desktop")).default;
-  }
-  return _configDesktop!;
+export function getConfigAsync(): Promise<IConfig> {
+  return Promise.resolve(_config!);
 }
 
 export async function getFrameConfigAsync(): Promise<IFrameConfig> {
@@ -103,7 +107,28 @@ export function getConfigWithOverrides(screenIndex: number): IConfig {
   return config;
 }
 
-export function assignConfig(dest: IConfig, src: Partial<IConfig>): void {
+export function cloneConfig(config: ISerializableConfig<LayoutInfo>): ISerializableConfig<LayoutInfo> {
+  let overrides: { [screenIndex: number]: Partial<ISerializableConfig<LayoutInfo>> } | undefined;
+  if (config.screenOverrides) {
+    overrides = {};
+    for (const screenIndex in config.screenOverrides) {
+      const overrideForScreen = config.screenOverrides[screenIndex];
+      overrides[screenIndex] = { ...overrideForScreen, layouts: overrideForScreen.layouts?.map(cloneLayoutInfo) };
+    }
+  }
+  return {
+    initialLayout: config.initialLayout,
+    initialTag: config.initialTag,
+    tags: config.tags,
+    layouts: config.layouts.map(cloneLayoutInfo),
+    screenOverrides: overrides,
+  };
+}
+
+export function assignConfig<TConfig extends ISerializableConfig<LayoutInfo>>(
+  dest: TConfig,
+  src: Partial<TConfig>
+): void {
   for (const configPropName in src) {
     switch (configPropName) {
       case "screenOverrides":
@@ -111,21 +136,23 @@ export function assignConfig(dest: IConfig, src: Partial<IConfig>): void {
           // Overwrite at the level of each subkey, not the entire object.
 
           // Clone the subobject, since sometimes the target is readonly.
-          let subobject = dest[configPropName as keyof IConfig] as ObjectConfigPropertyType;
+          let subobject = dest[configPropName as keyof ISerializableConfig<LayoutInfo>] as ObjectConfigPropertyType;
           subobject = subobject ? { ...subobject } : {};
 
           Object.assign(
             subobject,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            src[configPropName as keyof Partial<IConfig>] as any
+            src[configPropName as keyof Partial<ISerializableConfig<LayoutInfo>>] as any
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          dest[configPropName as keyof IConfig] = subobject as any;
+          dest[configPropName as keyof ISerializableConfig<LayoutInfo>] = subobject as any;
         }
         break;
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        dest[configPropName as keyof IConfig] = src[configPropName as keyof Partial<IConfig>] as any;
+        dest[configPropName as keyof ISerializableConfig<LayoutInfo>] = src[
+          configPropName as keyof Partial<ISerializableConfig<LayoutInfo>>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ] as any;
         break;
     }
   }

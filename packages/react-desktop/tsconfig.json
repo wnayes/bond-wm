@@ -1,7 +1,0 @@
-{
-  "extends": "@electron-wm/tsconfig/tsconfig.base.json",
-  "include": ["**/*"],
-  "compilerOptions": {
-    "rootDir": "."
-  }
-}

@@ -1,7 +1,2 @@
-// Bootstraps ts-node and loads the TypeScript main.ts entrypoint.
-require("ts-node").register({
-    cwd: __dirname,
-    project: "./tsconfig.json",
-    skipIgnore: true,
-});
+// Non-ts entrypoint file, mostly for historical reasons.
 require("./main.ts");

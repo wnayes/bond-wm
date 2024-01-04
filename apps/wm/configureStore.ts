@@ -1,5 +1,5 @@
 import { applyMiddleware, Middleware } from "redux";
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, Tuple } from "@reduxjs/toolkit";
 import { composeWithStateSync } from "electron-redux/main";
 import {
   configReducer,
@@ -26,7 +26,6 @@ export function configureWMStore(middleware: Middleware[]) {
       tray: trayReducer,
       windows: windowReducer,
     },
-    enhancers: [enhancer],
 
     // Could try to tune this, but for now just disable it.
     middleware: (getDefaultMiddleware) =>
@@ -34,6 +33,11 @@ export function configureWMStore(middleware: Middleware[]) {
         immutableCheck: false,
         serializableCheck: false,
       }),
+
+    // TODO: Can/should this use getDefaultEnhancers?
+    enhancers: () => {
+      return new Tuple(enhancer);
+    },
   });
   return store;
 }

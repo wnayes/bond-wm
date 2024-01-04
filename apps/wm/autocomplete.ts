@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { execCommand } from "@electron-wm/shared";
+import { execCommand } from "./exec";
 
 export function setupAutocompleteListener(): void {
   ipcMain.on("completion-options-get", (event) => {

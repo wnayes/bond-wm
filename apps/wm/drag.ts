@@ -1,4 +1,3 @@
-import { batch } from "react-redux";
 import {
   configureWindowAction,
   endDragAction,
@@ -44,12 +43,10 @@ export async function createDragModule(
     X.UngrabPointer(XCB_CURRENT_TIME);
     X.UngrabKeyboard(XCB_CURRENT_TIME);
 
-    batch(() => {
-      store.dispatch(endDragAction({ wid }));
+    store.dispatch(endDragAction({ wid }));
 
-      // The window may now be on a different screen visually, so we should update state to match.
-      setWindowIntoBestScreen(state.screens, win);
-    });
+    // The window may now be on a different screen visually, so we should update state to match.
+    setWindowIntoBestScreen(state.screens, win);
   }
 
   function doGrabsForDrag(wid: number): void {

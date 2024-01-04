@@ -14,12 +14,12 @@ import {
   XWMEventConsumerKeyPressArgs,
   XWMWindowType,
   geometriesDiffer,
-  getConfigAsync,
+  getConfig,
   getConfigWithOverrides,
-  getDesktopConfigAsync,
-  getFrameConfigAsync,
   getLayoutPluginName,
   selectVisibleWindowsFromCurrentTags,
+  setConfig,
+  setConfigAction,
 } from "@electron-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
@@ -52,8 +52,11 @@ import {
   WMSizeHints,
   WMHintsStates,
 } from "@electron-wm/shared";
-import { Action, Middleware } from "redux";
-import { batch } from "react-redux";
+import { Action, Middleware, UnknownAction, isAction } from "redux";
+import { ViteDevServer, createServer as createViteServer } from "vite";
+import { ViteNodeServer } from "vite-node/server";
+import { ViteNodeRunner } from "vite-node/client";
+import { installSourcemapsSupport } from "vite-node/source-map";
 import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "@electron-wm/shared";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
@@ -87,12 +90,16 @@ import { createDragModule } from "./drag";
 import { loggingEnabled } from "./args";
 import { createShortcutsModule } from "./shortcuts";
 import { assert } from "./assert";
-import { loadConfigFromDisk } from "./config";
+import { determineConfigPath } from "./config";
 import { createTrayEventConsumer } from "./systray";
 import { createDesktopEntriesModule } from "./desktopEntries";
+import { readVersionInfo } from "./version";
+import { fileURLToPath } from "node:url";
+import { dirname } from "path";
 
 // Path constants
-const PRELOAD_JS = path.resolve(path.join(__dirname, "dist", "preload.js"));
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PRELOAD_JS = path.resolve(path.join(__dirname, "preload.js"));
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
@@ -149,7 +156,7 @@ export interface XWMEventConsumerScreenCreatedArgs {
 }
 
 export interface XWMEventConsumerReduxActionArgs {
-  action: Action & { payload: unknown };
+  action: Action;
   getState(): ServerRootState;
 }
 
@@ -198,7 +205,6 @@ export async function createServer(): Promise<IWindowManagerServer> {
   let motif: AsyncReturnType<typeof createMotifModule>;
   let shortcuts: AsyncReturnType<typeof createShortcutsModule>;
 
-  let frameWindowSrc: string;
   const layoutsByScreen: Map<number, readonly LayoutPluginConfig[]> = new Map();
 
   const knownWids = new Set<number>();
@@ -230,11 +236,22 @@ export async function createServer(): Promise<IWindowManagerServer> {
   let lastFrameExtents: IBounds | undefined;
 
   const store = __setupStore();
+  await readVersionInfo(store);
 
-  await loadConfigFromDisk(store);
-  const config = await getConfigAsync();
-  const desktopConfig = await getDesktopConfigAsync();
-  const frameConfig = await getFrameConfigAsync();
+  const configPath = await determineConfigPath(store);
+
+  const [viteNodeServer, viteNodeRunner] = await __setupViteNodeServer(configPath);
+  setConfig((await viteNodeRunner.executeId(configPath)).default);
+  const config = getConfig();
+  log("Initial config", config);
+  store.dispatch(setConfigAction(config));
+
+  const viteWebServer = await __setupViteWebServer(configPath);
+  const viteLocalhost = viteWebServer.resolvedUrls?.local[0];
+  log("Vite web server at " + viteLocalhost);
+
+  const desktopLocation = viteLocalhost + "desktop/index.html";
+  const frameLocation = viteLocalhost + "frame/index.html";
 
   let context: XWMContext;
 
@@ -248,13 +265,20 @@ export async function createServer(): Promise<IWindowManagerServer> {
     }
   };
 
+  async function destroy(): Promise<void> {
+    await viteNodeServer.close();
+    await viteWebServer.close();
+  }
+
   const wmServer: IWindowManagerServer = {
-    restart: () => {
+    restart: async () => {
+      await destroy();
       app.relaunch();
       app.exit(0);
     },
 
-    quit: () => {
+    quit: async () => {
+      await destroy();
       app.quit();
     },
 
@@ -311,11 +335,6 @@ export async function createServer(): Promise<IWindowManagerServer> {
     motif = await createMotifModule(context);
     shortcuts = await createShortcutsModule(context);
     eventConsumers.push(shortcuts);
-
-    frameWindowSrc = frameConfig?.module?.getFrameWindowSrc();
-    if (!frameWindowSrc) {
-      throw new Error("Missing frame config. Frame windows cannot be created without frame config.");
-    }
 
     await __setupAtoms();
     await __initDesktop();
@@ -403,6 +422,48 @@ export async function createServer(): Promise<IWindowManagerServer> {
   // });
 
   setupAutocompleteListener();
+
+  async function __setupViteNodeServer(configPath: string): Promise<[ViteDevServer, ViteNodeRunner]> {
+    const viteServer = await createViteServer({
+      root: configPath,
+      mode: "development",
+      server: {
+        port: 19108,
+      },
+      optimizeDeps: {
+        disabled: true,
+      },
+    });
+    await viteServer.pluginContainer.buildStart({});
+    const viteNodeServer = new ViteNodeServer(viteServer);
+    installSourcemapsSupport({
+      getSourceMap: (source) => viteNodeServer.getSourceMap(source),
+    });
+    const runner = new ViteNodeRunner({
+      root: viteServer.config.root,
+      base: viteServer.config.base,
+      fetchModule(id) {
+        return viteNodeServer.fetchModule(id);
+      },
+      resolveId(id, importer) {
+        return viteNodeServer.resolveId(id, importer);
+      },
+    });
+    await viteServer.listen();
+    return [viteServer, runner];
+  }
+
+  async function __setupViteWebServer(configPath: string): Promise<ViteDevServer> {
+    const viteWebServer = await createViteServer({
+      root: configPath,
+      mode: "development",
+      server: {
+        port: 19109,
+      },
+    });
+    await viteWebServer.listen();
+    return viteWebServer;
+  }
 
   async function __setupAtoms(): Promise<void> {
     // TODO: Typings are a little awkward here.
@@ -529,8 +590,6 @@ export async function createServer(): Promise<IWindowManagerServer> {
       type: "desktop",
       webPreferences: {
         preload: PRELOAD_JS,
-        nodeIntegration: true,
-        contextIsolation: false,
       },
     });
 
@@ -546,12 +605,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     log("Created browser window", handle);
 
-    const desktopWindowSrc = desktopConfig?.module?.getDesktopWindowSrc(index);
-    if (!desktopWindowSrc) {
+    if (!desktopLocation) {
       throw new Error("Missing desktop config. Desktop windows cannot be created without a desktop plugin.");
     }
-
-    const url = desktopWindowSrc + "?screen=" + index;
+    const url = desktopLocation + "?screen=" + index;
     await win.loadURL(url);
 
     const zoomLevel = win.webContents.getZoomLevel();
@@ -576,8 +633,6 @@ export async function createServer(): Promise<IWindowManagerServer> {
     hasShadow: false,
     webPreferences: {
       preload: PRELOAD_JS,
-      nodeIntegration: true,
-      contextIsolation: false,
     },
   };
 
@@ -590,7 +645,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
       ...FrameBrowserBaseProperties,
       show: false,
     });
-    const winLoadPromise = win.loadURL(frameWindowSrc);
+    const winLoadPromise = win.loadURL(frameLocation);
 
     const fid = getNativeWindowHandleInt(win);
     if (!fid) {
@@ -627,7 +682,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
       win.webContents.on("did-finish-load", () => {
         win.webContents.setZoomLevel(screen.zoom);
       });
-      win.loadURL(`${frameWindowSrc}?wid=${wid}`);
+      win.loadURL(`${frameLocation}?wid=${wid}`);
 
       fid = getNativeWindowHandleInt(win);
       if (!fid) {
@@ -1639,34 +1694,33 @@ export async function createServer(): Promise<IWindowManagerServer> {
     const win = getWinFromStore(wid);
     if (win) {
       const nextScreenIndex = (win.screenIndex + 1) % screenCount;
-      batch(() => {
-        // Update the window's tags if the next screen has different tags visible.
-        const nextScreen = screens[nextScreenIndex];
-        const nextScreenTags = nextScreen.currentTags;
-        const tagIntersect = intersect(win.tags, nextScreenTags);
-        if (tagIntersect.length > 0) {
-          if (!arraysEqual(tagIntersect, win.tags)) {
-            store.dispatch(setWindowTagsAction({ wid, tags: tagIntersect }));
-          }
-        } else if (nextScreenTags.length > 0) {
-          store.dispatch(setWindowTagsAction({ wid, tags: [nextScreenTags[0]] }));
+
+      // Update the window's tags if the next screen has different tags visible.
+      const nextScreen = screens[nextScreenIndex];
+      const nextScreenTags = nextScreen.currentTags;
+      const tagIntersect = intersect(win.tags, nextScreenTags);
+      if (tagIntersect.length > 0) {
+        if (!arraysEqual(tagIntersect, win.tags)) {
+          store.dispatch(setWindowTagsAction({ wid, tags: tagIntersect }));
         }
+      } else if (nextScreenTags.length > 0) {
+        store.dispatch(setWindowTagsAction({ wid, tags: [nextScreenTags[0]] }));
+      }
 
-        // Another window could move under our mouse; we don't want it to steal focus.
-        ignoreEnterLeave = true;
+      // Another window could move under our mouse; we don't want it to steal focus.
+      ignoreEnterLeave = true;
 
-        store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreenIndex }));
+      store.dispatch(setWindowIntoScreenAction({ wid, screenIndex: nextScreenIndex }));
 
-        // The new screen may have different dimensions. Try to fit the window nicely within.
-        const nextOuter = fitGeometryWithinAnother(nextScreen.workArea, win.outer, {
-          width: getWindowMinWidth(win),
-          height: getWindowMinHeight(win),
-        });
-
-        // Trigger reconfigure since coordinates have remained the same,
-        // and we won't configure again otherwise (at least not if we are floating).
-        store.dispatch(configureWindowAction({ wid, ...nextOuter }));
+      // The new screen may have different dimensions. Try to fit the window nicely within.
+      const nextOuter = fitGeometryWithinAnother(nextScreen.workArea, win.outer, {
+        width: getWindowMinWidth(win),
+        height: getWindowMinHeight(win),
       });
+
+      // Trigger reconfigure since coordinates have remained the same,
+      // and we won't configure again otherwise (at least not if we are floating).
+      store.dispatch(configureWindowAction({ wid, ...nextOuter }));
     }
   }
 
@@ -1849,7 +1903,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
         const stateAfterDispatch = getState();
 
         let affectedSlice: string | undefined;
-        if (typeof action?.type === "string") {
+        if (isAction(action) && typeof action?.type === "string") {
           const actionTypeParts = action.type.split("/");
           if (actionTypeParts.length > 1) {
             affectedSlice = actionTypeParts[0];
@@ -1904,138 +1958,119 @@ export async function createServer(): Promise<IWindowManagerServer> {
       }
     }
 
-    const x11Middleware: Middleware<unknown, ServerRootState> = function ({ getState }) {
+    const x11Middleware: Middleware<UnknownAction, ServerRootState> = function ({ getState }) {
       return (next) => (action) => {
         const returnValue = next(action);
 
-        switch (action.type) {
-          case configureWindowAction.type:
-            {
-              const state = getState();
-              const payload: Partial<IGeometry> = action.payload;
-              const wid = action.payload.wid;
-              const win = state.windows[wid];
-              const screen = state.screens[win.screenIndex];
+        if (!isAction(action)) {
+          return returnValue;
+        }
 
-              const frameConfig: Partial<IGeometry> = {};
-              if (typeof payload.x === "number") {
-                frameConfig.x = screen.x + payload.x;
-              }
-              if (typeof payload.y === "number") {
-                frameConfig.y = screen.y + payload.y;
-              }
-              if (typeof payload.width === "number") {
-                frameConfig.width = payload.width;
-              }
-              if (typeof payload.height === "number") {
-                frameConfig.height = payload.height;
-              }
+        if (configureWindowAction.match(action)) {
+          const state = getState();
+          const payload: Partial<IGeometry> = action.payload;
+          const wid = action.payload.wid;
+          const win = state.windows[wid];
+          const screen = state.screens[win.screenIndex];
 
-              const fid = getFrameIdFromWindowId(wid) ?? wid;
-              widLog(fid, "Configuring from X11 middleware", frameConfig);
-              X.ConfigureWindow(fid, frameConfig);
+          const frameConfig: Partial<IGeometry> = {};
+          if (typeof payload.x === "number") {
+            frameConfig.x = screen.x + payload.x;
+          }
+          if (typeof payload.y === "number") {
+            frameConfig.y = screen.y + payload.y;
+          }
+          if (typeof payload.width === "number") {
+            frameConfig.width = payload.width;
+          }
+          if (typeof payload.height === "number") {
+            frameConfig.height = payload.height;
+          }
 
-              if (fid !== wid && win) {
-                X.ConfigureWindow(wid, {
-                  width: (payload.width ?? win.outer.width) - win.frameExtents.left - win.frameExtents.right,
-                  height: (payload.height ?? win.outer.height) - win.frameExtents.top - win.frameExtents.bottom,
-                });
-              }
+          const fid = getFrameIdFromWindowId(wid) ?? wid;
+          widLog(fid, "Configuring from X11 middleware", frameConfig);
+          X.ConfigureWindow(fid, frameConfig);
+
+          if (fid !== wid && win) {
+            X.ConfigureWindow(wid, {
+              width: (payload.width ?? win.outer.width) - win.frameExtents.left - win.frameExtents.right,
+              height: (payload.height ?? win.outer.height) - win.frameExtents.top - win.frameExtents.bottom,
+            });
+          }
+        } else if (setWindowMaximizedAction.match(action)) {
+          // Restore the window to its location prior to going maximized.
+          // We need to do this here since some layouts (floating) won't bother to move the window.
+          const { wid, maximized } = action.payload as { wid: number; maximized: boolean };
+          if (!maximized) {
+            configureToCurrentSize(getState(), wid);
+          }
+        } else if (setWindowFullscreenAction.match(action)) {
+          // Restore the window to its location prior to going fullscreen.
+          const { wid, fullscreen } = action.payload as { wid: number; fullscreen: boolean };
+          if (!fullscreen) {
+            configureToCurrentSize(getState(), wid);
+          }
+        } else if (setFrameExtentsAction.match(action)) {
+          const state = getState();
+          const wid = action.payload.wid;
+          const win = state.windows[wid];
+          const { width, height } = win.outer;
+          const frameExtents = {
+            left: action.payload.left,
+            right: action.payload.right,
+            top: action.payload.top,
+            bottom: action.payload.bottom,
+          };
+          lastFrameExtents = frameExtents;
+
+          X.ConfigureWindow(wid, {
+            x: frameExtents.left,
+            y: frameExtents.top,
+            width: width - frameExtents.left - frameExtents.right,
+            height: height - frameExtents.top - frameExtents.bottom,
+          });
+
+          eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents }));
+        } else if (setWindowIntoScreenAction.match(action)) {
+          const state = getState();
+          const { wid, screenIndex } = action.payload;
+          const screen = state.screens[screenIndex];
+
+          // Update the frame window's zoom level to match the screen zoom level, if it differs.
+          const frameWin = frameBrowserWindows[wid];
+          if (frameWin && frameWin.webContents && frameWin.webContents.zoomLevel !== screen.zoom) {
+            frameWin?.webContents.setZoomLevel(screen.zoom);
+          }
+        } else if (setScreenCurrentTagsAction.match(action)) {
+          const state = getState();
+          const { currentTags, screenIndex } = action.payload as {
+            currentTags: string[];
+            screenIndex: number;
+          };
+          let hidFocusedWid: number | undefined = undefined;
+          for (const widStr in state.windows) {
+            const wid = parseInt(widStr, 10);
+            const win = state.windows[widStr];
+            if (win.screenIndex !== screenIndex) {
+              continue; // Other screens not affected.
             }
-            break;
-          case setWindowMaximizedAction.type:
-            {
-              // Restore the window to its location prior to going maximized.
-              // We need to do this here since some layouts (floating) won't bother to move the window.
-              const { wid, maximized } = action.payload as { wid: number; maximized: boolean };
-              if (!maximized) {
-                configureToCurrentSize(getState(), wid);
+            if (anyIntersect(win.tags, currentTags)) {
+              if (!win.minimized) {
+                showWindow(wid);
               }
-            }
-            break;
-          case setWindowFullscreenAction.type:
-            {
-              // Restore the window to its location prior to going fullscreen.
-              const { wid, fullscreen } = action.payload as { wid: number; fullscreen: boolean };
-              if (!fullscreen) {
-                configureToCurrentSize(getState(), wid);
+            } else {
+              if (win.focused) {
+                hidFocusedWid = wid;
               }
+              hideWindow(wid);
             }
-            break;
-          case setFrameExtentsAction.type:
-            {
-              const state = getState();
-              const wid = action.payload.wid;
-              const win = state.windows[wid];
-              const { width, height } = win.outer;
-              const frameExtents = {
-                left: action.payload.left,
-                right: action.payload.right,
-                top: action.payload.top,
-                bottom: action.payload.bottom,
-              };
-              lastFrameExtents = frameExtents;
+          }
 
-              X.ConfigureWindow(wid, {
-                x: frameExtents.left,
-                y: frameExtents.top,
-                width: width - frameExtents.left - frameExtents.right,
-                height: height - frameExtents.top - frameExtents.bottom,
-              });
-
-              eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents }));
-            }
-            break;
-          case setWindowIntoScreenAction.type:
-            {
-              const state = getState();
-              const { wid, screenIndex } = action.payload;
-              const screen = state.screens[screenIndex];
-
-              // Update the frame window's zoom level to match the screen zoom level, if it differs.
-              const frameWin = frameBrowserWindows[wid];
-              if (frameWin && frameWin.webContents && frameWin.webContents.zoomLevel !== screen.zoom) {
-                frameWin?.webContents.setZoomLevel(screen.zoom);
-              }
-            }
-            break;
-          case setScreenCurrentTagsAction.type:
-            {
-              const state = getState();
-              const { currentTags, screenIndex } = action.payload as {
-                currentTags: string[];
-                screenIndex: number;
-              };
-              batch(() => {
-                let hidFocusedWid: number | undefined = undefined;
-                for (const widStr in state.windows) {
-                  const wid = parseInt(widStr, 10);
-                  const win = state.windows[widStr];
-                  if (win.screenIndex !== screenIndex) {
-                    continue; // Other screens not affected.
-                  }
-                  if (anyIntersect(win.tags, currentTags)) {
-                    if (!win.minimized) {
-                      showWindow(wid);
-                    }
-                  } else {
-                    if (win.focused) {
-                      hidFocusedWid = wid;
-                    }
-                    hideWindow(wid);
-                  }
-                }
-
-                if (typeof hidFocusedWid === "number" || !anyWindowHasFocus()) {
-                  tryReplaceFocusForScreen(screenIndex, hidFocusedWid);
-                }
-              });
-            }
-            break;
-
-          default:
-            eventConsumers.forEach((consumer) => consumer.onReduxAction?.({ action, getState }));
-            break;
+          if (typeof hidFocusedWid === "number" || !anyWindowHasFocus()) {
+            tryReplaceFocusForScreen(screenIndex, hidFocusedWid);
+          }
+        } else {
+          eventConsumers.forEach((consumer) => consumer.onReduxAction?.({ action, getState }));
         }
 
         performLayout();

@@ -1,5 +1,4 @@
-import path from "node:path";
-import { pathToFileURL } from "node:url";
+/// <reference types="vite/client" />
 import {
   IGeometry,
   LayoutFunction,
@@ -8,6 +7,7 @@ import {
   addLayoutResult,
   windowIsDialog,
 } from "@electron-wm/shared";
+import TilingIcon from "./tiling.png";
 
 const TilingLayout: LayoutFunction = ({ windows, screen }) => {
   const results = new Map<number, IGeometry>();
@@ -85,7 +85,7 @@ const TilingLayout: LayoutFunction = ({ windows, screen }) => {
 /** A tiling layout for electron-wm. */
 const Plugin: LayoutPluginConfig = {
   name: "Tiling",
-  icon: pathToFileURL(path.join(__dirname, "tiling.png")).toString(),
+  icon: TilingIcon,
   supportsMaximize: false,
   fn: TilingLayout,
 };

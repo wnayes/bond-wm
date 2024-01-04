@@ -1,17 +1,7 @@
-import { LayoutPluginConfig, getConfigAsync, getConfigWithOverrides } from "@electron-wm/shared";
-import { useEffect, useState } from "react";
+import { LayoutInfo, selectConfigWithOverrides } from "@electron-wm/shared";
+import { RootState } from "@electron-wm/shared-renderer";
+import { useSelector } from "react-redux";
 
-export function useLayoutPlugins(screenIndex: number | undefined): readonly LayoutPluginConfig[] {
-  const [layoutPlugins, setLayoutPlugins] = useState<readonly LayoutPluginConfig[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      if (typeof screenIndex === "number") {
-        await getConfigAsync();
-        setLayoutPlugins(getConfigWithOverrides(screenIndex).layouts);
-      }
-    })();
-  }, [screenIndex]);
-
-  return layoutPlugins;
+export function useLayoutPlugins(screenIndex: number | undefined): readonly LayoutInfo[] {
+  return useSelector((state: RootState) => selectConfigWithOverrides(state, screenIndex).layouts);
 }

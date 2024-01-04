@@ -4,14 +4,15 @@
   "compilerOptions": {
     "sourceMap": true,
     "rootDir": ".",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "target": "ESNext",
     "jsx": "react",
     "noEmit": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": true,
     "esModuleInterop": true,
     "isolatedModules": true
   },

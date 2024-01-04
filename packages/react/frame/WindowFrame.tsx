@@ -1,8 +1,12 @@
 import * as React from "react";
 import { isUrgent } from "@electron-wm/shared";
 import { useBrowserWindowSize } from "../useBrowserWindowSize";
-import { useWindow } from "../useWindow";
+import { WidContext, useWindow } from "../useWindow";
 import { useTheme } from "../theming";
+import { Provider } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { configureRendererStore, frameWindowMouseEnter, registerFrameWidListener } from "@electron-wm/shared-renderer";
+import "./WindowFrame.css";
 
 interface IWindowFrameProps extends React.PropsWithChildren<{}> {}
 
@@ -19,6 +23,63 @@ interface WindowFrameStyle extends React.CSSProperties {
  * Component that renders a window frame around a client window.
  */
 export function WindowFrame({ children }: IWindowFrameProps) {
+  const [store] = useState(() => configureRendererStore());
+  const [wid, setWid] = useState<number | null>(null);
+
+  // Read an initial wid from query parameter, if provided.
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for debug
+    (window as any).store = store;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const widParam = urlParams.get("wid");
+    if (widParam) {
+      const initialWid = parseInt(widParam, 10);
+      setWid(initialWid);
+      console.log("wid", initialWid);
+    }
+  }, [store]);
+
+  const onNewWidAssigned = useCallback((newWid: number) => {
+    // Update URL so that frame reload doesn't break the frame.
+    const url = new URL(window.location.href);
+    url.searchParams.set("wid", newWid + "");
+    window.history.pushState({}, "", url);
+
+    setWid(newWid);
+  }, []);
+
+  useEffect(() => {
+    registerFrameWidListener(onNewWidAssigned);
+  }, [onNewWidAssigned]);
+
+  const onFrameMouseEnter = useCallback(() => {
+    if (wid) {
+      frameWindowMouseEnter(wid);
+    }
+  }, [wid]);
+
+  useEffect(() => {
+    document.addEventListener("mouseenter", onFrameMouseEnter);
+    return () => {
+      document.removeEventListener("mouseenter", onFrameMouseEnter);
+    };
+  }, [onFrameMouseEnter]);
+
+  if (typeof wid !== "number") {
+    return null;
+  }
+
+  return (
+    <Provider store={store}>
+      <WidContext.Provider value={wid}>
+        <WindowFrameInner>{children}</WindowFrameInner>
+      </WidContext.Provider>
+    </Provider>
+  );
+}
+
+function WindowFrameInner({ children }: IWindowFrameProps) {
   const win = useWindow();
   useBrowserWindowSize(); // Triggers re-renders on resize.
 

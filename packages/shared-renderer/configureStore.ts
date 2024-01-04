@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { Tuple, configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/renderer";
 import {
   configReducer,
@@ -19,7 +19,6 @@ export function configureRendererStore() {
       tray: trayReducer,
       windows: windowReducer,
     },
-    enhancers: [stateSyncEnhancer()],
 
     // It is enough to check these in the main process; no need for each renderer.
     middleware: (getDefaultMiddleware) =>
@@ -27,6 +26,10 @@ export function configureRendererStore() {
         immutableCheck: false,
         serializableCheck: false,
       }),
+
+    enhancers: () => {
+      return new Tuple(stateSyncEnhancer());
+    },
   });
 }
 
