@@ -14,7 +14,6 @@ export enum IPCMessages {
   DesktopZoomOut = "desktop-zoom-out",
   DesktopZoomReset = "desktop-zoom-reset",
 
-  Exec = "exec",
   ExecDesktopEntry = "exec-desktop-entry",
 
   GetCompletionOptions = "completion-options-get",
@@ -45,7 +44,6 @@ export interface ElectronWMIPCInterface {
   desktopZoomIn(screenIndex: number): void;
   desktopZoomOut(screenIndex: number): void;
   desktopZoomReset(screenIndex: number): void;
-  exec(executable: string, args?: string): void;
   executeDesktopEntry(entryName: string): void;
   showDevTools(screenIndex: number): void;
   showContextMenu(menuKind: ContextMenuKind): void;

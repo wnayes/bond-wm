@@ -57,10 +57,6 @@ const electronWmApi: ElectronWMIPCInterface = {
     ipcRenderer.send("desktop-zoom-reset", { screenIndex });
   },
 
-  exec(executable: string, args?: string): void {
-    ipcRenderer.send("exec", { executable, args });
-  },
-
   executeDesktopEntry(entryName: string): void {
     ipcRenderer.send("exec-desktop-entry", { entryName });
   },

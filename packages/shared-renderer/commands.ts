@@ -52,10 +52,6 @@ export function desktopZoomReset(screenIndex: number): void {
   window.ElectronWM.desktopZoomReset(screenIndex);
 }
 
-export function exec(executable: string, args?: string): void {
-  window.ElectronWM.exec(executable, args);
-}
-
 export function executeDesktopEntry(entryName: string): void {
   window.ElectronWM.executeDesktopEntry(entryName);
 }
