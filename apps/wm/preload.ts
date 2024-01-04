@@ -18,63 +18,63 @@ let _onCompletionOptionsResult: CompletionOptionsCallback | undefined;
 
 const electronWmApi: ElectronWMIPCInterface = {
   raiseWindow(wid: number): void {
-    ipcRenderer.send("raise-window", wid);
+    ipcRenderer.send(IPCMessages.RaiseWindow, wid);
   },
 
   minimizeWindow(wid: number): void {
-    ipcRenderer.send("minimize-window", wid);
+    ipcRenderer.send(IPCMessages.MinimizeWindow, wid);
   },
 
   maximizeWindow(wid: number): void {
-    ipcRenderer.send("maximize-window", wid);
+    ipcRenderer.send(IPCMessages.MaximizeWindow, wid);
   },
 
   restoreWindow(wid: number): void {
-    ipcRenderer.send("restore-window", wid);
+    ipcRenderer.send(IPCMessages.RestoreWindow, wid);
   },
 
   closeWindow(wid: number): void {
-    ipcRenderer.send("close-window", wid);
+    ipcRenderer.send(IPCMessages.CloseWindow, wid);
   },
 
   focusDesktopBrowser({ screenIndex, takeVisualFocus }: { screenIndex: number; takeVisualFocus?: boolean }): void {
-    ipcRenderer.send("focus-desktop-browser", { screenIndex, takeVisualFocus });
+    ipcRenderer.send(IPCMessages.FocusDesktopBrowser, { screenIndex, takeVisualFocus });
   },
 
   frameWindowMouseEnter(wid: number): void {
-    ipcRenderer.send("frame-window-mouse-enter", wid);
+    ipcRenderer.send(IPCMessages.FrameWindowMouseEnter, wid);
   },
 
   desktopZoomIn(screenIndex: number): void {
-    ipcRenderer.send("desktop-zoom-in", { screenIndex });
+    ipcRenderer.send(IPCMessages.DesktopZoomIn, { screenIndex });
   },
 
   desktopZoomOut(screenIndex: number): void {
-    ipcRenderer.send("desktop-zoom-out", { screenIndex });
+    ipcRenderer.send(IPCMessages.DesktopZoomOut, { screenIndex });
   },
 
   desktopZoomReset(screenIndex: number): void {
-    ipcRenderer.send("desktop-zoom-reset", { screenIndex });
+    ipcRenderer.send(IPCMessages.DesktopZoomReset, { screenIndex });
   },
 
   executeDesktopEntry(entryName: string): void {
-    ipcRenderer.send("exec-desktop-entry", { entryName });
+    ipcRenderer.send(IPCMessages.ExecDesktopEntry, { entryName });
   },
 
   showDevTools(screenIndex: number): void {
-    ipcRenderer.send("show-desktop-dev-tools", { screenIndex });
+    ipcRenderer.send(IPCMessages.ShowDesktopDevTools, { screenIndex });
   },
 
   showContextMenu(menuKind: ContextMenuKind): void {
-    ipcRenderer.send("show-context-menu", { menuKind });
+    ipcRenderer.send(IPCMessages.ShowContextMenu, { menuKind });
   },
 
   sendRegisterDesktopShortcut(keyString: string, screenIndex: number): void {
-    ipcRenderer.send("register-desktop-shortcut", { keyString, screenIndex });
+    ipcRenderer.send(IPCMessages.RegisterDesktopShortcut, { keyString, screenIndex });
   },
 
   sendUnregisterDesktopShortcut(keyString: string, screenIndex: number): void {
-    ipcRenderer.send("unregister-desktop-shortcut", { keyString, screenIndex });
+    ipcRenderer.send(IPCMessages.UnregisterDesktopShortcut, { keyString, screenIndex });
   },
 
   setupIpc(callbacks: ISetupIPCCallbacks) {

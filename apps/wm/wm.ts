@@ -6,6 +6,7 @@ import { app, ipcMain, BrowserWindow } from "electron";
 import {
   IBounds,
   IGeometry,
+  IPCMessages,
   IWindowManagerServer,
   KeyRegistrationMap,
   LayoutPluginConfig,
@@ -352,72 +353,68 @@ export async function createServer(): Promise<IWindowManagerServer> {
   client.on("error", logError);
   client.on("event", __onXEvent);
 
-  ipcMain.on("raise-window", (event, wid) => {
+  ipcMain.on(IPCMessages.RaiseWindow, (event, wid) => {
     raiseWindow(wid);
   });
 
-  ipcMain.on("minimize-window", (event, wid) => {
+  ipcMain.on(IPCMessages.MinimizeWindow, (event, wid) => {
     minimize(wid);
   });
 
-  ipcMain.on("maximize-window", (event, wid) => {
+  ipcMain.on(IPCMessages.MaximizeWindow, (event, wid) => {
     maximize(wid);
   });
 
-  ipcMain.on("restore-window", (event, wid) => {
+  ipcMain.on(IPCMessages.RestoreWindow, (event, wid) => {
     restore(wid);
   });
 
-  ipcMain.on("close-window", (event, wid) => {
+  ipcMain.on(IPCMessages.CloseWindow, (event, wid) => {
     closeWindow(wid);
   });
 
-  ipcMain.on("focus-desktop-browser", (event, args: { screenIndex: number; takeVisualFocus?: boolean }) => {
+  ipcMain.on(IPCMessages.FocusDesktopBrowser, (event, args: { screenIndex: number; takeVisualFocus?: boolean }) => {
     setFocusToDesktopWindow(args.screenIndex, args.takeVisualFocus);
   });
 
-  ipcMain.on("frame-window-mouse-enter", (event, wid) => {
+  ipcMain.on(IPCMessages.FrameWindowMouseEnter, (event, wid) => {
     // Alternative in case we don't receive PointerMotion over a window.
     if (ignoreEnterLeave) {
-      widLog(wid, "frame-window-mouse-enter", "clearing enterleave ignore");
+      widLog(wid, IPCMessages.FrameWindowMouseEnter, "clearing enterleave ignore");
       ignoreEnterLeave = false;
     }
   });
 
-  ipcMain.on("desktop-zoom-in", (event, args: { screenIndex: number }) => {
+  ipcMain.on(IPCMessages.DesktopZoomIn, (event, args: { screenIndex: number }) => {
     desktopZoomIn(args.screenIndex);
   });
 
-  ipcMain.on("desktop-zoom-out", (event, args: { screenIndex: number }) => {
+  ipcMain.on(IPCMessages.DesktopZoomOut, (event, args: { screenIndex: number }) => {
     desktopZoomOut(args.screenIndex);
   });
 
-  ipcMain.on("desktop-zoom-reset", (event, args: { screenIndex: number }) => {
+  ipcMain.on(IPCMessages.DesktopZoomReset, (event, args: { screenIndex: number }) => {
     desktopZoomReset(args.screenIndex);
   });
 
-  ipcMain.on("exec", (event, args) => {
-    launchProcess(args.executable);
-  });
-
-  ipcMain.on("exec-desktop-entry", (event, args: { entryName: string }) => {
+  ipcMain.on(IPCMessages.ExecDesktopEntry, (event, args: { entryName: string }) => {
     desktopEntriesModule.launchDesktopEntry(args.entryName);
   });
 
-  ipcMain.on("show-context-menu", (event, args: { menuKind: ContextMenuKind }) => {
+  ipcMain.on(IPCMessages.ShowContextMenu, (event, args: { menuKind: ContextMenuKind }) => {
     showContextMenu(event, args.menuKind, store.getState().config.version);
   });
 
-  ipcMain.on("show-desktop-dev-tools", (event, args: { screenIndex: number }) => {
+  ipcMain.on(IPCMessages.ShowDesktopDevTools, (event, args: { screenIndex: number }) => {
     desktopBrowsers[args.screenIndex]?.webContents?.openDevTools();
   });
 
-  ipcMain.on("register-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
+  ipcMain.on(IPCMessages.RegisterDesktopShortcut, (event, args: { keyString: string; screenIndex: number }) => {
     const screen = store.getState().screens[args.screenIndex];
     shortcuts.registerShortcut(screen.root, args.keyString, sendKeyToBrowser);
   });
 
-  // ipcMain.on("unregister-desktop-shortcut", (event, args: { keyString: string; screenIndex: number }) => {
+  // ipcMain.on(IPCMessages.UnregisterDesktopShortcut, (event, args: { keyString: string; screenIndex: number }) => {
   //   // Not implemented yet.
   // });
 
