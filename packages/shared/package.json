@@ -1,11 +1,11 @@
 {
-  "name": "@electron-wm/shared",
+  "name": "@bond-wm/shared",
   "version": "0.2.1",
   "description": "Shared internal functionality",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./index.ts",
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
@@ -25,7 +25,7 @@
     "yargs": "^17.6.2"
   },
   "devDependencies": {
-    "@electron-wm/tsconfig": "workspace:^",
+    "@bond-wm/tsconfig": "workspace:^",
     "@jest/globals": "^29.3.1",
     "@types/node": "^18.11.17",
     "@types/yargs": "^17.0.15",

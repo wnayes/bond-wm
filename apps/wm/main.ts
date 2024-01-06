@@ -9,7 +9,7 @@ dialog.showErrorBox = function (title, content) {
   console.error(`${title}\n${content}`);
 };
 
-log("electron-wm main");
+log("bond-wm main");
 log("user data path: ", app.getPath("userData"));
 
 if (loggingEnabled()) {

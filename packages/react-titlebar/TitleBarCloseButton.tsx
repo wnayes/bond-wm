@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { closeWindow } from "@electron-wm/shared-renderer";
-import { useWindow } from "@electron-wm/react";
+import { closeWindow } from "@bond-wm/shared-renderer";
+import { useWindow } from "@bond-wm/react";
 import closeImg from "./assets/close.svg";
 
 export function TitleBarCloseButton() {

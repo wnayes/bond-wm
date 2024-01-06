@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { maximizeWindow, restoreWindow, showContextMenu } from "@electron-wm/shared-renderer";
-import { ContextMenuKind } from "@electron-wm/shared";
-import { IWindow } from "@electron-wm/shared";
-import { Stylesheet, useSupportsMaximize, useTheme, useWindow } from "@electron-wm/react";
+import { maximizeWindow, restoreWindow, showContextMenu } from "@bond-wm/shared-renderer";
+import { ContextMenuKind } from "@bond-wm/shared";
+import { IWindow } from "@bond-wm/shared";
+import { Stylesheet, useSupportsMaximize, useTheme, useWindow } from "@bond-wm/react";
 import styles from "./TitleBar.css";
 
 const DefaultHeight = 20;

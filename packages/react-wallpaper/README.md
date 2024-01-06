@@ -1,6 +1,6 @@
-# @electron-wm/react-wallpaper
+# @bond-wm/react-wallpaper
 
-A dynamic React wallpaper component for the `electron-wm` window manager.
+A dynamic React wallpaper component for the `bond-wm` window manager.
 
 The rendering algorithm is modified from
 https://github.com/roytanck/wallpaper-generator
@@ -10,7 +10,7 @@ https://github.com/roytanck/wallpaper-generator
 Use the `Wallpaper` component within your desktop's work area.
 
 ```tsx
-import { Wallpaper } from "@electron-wm/react-wallpaper";
+import { Wallpaper } from "@bond-wm/react-wallpaper";
 
 <Desktop>
   <WorkArea>

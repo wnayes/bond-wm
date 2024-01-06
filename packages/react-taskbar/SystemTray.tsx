@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
-import { configureTrayWindowAction, ITrayEntry, geometriesDiffer } from "@electron-wm/shared";
-import { useBrowserWindowSize, useScreenIndex } from "@electron-wm/react";
+import { RootState, getBoundingClientRectWithZoom } from "@bond-wm/shared-renderer";
+import { configureTrayWindowAction, ITrayEntry, geometriesDiffer } from "@bond-wm/shared";
+import { useBrowserWindowSize, useScreenIndex } from "@bond-wm/react";
 
 export function SystemTray() {
   useBrowserWindowSize(); // Triggers re-renders on resize.

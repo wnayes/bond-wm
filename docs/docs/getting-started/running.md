@@ -8,24 +8,24 @@ After installation and configuration, you can run the window manager and try it
 out.
 
 As with other X11 window managers, it is common to edit your `.xinitrc`
-file and add `electron-wm` to the end, making it the last executable invoked
+file and add `bond-wm` to the end, making it the last executable invoked
 when starting your X server.
 
 If your configuration package is in a non-default location, specify it via the
 `--config` command line parameter.
 
 ```
-electron-wm --config ~/my-desktop-config
+bond-wm --config ~/my-desktop-config
 ```
 
 If you omit `--config` it is assumed that your configuration resides in the
-`electron-wm-config` folder that the init script creates by default.
+`bond-wm-config` folder that the init script creates by default.
 
 Note that `--config` doesn't have to refer to a local folder. This can be any
 "package identifier" that Node.js can `require` at runtime, provided you have
 installed the package. For example, if you want the vanilla react template that
-electron-wm provides, you could `npm i -g @electron-wm/react-config` and then
-pass `--config @electron-wm/react-config`.
+bond-wm provides, you could `npm i -g @bond-wm/react-config` and then
+pass `--config @bond-wm/react-config`.
 
 ## Transparency
 
@@ -37,7 +37,7 @@ As typical with X11 compositors, they are often ran before the WM itself:
 
 ```
 picom &
-exec electron-wm
+exec bond-wm
 ```
 
 Picom enables several effects by default (shadows, fading) which you may want to

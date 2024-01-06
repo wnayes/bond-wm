@@ -7,7 +7,7 @@ import {
   WindowPosition,
   addLayoutResult,
   windowIsDialog,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 import FloatingIcon from "./floating.png";
 
 interface IFloatingLayoutSettings {
@@ -90,7 +90,7 @@ export function createFloatingLayout(settings?: IFloatingLayoutSettings): Layout
     return results;
   };
 
-  /** A floating layout for electron-wm. */
+  /** A floating layout for bond-wm. */
   const plugin: LayoutPluginConfig = {
     name: "Floating",
     icon: FloatingIcon,

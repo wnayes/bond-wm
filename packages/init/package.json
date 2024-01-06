@@ -1,9 +1,9 @@
 {
-  "name": "@electron-wm/init",
+  "name": "@bond-wm/init",
   "version": "0.1.1",
-  "description": "Configuration initialization scripts for electron-wm",
+  "description": "Configuration initialization scripts for bond-wm",
   "bin": "./init.mjs",
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {},

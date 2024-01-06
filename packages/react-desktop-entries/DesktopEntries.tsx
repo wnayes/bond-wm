@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { useDesktopEntries, useElementSize } from "@electron-wm/react";
-import { DesktopEntry as DesktopEntryType } from "@electron-wm/shared";
-import { executeDesktopEntry } from "@electron-wm/shared-renderer";
+import { useDesktopEntries, useElementSize } from "@bond-wm/react";
+import { DesktopEntry as DesktopEntryType } from "@bond-wm/shared";
+import { executeDesktopEntry } from "@bond-wm/shared-renderer";
 import "./DesktopEntries.css";
 
 const DesktopEntryHeight = 110;

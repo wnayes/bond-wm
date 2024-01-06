@@ -1,5 +1,5 @@
 > [!NOTE]
-> This is an electron-wm fork of the npm `keysym` to remove use of Node `fs` APIs and `__dirname`.
+> This is an bond-wm fork of the npm `keysym` to remove use of Node `fs` APIs and `__dirname`.
 
 # Keysym
 

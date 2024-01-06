@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { callRef, useElementSize, useIconInfoDataUri, useWindow } from "@electron-wm/react";
-import { IIconInfo } from "@electron-wm/shared";
+import { callRef, useElementSize, useIconInfoDataUri, useWindow } from "@bond-wm/react";
+import { IIconInfo } from "@bond-wm/shared";
 
 const IconMultipleOf = 8;
 const IconDefaultSize = 16;

@@ -6,7 +6,7 @@ import {
   WindowPosition,
   addLayoutResult,
   windowIsDialog,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 import TilingIcon from "./tiling.png";
 
 const TilingLayout: LayoutFunction = ({ windows, screen }) => {
@@ -82,7 +82,7 @@ const TilingLayout: LayoutFunction = ({ windows, screen }) => {
   return results;
 };
 
-/** A tiling layout for electron-wm. */
+/** A tiling layout for bond-wm. */
 const Plugin: LayoutPluginConfig = {
   name: "Tiling",
   icon: TilingIcon,

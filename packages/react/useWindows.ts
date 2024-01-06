@@ -1,12 +1,12 @@
 import { useSelector } from "react-redux";
-import { RootState } from "@electron-wm/shared-renderer";
+import { RootState } from "@bond-wm/shared-renderer";
 import {
   IWindow,
   selectAllWindows,
   selectVisibleWindowsFromCurrentTags,
   selectWindowsFromCurrentTags,
   selectWindowsFromScreen,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 import { useScreenIndex } from "./useScreenIndex";
 
 export interface IUseWindowsProps {

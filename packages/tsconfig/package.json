@@ -1,8 +1,8 @@
 {
-  "name": "@electron-wm/tsconfig",
+  "name": "@bond-wm/tsconfig",
   "version": "0.1.0",
-  "description": "Shared TypeScript configuration for electron-wm packages",
-  "repository": "https://github.com/wnayes/electron-wm",
+  "description": "Shared TypeScript configuration for bond-wm packages",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {},

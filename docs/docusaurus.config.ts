@@ -3,7 +3,7 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
-  title: "electron-wm docs",
+  title: "bond-wm docs",
   tagline: "Web-based X11 window manager",
   // favicon: "img/favicon.ico",
 
@@ -11,11 +11,11 @@ const config: Config = {
   url: "https://wnayes.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: "/electron-wm/",
+  baseUrl: "/bond-wm/",
 
   // GitHub pages deployment config.
   organizationName: "wnayes",
-  projectName: "electron-wm",
+  projectName: "bond-wm",
   trailingSlash: false,
 
   onBrokenLinks: "throw",
@@ -49,7 +49,7 @@ const config: Config = {
     // Replace with your project's social card
     // image: "img/docusaurus-social-card.jpg",
     navbar: {
-      // title: "electron-wm",
+      // title: "bond-wm",
       logo: {
         alt: "My Site Logo",
         src: "img/logo.svg",
@@ -62,7 +62,7 @@ const config: Config = {
         //   label: "Docs",
         // },
         {
-          href: "https://github.com/wnayes/electron-wm",
+          href: "https://github.com/wnayes/bond-wm",
           label: "GitHub",
           position: "right",
         },
@@ -81,7 +81,7 @@ const config: Config = {
     //       ],
     //     },
     //   ],
-    //   copyright: `Copyright © ${new Date().getFullYear()} electron-wm. Built with Docusaurus.`,
+    //   copyright: `Copyright © ${new Date().getFullYear()} bond-wm. Built with Docusaurus.`,
     // },
     prism: {
       theme: prismThemes.github,

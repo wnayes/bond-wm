@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
-import { IWindow, selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
-import { RootState } from "@electron-wm/shared-renderer";
+import { IWindow, selectWindowMaximizeCanTakeEffect } from "@bond-wm/shared";
+import { RootState } from "@bond-wm/shared-renderer";
 import { useLayoutPlugins } from "./useLayoutPlugins";
 
 export function useSupportsMaximize(win: IWindow | null): boolean {

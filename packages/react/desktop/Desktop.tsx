@@ -5,9 +5,9 @@ import {
   showContextMenu,
   setupIpc,
   invokeDesktopShortcutHandler,
-} from "@electron-wm/shared-renderer";
-import { ContextMenuKind } from "@electron-wm/shared";
-import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@electron-wm/shared-renderer";
+} from "@bond-wm/shared-renderer";
+import { ContextMenuKind } from "@bond-wm/shared";
+import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@bond-wm/shared-renderer";
 import { getScreenIndex, useScreenIndex } from "../useScreenIndex";
 import { Provider } from "react-redux";
 import "./Desktop.css";

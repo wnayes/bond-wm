@@ -1,5 +1,5 @@
 import { app, BrowserWindow, IpcMainEvent, Menu } from "electron";
-import { ContextMenuKind } from "@electron-wm/shared";
+import { ContextMenuKind } from "@bond-wm/shared";
 import { log } from "./log";
 
 export function showContextMenu(event: IpcMainEvent, kind: ContextMenuKind, version: string | undefined): void {
@@ -24,7 +24,7 @@ function showDesktopMenu(event: IpcMainEvent, version: string | undefined) {
 
   const desktopMenu = Menu.buildFromTemplate([
     {
-      label: "electron-wm" + (version ? ` — ${version}` : ""),
+      label: "bond-wm" + (version ? ` — ${version}` : ""),
       enabled: false,
     },
     {

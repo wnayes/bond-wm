@@ -1,6 +1,6 @@
-# @electron-wm/react-titlebar
+# @bond-wm/react-titlebar
 
-A frame window titlebar component implementation for the `electron-wm` window manager.
+A frame window titlebar component implementation for the `bond-wm` window manager.
 
 ## Usage
 
@@ -14,7 +14,7 @@ import {
   TitleBarMaximizeButton,
   TitleBarMinimizeButton,
   TitleBarText,
-} from "@electron-wm/react-titlebar";
+} from "@bond-wm/react-titlebar";
 
 return (
   <WindowFrame>

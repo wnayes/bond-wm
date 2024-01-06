@@ -6,7 +6,7 @@
 // 2. `cd .branches/react-config-release`
 // 3. `git status` and confirm staged changes are appropriate.
 // 4. Commit the changes.
-// 5. `git push` will push into the top level electron-wm .git repo.
+// 5. `git push` will push into the top level bond-wm .git repo.
 // 6. `cd ../..`
 // 7. `git push origin react-config-release`
 
@@ -21,7 +21,7 @@ const CheckoutFolder = join(process.cwd(), BranchesFolder, BranchName);
 const DotGitFolder = join(CheckoutFolder, ".git");
 
 const wmPackageJson = JSON.parse(readFileSync("./apps/wm/package.json", "utf-8"));
-if (!wmPackageJson || wmPackageJson.name !== "electron-wm") {
+if (!wmPackageJson || wmPackageJson.name !== "bond-wm") {
   console.error("Unexpected working directory");
   process.exit();
 }

@@ -8,7 +8,7 @@ import {
   screenReducer,
   trayReducer,
   windowReducer,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 
 export type ServerStore = ReturnType<typeof configureWMStore>;
 export type ServerRootState = ReturnType<ServerStore["getState"]>;

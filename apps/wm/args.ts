@@ -22,7 +22,7 @@ const argv = yargs(hideBin(process.argv))
     describe: "Enable logging output to a file",
   })
   .usage(
-    `electron-wm window manager
+    `bond-wm window manager
 
 Usage: $0 [options]`
   )

@@ -1,5 +1,5 @@
-import { LayoutInfo, selectConfigWithOverrides } from "@electron-wm/shared";
-import { RootState } from "@electron-wm/shared-renderer";
+import { LayoutInfo, selectConfigWithOverrides } from "@bond-wm/shared";
+import { RootState } from "@bond-wm/shared-renderer";
 import { useSelector } from "react-redux";
 
 export function useLayoutPlugins(screenIndex: number | undefined): readonly LayoutInfo[] {

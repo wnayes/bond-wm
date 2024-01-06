@@ -1,4 +1,4 @@
-import { useTheme } from "@electron-wm/react";
+import { useTheme } from "@bond-wm/react";
 import * as React from "react";
 import { PropsWithChildren } from "react";
 import "./Taskbar.css";

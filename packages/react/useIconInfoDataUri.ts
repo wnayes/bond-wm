@@ -1,4 +1,4 @@
-import { IIconInfo } from "@electron-wm/shared";
+import { IIconInfo } from "@bond-wm/shared";
 import { useEffect, useState } from "react";
 
 export function useIconInfoDataUri(iconInfo: IIconInfo | null | undefined): string | undefined {

@@ -1,12 +1,12 @@
 import * as React from "react";
 import { PropsWithChildren, useCallback, useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
-import { RootState, getBoundingClientRectWithZoom } from "@electron-wm/shared-renderer";
+import { RootState, getBoundingClientRectWithZoom } from "@bond-wm/shared-renderer";
 import { useBrowserWindowSize } from "../useBrowserWindowSize";
 import { useScreenIndex } from "../useScreenIndex";
-import { geometriesDiffer } from "@electron-wm/shared";
-import { configureScreenWorkAreaAction } from "@electron-wm/shared";
-import { focusDesktopBrowser } from "@electron-wm/shared-renderer";
+import { geometriesDiffer } from "@bond-wm/shared";
+import { configureScreenWorkAreaAction } from "@bond-wm/shared";
+import { focusDesktopBrowser } from "@bond-wm/shared-renderer";
 import { useTheme } from "../theming";
 
 export interface IWorkAreaProps extends PropsWithChildren {}

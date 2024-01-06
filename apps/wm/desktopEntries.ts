@@ -2,7 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { extname, isAbsolute, join } from "node:path";
 import { XWMContext } from "./wm";
 import { UserDirectoryKind, getXDGUserDirectory } from "./xdg";
-import { DesktopEntry, DesktopEntryKind, DesktopEntryMap, setDesktopEntries } from "@electron-wm/shared";
+import { DesktopEntry, DesktopEntryKind, DesktopEntryMap, setDesktopEntries } from "@bond-wm/shared";
 import { encodeArrayBufferToBase64 } from "./base64";
 import { log, logError } from "./log";
 // eslint-disable-next-line @typescript-eslint/no-var-requires

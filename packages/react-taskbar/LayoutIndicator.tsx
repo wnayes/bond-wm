@@ -1,9 +1,9 @@
 import React from "react";
 import { useCallback, useMemo } from "react";
-import { useLayoutPlugins, useRendererStore, useScreen } from "@electron-wm/react";
-import { getLayoutPluginName, switchToNextLayout } from "@electron-wm/shared";
+import { useLayoutPlugins, useRendererStore, useScreen } from "@bond-wm/react";
+import { getLayoutPluginName, switchToNextLayout } from "@bond-wm/shared";
 
-/** A default layout indicator/toggle for electron-wm. */
+/** A default layout indicator/toggle for bond-wm. */
 export function LayoutIndicator() {
   const screen = useScreen();
   const screenIndex = screen.index;

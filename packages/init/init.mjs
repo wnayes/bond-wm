@@ -7,10 +7,10 @@ import { env } from "node:process";
 import * as ChildProcess from "node:child_process";
 import prompts from "prompts";
 
-const RemoteRepo = "https://github.com/wnayes/electron-wm.git";
+const RemoteRepo = "https://github.com/wnayes/bond-wm.git";
 const Templates = ["react"];
 const XDGHome = getXDGHome();
-const DefaultConfigDirectoryName = "electron-wm-config";
+const DefaultConfigDirectoryName = "bond-wm-config";
 const DefaultConfigDirectoryPath = join(XDGHome, DefaultConfigDirectoryName);
 
 (async () => {

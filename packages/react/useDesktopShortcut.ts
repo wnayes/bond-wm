@@ -1,4 +1,4 @@
-import { DesktopShortcutOpts, registerDesktopShortcut, unregisterDesktopShortcut } from "@electron-wm/shared-renderer";
+import { DesktopShortcutOpts, registerDesktopShortcut, unregisterDesktopShortcut } from "@bond-wm/shared-renderer";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useScreenIndex } from "./useScreenIndex";
 

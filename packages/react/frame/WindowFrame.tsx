@@ -1,11 +1,11 @@
 import * as React from "react";
-import { isUrgent } from "@electron-wm/shared";
+import { isUrgent } from "@bond-wm/shared";
 import { useBrowserWindowSize } from "../useBrowserWindowSize";
 import { WidContext, useWindow } from "../useWindow";
 import { useTheme } from "../theming";
 import { Provider } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
-import { configureRendererStore, frameWindowMouseEnter, registerFrameWidListener } from "@electron-wm/shared-renderer";
+import { configureRendererStore, frameWindowMouseEnter, registerFrameWidListener } from "@bond-wm/shared-renderer";
 import "./WindowFrame.css";
 
 interface IWindowFrameProps extends React.PropsWithChildren<{}> {}

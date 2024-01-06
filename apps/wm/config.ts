@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 import { log } from "./log";
-import { setConfigPath, setConfigPathAction } from "@electron-wm/shared";
+import { setConfigPath, setConfigPathAction } from "@bond-wm/shared";
 import { ServerStore } from "./configureStore";
 import { getArgs } from "./args";
 import { getXDGConfigHome } from "./xdg";
@@ -21,7 +21,7 @@ export async function determineConfigPath(store: ServerStore): Promise<string> {
     const XDG_CONFIG_HOME = getXDGConfigHome();
     log("XDG_CONFIG_HOME", XDG_CONFIG_HOME);
 
-    configPath = join(XDG_CONFIG_HOME, "electron-wm-config", "index.ts");
+    configPath = join(XDG_CONFIG_HOME, "bond-wm-config", "index.ts");
     if (!existsSync(configPath)) {
       throw new Error("No --config path was specified, and no default config locations existed.");
     }

@@ -1,3 +1,3 @@
-# electron-wm
+# bond-wm
 
-See the [main electron-wm repository README](https://github.com/wnayes/electron-wm#electron-wm) for details.
+See the [main bond-wm repository README](https://github.com/wnayes/bond-wm#bond-wm) for details.

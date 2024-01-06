@@ -1,11 +1,11 @@
 {
-  "name": "@electron-wm/react",
+  "name": "@bond-wm/react",
   "version": "0.2.1",
-  "description": "Public APIs for electron-wm plugins",
+  "description": "Public APIs for bond-wm plugins",
   "main": "./index.ts",
   "exports": "./index.ts",
   "types": "./index.ts",
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
@@ -14,15 +14,15 @@
   },
   "dependencies": {
     "@callstack/react-theme-provider": "^3.0.9",
-    "@electron-wm/shared": "workspace:^",
-    "@electron-wm/shared-renderer": "workspace:^",
+    "@bond-wm/shared": "workspace:^",
+    "@bond-wm/shared-renderer": "workspace:^",
     "react-error-boundary": "^3.1.4",
     "react-redux": "^9.0.0",
     "redux": "^5.0.0",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@electron-wm/tsconfig": "workspace:^",
+    "@bond-wm/tsconfig": "workspace:^",
     "@types/node": "^18.11.17",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",

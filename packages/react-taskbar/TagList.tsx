@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
-import { RootState } from "@electron-wm/shared-renderer";
-import { selectWindowsFromScreen } from "@electron-wm/shared";
-import { setScreenCurrentTagsAction } from "@electron-wm/shared";
-import { arraysEqual, isUrgent } from "@electron-wm/shared";
-import { useScreenIndex } from "@electron-wm/react";
+import { RootState } from "@bond-wm/shared-renderer";
+import { selectWindowsFromScreen } from "@bond-wm/shared";
+import { setScreenCurrentTagsAction } from "@bond-wm/shared";
+import { arraysEqual, isUrgent } from "@bond-wm/shared";
+import { useScreenIndex } from "@bond-wm/react";
 
 export function TagList() {
   const screenIndex = useScreenIndex();

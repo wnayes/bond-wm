@@ -1,3 +1,3 @@
-# @electron-wm/shared
+# @bond-wm/shared
 
-A package containing shared APIs used by various other electron-wm packages.
+A package containing shared APIs used by various other bond-wm packages.

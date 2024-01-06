@@ -7,7 +7,7 @@ import {
   screenReducer,
   trayReducer,
   windowReducer,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 
 export function configureRendererStore() {
   return configureStore({

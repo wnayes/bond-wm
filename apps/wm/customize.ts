@@ -1,4 +1,4 @@
-import { IWindow, WindowPosition } from "@electron-wm/shared";
+import { IWindow, WindowPosition } from "@bond-wm/shared";
 
 /**
  * This is basically my personal customization.

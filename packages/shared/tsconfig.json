@@ -1,5 +1,5 @@
 {
-  "extends": "@electron-wm/tsconfig/tsconfig.base.json",
+  "extends": "@bond-wm/tsconfig/tsconfig.base.json",
   "include": ["**/*"],
   "exclude": ["./dist"],
   "compilerOptions": {

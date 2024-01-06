@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { app } from "electron";
 import { logError } from "./log";
-import { setVersionAction } from "@electron-wm/shared";
+import { setVersionAction } from "@bond-wm/shared";
 import { ServerStore } from "./configureStore";
 
 interface VersionJson {

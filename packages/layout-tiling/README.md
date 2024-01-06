@@ -1,13 +1,13 @@
-# @electron-wm/layout-tiling
+# @bond-wm/layout-tiling
 
-A default tiling layout for the `electron-wm` window manager.
+A default tiling layout for the `bond-wm` window manager.
 
 ## Usage
 
 Import and add a tiling layout in your config module:
 
 ```ts
-import LayoutTiling from "@electron-wm/layout-tiling";
+import LayoutTiling from "@bond-wm/layout-tiling";
 
 const config: IConfig = {
   // ...

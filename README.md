@@ -1,17 +1,19 @@
-# electron-wm
+<p align="center">
+  <a href="https://wnayes.github.io/bond-wm/" target="_blank" rel="noopener noreferrer">
+    <img src="/assets/logo.svg" height="110px" alt="bond-wm logo">
+  </a>
+</p>
 
-<img align="right" src="/assets/logo.svg" height="110px" alt="electron-wm logo">
+# bond-wm
 
-An X Window Manager built on web technologies, including Electron and React.
+An X Window Manager built on web technologies.
 
-See the [docs site](https://wnayes.github.io/electron-wm/)
+See the [docs site](https://wnayes.github.io/bond-wm/)
 for details on how to install and configure the window manager.
-
-<br /><br /><br />
 
 ## Screenshot
 
-![electron-wm screenshot](assets/screenshots/1.png?raw=true)
+![bond-wm screenshot](assets/screenshots/1.png?raw=true)
 
 ## Development
 

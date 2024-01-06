@@ -1,7 +1,7 @@
 import React from "react";
 import { useCallback, useEffect, useRef } from "react";
 
-/** A taskbar clock for electron-wm. */
+/** A taskbar clock for bond-wm. */
 export function Clock() {
   const divRef = useRef<HTMLDivElement>(null);
   const timeSpanRef = useRef<HTMLSpanElement>(null);

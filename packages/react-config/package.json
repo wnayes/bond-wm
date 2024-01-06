@@ -1,5 +1,5 @@
 {
-  "name": "@electron-wm/react-config",
+  "name": "@bond-wm/react-config",
   "version": "0.2.1",
   "description": "Default React user configuration",
   "exports": {
@@ -8,7 +8,7 @@
     "./frame/index.html": "./frame/index.html",
     "./package.json": "./package.json"
   },
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
@@ -16,14 +16,14 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
-    "@electron-wm/layout-floating": "workspace:^",
-    "@electron-wm/layout-tiling": "workspace:^",
-    "@electron-wm/react": "workspace:^",
-    "@electron-wm/react-desktop-entries": "workspace:^",
-    "@electron-wm/react-taskbar": "workspace:^",
-    "@electron-wm/react-titlebar": "workspace:^",
-    "@electron-wm/react-wallpaper": "workspace:^",
-    "@electron-wm/shared": "workspace:^",
+    "@bond-wm/layout-floating": "workspace:^",
+    "@bond-wm/layout-tiling": "workspace:^",
+    "@bond-wm/react": "workspace:^",
+    "@bond-wm/react-desktop-entries": "workspace:^",
+    "@bond-wm/react-taskbar": "workspace:^",
+    "@bond-wm/react-titlebar": "workspace:^",
+    "@bond-wm/react-wallpaper": "workspace:^",
+    "@bond-wm/shared": "workspace:^",
     "@vitejs/plugin-react": "^4.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -31,7 +31,7 @@
     "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@electron-wm/tsconfig": "workspace:^",
+    "@bond-wm/tsconfig": "workspace:^",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "typescript": "~5.3.2"

@@ -1,21 +1,21 @@
 {
-  "name": "@electron-wm/layout-tiling",
+  "name": "@bond-wm/layout-tiling",
   "version": "0.2.0",
-  "description": "Tiling layout for electron-wm",
+  "description": "Tiling layout for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
     "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@electron-wm/shared": "workspace:^",
+    "@bond-wm/shared": "workspace:^",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@electron-wm/tsconfig": "workspace:^",
+    "@bond-wm/tsconfig": "workspace:^",
     "@types/node": "^18.11.17",
     "type-fest": "^3.3.0",
     "typescript": "~5.3.2",

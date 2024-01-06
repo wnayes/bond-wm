@@ -1,6 +1,6 @@
-import type { IConfig } from "@electron-wm/shared";
-import { createFloatingLayout } from "@electron-wm/layout-floating";
-import LayoutTiling from "@electron-wm/layout-tiling";
+import type { IConfig } from "@bond-wm/shared";
+import { createFloatingLayout } from "@bond-wm/layout-floating";
+import LayoutTiling from "@bond-wm/layout-tiling";
 
 const DefaultTerminal = "xterm";
 const DefaultLauncher = "dmenu_run";

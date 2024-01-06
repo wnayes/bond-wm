@@ -1,13 +1,13 @@
-# @electron-wm/layout-floating
+# @bond-wm/layout-floating
 
-A default floating layout for the `electron-wm` window manager.
+A default floating layout for the `bond-wm` window manager.
 
 ## Usage
 
 Import and add floating layouts in your config module:
 
 ```ts
-import { createFloatingLayout } from "@electron-wm/layout-floating";
+import { createFloatingLayout } from "@bond-wm/layout-floating";
 
 const config: IConfig = {
   // ...

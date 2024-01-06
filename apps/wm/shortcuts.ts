@@ -1,7 +1,7 @@
-import { IXDisplay, KeyRegistrationMap, X11_KEY_MODIFIER, XWMEventConsumerKeyPressArgs } from "@electron-wm/shared";
+import { IXDisplay, KeyRegistrationMap, X11_KEY_MODIFIER, XWMEventConsumerKeyPressArgs } from "@bond-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
-import * as nodeKeySym from "@electron-wm/keysym";
+import * as nodeKeySym from "@bond-wm/keysym";
 
 interface KeyRegistrationInfo {
   originalKeyString: string;

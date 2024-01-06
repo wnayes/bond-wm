@@ -1,4 +1,4 @@
-import { ContextMenuKind, ElectronWMIPCInterface, ISetupIPCCallbacks } from "@electron-wm/shared";
+import { ContextMenuKind, ElectronWMIPCInterface, ISetupIPCCallbacks } from "@bond-wm/shared";
 
 declare global {
   interface Window {

@@ -1,13 +1,13 @@
-import { XWMWindowType, setWindowFullscreenAction, setWindowUrgentAction } from "@electron-wm/shared";
-import { numsToBuffer } from "@electron-wm/shared";
-import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@electron-wm/shared";
+import { XWMWindowType, setWindowFullscreenAction, setWindowUrgentAction } from "@bond-wm/shared";
+import { numsToBuffer } from "@bond-wm/shared";
+import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@bond-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
 import { pid } from "process";
 import { DragModule } from "./drag";
-import { Coords } from "@electron-wm/shared";
-import { IIconInfo, ResizeDirection } from "@electron-wm/shared";
+import { Coords } from "@bond-wm/shared";
+import { IIconInfo, ResizeDirection } from "@bond-wm/shared";
 
 enum NetWmStateAction {
   _NET_WM_STATE_REMOVE = 0,
@@ -213,7 +213,7 @@ export async function createEWMHEventConsumer(
       const widBuffer = numsToBuffer([wid]);
       X.ChangeProperty(XPropMode.Replace, root, atoms._NET_SUPPORTING_WM_CHECK, X.atoms.WINDOW, 32, widBuffer);
       X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_SUPPORTING_WM_CHECK, X.atoms.WINDOW, 32, widBuffer);
-      X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_NAME, atoms.UTF8_STRING, 8, "electron-wm");
+      X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_NAME, atoms.UTF8_STRING, 8, "bond-wm");
       X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_PID, X.atoms.CARDINAL, 32, numsToBuffer([pid]));
     },
 

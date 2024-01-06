@@ -1,5 +1,5 @@
 import React from "react";
-import { WindowFrame, WindowClientArea, ThemeContextProvider } from "@electron-wm/react";
+import { WindowFrame, WindowClientArea, ThemeContextProvider } from "@bond-wm/react";
 import {
   TitleBar,
   TitleBarCloseButton,
@@ -7,7 +7,7 @@ import {
   TitleBarMaximizeButton,
   TitleBarMinimizeButton,
   TitleBarText,
-} from "@electron-wm/react-titlebar";
+} from "@bond-wm/react-titlebar";
 import { MyTheme } from "../theme";
 
 export default () => {

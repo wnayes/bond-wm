@@ -1,4 +1,4 @@
-import { Atom, IXClient, XEventMask, XGetPropertyCallbackProps } from "@electron-wm/shared";
+import { Atom, IXClient, XEventMask, XGetPropertyCallbackProps } from "@bond-wm/shared";
 import { log, logError } from "./log";
 import { ExtraAtoms } from "./wm";
 

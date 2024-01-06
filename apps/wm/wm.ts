@@ -21,7 +21,7 @@ import {
   selectVisibleWindowsFromCurrentTags,
   setConfig,
   setConfigAction,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
 import { log, logDir, logError } from "./log";
@@ -52,20 +52,20 @@ import {
   IXButtonReleaseEvent,
   WMSizeHints,
   WMHintsStates,
-} from "@electron-wm/shared";
+} from "@bond-wm/shared";
 import { Action, Middleware, UnknownAction, isAction } from "redux";
 import { ViteDevServer, createServer as createViteServer } from "vite";
 import { ViteNodeServer } from "vite-node/server";
 import { ViteNodeRunner } from "vite-node/client";
 import { installSourcemapsSupport } from "vite-node/source-map";
-import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "@electron-wm/shared";
+import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect } from "@bond-wm/shared";
 import { requireExt as requireXinerama } from "./xinerama";
 import { createEWMHEventConsumer } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
-import { ContextMenuKind } from "@electron-wm/shared";
+import { ContextMenuKind } from "@bond-wm/shared";
 import { showContextMenu } from "./menus";
 import {
   addWindowAction,
@@ -80,12 +80,12 @@ import {
   setWindowTagsAction,
   setWindowTitleAction,
   setWindowVisibleAction,
-} from "@electron-wm/shared";
-import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "@electron-wm/shared";
-import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } from "@electron-wm/shared";
-import { IScreen } from "@electron-wm/shared";
+} from "@bond-wm/shared";
+import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "@bond-wm/shared";
+import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } from "@bond-wm/shared";
+import { IScreen } from "@bond-wm/shared";
 import { setupAutocompleteListener } from "./autocomplete";
-import { switchToNextLayout } from "@electron-wm/shared";
+import { switchToNextLayout } from "@bond-wm/shared";
 import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
 import { loggingEnabled } from "./args";

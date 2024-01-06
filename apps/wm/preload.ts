@@ -11,8 +11,8 @@ import type {
   ElectronWMIPCInterface,
   CompletionOptionsCallback,
   ISetupIPCCallbacks,
-} from "@electron-wm/shared";
-import { IPCMessages } from "@electron-wm/shared";
+} from "@bond-wm/shared";
+import { IPCMessages } from "@bond-wm/shared";
 
 let _onCompletionOptionsResult: CompletionOptionsCallback | undefined;
 

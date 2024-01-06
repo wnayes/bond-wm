@@ -5,19 +5,19 @@ import {
   setWindowIntoScreenAction,
   startDragAction,
   XWMWindowType,
-} from "@electron-wm/shared";
-import { IScreen } from "@electron-wm/shared";
-import { selectWindowMaximizeCanTakeEffect } from "@electron-wm/shared";
-import { Coords, IGeometry } from "@electron-wm/shared";
-import { geometryArea, geometryIntersect } from "@electron-wm/shared";
+} from "@bond-wm/shared";
+import { IScreen } from "@bond-wm/shared";
+import { selectWindowMaximizeCanTakeEffect } from "@bond-wm/shared";
+import { Coords, IGeometry } from "@bond-wm/shared";
+import { geometryArea, geometryIntersect } from "@bond-wm/shared";
 import {
   getAbsoluteWindowGeometry,
   IWindow,
   newHeightForWindow,
   newWidthForWindow,
   ResizeDirection,
-} from "@electron-wm/shared";
-import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "@electron-wm/shared";
+} from "@bond-wm/shared";
+import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "@bond-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
 

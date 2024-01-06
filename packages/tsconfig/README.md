@@ -1,3 +1,3 @@
-# @electron-wm/tsconfig
+# @bond-wm/tsconfig
 
-TypeScript configuration used by electron-wm packages.
+TypeScript configuration used by bond-wm packages.

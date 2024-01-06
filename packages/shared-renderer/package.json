@@ -1,11 +1,11 @@
 {
-  "name": "@electron-wm/shared-renderer",
+  "name": "@bond-wm/shared-renderer",
   "version": "0.2.0",
   "description": "Renderer shared internal functionality",
   "main": "./index.ts",
   "exports": "./index.ts",
   "types": "./index.ts",
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
@@ -13,14 +13,14 @@
     "clean": "rm -rf ./dist ./node_modules"
   },
   "dependencies": {
-    "@electron-wm/shared": "workspace:^",
+    "@bond-wm/shared": "workspace:^",
     "@reduxjs/toolkit": "^2.0.0",
     "electron-redux": "2.0.0-alpha.9",
     "redux": "^5.0.0",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@electron-wm/tsconfig": "workspace:^",
+    "@bond-wm/tsconfig": "workspace:^",
     "@types/node": "^18.11.17",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",

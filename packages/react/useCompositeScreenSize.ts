@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
-import { RootState } from "@electron-wm/shared-renderer";
-import { IGeometry, ISize } from "@electron-wm/shared";
+import { RootState } from "@bond-wm/shared-renderer";
+import { IGeometry, ISize } from "@bond-wm/shared";
 
 /**
  * Returns the "composite size" of all screens together.
