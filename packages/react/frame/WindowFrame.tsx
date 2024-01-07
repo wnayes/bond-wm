@@ -19,6 +19,20 @@ interface WindowFrameStyle extends React.CSSProperties {
   "--window-urgent-border-color": string;
 }
 
+let _onSetNewWidInReact: ((newWid: number) => void) | undefined;
+
+// This needs to be registered early (script load) or else we get into a race condition.
+registerFrameWidListener((newWid) => {
+  // Update URL so that frame reload doesn't break the frame.
+  const url = new URL(window.location.href);
+  url.searchParams.set("wid", newWid + "");
+  window.history.pushState({}, "", url);
+
+  if (_onSetNewWidInReact) {
+    _onSetNewWidInReact(newWid);
+  }
+});
+
 /**
  * Component that renders a window frame around a client window.
  */
@@ -40,18 +54,15 @@ export function WindowFrame({ children }: IWindowFrameProps) {
     }
   }, [store]);
 
-  const onNewWidAssigned = useCallback((newWid: number) => {
-    // Update URL so that frame reload doesn't break the frame.
-    const url = new URL(window.location.href);
-    url.searchParams.set("wid", newWid + "");
-    window.history.pushState({}, "", url);
-
-    setWid(newWid);
-  }, []);
-
   useEffect(() => {
-    registerFrameWidListener(onNewWidAssigned);
-  }, [onNewWidAssigned]);
+    if (_onSetNewWidInReact) {
+      throw new Error("Only one WindowFrame component is allowed to render");
+    }
+    _onSetNewWidInReact = setWid;
+    return () => {
+      _onSetNewWidInReact = undefined;
+    };
+  }, []);
 
   const onFrameMouseEnter = useCallback(() => {
     if (wid) {

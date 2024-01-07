@@ -667,7 +667,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
       win.setSize(geometry.width, geometry.height, false);
       win.setPosition(geometry.x, geometry.y, false);
       onDeckInfo.winLoadPromise.then(() => {
-        win.webContents.send("set-frame-wid", wid);
+        win.webContents.send(IPCMessages.SetFrameWid, wid);
         win.webContents.setZoomLevel(screen.zoom);
       });
       win.show();
