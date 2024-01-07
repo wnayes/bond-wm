@@ -8,9 +8,9 @@
     <div id="content"></div>
   </body>
   <script type="module">
-    import MyFrame from "./frame.tsx";
     import React from "react";
     import { createRoot } from "react-dom/client";
+    import MyFrame from "./frame.tsx";
 
     const reactRoot = createRoot(document.getElementById("content"));
     reactRoot.render(React.createElement(MyFrame));
