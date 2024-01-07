@@ -1,19 +1,18 @@
 import React from "react";
-import * as ReactDesktop from "@electron-wm/react-desktop";
-import { Desktop, ErrorDisplay, WorkArea, ThemeContextProvider, useScreenIndex } from "@electron-wm/react";
+import { Desktop, ErrorDisplay, WorkArea, ThemeContextProvider, useScreenIndex } from "@bond-wm/react";
 import { ErrorBoundary } from "react-error-boundary";
-import { Taskbar, TagList, TaskList, RunField, SystemTray, Clock, LayoutIndicator } from "@electron-wm/react-taskbar";
-import { Wallpaper } from "@electron-wm/react-wallpaper";
-import { MyTheme } from "./theme";
+import { DesktopEntries } from "@bond-wm/react-desktop-entries";
+import { Taskbar, TagList, TaskList, SystemTray, Clock, LayoutIndicator } from "@bond-wm/react-taskbar";
+import { Wallpaper } from "@bond-wm/react-wallpaper";
+import { MyTheme } from "../theme";
 
-const MyDesktop = () => {
+export default () => {
   const screenIndex = useScreenIndex();
   return (
     <ThemeContextProvider theme={MyTheme}>
       <Desktop>
         <Taskbar height={20}>
           <TagList />
-          <RunField />
           <TaskList />
           {screenIndex === 0 && <SystemTray />}
           <Clock />
@@ -22,17 +21,10 @@ const MyDesktop = () => {
         <ErrorBoundary FallbackComponent={ErrorDisplay}>
           <WorkArea>
             <Wallpaper />
+            <DesktopEntries />
           </WorkArea>
         </ErrorBoundary>
       </Desktop>
     </ThemeContextProvider>
   );
-};
-
-/** Desktop configuration. */
-export default {
-  module: ReactDesktop,
-  settings: {
-    desktopComponent: MyDesktop,
-  },
 };

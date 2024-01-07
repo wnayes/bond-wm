@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+  </head>
+  <body>
+    <div id="content"></div>
+  </body>
+  <script type="module">
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    import MyFrame from "./frame.tsx";
+
+    const reactRoot = createRoot(document.getElementById("content"));
+    reactRoot.render(React.createElement(MyFrame));
+  </script>
+</html>

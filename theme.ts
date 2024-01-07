@@ -1,4 +1,4 @@
-import { Theme } from "@electron-wm/react";
+import { Theme } from "@bond-wm/react";
 
 export const MyTheme: Theme = {
   primaryColor: "#7269d2",

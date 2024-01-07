@@ -1,3 +1,3 @@
-# @electron-wm/react-config
+# @bond-wm/react-config
 
-A default configuration template for a React-based electron-wm desktop.
+A default configuration template for a React-based bond-wm desktop.

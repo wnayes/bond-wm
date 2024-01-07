@@ -1,13 +1,14 @@
 {
-  "name": "@electron-wm/react-config",
-  "version": "0.2.1",
-  "description": "Default React user configuration",
+  "name": "@bond-wm/react-config",
+  "version": "0.3.0",
+  "description": "Default bond-wm React user configuration",
   "exports": {
     ".": "./index.ts",
-    "./desktop": "./desktop.tsx",
-    "./frame": "./frame.tsx"
+    "./desktop/index.html": "./desktop/index.html",
+    "./frame/index.html": "./frame/index.html",
+    "./package.json": "./package.json"
   },
-  "repository": "https://github.com/wnayes/electron-wm",
+  "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",
   "license": "MIT",
   "scripts": {
@@ -15,26 +16,24 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
-    "@electron-wm/layout-floating": "^0.2.0",
-    "@electron-wm/layout-tiling": "^0.2.0",
-    "@electron-wm/react": "^0.2.0",
-    "@electron-wm/react-desktop": "^0.2.0",
-    "@electron-wm/react-frame": "^0.2.0",
-    "@electron-wm/react-taskbar": "^0.2.0",
-    "@electron-wm/react-titlebar": "^0.2.0",
-    "@electron-wm/react-wallpaper": "^0.2.0",
-    "@electron-wm/shared": "^0.2.0",
+    "@bond-wm/layout-floating": "^0.3.0",
+    "@bond-wm/layout-tiling": "^0.3.0",
+    "@bond-wm/react": "^0.3.0",
+    "@bond-wm/react-desktop-entries": "^0.3.0",
+    "@bond-wm/react-taskbar": "^0.3.0",
+    "@bond-wm/react-titlebar": "^0.3.0",
+    "@bond-wm/react-wallpaper": "^0.3.0",
+    "@bond-wm/shared": "^0.3.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",
     "tslib": "^2.4.1"
   },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
   "devDependencies": {
-    "@electron-wm/tsconfig": "^0.1.0",
-    "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.9",
+    "@bond-wm/tsconfig": "^0.3.0",
+    "@types/react": "^18.2.46",
+    "@types/react-dom": "^18.2.18",
     "typescript": "~5.3.2"
   }
 }

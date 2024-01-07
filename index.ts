@@ -1,8 +1,9 @@
-import type { IConfig } from "@electron-wm/shared";
-import { createFloatingLayout } from "@electron-wm/layout-floating";
-import LayoutTiling from "@electron-wm/layout-tiling";
+import type { IConfig } from "@bond-wm/shared";
+import { createFloatingLayout } from "@bond-wm/layout-floating";
+import LayoutTiling from "@bond-wm/layout-tiling";
 
 const DefaultTerminal = "xterm";
+const DefaultLauncher = "dmenu_run";
 
 const config: IConfig = {
   /** Layout to use initially. */
@@ -22,6 +23,7 @@ const config: IConfig = {
     // Establish keyboard shortcuts.
     wm.registerShortcuts({
       "Mod4 + o": () => wm.sendActiveWindowToNextScreen(),
+      "Mod4 + r": () => wm.launchProcess(DefaultLauncher),
 
       "Mod4 + Return": () => wm.launchProcess(DefaultTerminal),
       "Mod4 + space": () => wm.switchToNextLayout(),
