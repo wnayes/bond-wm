@@ -14,17 +14,17 @@
   },
   "dependencies": {
     "@bond-wm/shared": "workspace:^",
-    "@reduxjs/toolkit": "^2.0.0",
-    "electron-redux": "2.0.0-alpha.9",
-    "redux": "^5.0.0",
-    "tslib": "^2.4.1"
+    "@reduxjs/toolkit": "^2.0.1",
+    "@wnayes/electron-redux": "2.0.0-alpha.10",
+    "redux": "^5.0.1",
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@bond-wm/tsconfig": "workspace:^",
-    "@types/node": "^18.11.17",
-    "jest": "^29.3.1",
-    "ts-jest": "^29.0.3",
-    "type-fest": "^3.3.0",
-    "typescript": "~5.3.2"
+    "@types/node": "^18.19.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "type-fest": "^3.13.1",
+    "typescript": "~5.3.3"
   }
 }

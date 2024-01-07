@@ -12,18 +12,18 @@
     "build": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
+    "@bond-wm/react": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@bond-wm/shared-renderer": "workspace:^",
-    "@bond-wm/react": "workspace:^",
-    "tslib": "^2.4.1"
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@bond-wm/tsconfig": "workspace:^",
-    "@types/node": "^18.11.17",
-    "@types/react": "^18.2.46",
+    "@types/node": "^18.19.5",
+    "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
-    "type-fest": "^3.3.0",
-    "typescript": "~5.3.2"
+    "type-fest": "^3.13.1",
+    "typescript": "~5.3.3"
   },
   "peerDependencies": {
     "react": "^18.2.0",

@@ -1,6 +1,6 @@
 import { applyMiddleware, Middleware } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { composeWithStateSync } from "electron-redux/main";
+import { composeWithStateSync } from "@wnayes/electron-redux/main";
 import {
   configReducer,
   desktopReducer,

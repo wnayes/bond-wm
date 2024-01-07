@@ -23,7 +23,7 @@
   "scripts": {
     "start": "DISPLAY=:1 electron .",
     "build": "pnpm check && pnpm build-index && pnpm build-preload && pnpm generate-version-json",
-    "build-index": "esbuild ./index.js --bundle --platform=node --packages=external --alias:electron-redux/main=electron-redux/es/main.mjs --format=esm --outfile=./dist/index.mjs --sourcemap --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
+    "build-index": "esbuild ./index.js --bundle --platform=node --packages=external --format=esm --outfile=./dist/index.mjs --sourcemap --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
     "build-preload": "esbuild ./preload.ts --bundle --platform=node --external:electron --outfile=./dist/preload.js",
     "check": "tsc -b ./tsconfig.json",
     "generate-version-json": "./scripts/generate-version-json.mjs",
@@ -33,27 +33,27 @@
     "@bond-wm/keysym": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@bond-wm/tsconfig": "workspace:^",
-    "@reduxjs/toolkit": "^2.0.0",
-    "electron": "^28.0.0",
-    "electron-redux": "2.0.0-alpha.9",
+    "@reduxjs/toolkit": "^2.0.1",
+    "@wnayes/electron-redux": "2.0.0-alpha.10",
+    "electron": "^28.1.1",
     "freedesktop-desktop-entry": "^1.0.0",
     "freedesktop-icons": "^1.0.0",
-    "redux": "^5.0.0",
+    "redux": "^5.0.1",
     "rfc4648": "^1.5.3",
-    "tslib": "^2.4.1",
-    "typescript": "~5.3.2",
-    "vite": "^5.0.10",
-    "vite-node": "^1.1.1",
+    "tslib": "^2.6.2",
+    "typescript": "~5.3.3",
+    "vite": "^5.0.11",
+    "vite-node": "^1.1.3",
     "x11": "^2.3.0",
     "xdg-user-dir": "^0.0.1",
-    "yargs": "^17.6.2"
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@types/node": "^18.11.17",
-    "@types/yargs": "^17.0.15",
-    "esbuild": "^0.16.12",
-    "jest": "^29.3.1",
-    "ts-jest": "^29.0.3",
-    "type-fest": "^3.3.0"
+    "@types/node": "^18.19.5",
+    "@types/yargs": "^17.0.32",
+    "esbuild": "^0.16.17",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "type-fest": "^3.13.1"
   }
 }

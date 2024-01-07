@@ -13,21 +13,21 @@
     "build": "tsc -b ./tsconfig.json && esbuild ./index.tsx --bundle --format=esm --packages=external --loader:.svg=dataurl --loader:.css=dataurl --outfile=./dist/index.js"
   },
   "dependencies": {
+    "@bond-wm/react": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@bond-wm/shared-renderer": "workspace:^",
-    "@bond-wm/react": "workspace:^",
-    "react-redux": "^9.0.0",
-    "redux": "^5.0.0",
-    "tslib": "^2.4.1"
+    "react-redux": "^9.0.4",
+    "redux": "^5.0.1",
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@bond-wm/tsconfig": "workspace:^",
-    "@types/node": "^18.11.17",
-    "@types/react": "^18.2.46",
+    "@types/node": "^18.19.5",
+    "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
-    "esbuild": "^0.16.12",
-    "type-fest": "^3.3.0",
-    "typescript": "~5.3.2"
+    "esbuild": "^0.16.17",
+    "type-fest": "^3.13.1",
+    "typescript": "~5.3.3"
   },
   "peerDependencies": {
     "react": "^18.2.0",

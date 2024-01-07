@@ -1,4 +1,4 @@
-import { preload } from "electron-redux/preload";
+import { preload } from "@wnayes/electron-redux/preload";
 
 // Importing the preload module automatically executes it.
 // We need to somehow reference the module though, else esbuild wants to elide it.

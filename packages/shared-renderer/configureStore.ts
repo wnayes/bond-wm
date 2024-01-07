@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { stateSyncEnhancer } from "electron-redux/renderer";
+import { stateSyncEnhancer } from "@wnayes/electron-redux/renderer";
 import {
   configReducer,
   desktopReducer,
