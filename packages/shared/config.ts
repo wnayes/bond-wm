@@ -1,18 +1,6 @@
 import { LayoutInfo, LayoutPluginConfig, cloneLayoutInfo } from "./layouts";
 import { IWindowManagerServer } from "./server";
 
-/** Expect module contents for a "desktop" module. */
-export interface DesktopModule {
-  /** Returns the source path to use for the desktop window. */
-  getDesktopWindowSrc(screenIndex: number): string;
-}
-
-/** Expect module contents for a "frame" module. */
-export interface FrameModule {
-  /** Returns the source path to use for the frame window. */
-  getFrameWindowSrc(): string;
-}
-
 type ScreenOverridesDict<TConfig> = { [screenIndex: number]: Partial<TConfig> };
 
 type ObjectConfigPropertyType = ScreenOverridesDict<ISerializableConfig<LayoutInfo>>;
@@ -34,16 +22,6 @@ export interface IConfig extends ISerializableConfig<LayoutPluginConfig> {
   onWindowManagerReady?: (args: WindowManagerReadyArgs) => Promise<void> | void;
 }
 
-export interface IDesktopConfig {
-  module: DesktopModule;
-  settings?: unknown;
-}
-
-export interface IFrameConfig {
-  module: FrameModule;
-  settings?: unknown;
-}
-
 export const defaultConfig: IConfig = {
   initialLayout: "Floating",
   initialTag: "1",
@@ -56,7 +34,6 @@ export const defaultConfig: IConfig = {
 //const dynamicImport = new Function("specifier", "return import(specifier)");
 
 let _config: IConfig | null = null;
-let _configFrame: IFrameConfig | null = null;
 let _configPath: string | null = null;
 
 export function setConfigPath(configPath: string): void {
@@ -79,20 +56,6 @@ export function setConfig(config: IConfig): void {
 
 export function getConfig(): IConfig {
   return _config!;
-}
-
-export function getConfigAsync(): Promise<IConfig> {
-  return Promise.resolve(_config!);
-}
-
-export async function getFrameConfigAsync(): Promise<IFrameConfig> {
-  if (!_configFrame) {
-    if (!_configPath) {
-      throw new Error("Config path was not determined.");
-    }
-    _configFrame = (await import(_configPath + "/frame")).default;
-  }
-  return _configFrame!;
 }
 
 export function getConfigWithOverrides(screenIndex: number): IConfig {
