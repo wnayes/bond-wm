@@ -97,6 +97,7 @@ import { createDesktopEntriesModule } from "./desktopEntries";
 import { readVersionInfo } from "./version";
 import { fileURLToPath } from "node:url";
 import { dirname } from "path";
+import { setupContentSecurityPolicy } from "./csp";
 
 // Path constants
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -253,6 +254,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   const desktopLocation = viteLocalhost + "desktop/index.html";
   const frameLocation = viteLocalhost + "frame/index.html";
+
+  setupContentSecurityPolicy();
 
   let context: XWMContext;
 
