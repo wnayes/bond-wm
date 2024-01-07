@@ -1,7 +1,7 @@
 {
   "name": "@bond-wm/react",
-  "version": "0.2.1",
-  "description": "Public APIs for bond-wm plugins",
+  "version": "0.3.0",
+  "description": "React functionality for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
   "types": "./index.ts",
