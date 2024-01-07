@@ -24,9 +24,7 @@
     "start": "DISPLAY=:1 electron .",
     "build": "pnpm check && pnpm build-index && pnpm build-preload && pnpm generate-version-json",
     "build-index": "esbuild ./index.js --bundle --platform=node --packages=external --alias:electron-redux/main=electron-redux/es/main.mjs --format=esm --outfile=./dist/index.mjs --sourcemap --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
-    "build-index2": "esbuild ./index.js --bundle --platform=node --external:electron --external:vite --external:vite-node --external:x11 --alias:electron-redux/main=electron-redux/es/main.js --format=esm --outfile=./dist/index.mjs --sourcemap",
     "build-preload": "esbuild ./preload.ts --bundle --platform=node --external:electron --outfile=./dist/preload.js",
-    "build-preload2": "esbuild ./preload.ts --bundle --platform=node --packages=external --outfile=./dist/preload.js",
     "check": "tsc -b ./tsconfig.json",
     "generate-version-json": "./scripts/generate-version-json.mjs",
     "clean": "rm -rf ./dist ./node_modules"
