@@ -1,5 +1,5 @@
 import { applyMiddleware, Middleware } from "redux";
-import { configureStore, Tuple } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { composeWithStateSync } from "electron-redux/main";
 import {
   configReducer,
@@ -34,9 +34,8 @@ export function configureWMStore(middleware: Middleware[]) {
         serializableCheck: false,
       }),
 
-    // TODO: Can/should this use getDefaultEnhancers?
-    enhancers: () => {
-      return new Tuple(enhancer);
+    enhancers: (getDefaultEnhancers) => {
+      return getDefaultEnhancers().concat(enhancer);
     },
   });
   return store;

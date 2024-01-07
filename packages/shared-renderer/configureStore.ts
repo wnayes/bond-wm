@@ -1,4 +1,4 @@
-import { Tuple, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { stateSyncEnhancer } from "electron-redux/renderer";
 import {
   configReducer,
@@ -27,8 +27,8 @@ export function configureRendererStore() {
         serializableCheck: false,
       }),
 
-    enhancers: () => {
-      return new Tuple(stateSyncEnhancer());
+    enhancers: (getDefaultEnhancers) => {
+      return getDefaultEnhancers().concat(stateSyncEnhancer());
     },
   });
 }
