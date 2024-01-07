@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react-titlebar",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "React frame window titlebar for bond-wm",
   "type": "module",
   "main": "./dist/index.js",
