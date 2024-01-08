@@ -10,7 +10,7 @@ import { ContextMenuKind } from "@bond-wm/shared";
 import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@bond-wm/shared-renderer";
 import { getScreenIndex, useScreenIndex } from "../useScreenIndex";
 import { Provider } from "react-redux";
-import "./Desktop.css";
+import "./DesktopStyles.css";
 
 export interface IDesktopProps extends PropsWithChildren {}
 

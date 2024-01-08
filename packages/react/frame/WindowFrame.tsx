@@ -6,7 +6,7 @@ import { useTheme } from "../theming";
 import { Provider } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { configureRendererStore, frameWindowMouseEnter, registerFrameWidListener } from "@bond-wm/shared-renderer";
-import "./WindowFrame.css";
+import "./WindowFrameStyles.css";
 
 interface IWindowFrameProps extends React.PropsWithChildren<{}> {}
 

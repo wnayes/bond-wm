@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useDesktopEntries, useElementSize } from "@bond-wm/react";
 import { DesktopEntry as DesktopEntryType } from "@bond-wm/shared";
 import { executeDesktopEntry } from "@bond-wm/shared-renderer";
-import "./DesktopEntries.css";
+import "./DesktopEntriesStyles.css";
 
 const DesktopEntryHeight = 110;
 const DesktopEntryWidth = 80;

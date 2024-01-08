@@ -4,7 +4,7 @@ import { maximizeWindow, restoreWindow, showContextMenu } from "@bond-wm/shared-
 import { ContextMenuKind } from "@bond-wm/shared";
 import { IWindow } from "@bond-wm/shared";
 import { Stylesheet, useSupportsMaximize, useTheme, useWindow } from "@bond-wm/react";
-import styles from "./TitleBar.css";
+import styles from "./TitleBarStyles.css";
 
 const DefaultHeight = 20;
 

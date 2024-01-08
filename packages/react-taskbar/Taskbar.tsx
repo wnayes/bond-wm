@@ -1,7 +1,7 @@
 import { useTheme } from "@bond-wm/react";
 import * as React from "react";
 import { PropsWithChildren } from "react";
-import "./Taskbar.css";
+import "./TaskbarStyles.css";
 
 interface TaskbarStyle extends React.CSSProperties {
   "--desktop-taskbar-bg-color": string;
