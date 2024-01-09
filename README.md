@@ -9,7 +9,7 @@
 
 ### [Read the docs to get started 🔗](https://wnayes.github.io/bond-wm)
 
-This [X window manager](https://en.wikipedia.org/wiki/X_window_manager) gives web developers a familiar platform for total customization of their desktop appearance.
+Bond Window Manager is a [X window manager](https://en.wikipedia.org/wiki/X_window_manager) gives web developers a familiar platform for total customization of their desktop appearance.
 
 The goal is to thoughtfully apply front-end technologies to the desktop. Today this means:
 
