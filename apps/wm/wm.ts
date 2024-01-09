@@ -86,7 +86,6 @@ import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } fr
 import { IScreen } from "@bond-wm/shared";
 import { setupAutocompleteListener } from "./autocomplete";
 import { switchToNextLayout } from "@bond-wm/shared";
-import { customizeWindow } from "./customize";
 import { createDragModule } from "./drag";
 import { loggingEnabled } from "./args";
 import { createShortcutsModule } from "./shortcuts";
@@ -864,7 +863,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
       const state = store.getState();
 
-      customizeWindow(win as IWindow);
+      if (typeof config.onWindowCreated === "function") {
+        config.onWindowCreated({ win: win as IWindow });
+      }
 
       assert(typeof win.screenIndex === "number");
       assert(win.outer);

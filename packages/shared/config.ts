@@ -1,5 +1,6 @@
 import { LayoutInfo, LayoutPluginConfig, cloneLayoutInfo } from "./layouts";
 import { IWindowManagerServer } from "./server";
+import { IWindow } from "./window";
 
 type ScreenOverridesDict<TConfig> = { [screenIndex: number]: Partial<TConfig> };
 
@@ -7,6 +8,10 @@ type ObjectConfigPropertyType = ScreenOverridesDict<ISerializableConfig<LayoutIn
 
 interface WindowManagerReadyArgs {
   wm: IWindowManagerServer;
+}
+
+interface WindowCreatedArgs {
+  win: IWindow;
 }
 
 export interface ISerializableConfig<TLayouts extends LayoutInfo> {
@@ -19,7 +24,17 @@ export interface ISerializableConfig<TLayouts extends LayoutInfo> {
 
 /** Window manager configuration. */
 export interface IConfig extends ISerializableConfig<LayoutPluginConfig> {
-  onWindowManagerReady?: (args: WindowManagerReadyArgs) => Promise<void> | void;
+  /**
+   * Called once when the window manager starts up.
+   * Provides an opportunity to set up certain window manager features.
+   */
+  onWindowManagerReady?(args: WindowManagerReadyArgs): Promise<void> | void;
+
+  /**
+   * Called before a new window is managed.
+   * Can be used to alter the default placement/appearance of the window.
+   */
+  onWindowCreated?(args: WindowCreatedArgs): void;
 }
 
 export const defaultConfig: IConfig = {
