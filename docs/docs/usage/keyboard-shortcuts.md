@@ -16,6 +16,7 @@ that can be edited or extended as desired.
 | ----------------------------------------- | --------------------------------------------------------- |
 | `Mod4 + Enter`                            | Opens a new instance of your configured default terminal. |
 | `Mod4 + Space`                            | Swaps between available layouts on the current screen.    |
+| `Mod4 + E`                                | Opens a file manager of your choice.                      |
 | `Mod4 + R`                                | Opens a launcher program of your choice.                  |
 | `Mod4 + O`                                | Sends the active window to the next screen.               |
 | `Mod4 + 1` ... `Mod4 + 9`                 | Switches to a different tag by index.                     |
