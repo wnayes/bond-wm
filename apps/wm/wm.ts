@@ -901,7 +901,13 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
       X.UngrabServer();
 
-      X.ConfigureWindow(fid, { borderWidth: 0, x: frameX, y: frameY });
+      X.ConfigureWindow(fid, {
+        borderWidth: 0,
+        x: frameX,
+        y: frameY,
+        width: win.outer.width,
+        height: win.outer.height,
+      });
       X.ConfigureWindow(wid, { borderWidth: 0 });
 
       store.dispatch(addWindowAction({ wid, ...win }));
