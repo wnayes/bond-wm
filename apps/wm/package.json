@@ -1,6 +1,6 @@
 {
   "name": "bond-wm",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "An X Window Manager built on web technologies.",
   "main": "./dist/index.mjs",
   "exports": {

@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/layout-floating",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Floating layout for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",

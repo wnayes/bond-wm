@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react-config",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Default bond-wm React user configuration",
   "exports": {
     ".": "./index.ts",
