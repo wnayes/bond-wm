@@ -3,6 +3,6 @@
   "include": ["**/*"],
   "exclude": ["./dist"],
   "compilerOptions": {
-    "rootDir": "."
-  }
+    "rootDir": ".",
+  },
 }
