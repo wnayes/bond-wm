@@ -350,6 +350,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
     if (typeof config.onWindowManagerReady === "function") {
       await config.onWindowManagerReady({ wm: wmServer });
     }
+
+    // Prep one frame window to speed up rendering for the first window.
+    setTimeout(() => createFrameBrowserOnDeck(), 0);
   });
 
   client.on("error", logError);
