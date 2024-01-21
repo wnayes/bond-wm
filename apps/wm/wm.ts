@@ -915,6 +915,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
       });
       X.ConfigureWindow(wid, { borderWidth: 0 });
 
+      if (lastFrameExtents) {
+        eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents: lastFrameExtents! }));
+      }
+
       store.dispatch(addWindowAction({ wid, ...win }));
 
       X.MapWindow(fid);
