@@ -119,7 +119,7 @@ export function getWindowMinHeight(win: IWindow): number {
 export function getWindowMaxHeight(win: IWindow): number {
   const maxHeight = win.normalHints?.maxHeight;
   if (maxHeight && maxHeight > 0) {
-    return maxHeight || 0;
+    return maxHeight;
   }
   return Infinity;
 }

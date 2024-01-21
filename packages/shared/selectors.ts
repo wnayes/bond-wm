@@ -1,8 +1,9 @@
-import { IWindow } from "./window";
+import { IWindow, getWindowMaxHeight, getWindowMaxWidth } from "./window";
 import { anyIntersect } from "./utils";
 import { SharedRootState } from "./redux/basicStore";
 import { LayoutInfo, getLayoutPluginName } from "./layouts";
 import { ISerializableConfig, assignConfig } from "./config";
+import { IScreen } from "./screen";
 
 export function selectAllWindows(state: SharedRootState): IWindow[] {
   const wins = [];
@@ -42,6 +43,11 @@ export function selectVisibleWindowsFromCurrentTags(state: SharedRootState, scre
   });
 }
 
+export function selectScreenForWindow(state: SharedRootState, wid: number): IScreen | null {
+  const win = state.windows[wid];
+  return state.screens[win?.screenIndex] ?? null;
+}
+
 export function selectCurrentLayoutForScreen(state: SharedRootState, screenIndex: number): string {
   const screen = state.screens[screenIndex];
   return screen.currentLayouts[screen.currentTags[0]];
@@ -56,6 +62,15 @@ export function selectWindowMaximizeCanTakeEffect(
   if (!win) {
     return false;
   }
+
+  // Is the window constrained by max size?
+  const maxWidth = getWindowMaxWidth(win);
+  const maxHeight = getWindowMaxHeight(win);
+  const screen = selectScreenForWindow(state, wid);
+  if (screen && (screen.width > maxWidth || screen.height > maxHeight)) {
+    return false;
+  }
+
   const currentLayoutName = selectCurrentLayoutForScreen(state, win.screenIndex);
   const currentLayout = layoutInfo?.find((plugin) => getLayoutPluginName(plugin) === currentLayoutName);
   if (currentLayout) {
