@@ -14,6 +14,7 @@ export interface IWindow {
   minimized: boolean;
   maximized: boolean;
   fullscreen: boolean;
+  type: WindowType;
   transientFor: number | undefined;
   position: WindowPosition;
   focused: boolean;
@@ -38,6 +39,23 @@ export interface IIconInfo {
   width: number;
   height: number;
   data: number[];
+}
+
+export enum WindowType {
+  Normal,
+  Desktop,
+  Dock,
+  Toolbar,
+  Menu,
+  Utility,
+  Splash,
+  Dialog,
+  DropdownMenu,
+  PopupMenu,
+  Tooltip,
+  Notification,
+  Combo,
+  DragDrop
 }
 
 export enum WindowPosition {
@@ -157,5 +175,16 @@ export function windowIsDialog(win: IWindow): boolean {
   if (typeof win.transientFor === "number") {
     return true;
   }
+  if (win.type === WindowType.Dialog) {
+    return true;
+  }
   return false;
+}
+
+/**
+ * Returns true if the window is one that should display floated in the center
+ * of the screen by default.
+ */
+export function windowFloatsCenter(win: IWindow): boolean {
+  return windowIsDialog(win) || win.type === WindowType.Splash;
 }

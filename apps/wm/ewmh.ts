@@ -1,4 +1,4 @@
-import { XWMWindowType, setWindowFullscreenAction, setWindowUrgentAction } from "@bond-wm/shared";
+import { WindowType, XWMWindowType, setWindowFullscreenAction, setWindowUrgentAction } from "@bond-wm/shared";
 import { numsToBuffer } from "@bond-wm/shared";
 import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@bond-wm/shared";
 import { log, logError } from "./log";
@@ -64,6 +64,7 @@ function netWMMoveResizeTypeToInternal(newWmMoveResizeType: NetWmMoveResizeType)
 }
 
 export interface EWMHModule extends IXWMEventConsumer {
+  getNetWmType(wid: number): Promise<WindowType | null>;
   getNetWmIcons(wid: number): Promise<IIconInfo[]>;
 }
 
@@ -82,6 +83,22 @@ export async function createEWMHEventConsumer(
     _NET_WM_STATE: await internAtomAsync(X, "_NET_WM_STATE"),
     _NET_WM_STATE_FULLSCREEN: await internAtomAsync(X, "_NET_WM_STATE_FULLSCREEN"),
     _NET_WM_STATE_DEMANDS_ATTENTION: await internAtomAsync(X, "_NET_WM_STATE_DEMANDS_ATTENTION"),
+
+    _NET_WM_WINDOW_TYPE: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE"),
+    _NET_WM_WINDOW_TYPE_DESKTOP: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DESKTOP"),
+    _NET_WM_WINDOW_TYPE_DOCK: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DOCK"),
+    _NET_WM_WINDOW_TYPE_TOOLBAR: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_TOOLBAR"),
+    _NET_WM_WINDOW_TYPE_MENU: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_MENU"),
+    _NET_WM_WINDOW_TYPE_UTILITY: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_UTILITY"),
+    _NET_WM_WINDOW_TYPE_SPLASH: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_SPLASH"),
+    _NET_WM_WINDOW_TYPE_DIALOG: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DIALOG"),
+    _NET_WM_WINDOW_TYPE_DROPDOWN_MENU: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU"),
+    _NET_WM_WINDOW_TYPE_POPUP_MENU: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_POPUP_MENU"),
+    _NET_WM_WINDOW_TYPE_TOOLTIP: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_TOOLTIP"),
+    _NET_WM_WINDOW_TYPE_NOTIFICATION: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_NOTIFICATION"),
+    _NET_WM_WINDOW_TYPE_COMBO: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_COMBO"),
+    _NET_WM_WINDOW_TYPE_DND: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DND"),
+    _NET_WM_WINDOW_TYPE_NORMAL: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_NORMAL"),
 
     _NET_FRAME_EXTENTS: await internAtomAsync(X, "_NET_FRAME_EXTENTS"),
     _NET_WM_PID: await internAtomAsync(X, "_NET_WM_PID"),
@@ -183,6 +200,26 @@ export async function createEWMHEventConsumer(
       case NetWmStateAction._NET_WM_STATE_TOGGLE:
         store.dispatch(setWindowUrgentAction({ wid, urgent: !win.urgent }));
         break;
+    }
+  }
+
+  function getWindowTypeFromAtom(typeAtom: number): WindowType | null {
+    switch (typeAtom) {
+      case atoms._NET_WM_WINDOW_TYPE_DESKTOP: return WindowType.Desktop;
+      case atoms._NET_WM_WINDOW_TYPE_DOCK: return WindowType.Dock;
+      case atoms._NET_WM_WINDOW_TYPE_TOOLBAR: return WindowType.Toolbar;
+      case atoms._NET_WM_WINDOW_TYPE_MENU: return WindowType.Menu;
+      case atoms._NET_WM_WINDOW_TYPE_UTILITY: return WindowType.Utility;
+      case atoms._NET_WM_WINDOW_TYPE_SPLASH: return WindowType.Splash;
+      case atoms._NET_WM_WINDOW_TYPE_DIALOG: return WindowType.Dialog;
+      case atoms._NET_WM_WINDOW_TYPE_DROPDOWN_MENU: return WindowType.DropdownMenu;
+      case atoms._NET_WM_WINDOW_TYPE_POPUP_MENU: return WindowType.PopupMenu;
+      case atoms._NET_WM_WINDOW_TYPE_TOOLTIP: return WindowType.Tooltip;
+      case atoms._NET_WM_WINDOW_TYPE_NOTIFICATION: return WindowType.Notification;
+      case atoms._NET_WM_WINDOW_TYPE_COMBO: return WindowType.Combo;
+      case atoms._NET_WM_WINDOW_TYPE_DND: return WindowType.DragDrop;
+      case atoms._NET_WM_WINDOW_TYPE_NORMAL: return WindowType.Normal;
+      default: return null;
     }
   }
 
@@ -289,6 +326,29 @@ export async function createEWMHEventConsumer(
       extentsInts.writeInt32LE(frameExtents.bottom, 12);
 
       X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_FRAME_EXTENTS, X.atoms.CARDINAL, 32, extentsInts);
+    },
+
+    async getNetWmType(wid: number): Promise<WindowType | null> {
+      const { data } = await getRawPropertyValue(X, wid, atoms._NET_WM_WINDOW_TYPE, X.atoms.ATOM);
+      if (!data) {
+        return null;
+      }
+
+      const types: WindowType[] = []
+      let i = 0;
+      while (i < data.byteLength) {
+        const typeAtom = data.readInt32LE(i);
+        const type = getWindowTypeFromAtom(typeAtom);
+        if (type !== null) {
+          types.push(type);
+        }
+        i += 4;
+      }
+
+      if (types.length > 1) {
+        log(`Window ${wid} has more than one type: ${types.join(",")}`);
+      }
+      return types[0] ?? null;
     },
 
     async getNetWmIcons(wid: number): Promise<IIconInfo[]> {

@@ -10,6 +10,7 @@ import {
   IWindowManagerServer,
   KeyRegistrationMap,
   LayoutPluginConfig,
+  WindowType,
   XWMEventConsumerArgs,
   XWMEventConsumerArgsWithType,
   XWMEventConsumerKeyPressArgs,
@@ -815,10 +816,11 @@ export async function createServer(): Promise<IWindowManagerServer> {
       getNormalHints(X, wid),
       motif.getMotifHints(wid),
       getWMTransientFor(X, wid),
+      ewmhModule.getNetWmType(wid),
       ewmhModule.getNetWmIcons(wid),
     ]);
 
-    const [attrs, clientGeom, title, wmClass, wmHints, normalHints, motifHints, transientFor, icons] = values;
+    const [attrs, clientGeom, title, wmClass, wmHints, normalHints, motifHints, transientFor, winType, icons] = values;
     log(`got values for ${wid}:`, values);
 
     const isOverrideRedirect = attrs.overrideRedirect === 1;
@@ -853,6 +855,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
         },
         frameExtents: lastFrameExtents,
         visible: true,
+        type: winType ?? WindowType.Normal,
         transientFor,
         decorated: hasMotifDecorations(motifHints),
         title,

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IBounds, IGeometry } from "../types";
-import { IWindow, ResizeDirection, WindowPosition } from "../window";
+import { IWindow, ResizeDirection, WindowPosition, WindowType } from "../window";
 
 export interface WindowsState {
   [wid: number]: IWindow;
@@ -21,6 +21,7 @@ export const windowsSlice = createSlice({
         minimized: payload.minimized ?? false,
         maximized: payload.maximized ?? false,
         fullscreen: false,
+        type: payload.type ?? WindowType.Normal,
         transientFor: payload.transientFor,
         position: payload.position ?? WindowPosition.Default,
         focused: false,

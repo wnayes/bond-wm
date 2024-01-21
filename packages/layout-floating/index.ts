@@ -6,7 +6,7 @@ import {
   LayoutPluginConfig,
   WindowPosition,
   addLayoutResult,
-  windowIsDialog,
+  windowFloatsCenter,
 } from "@bond-wm/shared";
 import FloatingIcon from "./floating.png";
 
@@ -46,7 +46,7 @@ export function createFloatingLayout(settings?: IFloatingLayoutSettings): Layout
           width: win.outer.width,
           height: win.outer.height,
         });
-      } else if (windowIsDialog(win)) {
+      } else if (windowFloatsCenter(win)) {
         // Center the window.
         addLayoutResult(results, win, screen, {
           x: workArea.x + Math.max(0, Math.floor((workArea.width - win.outer.width) / 2)),

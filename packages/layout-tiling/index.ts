@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { IGeometry, LayoutPluginConfig, WindowPosition, addLayoutResult, windowIsDialog } from "@bond-wm/shared";
+import { IGeometry, LayoutPluginConfig, WindowPosition, addLayoutResult, windowFloatsCenter } from "@bond-wm/shared";
 import TilingIcon from "./tiling.png";
 
 /** A tiling layout for bond-wm. */
@@ -22,7 +22,7 @@ const Plugin: LayoutPluginConfig = {
           width: screen.width,
           height: screen.height,
         });
-      } else if (windowIsDialog(win)) {
+      } else if (windowFloatsCenter(win)) {
         // Center the window.
         addLayoutResult(results, win, screen, {
           x: workArea.x + Math.max(0, Math.floor((workArea.width - win.outer.width) / 2)),
