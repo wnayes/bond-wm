@@ -4,6 +4,7 @@ import LayoutTiling from "@bond-wm/layout-tiling";
 
 const DefaultTerminal = "xterm";
 const DefaultLauncher = "dmenu_run";
+const DefaultFileManager = "pcmanfm";
 
 const config: IConfig = {
   /** Layout to use initially. */
@@ -22,19 +23,19 @@ const config: IConfig = {
   onWindowManagerReady: ({ wm }) => {
     // Establish keyboard shortcuts.
     wm.registerShortcuts({
-      "Mod4 + o": () => wm.sendActiveWindowToNextScreen(),
+      "Mod4 + e": () => wm.launchProcess(DefaultFileManager),
       "Mod4 + r": () => wm.launchProcess(DefaultLauncher),
-
       "Mod4 + Return": () => wm.launchProcess(DefaultTerminal),
+
       "Mod4 + space": () => wm.switchToNextLayout(),
 
+      "Mod4 + o": () => wm.sendActiveWindowToNextScreen(),
       "Mod4 + Shift + C": () => wm.closeFocusedWindow(),
       "Mod4 + Shift + M": () => wm.startDragFocusedWindow(),
-      "Mod4 + Shift + Q": () => wm.quit(),
-
       "Mod4 + Shift + F12": () => wm.showDevtoolsForFocusedWindowFrame(),
 
       "Mod4 + Ctrl + r": () => wm.restart(),
+      "Mod4 + Shift + Q": () => wm.quit(),
     });
     for (let i = 1; i <= 9; i++) {
       wm.registerShortcuts({
