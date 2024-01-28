@@ -201,7 +201,7 @@ interface XQueryTreeResult {
   children: number[];
 }
 
-type XExtension<T> = XExtensionInfo & T;
+export type XExtension<T> = XExtensionInfo & T;
 
 interface XExtensionInfo {
   present: boolean;
@@ -334,24 +334,6 @@ interface RandrExtension {
 }
 
 export type XRandrExtension = XExtension<RandrExtension>;
-
-export interface XineramaScreenInfo {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-interface XineramaExtension {
-  major: number;
-  minor: number;
-
-  QueryVersion(clientMaj: number, clientMin: number, callback: XCbWithErr<[[major: number, minor: number]]>): void;
-  IsActive(callback: XCbWithErr<[isActive: boolean]>): void;
-  QueryScreens(callback: XCbWithErr<[info: XineramaScreenInfo[]]>): void;
-}
-
-export type XXineramaExtension = XExtension<XineramaExtension>;
 
 /** ICCCM WM_HINTS structure. */
 export interface WMHints {

@@ -3,9 +3,27 @@
  * If node-x11 adds Xinerama support, this could be removed.
  */
 
-import { IXDisplay, XBuffer, XCbWithErr, XineramaScreenInfo, XXineramaExtension } from "@bond-wm/shared";
+import { IXDisplay, XBuffer, XCbWithErr, XExtension } from "../X";
 
-export function requireExt(display: IXDisplay, extCallback: XCbWithErr<[ext: XXineramaExtension | null]>) {
+export interface XineramaScreenInfo {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface XineramaExtension {
+  major: number;
+  minor: number;
+
+  QueryVersion(clientMaj: number, clientMin: number, callback: XCbWithErr<[[major: number, minor: number]]>): void;
+  IsActive(callback: XCbWithErr<[isActive: boolean]>): void;
+  QueryScreens(callback: XCbWithErr<[info: XineramaScreenInfo[]]>): void;
+}
+
+export type XXineramaExtension = XExtension<XineramaExtension>;
+
+export function requireXinerama(display: IXDisplay, extCallback: XCbWithErr<[ext: XXineramaExtension | null]>) {
   const X = display.client;
 
   X.QueryExtension<XXineramaExtension>("XINERAMA", (err, ext) => {

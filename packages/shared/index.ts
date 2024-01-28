@@ -22,3 +22,4 @@ export * from "./types";
 export * from "./utils";
 export * from "./window";
 export * from "./X";
+export * from "./X11/xinerama";
