@@ -22,12 +22,6 @@ import {
   selectVisibleWindowsFromCurrentTags,
   setConfig,
   setConfigAction,
-} from "@bond-wm/shared";
-import { spawn } from "child_process";
-import { AsyncReturnType, Writable } from "type-fest";
-import { log, logDir, logError } from "./log";
-import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
-import {
   X11_EVENT_TYPE,
   IXEvent,
   IXConfigureEvent,
@@ -54,6 +48,10 @@ import {
   WMSizeHints,
   WMHintsStates,
 } from "@bond-wm/shared";
+import { spawn } from "child_process";
+import { AsyncReturnType, Writable } from "type-fest";
+import { log, logDir, logError } from "./log";
+import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
 import { Action, Middleware, UnknownAction, isAction } from "redux";
 import { ViteDevServer, createServer as createViteServer } from "vite";
 import { ViteNodeServer } from "vite-node/server";
