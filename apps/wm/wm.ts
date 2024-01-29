@@ -6,6 +6,7 @@ import { app, ipcMain, BrowserWindow } from "electron";
 import {
   IBounds,
   IGeometry,
+  IScreen,
   IPCMessages,
   IWindowManagerServer,
   KeyRegistrationMap,
@@ -47,25 +48,12 @@ import {
   IXButtonReleaseEvent,
   WMSizeHints,
   WMHintsStates,
-} from "@bond-wm/shared";
-import { spawn } from "child_process";
-import { AsyncReturnType, Writable } from "type-fest";
-import { log, logDir, logError } from "./log";
-import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
-import { Action, Middleware, UnknownAction, isAction } from "redux";
-import { ViteDevServer, createServer as createViteServer } from "vite";
-import { ViteNodeServer } from "vite-node/server";
-import { ViteNodeRunner } from "vite-node/client";
-import { installSourcemapsSupport } from "vite-node/source-map";
-import { anyIntersect, arraysEqual, fitGeometryWithinAnother, intersect, requireXinerama } from "@bond-wm/shared";
-import { createEWMHEventConsumer } from "./ewmh";
-import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
-import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
-import { createMotifModule, hasMotifDecorations } from "./motif";
-import { ContextMenuKind } from "@bond-wm/shared";
-import { showContextMenu } from "./menus";
-import {
+  ContextMenuKind,
+  anyIntersect,
+  arraysEqual,
+  fitGeometryWithinAnother,
+  intersect,
+  requireXinerama,
   addWindowAction,
   configureWindowAction,
   focusWindowAction,
@@ -78,12 +66,31 @@ import {
   setWindowTagsAction,
   setWindowTitleAction,
   setWindowVisibleAction,
+  addScreenAction,
+  setScreenCurrentTagsAction,
+  setScreenZoomLevelAction,
+  getWindowMinHeight,
+  getWindowMinWidth,
+  IWindow,
+  windowAcceptsFocus,
+  switchToNextLayout,
 } from "@bond-wm/shared";
-import { addScreenAction, setScreenCurrentTagsAction, setScreenZoomLevelAction } from "@bond-wm/shared";
-import { getWindowMinHeight, getWindowMinWidth, IWindow, windowAcceptsFocus } from "@bond-wm/shared";
-import { IScreen } from "@bond-wm/shared";
+import { spawn } from "child_process";
+import { AsyncReturnType, Writable } from "type-fest";
+import { log, logDir, logError } from "./log";
+import { configureWMStore, ServerRootState, ServerStore } from "./configureStore";
+import { Action, Middleware, UnknownAction, isAction } from "redux";
+import { ViteDevServer, createServer as createViteServer } from "vite";
+import { ViteNodeServer } from "vite-node/server";
+import { ViteNodeRunner } from "vite-node/client";
+import { installSourcemapsSupport } from "vite-node/source-map";
+import { createEWMHEventConsumer } from "./ewmh";
+import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
+import { getScreenIndexWithCursor, queryPointer } from "./pointer";
+import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
+import { createMotifModule, hasMotifDecorations } from "./motif";
+import { showContextMenu } from "./menus";
 import { setupAutocompleteListener } from "./autocomplete";
-import { switchToNextLayout } from "@bond-wm/shared";
 import { createDragModule } from "./drag";
 import { loggingEnabled } from "./args";
 import { createShortcutsModule } from "./shortcuts";
