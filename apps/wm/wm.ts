@@ -438,7 +438,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
         port: 19108,
       },
       optimizeDeps: {
-        disabled: true,
+        noDiscovery: true,
+        include: undefined,
       },
     });
     await viteServer.pluginContainer.buildStart({});
