@@ -35,7 +35,7 @@
     "@bond-wm/tsconfig": "workspace:^",
     "@reduxjs/toolkit": "^2.0.1",
     "@wnayes/electron-redux": "2.0.0-alpha.10",
-    "electron": "^28.1.4",
+    "electron": "^29.1.1",
     "freedesktop-desktop-entry": "^1.0.0",
     "freedesktop-icons": "^1.0.0",
     "redux": "^5.0.1",

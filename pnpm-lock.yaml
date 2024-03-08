@@ -52,10 +52,10 @@ importers:
         version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
       '@wnayes/electron-redux':
         specifier: 2.0.0-alpha.10
-        version: 2.0.0-alpha.10(electron@28.1.4)(redux@5.0.1)
+        version: 2.0.0-alpha.10(electron@29.1.1)(redux@5.0.1)
       electron:
-        specifier: ^28.1.4
-        version: 28.1.4
+        specifier: ^29.1.1
+        version: 29.1.1
       freedesktop-desktop-entry:
         specifier: ^1.0.0
         version: 1.0.0
@@ -483,8 +483,8 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
       electron:
-        specifier: ^28.1.4
-        version: 28.1.4
+        specifier: ^29.1.1
+        version: 29.1.1
       react-redux:
         specifier: ^9.0.4
         version: 9.0.4(@types/react@18.2.64)(react@18.2.0)(redux@5.0.1)
@@ -539,7 +539,7 @@ importers:
         version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
       '@wnayes/electron-redux':
         specifier: 2.0.0-alpha.10
-        version: 2.0.0-alpha.10(electron@28.1.4)(redux@5.0.1)
+        version: 2.0.0-alpha.10(electron@29.1.1)(redux@5.0.1)
       redux:
         specifier: ^5.0.0
         version: 5.0.1
@@ -4602,14 +4602,14 @@ packages:
       '@webassemblyjs/ast': 1.11.6
       '@xtuc/long': 4.2.2
 
-  /@wnayes/electron-redux@2.0.0-alpha.10(electron@28.1.4)(redux@5.0.1):
+  /@wnayes/electron-redux@2.0.0-alpha.10(electron@29.1.1)(redux@5.0.1):
     resolution: {integrity: sha512-ycYbhPH5Ap2z5wnarYK6C+WbowEK+B6olzbGYW5uM4m1wsIFAs6Fp5zLhiZ2vh4NvnP92TWlbrvsC2WWWoFf6A==}
     engines: {node: '>= 12'}
     peerDependencies:
       electron: '>=8.0.0'
       redux: ^5.0.0
     dependencies:
-      electron: 28.1.4
+      electron: 29.1.1
       lodash.isplainobject: 4.0.6
       lodash.isstring: 4.0.1
       redux: 5.0.1
@@ -6075,14 +6075,14 @@ packages:
   /electron-to-chromium@1.4.623:
     resolution: {integrity: sha512-lKoz10iCYlP1WtRYdh5MvocQPWVRoI7ysp6qf18bmeBgR8abE6+I2CsfyNKztRDZvhdWc+krKT6wS7Neg8sw3A==}
 
-  /electron@28.1.4:
-    resolution: {integrity: sha512-WE6go611KOhtH6efRPMnVC7FE7DCKnQ3ZyHFeI1DbaCy8OU4UjZ8/CZGcuZmZgRdxSBEHoHdgaJkWRHZzF0FOg==}
+  /electron@29.1.1:
+    resolution: {integrity: sha512-cXN15NgCi7MkzGo5/23ZQbii+0UfhmUiDjACunmzcUofYCjF42XhFbL7JZnwgI0qtBCCeJU8qZNZt9lU91gUFw==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@electron/get': 2.0.3
-      '@types/node': 18.19.5
+      '@types/node': 20.10.7
       extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color
