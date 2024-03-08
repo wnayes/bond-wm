@@ -222,8 +222,8 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
       react-error-boundary:
-        specifier: ^3.1.4
-        version: 3.1.4(react@18.2.0)
+        specifier: ^4.0.13
+        version: 4.0.13(react@18.2.0)
       react-redux:
         specifier: ^9.1.0
         version: 9.1.0(@types/react@18.2.64)(react@18.2.0)(redux@5.0.1)
@@ -289,8 +289,8 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
       react-error-boundary:
-        specifier: ^3.1.4
-        version: 3.1.4(react@18.2.0)
+        specifier: ^4.0.13
+        version: 4.0.13(react@18.2.0)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -10115,9 +10115,8 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
-  /react-error-boundary@3.1.4(react@18.2.0):
-    resolution: {integrity: sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==}
-    engines: {node: '>=10', npm: '>=6'}
+  /react-error-boundary@4.0.13(react@18.2.0):
+    resolution: {integrity: sha512-b6PwbdSv8XeOSYvjt8LpgpKrZ0yGdtZokYwkwV2wlcZbxgopHX/hgPl5VgpnoVOWd868n1hktM8Qm4b+02MiLQ==}
     peerDependencies:
       react: '>=16.13.1'
     dependencies:

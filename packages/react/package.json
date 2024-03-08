@@ -16,7 +16,7 @@
     "@bond-wm/shared": "workspace:^",
     "@bond-wm/shared-renderer": "workspace:^",
     "@callstack/react-theme-provider": "^3.0.9",
-    "react-error-boundary": "^3.1.4",
+    "react-error-boundary": "^4.0.13",
     "react-redux": "^9.1.0",
     "redux": "^5.0.1",
     "tslib": "^2.6.2"
