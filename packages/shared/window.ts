@@ -55,7 +55,7 @@ export enum WindowType {
   Tooltip,
   Notification,
   Combo,
-  DragDrop
+  DragDrop,
 }
 
 export enum WindowPosition {

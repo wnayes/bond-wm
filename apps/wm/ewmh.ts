@@ -205,21 +205,36 @@ export async function createEWMHEventConsumer(
 
   function getWindowTypeFromAtom(typeAtom: number): WindowType | null {
     switch (typeAtom) {
-      case atoms._NET_WM_WINDOW_TYPE_DESKTOP: return WindowType.Desktop;
-      case atoms._NET_WM_WINDOW_TYPE_DOCK: return WindowType.Dock;
-      case atoms._NET_WM_WINDOW_TYPE_TOOLBAR: return WindowType.Toolbar;
-      case atoms._NET_WM_WINDOW_TYPE_MENU: return WindowType.Menu;
-      case atoms._NET_WM_WINDOW_TYPE_UTILITY: return WindowType.Utility;
-      case atoms._NET_WM_WINDOW_TYPE_SPLASH: return WindowType.Splash;
-      case atoms._NET_WM_WINDOW_TYPE_DIALOG: return WindowType.Dialog;
-      case atoms._NET_WM_WINDOW_TYPE_DROPDOWN_MENU: return WindowType.DropdownMenu;
-      case atoms._NET_WM_WINDOW_TYPE_POPUP_MENU: return WindowType.PopupMenu;
-      case atoms._NET_WM_WINDOW_TYPE_TOOLTIP: return WindowType.Tooltip;
-      case atoms._NET_WM_WINDOW_TYPE_NOTIFICATION: return WindowType.Notification;
-      case atoms._NET_WM_WINDOW_TYPE_COMBO: return WindowType.Combo;
-      case atoms._NET_WM_WINDOW_TYPE_DND: return WindowType.DragDrop;
-      case atoms._NET_WM_WINDOW_TYPE_NORMAL: return WindowType.Normal;
-      default: return null;
+      case atoms._NET_WM_WINDOW_TYPE_DESKTOP:
+        return WindowType.Desktop;
+      case atoms._NET_WM_WINDOW_TYPE_DOCK:
+        return WindowType.Dock;
+      case atoms._NET_WM_WINDOW_TYPE_TOOLBAR:
+        return WindowType.Toolbar;
+      case atoms._NET_WM_WINDOW_TYPE_MENU:
+        return WindowType.Menu;
+      case atoms._NET_WM_WINDOW_TYPE_UTILITY:
+        return WindowType.Utility;
+      case atoms._NET_WM_WINDOW_TYPE_SPLASH:
+        return WindowType.Splash;
+      case atoms._NET_WM_WINDOW_TYPE_DIALOG:
+        return WindowType.Dialog;
+      case atoms._NET_WM_WINDOW_TYPE_DROPDOWN_MENU:
+        return WindowType.DropdownMenu;
+      case atoms._NET_WM_WINDOW_TYPE_POPUP_MENU:
+        return WindowType.PopupMenu;
+      case atoms._NET_WM_WINDOW_TYPE_TOOLTIP:
+        return WindowType.Tooltip;
+      case atoms._NET_WM_WINDOW_TYPE_NOTIFICATION:
+        return WindowType.Notification;
+      case atoms._NET_WM_WINDOW_TYPE_COMBO:
+        return WindowType.Combo;
+      case atoms._NET_WM_WINDOW_TYPE_DND:
+        return WindowType.DragDrop;
+      case atoms._NET_WM_WINDOW_TYPE_NORMAL:
+        return WindowType.Normal;
+      default:
+        return null;
     }
   }
 
@@ -334,7 +349,7 @@ export async function createEWMHEventConsumer(
         return null;
       }
 
-      const types: WindowType[] = []
+      const types: WindowType[] = [];
       let i = 0;
       while (i < data.byteLength) {
         const typeAtom = data.readInt32LE(i);
