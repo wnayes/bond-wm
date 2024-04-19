@@ -3,7 +3,7 @@ import { Desktop, ErrorDisplay, WorkArea, ThemeContextProvider, useScreenIndex }
 import { ErrorBoundary } from "react-error-boundary";
 import { DesktopEntries } from "@bond-wm/react-desktop-entries";
 import { Taskbar, TagList, TaskList, SystemTray, Clock, LayoutIndicator } from "@bond-wm/react-taskbar";
-import { Wallpaper } from "@bond-wm/react-wallpaper";
+import { RandomWallpaper } from "@bond-wm/react-random-wallpaper";
 import { MyTheme } from "../theme";
 
 export default () => {
@@ -20,7 +20,7 @@ export default () => {
         </Taskbar>
         <ErrorBoundary FallbackComponent={ErrorDisplay}>
           <WorkArea>
-            <Wallpaper />
+            <RandomWallpaper />
             <DesktopEntries />
           </WorkArea>
         </ErrorBoundary>
