@@ -1316,9 +1316,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
   function launchProcess(command: string): void {
     log("launchProcess", command);
 
-    const child = spawn(command, [], {
+    const child = spawn(command, {
       detached: true,
       stdio: "ignore",
+      shell: true,
     });
     child.unref(); // Allow electron to close before this child
   }
