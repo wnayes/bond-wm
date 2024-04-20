@@ -23,6 +23,7 @@
     "@bond-wm/react-taskbar": "workspace:^",
     "@bond-wm/react-titlebar": "workspace:^",
     "@bond-wm/react-wallpaper": "workspace:^",
+    "@bond-wm/react-random-wallpaper": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@vitejs/plugin-react": "^4.2.1",
     "react": "^18.2.0",

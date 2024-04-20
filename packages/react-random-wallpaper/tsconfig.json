@@ -1,0 +1,8 @@
+{
+  "extends": "@bond-wm/tsconfig/tsconfig.base.json",
+  "include": ["**/*"],
+  "compilerOptions": {
+    "jsx": "react",
+    "rootDir": "."
+  }
+}
