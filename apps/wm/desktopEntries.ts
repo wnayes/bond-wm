@@ -155,6 +155,8 @@ function parseDesktopEntryKind(typeString: string): DesktopEntryKind {
   }
 }
 
+const IconFallbackPaths = ["/usr/share/pixmaps", "/usr/share/icons"];
+
 async function parseDesktopEntryIcon(iconString: string): Promise<string | undefined> {
   if (isAbsolute(iconString)) {
     return await readIconAsync(iconString);
@@ -184,7 +186,8 @@ async function parseDesktopEntryIcon(iconString: string): Promise<string | undef
       { name: iconString },
     ],
     undefined,
-    ["png"]
+    ["png"],
+    IconFallbackPaths
   );
   if (pngPath) {
     return await readIconAsync(pngPath);
@@ -194,6 +197,7 @@ async function parseDesktopEntryIcon(iconString: string): Promise<string | undef
 }
 
 async function readIconAsync(iconPath: string): Promise<string | undefined> {
+  log("Reading icon path: " + iconPath);
   switch (extname(iconPath).toLowerCase()) {
     case ".png":
       {
