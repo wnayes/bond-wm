@@ -20,6 +20,7 @@ import {
 import { XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XEventMask } from "@bond-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
+import { updateWindowTagsForNextScreen } from "./window";
 
 export interface DragModule extends IXWMEventConsumer {
   startMove(wid: number, coords: Coords): void;
@@ -73,6 +74,8 @@ export async function createDragModule(
     const prevWinScreen = screens[win.screenIndex];
     const bestWinScreen = getBestScreenForWindow(screens, win);
     if (bestWinScreen && bestWinScreen !== prevWinScreen) {
+      updateWindowTagsForNextScreen(store, win, bestWinScreen);
+
       store.dispatch(setWindowIntoScreenAction({ wid: win.id, screenIndex: screens.indexOf(bestWinScreen) }));
 
       // The window coordinates need to be adjusted to be relative to the new screen.

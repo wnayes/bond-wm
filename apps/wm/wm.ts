@@ -52,7 +52,6 @@ import {
   anyIntersect,
   arraysEqual,
   fitGeometryWithinAnother,
-  intersect,
   requireXinerama,
   addWindowAction,
   configureWindowAction,
@@ -102,6 +101,7 @@ import { readVersionInfo } from "./version";
 import { fileURLToPath } from "node:url";
 import { dirname } from "path";
 import { setupContentSecurityPolicy } from "./csp";
+import { updateWindowTagsForNextScreen } from "./window";
 
 // Path constants
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -1716,15 +1716,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
       // Update the window's tags if the next screen has different tags visible.
       const nextScreen = screens[nextScreenIndex];
-      const nextScreenTags = nextScreen.currentTags;
-      const tagIntersect = intersect(win.tags, nextScreenTags);
-      if (tagIntersect.length > 0) {
-        if (!arraysEqual(tagIntersect, win.tags)) {
-          store.dispatch(setWindowTagsAction({ wid, tags: tagIntersect }));
-        }
-      } else if (nextScreenTags.length > 0) {
-        store.dispatch(setWindowTagsAction({ wid, tags: [nextScreenTags[0]] }));
-      }
+      updateWindowTagsForNextScreen(store, win, nextScreen);
 
       // Another window could move under our mouse; we don't want it to steal focus.
       ignoreEnterLeave = true;
