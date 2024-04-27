@@ -6,6 +6,7 @@
     ".": "./index.ts",
     "./desktop/index.html": "./desktop/index.html",
     "./frame/index.html": "./frame/index.html",
+    "./frameDialog/index.html": "./frameDialog/index.html",
     "./package.json": "./package.json"
   },
   "repository": "https://github.com/wnayes/bond-wm",
