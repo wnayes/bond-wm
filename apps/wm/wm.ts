@@ -230,6 +230,12 @@ export async function createServer(): Promise<IWindowManagerServer> {
     winLoadPromise: Promise<void>;
   } | null = null;
 
+  let frameBrowserDialogOnDeck: {
+    win: BrowserWindow;
+    fid: number;
+    winLoadPromise: Promise<void>;
+  } | null = null;
+  
   const initializingWins: { [win: number]: boolean } = {};
 
   let ignoreEnterLeave = false;
@@ -258,6 +264,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   const desktopLocation = viteLocalhost + "desktop/index.html";
   const frameLocation = viteLocalhost + "frame/index.html";
+  const frameDialogLocation = viteLocalhost + "frameDialog/index.html";
 
   setupContentSecurityPolicy();
 
@@ -358,6 +365,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     // Prep one frame window to speed up rendering for the first window.
     setTimeout(() => createFrameBrowserOnDeck(), 0);
+    setTimeout(() => createFrameBrowserDialogOnDeck(), 0);
   });
 
   client.on("error", logError);
@@ -662,41 +670,86 @@ export async function createServer(): Promise<IWindowManagerServer> {
     frameBrowserOnDeck = { win, fid, winLoadPromise };
   }
 
-  function createFrameBrowser(wid: number, screen: IScreen, geometry: IGeometry) {
+  function createFrameBrowserDialogOnDeck() {
+    if (frameBrowserDialogOnDeck) {
+      return;
+    }
+
+    const win = new BrowserWindow({
+      ...FrameBrowserBaseProperties,
+      show: false,
+    });
+    const winLoadPromise = win.loadURL(frameDialogLocation);
+
+
+console.log("createFrameBrowserDialogOnDeck",frameDialogLocation)
+   
+const fid = getNativeWindowHandleInt(win);
+    if (!fid) {
+      logError("Frame window handle was null");
+    }
+
+    frameBrowserDialogOnDeck = { win, fid, winLoadPromise };
+  }
+
+  function createFrameBrowser(wid: number, screen: IScreen, geometry: IGeometry, windowType: WindowType) {
     // If we have a pre-made frame window, use it. Otherwise, create one.
     let win: BrowserWindow;
     let fid: number;
-    if (frameBrowserOnDeck) {
-      const onDeckInfo = frameBrowserOnDeck;
-      frameBrowserOnDeck = null;
-      win = onDeckInfo.win;
-      fid = onDeckInfo.fid;
-      win.setSize(geometry.width, geometry.height, false);
-      win.setPosition(geometry.x, geometry.y, false);
-      onDeckInfo.winLoadPromise.then(() => {
-        win.webContents.send(IPCMessages.SetFrameWid, wid);
-        win.webContents.setZoomLevel(screen.zoom);
-      });
-      win.show();
-    } else {
-      win = new BrowserWindow({
-        ...FrameBrowserBaseProperties,
-        width: geometry.width,
-        height: geometry.height,
-        x: geometry.x,
-        y: geometry.y,
-      });
-      win.webContents.on("did-finish-load", () => {
-        win.webContents.setZoomLevel(screen.zoom);
-      });
-      win.loadURL(`${frameLocation}?wid=${wid}`);
+    switch (windowType) {
+      case WindowType.Dialog: {
+        if (frameBrowserDialogOnDeck) {
+          const onDeckInfo = frameBrowserDialogOnDeck;
+          frameBrowserDialogOnDeck = null;
+          win = onDeckInfo.win;
+          fid = onDeckInfo.fid;
+          win.setSize(geometry.width, geometry.height, false);
+          win.setPosition(geometry.x, geometry.y, false);
+          onDeckInfo.winLoadPromise.then(() => {
+            win.webContents.send(IPCMessages.SetFrameWid, wid);
+            win.webContents.setZoomLevel(screen.zoom);
+          });
+          win.show();
+          break;
+        }
+      }
+      default: {
+        if (frameBrowserOnDeck) {
+          const onDeckInfo = frameBrowserOnDeck;
+          frameBrowserOnDeck = null;
+          win = onDeckInfo.win;
+          fid = onDeckInfo.fid;
+          win.setSize(geometry.width, geometry.height, false);
+          win.setPosition(geometry.x, geometry.y, false);
+          onDeckInfo.winLoadPromise.then(() => {
+            win.webContents.send(IPCMessages.SetFrameWid, wid);
+            win.webContents.setZoomLevel(screen.zoom);
+          });
+          win.show();
+          break;
+        }
+        else {
+          win = new BrowserWindow({
+            ...FrameBrowserBaseProperties,
+            width: geometry.width,
+            height: geometry.height,
+            x: geometry.x,
+            y: geometry.y,
+          });
+          win.webContents.on("did-finish-load", () => {
+            win.webContents.setZoomLevel(screen.zoom);
+          });
+          win.loadURL(`${frameLocation}?wid=${wid}`);
 
-      fid = getNativeWindowHandleInt(win);
-      if (!fid) {
-        logError("Frame window handle was null");
+          fid = getNativeWindowHandleInt(win);
+          if (!fid) {
+            logError("Frame window handle was null");
+          }
+          break;
+        }
       }
     }
-
+    
     frameBrowserWindows[wid] = win;
 
     frameBrowserWinIdToFrameId[wid] = fid;
@@ -704,6 +757,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     log("Created frame window", fid);
 
+    if (!frameBrowserDialogOnDeck) {
+      setTimeout(() => createFrameBrowserDialogOnDeck(), 0);
+    }
     if (!frameBrowserOnDeck) {
       setTimeout(() => createFrameBrowserOnDeck(), 0);
     }
@@ -894,8 +950,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
       }
 
       const [frameX, frameY] = [screen.x + win.outer.x, screen.y + win.outer.y];
-
-      const fid = createFrameBrowser(wid, screen, { ...win.outer, x: frameX, y: frameY });
+      
+      
+      const fid = createFrameBrowser(wid, screen, { ...win.outer, x: frameX, y: frameY}, win.type || WindowType.Normal );
       knownWids.add(fid);
 
       winIdToRootId[wid] = screen.root;
