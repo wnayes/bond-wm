@@ -5,7 +5,7 @@ import {
   removeTrayWindowAction,
 } from "@bond-wm/shared";
 import { IGeometry } from "@bond-wm/shared";
-import { numsToBuffer } from "@bond-wm/shared";
+import { numsToBuffer } from "./xutils";
 import { IX11Mod, X11_EVENT_TYPE, XCB_COPY_FROM_PARENT, XPropMode } from "@bond-wm/shared";
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";

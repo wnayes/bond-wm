@@ -73,3 +73,16 @@ export function changeWindowEventMask(X: IXClient, wid: number, eventMask: XEven
   });
   return !failed;
 }
+
+/**
+ * Converts an array of numbers into a Buffer holding those numbers.
+ * @param nums Numbers to put in the buffer (as 32 bit ints)
+ * @returns Buffer filled with nums.
+ */
+export function numsToBuffer(nums: number[]): Buffer {
+  const buffer = Buffer.alloc(nums.length * 4);
+  for (let i = 0; i < nums.length; i++) {
+    buffer.writeInt32LE(nums[i], i * 4);
+  }
+  return buffer;
+}
