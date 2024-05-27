@@ -22,18 +22,18 @@ const Plugin: LayoutPluginConfig = {
           width: screen.width,
           height: screen.height,
         });
+      } else if (win.position === WindowPosition.UserPositioned) {
+        addLayoutResult(results, win, screen, {
+          x: win.outer.x,
+          y: win.outer.y,
+          width: win.outer.width,
+          height: win.outer.height,
+        });
       } else if (windowFloatsCenter(win)) {
         // Center the window.
         addLayoutResult(results, win, screen, {
           x: workArea.x + Math.max(0, Math.floor((workArea.width - win.outer.width) / 2)),
           y: workArea.y + Math.max(0, Math.floor((workArea.height - win.outer.height) / 2)),
-          width: win.outer.width,
-          height: win.outer.height,
-        });
-      } else if (win.position === WindowPosition.UserPositioned) {
-        addLayoutResult(results, win, screen, {
-          x: win.outer.x,
-          y: win.outer.y,
           width: win.outer.width,
           height: win.outer.height,
         });
