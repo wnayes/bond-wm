@@ -33,7 +33,7 @@
     "@bond-wm/keysym": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@bond-wm/tsconfig": "workspace:^",
-    "@reduxjs/toolkit": "^2.2.1",
+    "@reduxjs/toolkit": "^2.2.5",
     "@wnayes/electron-redux": "2.0.0-alpha.10",
     "electron": "^30.0.8",
     "freedesktop-desktop-entry": "^1.0.0",

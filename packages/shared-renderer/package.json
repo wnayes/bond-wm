@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@bond-wm/shared": "workspace:^",
-    "@reduxjs/toolkit": "^2.2.1",
+    "@reduxjs/toolkit": "^2.2.5",
     "@wnayes/electron-redux": "2.0.0-alpha.10",
     "redux": "^5.0.1",
     "tslib": "^2.6.2"
