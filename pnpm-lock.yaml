@@ -52,10 +52,10 @@ importers:
         version: 2.2.1(react-redux@9.1.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 2.0.0-alpha.10
-        version: 2.0.0-alpha.10(electron@29.1.1)(redux@5.0.1)
+        version: 2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)
       electron:
-        specifier: ^29.1.1
-        version: 29.1.1
+        specifier: ^30.0.8
+        version: 30.0.8
       freedesktop-desktop-entry:
         specifier: ^1.0.0
         version: 1.0.0
@@ -483,8 +483,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1(react-redux@9.1.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       electron:
-        specifier: ^29.1.1
-        version: 29.1.1
+        specifier: ^30.0.8
+        version: 30.0.8
       react-redux:
         specifier: ^9.1.0
         version: 9.1.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
@@ -539,7 +539,7 @@ importers:
         version: 2.2.1(react-redux@9.1.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 2.0.0-alpha.10
-        version: 2.0.0-alpha.10(electron@29.1.1)(redux@5.0.1)
+        version: 2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)
       redux:
         specifier: ^5.0.0
         version: 5.0.1
@@ -3380,8 +3380,8 @@ packages:
   electron-to-chromium@1.4.623:
     resolution: {integrity: sha512-lKoz10iCYlP1WtRYdh5MvocQPWVRoI7ysp6qf18bmeBgR8abE6+I2CsfyNKztRDZvhdWc+krKT6wS7Neg8sw3A==}
 
-  electron@29.1.1:
-    resolution: {integrity: sha512-cXN15NgCi7MkzGo5/23ZQbii+0UfhmUiDjACunmzcUofYCjF42XhFbL7JZnwgI0qtBCCeJU8qZNZt9lU91gUFw==}
+  electron@30.0.8:
+    resolution: {integrity: sha512-ivzXJJ/9gdb4oOw+5SDuaZpSInz8C+Z021dKZfFLMltKbDa4sSqt5cRBiUg7J36Z2kdus+Jai0bdHWutYE9wAA==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -9342,9 +9342,9 @@ snapshots:
       '@webassemblyjs/ast': 1.11.6
       '@xtuc/long': 4.2.2
 
-  '@wnayes/electron-redux@2.0.0-alpha.10(electron@29.1.1)(redux@5.0.1)':
+  '@wnayes/electron-redux@2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)':
     dependencies:
-      electron: 29.1.1
+      electron: 30.0.8
       lodash.isplainobject: 4.0.6
       lodash.isstring: 4.0.1
       redux: 5.0.1
@@ -10243,7 +10243,7 @@ snapshots:
 
   electron-to-chromium@1.4.623: {}
 
-  electron@29.1.1:
+  electron@30.0.8:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.11.25
