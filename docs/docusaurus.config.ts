@@ -51,7 +51,7 @@ const config: Config = {
     navbar: {
       // title: "bond-wm",
       logo: {
-        alt: "My Site Logo",
+        alt: "bond-wm Logo",
         src: "img/logo.svg",
       },
       items: [
