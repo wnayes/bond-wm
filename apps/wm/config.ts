@@ -21,7 +21,7 @@ export async function determineConfigPath(store: ServerStore): Promise<string> {
     const XDG_CONFIG_HOME = getXDGConfigHome();
     log("XDG_CONFIG_HOME", XDG_CONFIG_HOME);
 
-    configPath = join(XDG_CONFIG_HOME, "bond-wm-config", "index.ts");
+    configPath = join(XDG_CONFIG_HOME, "bond-wm-config");
     if (!existsSync(configPath)) {
       throw new Error("No --config path was specified, and no default config locations existed.");
     }
