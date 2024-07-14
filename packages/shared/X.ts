@@ -471,6 +471,11 @@ export interface XBuffer {
   unpack(format: string, offset?: number): number[];
 }
 
+export interface XColor {
+  pixel: number;
+  // There are others.
+}
+
 export type XCbWithErr<TArgs extends unknown[], TError = unknown> = (err: TError, ...args: TArgs) => void;
 
 export type Atom = number;
@@ -546,6 +551,23 @@ export interface XStandardAtoms {
   WM_TRANSIENT_FOR: 68;
 }
 
+interface XWindowSetAttrs {
+  backgroundPixmap?: number;
+  backgroundPixel?: number;
+  backingStore?: number;
+  backingPlanes?: number;
+  borderPixmap?: number;
+  borderPixel?: number;
+  bitGravity?: number;
+  colormap?: number;
+  cursor?: number;
+  doNotPropagateMask?: number;
+  eventMask?: number;
+  overrideRedirect?: number;
+  saveUnder?: number;
+  winGravity?: number;
+}
+
 // https://github.com/sidorares/node-x11/wiki/Core-requests
 export interface IXClient {
   atoms: XStandardAtoms;
@@ -560,7 +582,7 @@ export interface IXClient {
 
   require<T>(extensionName: string, callback: XCbWithErr<[ext: T]>): void;
 
-  AllocColor(...args: unknown[]): unknown;
+  AllocColor(colormap: number, r: number, g: number, b: number, callback: XCbWithErr<[XColor]>): unknown;
   AllocID(): number;
   AllowEvents(...args: unknown[]): unknown;
   CreateWindow(
@@ -574,7 +596,7 @@ export interface IXClient {
     depth: number,
     _class: unknown,
     visual: unknown,
-    createWindowAdditionalValues?: unknown
+    createWindowAdditionalValues?: XWindowSetAttrs
   ): void;
   ChangeActivePointerGrab(...args: unknown[]): unknown;
   ChangeGC(...args: unknown[]): unknown;
@@ -587,12 +609,8 @@ export interface IXClient {
     data: Buffer | string
   ): void;
   ChangeSaveSet(a: number, wid: number): void;
-  ChangeWindowAttributes(
-    wid: number,
-    values: { eventMask: unknown },
-    callback: XCbWithErr<[void], { error: number }>
-  ): void;
-  ClearArea(...args: unknown[]): unknown;
+  ChangeWindowAttributes(wid: number, values: XWindowSetAttrs, callback?: XCbWithErr<[void], { error: number }>): void;
+  ClearArea(wid: number, x: number, y: number, width: number, height: number, exposures: unknown): unknown;
   ConfigureWindow(wid: number, info: Partial<IXConfigureInfo>): void;
   ConvertSelection(...args: unknown[]): unknown;
   CopyArea(...args: unknown[]): unknown;

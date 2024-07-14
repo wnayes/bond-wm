@@ -1,11 +1,47 @@
-import React, { useLayoutEffect, useRef } from "react";
-import { useSelector, useStore } from "react-redux";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { useDispatch, useSelector, useStore } from "react-redux";
 import { RootState, getBoundingClientRectWithZoom } from "@bond-wm/shared-renderer";
-import { configureTrayWindowAction, ITrayEntry, geometriesDiffer } from "@bond-wm/shared";
+import {
+  configureTrayWindowAction,
+  ITrayEntry,
+  geometriesDiffer,
+  CSSColorStringToRGBAArray,
+  RGBAArray,
+  arraysEqual,
+  setTrayBackgroundColorAction,
+} from "@bond-wm/shared";
 import { useBrowserWindowSize, useScreenIndex } from "@bond-wm/react";
 
 export function SystemTray() {
+  const sysTrayDivRef = useRef<HTMLDivElement>(null);
+
   useBrowserWindowSize(); // Triggers re-renders on resize.
+
+  const dispatch = useDispatch();
+  const trayBgColor = useSelector((state: RootState) => state.tray.backgroundColor);
+
+  // Determine the tray's background color and send it to the server.
+  // Part of the workaround for tray icon transparency.
+  useEffect(() => {
+    if (sysTrayDivRef.current) {
+      let el: HTMLElement | null | undefined = sysTrayDivRef.current;
+      let bgColorArr: RGBAArray | undefined;
+      while (el) {
+        const computedStyle = getComputedStyle(el);
+        const bgColor = computedStyle.backgroundColor;
+        bgColorArr = CSSColorStringToRGBAArray(bgColor);
+        if (!bgColor || bgColorArr[3] === 0) {
+          bgColorArr = undefined;
+          el = el.parentElement;
+        } else {
+          break;
+        }
+      }
+      if (bgColorArr && !arraysEqual(trayBgColor, bgColorArr)) {
+        dispatch(setTrayBackgroundColorAction(bgColorArr));
+      }
+    }
+  });
 
   const trayWindows = useSelector((state: RootState) => state.tray.windows);
   if (!trayWindows) {
@@ -17,7 +53,11 @@ export function SystemTray() {
     const trayWin = trayWindows[trayWinId];
     entries.push(<SystemTrayIcon key={trayWin.id} win={trayWin} />);
   }
-  return <div className="sysTray">{entries}</div>;
+  return (
+    <div ref={sysTrayDivRef} className="sysTray">
+      {entries}
+    </div>
+  );
 }
 
 interface ISystemTrayIconProps {

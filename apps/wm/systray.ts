@@ -3,6 +3,7 @@ import {
   addTrayWindowAction,
   configureTrayWindowAction,
   removeTrayWindowAction,
+  setTrayBackgroundColorAction,
 } from "@bond-wm/shared";
 import { IGeometry } from "@bond-wm/shared";
 import { numsToBuffer } from "./xutils";
@@ -53,8 +54,11 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
   };
 
   let _registered = false;
+  //let _rootWid: number;
   let _trayOwnerWid = 0;
   //let _trayDesktopWid = 0;
+  let _currentColorPixel: number;
+  const frameBrowserWinIdToFrameId: Map<number, number> = new Map();
 
   const _notificationState: NotificationState = {};
 
@@ -72,10 +76,24 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
     changeWindowEventMask(X, trayWid, TRAY_WIN_EVENT_MASK);
 
     // X.ChangeSaveSet(XCB_SET_MODE_INSERT, trayWid) ?
+    //X.ReparentWindow(trayWid, _trayOwnerWid, 0, 0);
     //X.ReparentWindow(trayWid, _trayDesktopWid, 0, 0);
 
+    //const frameWid = X.AllocID();
+    //frameBrowserWinIdToFrameId.set(trayWid, frameWid);
+    // X.CreateWindow(frameWid, _rootWid, -16, -16, 16, 16, 0, XCB_COPY_FROM_PARENT, 1, XDisplay.screen[0].root_visual, {
+    //   colormap: XDisplay.screen[0].default_colormap,
+    //   backgroundPixel: _currentColorPixel,
+    //   borderPixel: 0,
+    // });
+
+    X.ChangeWindowAttributes(trayWid, {
+      backgroundPixel: _currentColorPixel,
+    });
+
+    //X.ReparentWindow(trayWid, frameWid, 0, 0);
     X.ConfigureWindow(trayWid, { width: 16, height: 16 });
-    X.MapWindow(trayWid);
+    //X.MapWindow(frameWid);
   }
 
   return {
@@ -84,11 +102,49 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
         return;
       }
       _registered = true;
+      //_rootWid = args.root;
 
+      //_trayDesktopWid = args.desktopWindowId;
+
+      // let visual;
+      // const rgbaVisuals = Object.keys((XDisplay as any).screen[0].depths[32]);
+      // for (const v in rgbaVisuals) {
+      //   const vid = rgbaVisuals[v];
+      //   if ((XDisplay as any).screen[0].depths[32][vid].class === 4) {
+      //     visual = vid;
+      //     break;
+      //   }
+      // }
+      // if (visual === undefined) {
+      //   visual = 0;
+      //   console.log("No RGBA visual found");
+      // }
+      // log("rgbavvisual", visual);
+      // log("rootvisual", XDisplay.screen[0].root_visual, XDisplay.screen[0].root_depth);
+      // log("all visuals", (XDisplay as any).screen[0].depths[32]);
+      //const trayGeometry = store.getState().tray.trayGeometry;
+
+      _currentColorPixel = XDisplay.screen[0].black_pixel;
+
+      // log("black_pixel: ", XDisplay.screen[0].black_pixel, "white_pixel: ", XDisplay.screen[0].white_pixel);
       _trayOwnerWid = X.AllocID();
-      X.CreateWindow(_trayOwnerWid, args.root, -1, -1, 1, 1, 0, XCB_COPY_FROM_PARENT, 0, 0, {
-        backgroundPixel: XDisplay.screen[0].black_pixel,
-      });
+      X.CreateWindow(
+        _trayOwnerWid,
+        args.root,
+        -1,
+        -1,
+        1,
+        1,
+        0,
+        XCB_COPY_FROM_PARENT,
+        1,
+        XDisplay.screen[0].root_visual,
+        {
+          colormap: XDisplay.screen[0].default_colormap,
+          backgroundPixel: _currentColorPixel,
+          borderPixel: 0,
+        }
+      );
 
       changeWindowEventMask(X, _trayOwnerWid, TRAY_OWNER_EVENT_MASK);
 
@@ -101,7 +157,6 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
         numsToBuffer([SystemTrayOrientation._NET_SYSTEM_TRAY_ORIENTATION_HORZ])
       );
 
-      //_trayDesktopWid = args.desktopWindowId;
       const selection = atoms[TraySelectionAtom];
 
       const eventData = Buffer.alloc(32);
@@ -119,11 +174,20 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
 
       X.SendEvent(args.root, false, 0xffffff, eventData);
       log(`Registered ${_trayOwnerWid} as tray selection owner for ${TraySelectionAtom}.`);
+
+      // X.ClearArea(_trayOwnerWid, 0, 0, 1, 1, 1);
+
+      // X.MapWindow(_trayOwnerWid);
     },
 
     onUnmapNotify(args) {
       if (isTrayWin(args.wid)) {
         store.dispatch(removeTrayWindowAction(args.wid));
+
+        const frameId = frameBrowserWinIdToFrameId.get(args.wid);
+        if (typeof frameId === "number") {
+          X.DestroyWindow(frameId);
+        }
       }
     },
 
@@ -209,29 +273,57 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
           return;
         }
 
-        // Should always be sent now; fallback until next major version.
-        const screen = state.screens[payload.screenIndex ?? 0];
+        const screen = state.screens[payload.screenIndex];
 
-        const trayConfig: Partial<IGeometry> = {};
-        if (typeof payload.x === "number") {
-          trayConfig.x = screen.x + payload.x;
-        }
-        if (typeof payload.y === "number") {
-          trayConfig.y = screen.y + payload.y;
-        }
-        if (typeof payload.width === "number") {
-          trayConfig.width = payload.width;
-        }
-        if (typeof payload.height === "number") {
-          trayConfig.height = payload.height;
-        }
+        const trayConfig: IGeometry = {
+          x: screen.x + payload.x,
+          y: screen.y + payload.y,
+          width: payload.width,
+          height: payload.height,
+        };
 
         log(`Configuring tray window ${wid}`, trayConfig);
-        X.ConfigureWindow(wid, trayConfig);
+
+        const frameWid = frameBrowserWinIdToFrameId.get(wid);
+        if (typeof frameWid === "number") {
+          X.ConfigureWindow(frameWid, trayConfig);
+          X.ConfigureWindow(wid, {
+            x: 0,
+            y: 0,
+            width: payload.width,
+            height: payload.height,
+          });
+        } else {
+          X.ConfigureWindow(wid, trayConfig);
+        }
+
+        X.MapWindow(wid);
 
         // Sometimes tray windows that existed prior to the window manager
         // starting up will be behind the desktop. Raise them just in case.
+        if (typeof frameWid === "number") {
+          X.RaiseWindow(frameWid);
+        }
         X.RaiseWindow(wid);
+      } else if (setTrayBackgroundColorAction.match(args.action)) {
+        const [r, g, b] = args.action.payload;
+        const state = args.getState();
+        X.AllocColor(XDisplay.screen[0].default_colormap, r * 256, g * 256, b * 256, function (err, color) {
+          _currentColorPixel = color.pixel;
+
+          for (const trayWidStr in state.tray.windows) {
+            const trayWid = parseInt(trayWidStr, 10);
+            X.ChangeWindowAttributes(trayWid, {
+              backgroundPixel: _currentColorPixel,
+            });
+          }
+
+          frameBrowserWinIdToFrameId.forEach((frameWid) => {
+            X.ChangeWindowAttributes(frameWid, {
+              backgroundPixel: _currentColorPixel,
+            });
+          });
+        });
       }
     },
   };

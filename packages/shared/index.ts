@@ -11,6 +11,7 @@ export * from "./redux/traySlice";
 export { default as trayReducer } from "./redux/traySlice";
 export * from "./redux/windowSlice";
 export { default as windowReducer } from "./redux/windowSlice";
+export * from "./colors";
 export * from "./config";
 export * from "./ContextMenuKind";
 export * from "./layouts";

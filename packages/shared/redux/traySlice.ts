@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IGeometry } from "../types";
+import { RGBAArray } from "../colors";
 
-export type ConfigureTrayPayload = { wid: number; screenIndex: number } & Partial<IGeometry>;
+export type ConfigureTrayPayload = { wid: number; screenIndex: number } & IGeometry;
 
 export interface ITrayEntry {
   id: number;
@@ -11,10 +12,12 @@ export interface ITrayEntry {
 export type TrayWindowDict = { [wid: number]: ITrayEntry };
 
 export interface TrayState {
+  backgroundColor: RGBAArray;
   windows: TrayWindowDict;
 }
 
 const initialState: TrayState = {
+  backgroundColor: [0, 0, 0, 0],
   windows: {},
 };
 
@@ -55,9 +58,14 @@ export const traySlice = createSlice({
         }
       }
     },
+
+    setTrayBackgroundColorAction: (state, { payload }: PayloadAction<RGBAArray>) => {
+      state.backgroundColor = payload;
+    },
   },
 });
 
-export const { addTrayWindowAction, removeTrayWindowAction, configureTrayWindowAction } = traySlice.actions;
+export const { addTrayWindowAction, removeTrayWindowAction, configureTrayWindowAction, setTrayBackgroundColorAction } =
+  traySlice.actions;
 
 export default traySlice.reducer;
