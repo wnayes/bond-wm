@@ -104,29 +104,10 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
       _registered = true;
       //_rootWid = args.root;
 
-      //_trayDesktopWid = args.desktopWindowId;
+      if (typeof _currentColorPixel !== "number") {
+        _currentColorPixel = XDisplay.screen[0].black_pixel;
+      }
 
-      // let visual;
-      // const rgbaVisuals = Object.keys((XDisplay as any).screen[0].depths[32]);
-      // for (const v in rgbaVisuals) {
-      //   const vid = rgbaVisuals[v];
-      //   if ((XDisplay as any).screen[0].depths[32][vid].class === 4) {
-      //     visual = vid;
-      //     break;
-      //   }
-      // }
-      // if (visual === undefined) {
-      //   visual = 0;
-      //   console.log("No RGBA visual found");
-      // }
-      // log("rgbavvisual", visual);
-      // log("rootvisual", XDisplay.screen[0].root_visual, XDisplay.screen[0].root_depth);
-      // log("all visuals", (XDisplay as any).screen[0].depths[32]);
-      //const trayGeometry = store.getState().tray.trayGeometry;
-
-      _currentColorPixel = XDisplay.screen[0].black_pixel;
-
-      // log("black_pixel: ", XDisplay.screen[0].black_pixel, "white_pixel: ", XDisplay.screen[0].white_pixel);
       _trayOwnerWid = X.AllocID();
       X.CreateWindow(
         _trayOwnerWid,
@@ -309,19 +290,32 @@ export async function createTrayEventConsumer({ X, store, XDisplay }: XWMContext
         const [r, g, b] = args.action.payload;
         const state = args.getState();
         X.AllocColor(XDisplay.screen[0].default_colormap, r * 256, g * 256, b * 256, function (err, color) {
+          log("Changing tray window bg color", color);
+
           _currentColorPixel = color.pixel;
+
+          if (_trayOwnerWid !== 0) {
+            X.ChangeWindowAttributes(_trayOwnerWid, {
+              backgroundPixel: _currentColorPixel,
+            });
+            X.ClearArea(_trayOwnerWid, 0, 0, 1, 1, 1);
+          }
 
           for (const trayWidStr in state.tray.windows) {
             const trayWid = parseInt(trayWidStr, 10);
+            const trayInfo = state.tray.windows[trayWidStr];
             X.ChangeWindowAttributes(trayWid, {
               backgroundPixel: _currentColorPixel,
             });
+            X.ClearArea(trayWid, 0, 0, trayInfo.location.width, trayInfo.location.height, 1);
           }
 
-          frameBrowserWinIdToFrameId.forEach((frameWid) => {
+          frameBrowserWinIdToFrameId.forEach((frameWid, trayWid) => {
+            const trayInfo = state.tray.windows[trayWid];
             X.ChangeWindowAttributes(frameWid, {
               backgroundPixel: _currentColorPixel,
             });
+            X.ClearArea(frameWid, 0, 0, trayInfo.location.width, trayInfo.location.height, 1);
           });
         });
       }
