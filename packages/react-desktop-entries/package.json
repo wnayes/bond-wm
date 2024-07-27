@@ -15,14 +15,14 @@
     "@bond-wm/react": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@bond-wm/shared-renderer": "workspace:^",
-    "tslib": "^2.6.2"
+    "tslib": "catalog:"
   },
   "devDependencies": {
     "@bond-wm/tsconfig": "workspace:^",
-    "@types/node": "^20.12.12",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "typescript": "~5.4.5"
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "react": "^18.3.1",

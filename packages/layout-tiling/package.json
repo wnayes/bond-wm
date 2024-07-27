@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@bond-wm/shared": "workspace:^",
-    "tslib": "^2.6.2"
+    "tslib": "catalog:"
   },
   "devDependencies": {
     "@bond-wm/tsconfig": "workspace:^",
-    "@types/node": "^20.12.12",
-    "typescript": "~5.4.5",
-    "vite": "^5.2.11"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }
