@@ -2,7 +2,14 @@ const x11: IX11Mod = require("x11"); // eslint-disable-line
 
 import * as path from "path";
 import * as os from "os";
-import { app, ipcMain, BrowserWindow } from "electron";
+import {
+  app,
+  ipcMain,
+  BrowserWindow,
+  HandlerDetails,
+  BrowserWindowConstructorOptions,
+  DidCreateWindowDetails,
+} from "electron";
 import {
   IBounds,
   IGeometry,
@@ -106,6 +113,9 @@ import { updateWindowTagsForNextScreen } from "./window";
 // Path constants
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PRELOAD_JS = path.resolve(path.join(__dirname, "preload.js"));
+
+/** The WM_CLASS that we expect our ChildWindow instances to have. */
+const CHILD_WINDOW_WM_CLASS = "bond-wm";
 
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
@@ -469,6 +479,29 @@ export async function createServer(): Promise<IWindowManagerServer> {
         port: 19109,
       },
     });
+
+    // Endpoint for "/icon/[desktopEntry]" to get an icon image response.
+    viteWebServer.middlewares.use("/icon", async (req, res) => {
+      log("Icon request: " + req.url);
+
+      let desktopEntryName = req.url!;
+      while (desktopEntryName.endsWith("/")) {
+        desktopEntryName = desktopEntryName.substring(0, desktopEntryName.length - 1);
+      }
+      while (desktopEntryName.startsWith("/")) {
+        desktopEntryName = desktopEntryName.substring(1);
+      }
+      const iconInfo = await desktopEntriesModule.getDesktopEntryIcon(desktopEntryName);
+      if (!iconInfo) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+      res.setHeader("Content-Type", iconInfo.mimeType);
+      res.end(iconInfo.data);
+    });
+    viteWebServer.middlewares.stack.unshift(viteWebServer.middlewares.stack.pop()!);
+
     await viteWebServer.listen();
     return viteWebServer;
   }
@@ -612,6 +645,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     log("Created browser window", handle);
 
+    win.webContents.setWindowOpenHandler(onWindowOpen);
+    win.webContents.addListener("did-create-window", onChildWindowCreated);
+
     if (!desktopLocation) {
       throw new Error("Missing desktop config. Desktop windows cannot be created without a desktop plugin.");
     }
@@ -709,6 +745,34 @@ export async function createServer(): Promise<IWindowManagerServer> {
     }
 
     return fid;
+  }
+
+  function onWindowOpen(
+    details: HandlerDetails
+  ):
+    | { action: "deny" }
+    | { action: "allow"; outlivesOpener?: boolean; overrideBrowserWindowOptions?: BrowserWindowConstructorOptions } {
+    const { url } = details;
+    if (url === "about:blank") {
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          frame: false,
+          fullscreenable: false,
+          resizable: false,
+          backgroundColor: "#00FFFFFF", // AARRGGBB
+          transparent: true,
+          hasShadow: false,
+        },
+      };
+    }
+    return { action: "allow" };
+  }
+
+  function onChildWindowCreated(win: BrowserWindow, details: DidCreateWindowDetails) {
+    log("Child window created", details);
+
+    // win.webContents.openDevTools({ mode: "detach" });
   }
 
   function __onXEvent(ev: IXEvent) {
@@ -838,7 +902,12 @@ export async function createServer(): Promise<IWindowManagerServer> {
       log(`Not managing ${wid} due to unmapped state.`);
     }
 
-    if (isOverrideRedirect || isUnmappedState) {
+    const isChildWindow = wmClass?.[0] === CHILD_WINDOW_WM_CLASS && title === CHILD_WINDOW_WM_CLASS;
+    if (isChildWindow) {
+      log(`Not managing ${wid} due to it being a ChildWindow.`);
+    }
+
+    if (isOverrideRedirect || isUnmappedState || isChildWindow) {
       delete initializingWins[wid];
       X.MapWindow(wid);
       return;

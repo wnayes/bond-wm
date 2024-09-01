@@ -1,12 +1,14 @@
 import { readFile, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { extname, isAbsolute, join } from "node:path";
 import { XWMContext } from "./wm";
 import { UserDirectoryKind, getXDGUserDirectory } from "./xdg";
-import { DesktopEntry, DesktopEntryKind, DesktopEntryMap, setDesktopEntries } from "@bond-wm/shared";
-import { encodeArrayBufferToBase64 } from "./base64";
+import { DesktopEntry, DesktopEntryKind, DesktopEntryMap, setDesktopEntries, setEntries } from "@bond-wm/shared";
 import { log, logError } from "./log";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const DesktopEntryObject = require("freedesktop-desktop-entry");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const FreedesktopIcons = require("freedesktop-icons") as FreedesktopIconsModule;
 
 interface DesktopEntryObjectShape {
   JSON: Record<string, DesktopEntryObjectGroup>;
@@ -27,9 +29,6 @@ interface DesktopEntryObjectEntryProperties {
   comment: string;
   precedingComment: string[];
 }
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const FreedesktopIcons = require("freedesktop-icons") as FreedesktopIconsModule;
 
 interface FreedesktopIconsModule {
   (
@@ -52,23 +51,53 @@ interface IconDescription {
   scale?: number;
 }
 
+interface IDesktopEntryIconData {
+  data: Buffer;
+  mimeType: string;
+}
+
 export interface DesktopEntriesModule {
   launchDesktopEntry(entryName: string): void;
+  getDesktopEntryIcon(entryName: string): Promise<IDesktopEntryIconData | null>;
 }
+
+const DesktopFileDirectories = [
+  "/usr/share/applications",
+  "/usr/local/share/applications",
+  "~/.local/share/applications",
+];
 
 export async function createDesktopEntriesModule({ store, wmServer }: XWMContext): Promise<DesktopEntriesModule> {
   const desktopFolder = await getXDGUserDirectory(UserDirectoryKind.Desktop);
-  if (desktopFolder) {
+  if (desktopFolder && existsSync(desktopFolder)) {
     const desktopEntries = await parseDesktopEntries(desktopFolder);
     store.dispatch(setDesktopEntries(desktopEntries));
   }
+
+  const allEntries = {};
+  for (const folder of DesktopFileDirectories) {
+    if (!existsSync(folder)) {
+      continue;
+    }
+    const addlEntries = await parseDesktopEntries(folder);
+    if (addlEntries) {
+      Object.assign(allEntries, addlEntries);
+    }
+  }
+  store.dispatch(setEntries(allEntries));
+
+  function getEntryFromStore(entryName: string): DesktopEntry | null | undefined {
+    const state = store.getState().desktop;
+    return state?.desktopEntries[entryName] ?? state?.entries[entryName];
+  }
+
+  const iconDataByName: Map<string, IDesktopEntryIconData | null> = new Map();
 
   return {
     launchDesktopEntry(entryName: string): void {
       log("launchDesktopEntry", entryName);
 
-      const entries = store.getState().desktop?.entries;
-      const entry = entries[entryName];
+      const entry = getEntryFromStore(entryName);
       if (entry) {
         switch (entry.kind) {
           case DesktopEntryKind.Application:
@@ -84,6 +113,20 @@ export async function createDesktopEntriesModule({ store, wmServer }: XWMContext
             break;
         }
       }
+    },
+
+    async getDesktopEntryIcon(entryName: string): Promise<IDesktopEntryIconData | null> {
+      const entry = getEntryFromStore(entryName);
+      if (!entry || !entry.icon) {
+        return null;
+      }
+
+      if (iconDataByName.has(entry.key)) {
+        return iconDataByName.get(entry.key) ?? null;
+      }
+      const iconData = await parseDesktopEntryIcon(entry.icon);
+      iconDataByName.set(entry.key, iconData);
+      return iconData;
     },
   };
 }
@@ -113,7 +156,7 @@ async function parseDesktopEntries(desktopFolder: string): Promise<DesktopEntryM
       key: fileName,
       name: desktopEntryGroupEntries["Name"]?.value,
       kind: parseDesktopEntryKind(desktopEntryGroupEntries["Type"]?.value),
-      icon: await parseDesktopEntryIcon(desktopEntryGroupEntries["Icon"]?.value),
+      icon: desktopEntryGroupEntries["Icon"]?.value,
     };
     if (!entry.name) {
       continue;
@@ -157,7 +200,10 @@ function parseDesktopEntryKind(typeString: string): DesktopEntryKind {
 
 const IconFallbackPaths = ["/usr/share/pixmaps", "/usr/share/icons"];
 
-async function parseDesktopEntryIcon(iconString: string): Promise<string | undefined> {
+async function parseDesktopEntryIcon(iconString: string): Promise<IDesktopEntryIconData | null> {
+  if (!iconString) {
+    return null;
+  }
   if (isAbsolute(iconString)) {
     return await readIconAsync(iconString);
   }
@@ -193,26 +239,34 @@ async function parseDesktopEntryIcon(iconString: string): Promise<string | undef
     return await readIconAsync(pngPath);
   }
 
-  return undefined;
+  return null;
 }
 
-async function readIconAsync(iconPath: string): Promise<string | undefined> {
+async function readIconAsync(iconPath: string): Promise<IDesktopEntryIconData | null> {
   log("Reading icon path: " + iconPath);
   switch (extname(iconPath).toLowerCase()) {
     case ".png":
       {
         const fileBytes = await readFile(iconPath);
-        return "data:image/png;base64," + encodeArrayBufferToBase64(fileBytes);
+        return {
+          data: fileBytes,
+          mimeType: "image/png",
+        };
+        // return "data:image/png;base64," + encodeArrayBufferToBase64(fileBytes);
       }
       break;
     case ".svg":
       {
         const fileBytes = await readFile(iconPath);
-        return "data:image/svg+xml;base64," + encodeArrayBufferToBase64(fileBytes);
+        return {
+          data: fileBytes,
+          mimeType: "image/svg+xml",
+        };
+        // return "data:image/svg+xml;base64," + encodeArrayBufferToBase64(fileBytes);
       }
       break;
   }
-  return undefined;
+  return null;
 }
 
 function sanitizeExecString(exec: string | null | undefined): string {

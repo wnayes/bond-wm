@@ -1,4 +1,5 @@
 import { useInsertionEffect } from "react";
+import { useDomWindow } from "@bond-wm/react";
 
 export interface IStylesheetProps {
   href: string;
@@ -6,18 +7,20 @@ export interface IStylesheetProps {
 
 /** Component that adds a stylesheet to the page. */
 export function Stylesheet(props: IStylesheetProps) {
+  const win = useDomWindow();
+
   const href = props.href;
   useInsertionEffect(() => {
-    const link = document.createElement("link");
+    const link = win.document.createElement("link");
     link.type = "text/css";
     link.rel = "stylesheet";
     link.href = href;
-    document.head.appendChild(link);
+    win.document.head.appendChild(link);
 
     return () => {
-      document.head.removeChild(link);
+      win.document.head.removeChild(link);
     };
-  }, [href]);
+  }, [win, href]);
 
   return null;
 }

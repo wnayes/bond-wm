@@ -54,6 +54,11 @@ export interface Theme {
       timeColor?: string;
     };
   };
+  startmenu?: {
+    backgroundColor?: string;
+    entryHoverColor?: string;
+    entryHoverForeColor?: string;
+  };
 }
 
 const DefaultTheme: Theme = {

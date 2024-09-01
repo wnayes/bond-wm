@@ -20,19 +20,28 @@ export interface DesktopEntryMap {
 }
 
 interface IDesktopSlice {
+  /** Metadata for all .desktop files on the system. */
   entries: DesktopEntryMap;
+
+  /** Metadata for .desktop files that are shown as icons on the desktop. */
+  desktopEntries: DesktopEntryMap;
 }
+
+const initialState: IDesktopSlice = { entries: {}, desktopEntries: {} };
 
 export const desktopSlice = createSlice({
   name: "desktop",
-  initialState: { entries: {} } as IDesktopSlice,
+  initialState,
   reducers: {
-    setDesktopEntries: (state, { payload }: PayloadAction<DesktopEntryMap>) => {
+    setEntries: (state, { payload }: PayloadAction<DesktopEntryMap>) => {
       state.entries = payload;
+    },
+    setDesktopEntries: (state, { payload }: PayloadAction<DesktopEntryMap>) => {
+      state.desktopEntries = payload;
     },
   },
 });
 
-export const { setDesktopEntries } = desktopSlice.actions;
+export const { setEntries, setDesktopEntries } = desktopSlice.actions;
 
 export default desktopSlice.reducer;

@@ -1,0 +1,48 @@
+.startMenuButton {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    font-size: 12px; /* For padding to work */
+    padding: 0 0.5em;
+    cursor: default;
+}
+
+.startMenu {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--start-menu-bg-color);
+}
+
+.startMenuAppList {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+
+.startMenuAppEntry {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    width: 100%;
+    cursor: default;
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 2px 0 2px 5px;
+}
+.startMenuAppEntry:hover {
+    background-color: var(--start-menu-entry-hover-bg-color);
+    color: var(--start-menu-entry-hover-text-color);
+}
+
+.startMenuAppEntryIcon {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin-right: 5px;
+}

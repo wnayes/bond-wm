@@ -1,7 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./moduletypes.d.ts" />
+
 export { usePluginState } from "./usePluginState";
 export { useCombinedRef } from "./useCombinedRef";
 export { useCompositeScreenSize } from "./useCompositeScreenSize";
-export { useDesktopEntries } from "./useDesktopEntries";
+export { useDomWindow, DomWindowContext } from "./useDomWindow";
+export { useDesktopEntries, useDesktopEntriesForDesktopIcons } from "./useDesktopEntries";
 export { useDesktopShortcut } from "./useDesktopShortcut";
 export { useElementSize } from "./useElementSize";
 export { useIconInfoDataUri } from "./useIconInfoDataUri";
@@ -14,6 +18,7 @@ export { useWindow, WidContext } from "./useWindow";
 export { useWindows } from "./useWindows";
 export { useBrowserWindowSize } from "./useBrowserWindowSize";
 
+export { ChildWindow } from "./components/ChildWindow";
 export { ErrorDisplay } from "./components/ErrorDisplay";
 export { Stylesheet } from "./components/Stylesheet";
 

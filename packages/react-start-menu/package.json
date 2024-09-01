@@ -1,0 +1,35 @@
+{
+  "name": "@bond-wm/react-start-menu",
+  "version": "0.4.0",
+  "description": "React start menu for bond-wm",
+  "type": "module",
+  "main": "./index.tsx",
+  "exports": "./index.tsx",
+  "types": "./index.tsx",
+  "repository": "https://github.com/wnayes/bond-wm",
+  "author": "Will Nayes",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@bond-wm/react": "workspace:^",
+    "@bond-wm/shared": "workspace:^",
+    "@bond-wm/shared-renderer": "workspace:^",
+    "react-redux": "catalog:",
+    "redux": "catalog:",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@bond-wm/tsconfig": "workspace:^",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "esbuild": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

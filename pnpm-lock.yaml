@@ -154,7 +154,7 @@ importers:
         version: link:../../packages/tsconfig
       '@reduxjs/toolkit':
         specifier: 'catalog:'
-        version: 2.2.5(react-redux@9.1.2(react@18.3.1)(redux@5.0.1))(react@18.3.1)
+        version: 2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 'catalog:'
         version: 2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)
@@ -363,6 +363,9 @@ importers:
       '@bond-wm/react-desktop-entries':
         specifier: workspace:^
         version: link:../react-desktop-entries
+      '@bond-wm/react-start-menu':
+        specifier: workspace:^
+        version: link:../react-start-menu
       '@bond-wm/react-taskbar':
         specifier: workspace:^
         version: link:../react-taskbar
@@ -437,6 +440,52 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 18.3.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.4.5
+
+  packages/react-start-menu:
+    dependencies:
+      '@bond-wm/react':
+        specifier: workspace:^
+        version: link:../react
+      '@bond-wm/shared':
+        specifier: workspace:^
+        version: link:../shared
+      '@bond-wm/shared-renderer':
+        specifier: workspace:^
+        version: link:../shared-renderer
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-redux:
+        specifier: 'catalog:'
+        version: 9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
+      redux:
+        specifier: ^5.0.0
+        version: 5.0.1
+      tslib:
+        specifier: 'catalog:'
+        version: 2.6.2
+    devDependencies:
+      '@bond-wm/tsconfig':
+        specifier: workspace:^
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 20.12.12
+      '@types/react':
+        specifier: 'catalog:'
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 18.3.0
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.21.4
       typescript:
         specifier: 'catalog:'
         version: 5.4.5
@@ -565,7 +614,7 @@ importers:
     dependencies:
       '@reduxjs/toolkit':
         specifier: 'catalog:'
-        version: 2.2.5(react-redux@9.1.2(react@18.3.1)(redux@5.0.1))(react@18.3.1)
+        version: 2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       electron:
         specifier: 'catalog:'
         version: 30.0.8
@@ -614,7 +663,7 @@ importers:
         version: link:../shared
       '@reduxjs/toolkit':
         specifier: 'catalog:'
-        version: 2.2.5(react-redux@9.1.2(react@18.3.1)(redux@5.0.1))(react@18.3.1)
+        version: 2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 'catalog:'
         version: 2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)
@@ -8556,7 +8605,7 @@ snapshots:
 
   '@polka/url@1.0.0-next.24': {}
 
-  '@reduxjs/toolkit@2.2.5(react-redux@9.1.2(react@18.3.1)(redux@5.0.1))(react@18.3.1)':
+  '@reduxjs/toolkit@2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)':
     dependencies:
       immer: 10.0.3
       redux: 5.0.1

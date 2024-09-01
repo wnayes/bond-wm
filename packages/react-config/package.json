@@ -20,6 +20,7 @@
     "@bond-wm/layout-tiling": "workspace:^",
     "@bond-wm/react": "workspace:^",
     "@bond-wm/react-desktop-entries": "workspace:^",
+    "@bond-wm/react-start-menu": "workspace:^",
     "@bond-wm/react-taskbar": "workspace:^",
     "@bond-wm/react-titlebar": "workspace:^",
     "@bond-wm/react-wallpaper": "workspace:^",

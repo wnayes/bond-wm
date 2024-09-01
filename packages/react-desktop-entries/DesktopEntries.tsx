@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { useDesktopEntries, useElementSize } from "@bond-wm/react";
+import { useDesktopEntriesForDesktopIcons, useElementSize } from "@bond-wm/react";
 import { DesktopEntry as DesktopEntryType } from "@bond-wm/shared";
-import { executeDesktopEntry } from "@bond-wm/shared-renderer";
+import { executeDesktopEntry, makeDesktopEntryIconUrl } from "@bond-wm/shared-renderer";
 import "./DesktopEntriesStyles.css";
 
 const DesktopEntryHeight = 110;
@@ -24,7 +24,7 @@ export function DesktopEntries({ flowDirection }: IDesktopEntriesProps) {
     executeDesktopEntry(entry.key);
   }, []);
 
-  const entries = useDesktopEntries();
+  const entries = useDesktopEntriesForDesktopIcons();
   const entryElements = [];
   for (const entryName in entries) {
     const entry = entries[entryName];
@@ -102,7 +102,7 @@ function DesktopEntryComponent({ entry, selected, onClick, onActivate }: IDeskto
 
   return (
     <div className={className} onClick={onClickWrapper} onDoubleClick={onDoubleClickWrapper}>
-      {entry.icon && <img src={entry.icon} height={48} width={48} className="desktopIcon" />}
+      {entry.icon && <img src={makeDesktopEntryIconUrl(entry.key)} height={48} width={48} className="desktopIcon" />}
       <div className="desktopEntryText">{entry.name}</div>
     </div>
   );
