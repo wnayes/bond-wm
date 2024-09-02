@@ -20,6 +20,7 @@ export const windowsSlice = createSlice({
         visible: payload.visible ?? true,
         minimized: payload.minimized ?? false,
         maximized: payload.maximized ?? false,
+        alwaysOnTop: payload.alwaysOnTop ?? false,
         fullscreen: false,
         type: payload.type ?? WindowType.Normal,
         transientFor: payload.transientFor,
@@ -128,6 +129,15 @@ export const windowsSlice = createSlice({
       }
     },
 
+    setWindowAlwaysOnTopAction: (state, action: PayloadAction<{ wid: number; alwaysOnTop: boolean }>) => {
+      const { payload } = action;
+      if (assertWidInState(state, action)) {
+        const { alwaysOnTop } = payload;
+        const win = state[payload.wid];
+        win.alwaysOnTop = alwaysOnTop;
+      }
+    },
+
     setWindowFullscreenAction: (state, action: PayloadAction<{ wid: number; fullscreen: boolean }>) => {
       const { payload } = action;
       if (assertWidInState(state, action)) {
@@ -228,6 +238,7 @@ export const {
   setWindowTitleAction,
   setWindowMinimizedAction,
   setWindowMaximizedAction,
+  setWindowAlwaysOnTopAction,
   setWindowFullscreenAction,
   setWindowPositionAction,
   setWindowVisibleAction,

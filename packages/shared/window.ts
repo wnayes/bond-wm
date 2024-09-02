@@ -13,6 +13,8 @@ export interface IWindow {
   visible: boolean;
   minimized: boolean;
   maximized: boolean;
+  /** If true, the window should usually be above other windows. */
+  alwaysOnTop: boolean;
   fullscreen: boolean;
   type: WindowType;
   transientFor: number | undefined;

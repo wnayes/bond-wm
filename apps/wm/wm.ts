@@ -114,9 +114,6 @@ import { updateWindowTagsForNextScreen } from "./window";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PRELOAD_JS = path.resolve(path.join(__dirname, "preload.js"));
 
-/** The WM_CLASS that we expect our ChildWindow instances to have. */
-const CHILD_WINDOW_WM_CLASS = "bond-wm";
-
 // The values here are arbitrary; we call InternAtom to get the true constants.
 export const ExtraAtoms = {
   UTF8_STRING: -1,
@@ -241,6 +238,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
   } | null = null;
 
   const initializingWins: { [win: number]: boolean } = {};
+
+  let childWindowCounter = 0;
+  const childWindows: Map<string, { wid: number | null; alwaysOnTop: boolean }> = new Map();
 
   let ignoreEnterLeave = false;
 
@@ -747,16 +747,20 @@ export async function createServer(): Promise<IWindowManagerServer> {
     return fid;
   }
 
-  function onWindowOpen(
-    details: HandlerDetails
-  ):
+  type WindowOpenResult =
     | { action: "deny" }
-    | { action: "allow"; outlivesOpener?: boolean; overrideBrowserWindowOptions?: BrowserWindowConstructorOptions } {
-    const { url } = details;
-    if (url === "about:blank") {
-      return {
+    | { action: "allow"; outlivesOpener?: boolean; overrideBrowserWindowOptions?: BrowserWindowConstructorOptions };
+
+  function onWindowOpen(details: HandlerDetails): WindowOpenResult {
+    const { url, features } = details;
+    if (url === "about:blank" && features?.includes("BondWmChildWindow=true")) {
+      const title = `BondWmChildWindow-${++childWindowCounter}`;
+      const alwaysOnTop = features?.includes("alwaysOnTop=true") ?? false;
+      const windowOpenResult: WindowOpenResult = {
         action: "allow",
         overrideBrowserWindowOptions: {
+          title,
+          alwaysOnTop,
           frame: false,
           fullscreenable: false,
           resizable: false,
@@ -765,6 +769,12 @@ export async function createServer(): Promise<IWindowManagerServer> {
           hasShadow: false,
         },
       };
+      log("onWindowOpen", windowOpenResult);
+      childWindows.set(title, {
+        wid: null, // Assigned when created
+        alwaysOnTop,
+      });
+      return windowOpenResult;
     }
     return { action: "allow" };
   }
@@ -902,8 +912,14 @@ export async function createServer(): Promise<IWindowManagerServer> {
       log(`Not managing ${wid} due to unmapped state.`);
     }
 
-    const isChildWindow = wmClass?.[0] === CHILD_WINDOW_WM_CLASS && title === CHILD_WINDOW_WM_CLASS;
+    const isChildWindow = title?.startsWith("BondWmChildWindow-");
     if (isChildWindow) {
+      const childWindowInfo = childWindows.get(title!);
+      if (!childWindowInfo) {
+        logError("Missing child window info");
+      } else {
+        childWindowInfo.wid = wid;
+      }
       log(`Not managing ${wid} due to it being a ChildWindow.`);
     }
 
@@ -1178,6 +1194,13 @@ export async function createServer(): Promise<IWindowManagerServer> {
   function onDestroyNotify(ev: IXEvent) {
     const { wid } = ev;
     widLog(wid, "onDestroyNotify", ev);
+
+    childWindows.forEach((childWindowInfo, title) => {
+      if (wid === childWindowInfo.wid) {
+        log(`Removing child window ${wid} ${title}`);
+        childWindows.delete(title);
+      }
+    });
 
     unmanageWindow(wid);
   }
@@ -1698,6 +1721,20 @@ export async function createServer(): Promise<IWindowManagerServer> {
         X.RaiseWindow(wid);
       }
     }
+
+    // Keep "above windows" on top.
+    const windows = store.getState().windows;
+    for (const widStr in windows) {
+      const win = windows[widStr];
+      if (win.alwaysOnTop) {
+        X.RaiseWindow(win.id);
+      }
+    }
+    childWindows.forEach((childWinInfo) => {
+      if (childWinInfo.alwaysOnTop && childWinInfo.wid !== null) {
+        X.RaiseWindow(childWinInfo.wid);
+      }
+    });
 
     if (windowAcceptsFocus(win)) {
       setFocus(wid);

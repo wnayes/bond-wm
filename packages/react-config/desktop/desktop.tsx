@@ -18,7 +18,11 @@ export default () => {
           {screenIndex === 0 && (
             <StartMenuButton>
               {() => (
-                <ChildWindow position={{ x: 0, y: TaskbarHeight }} size={{ width: 300, height: screen.height / 2 }}>
+                <ChildWindow
+                  alwaysOnTop
+                  position={{ x: 0, y: TaskbarHeight }}
+                  size={{ width: 300, height: screen.height / 2 }}
+                >
                   <StartMenu>
                     <StartMenuApplicationList />
                   </StartMenu>

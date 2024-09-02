@@ -7,6 +7,7 @@ import styles from "./ChildWindowStyles.css?url";
 import { Stylesheet } from "./Stylesheet";
 
 export interface IChildWindowProps {
+  alwaysOnTop?: boolean;
   children?: ReactNode;
   position: { x: number; y: number };
   size: ISize;
@@ -15,13 +16,21 @@ export interface IChildWindowProps {
 /**
  * Component that renders a separate floating window.
  */
-export const ChildWindow: FC<IChildWindowProps> = ({ children, position, size }) => {
+export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, children, position, size }) => {
   const [win, setWin] = useState<Window | null>(null);
 
-  const [initialProps] = useState({ position, size });
+  const [initialProps] = useState({ alwaysOnTop, position, size });
+  if (initialProps.alwaysOnTop !== alwaysOnTop) {
+    console.error("ChildWindow alwaysOnTop cannot be changed");
+  }
 
   useLayoutEffect(() => {
-    const features = [`width=${initialProps.size.width}`, `height=${initialProps.size.height}`].join(",");
+    const features = [
+      "BondWmChildWindow=true",
+      `width=${initialProps.size.width}`,
+      `height=${initialProps.size.height}`,
+      `alwaysOnTop=${initialProps.alwaysOnTop}`,
+    ].join(",");
     const w = window.open("about:blank", "_blank", features);
     setWin(w);
     return () => w?.close();

@@ -1,4 +1,10 @@
-import { WindowType, XWMWindowType, setWindowFullscreenAction, setWindowUrgentAction } from "@bond-wm/shared";
+import {
+  WindowType,
+  XWMWindowType,
+  setWindowAlwaysOnTopAction,
+  setWindowFullscreenAction,
+  setWindowUrgentAction,
+} from "@bond-wm/shared";
 import { numsToBuffer } from "./xutils";
 import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@bond-wm/shared";
 import { log, logError } from "./log";
@@ -81,6 +87,7 @@ export async function createEWMHEventConsumer(
     _NET_WM_ICON: await internAtomAsync(X, "_NET_WM_ICON"),
 
     _NET_WM_STATE: await internAtomAsync(X, "_NET_WM_STATE"),
+    _NET_WM_STATE_ABOVE: await internAtomAsync(X, "_NET_WM_STATE_ABOVE"),
     _NET_WM_STATE_FULLSCREEN: await internAtomAsync(X, "_NET_WM_STATE_FULLSCREEN"),
     _NET_WM_STATE_DEMANDS_ATTENTION: await internAtomAsync(X, "_NET_WM_STATE_DEMANDS_ATTENTION"),
 
@@ -114,6 +121,9 @@ export async function createEWMHEventConsumer(
     }
 
     const hintAtoms: number[] = [];
+    if (win.alwaysOnTop) {
+      hintAtoms.push(atoms._NET_WM_STATE_ABOVE);
+    }
     if (win.fullscreen) {
       hintAtoms.push(atoms._NET_WM_STATE_FULLSCREEN);
     }
@@ -135,12 +145,16 @@ export async function createEWMHEventConsumer(
   function processWindowStateChange(wid: number, action: NetWmStateAction, atom: Atom): void {
     let handled = true;
     switch (atom) {
-      case atoms._NET_WM_STATE_FULLSCREEN:
-        processWindowFullscreenChange(wid, action);
+      case atoms._NET_WM_STATE_ABOVE:
+        processWindowAboveChange(wid, action);
         break;
 
       case atoms._NET_WM_STATE_DEMANDS_ATTENTION:
         processWindowUrgentChange(wid, action);
+        break;
+
+      case atoms._NET_WM_STATE_FULLSCREEN:
+        processWindowFullscreenChange(wid, action);
         break;
 
       default:
@@ -150,6 +164,31 @@ export async function createEWMHEventConsumer(
 
     if (handled) {
       updateWindowStateHints(wid);
+    }
+  }
+
+  function processWindowAboveChange(wid: number, action: NetWmStateAction): void {
+    const win = store.getState().windows[wid];
+    if (!win) {
+      return;
+    }
+
+    switch (action) {
+      case NetWmStateAction._NET_WM_STATE_ADD:
+        if (!win.alwaysOnTop) {
+          store.dispatch(setWindowAlwaysOnTopAction({ wid, alwaysOnTop: true }));
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_REMOVE:
+        if (win.alwaysOnTop) {
+          store.dispatch(setWindowAlwaysOnTopAction({ wid, alwaysOnTop: false }));
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_TOGGLE:
+        store.dispatch(setWindowAlwaysOnTopAction({ wid, alwaysOnTop: !win.alwaysOnTop }));
+        break;
     }
   }
 
@@ -252,6 +291,7 @@ export async function createEWMHEventConsumer(
           atoms._NET_WM_NAME,
           atoms._NET_WM_ICON,
           atoms._NET_WM_STATE,
+          atoms._NET_WM_STATE_ABOVE,
           atoms._NET_WM_STATE_FULLSCREEN,
           atoms._NET_FRAME_EXTENTS,
           atoms._NET_WM_PID,
