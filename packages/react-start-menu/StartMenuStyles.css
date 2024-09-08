@@ -46,3 +46,11 @@
     width: 16px;
     margin-right: 5px;
 }
+
+.startMenuAppList h3 {
+    padding-left: 5px;
+    margin: 10px 0 5px;
+    font-size: 16px;
+    color: var(--start-menu-entry-hover-bg-color);
+    border-left: 4px solid var(--start-menu-entry-hover-bg-color);
+  }

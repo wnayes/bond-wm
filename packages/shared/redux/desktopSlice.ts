@@ -13,6 +13,7 @@ export interface DesktopEntry {
   target?: string;
   icon?: string;
   workingDirectory?: string;
+  categories?: string[];
 }
 
 export interface DesktopEntryMap {

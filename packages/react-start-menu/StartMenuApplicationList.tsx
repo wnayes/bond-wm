@@ -16,24 +16,33 @@ export function StartMenuApplicationList() {
   );
 
   const entries = useDesktopEntries();
-  const entryComponents = useMemo(() => {
-    return Object.values(entries)
-      .sort((a, b) => {
-        // Sort by case-insensitive name.
-        const nameA = a.name.toUpperCase();
-        const nameB = b.name.toUpperCase();
-        if (nameA < nameB) {
-          return -1;
+  const categorizedEntries = useMemo(() => {
+    const categories: Record<string, DesktopEntry[]> = {};
+    Object.values(entries).forEach((entry) => {
+      entry.categories?.forEach((category) => {
+        if (!categories[category]) {
+          categories[category] = [];
         }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      })
-      .map((entry) => <StartMenuApplicationEntry key={entry.key} entry={entry} onClick={onEntryActivated} />);
-  }, [entries, onEntryActivated]);
+        categories[category].push(entry);
+      });
+    });
+    return categories;
+  }, [entries]);
 
-  return <div className="startMenuAppList">{entryComponents}</div>;
+  return (
+    <div className="startMenuAppList">
+      {Object.entries(categorizedEntries).map(([category, entries]) => (
+        <div key={category}>
+          <h3>{category}</h3>
+          {entries
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((entry) => (
+              <StartMenuApplicationEntry key={entry.key} entry={entry} onClick={onEntryActivated} />
+            ))}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 interface IStartMenuApplicationEntryProps {

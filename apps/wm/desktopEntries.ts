@@ -134,6 +134,7 @@ export async function createDesktopEntriesModule({ store, wmServer }: XWMContext
 async function parseDesktopEntries(desktopFolder: string): Promise<DesktopEntryMap> {
   const entries: DesktopEntryMap = {};
   const files = await readdir(desktopFolder, {});
+
   for (const fileName of files) {
     if (!isDesktopFile(fileName)) {
       continue;
@@ -152,11 +153,17 @@ async function parseDesktopEntries(desktopFolder: string): Promise<DesktopEntryM
       continue;
     }
 
+    const categoriesValue = desktopEntryGroupEntries["Categories"]?.value;
+    const categories = Array.isArray(categoriesValue) ? categoriesValue : ["Others"];
+
+    let assignedCategory = categories[0] ?? "Others";
+
     const entry: DesktopEntry = {
       key: fileName,
       name: desktopEntryGroupEntries["Name"]?.value,
       kind: parseDesktopEntryKind(desktopEntryGroupEntries["Type"]?.value),
       icon: desktopEntryGroupEntries["Icon"]?.value,
+      categories: [assignedCategory],
     };
     if (!entry.name) {
       continue;
