@@ -1,11 +1,17 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useDesktopEntries } from "@bond-wm/react";
 import { DesktopEntry } from "@bond-wm/shared";
 import { executeDesktopEntry, makeDesktopEntryIconUrl } from "@bond-wm/shared-renderer";
 import { useStartMenuContext } from "./StartMenuContext";
 import { defaultCategories } from "./categoryMappings";
+import "./StartMenuStyles.css";
 
-export function StartMenuApplicationList() {
+interface IStartMenuApplicationListProps {
+  groupBy?: "categories" | "all";
+}
+
+export function StartMenuApplicationList({ groupBy = "categories" }: IStartMenuApplicationListProps) {
+  const [currentGroupBy, setCurrentGroupBy] = useState(groupBy);
   const smContext = useStartMenuContext();
 
   const onEntryActivated = useCallback(
@@ -16,8 +22,16 @@ export function StartMenuApplicationList() {
     [smContext]
   );
 
+  const toggleGroupBy = () => {
+    setCurrentGroupBy((prevGroupBy) => (prevGroupBy === "categories" ? "all" : "categories"));
+  };
+
   const entries = useDesktopEntries();
   const categorizedEntries = useMemo(() => {
+    if (currentGroupBy === "all") {
+      return { All: Object.values(entries) };
+    }
+
     const categories: Record<string, DesktopEntry[]> = {};
     Object.values(entries).forEach((entry) => {
       entry.categories?.forEach((category) => {
@@ -29,10 +43,15 @@ export function StartMenuApplicationList() {
       });
     });
     return categories;
-  }, [entries]);
+  }, [entries, currentGroupBy]);
 
   return (
     <div className="startMenuAppList">
+      <div className="listHeader">
+        <div className="toggleButton" onClick={toggleGroupBy}>
+          Group by <span>{currentGroupBy === "categories" ? "All" : "Categories"}</span>
+        </div>
+      </div>
       {Object.entries(categorizedEntries).map(([category, entries]) => (
         <div key={category}>
           <h3>{category}</h3>

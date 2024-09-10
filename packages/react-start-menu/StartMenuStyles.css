@@ -54,3 +54,20 @@
     color: var(--start-menu-entry-hover-bg-color);
     border-left: 4px solid var(--start-menu-entry-hover-bg-color);
   }
+
+.toggleButton {
+    border: none;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+.toggleButton span {
+    color: var(--start-menu-entry-hover-bg-color);
+  }
+  
+.listHeader {
+    display: flex;
+    justify-content: flex-end;
+  }
