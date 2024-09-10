@@ -49,7 +49,7 @@ export function StartMenuApplicationList({ groupBy = "categories" }: IStartMenuA
     <div className="startMenuAppList">
       <div className="listHeader">
         <div className="toggleButton" onClick={toggleGroupBy}>
-          Group by <span>{currentGroupBy === "categories" ? "All" : "Categories"}</span>
+          {currentGroupBy === "categories" ? "All" : "Categories"}
         </div>
       </div>
       {Object.entries(categorizedEntries).map(([category, entries]) => (
