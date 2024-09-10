@@ -3,6 +3,8 @@ import { useDesktopEntries } from "@bond-wm/react";
 import { DesktopEntry } from "@bond-wm/shared";
 import { executeDesktopEntry, makeDesktopEntryIconUrl } from "@bond-wm/shared-renderer";
 import { useStartMenuContext } from "./StartMenuContext";
+import { defaultCategories } from "./categoryMappings";
+
 
 export function StartMenuApplicationList() {
   const smContext = useStartMenuContext();
@@ -20,10 +22,11 @@ export function StartMenuApplicationList() {
     const categories: Record<string, DesktopEntry[]> = {};
     Object.values(entries).forEach((entry) => {
       entry.categories?.forEach((category) => {
-        if (!categories[category]) {
-          categories[category] = [];
+        const humanReadableCategory = defaultCategories[category] || category;
+        if (!categories[humanReadableCategory]) {
+          categories[humanReadableCategory] = [];
         }
-        categories[category].push(entry);
+        categories[humanReadableCategory].push(entry);
       });
     });
     return categories;
