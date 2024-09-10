@@ -154,9 +154,20 @@ async function parseDesktopEntries(desktopFolder: string): Promise<DesktopEntryM
     }
 
     const categoriesValue = desktopEntryGroupEntries["Categories"]?.value;
-    const categories = Array.isArray(categoriesValue) ? categoriesValue : ["Others"];
 
-    let assignedCategory = categories[0] ?? "Others";
+    const categories = ensureArray(categoriesValue, "Others");
+
+    const assignedCategory = categories[0] ?? "Others";
+
+    function ensureArray(value: any, defaultValue: string): string[] {
+      if (Array.isArray(value)) {
+        return value;
+      }
+      if (typeof value === "string") {
+        return [value];
+      }
+      return [defaultValue];
+    }
 
     const entry: DesktopEntry = {
       key: fileName,
