@@ -5,7 +5,6 @@ import { executeDesktopEntry, makeDesktopEntryIconUrl } from "@bond-wm/shared-re
 import { useStartMenuContext } from "./StartMenuContext";
 import { defaultCategories } from "./categoryMappings";
 
-
 export function StartMenuApplicationList() {
   const smContext = useStartMenuContext();
 
