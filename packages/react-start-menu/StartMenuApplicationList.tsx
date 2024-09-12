@@ -4,13 +4,16 @@ import { DesktopEntry } from "@bond-wm/shared";
 import { executeDesktopEntry, makeDesktopEntryIconUrl } from "@bond-wm/shared-renderer";
 import { useStartMenuContext } from "./StartMenuContext";
 import { defaultCategories } from "./categoryMappings";
-import "./StartMenuStyles.css";
 
 interface IStartMenuApplicationListProps {
   groupBy?: "categories" | "all";
+  showGroupByToggle?: boolean;
 }
 
-export function StartMenuApplicationList({ groupBy = "categories" }: IStartMenuApplicationListProps) {
+export function StartMenuApplicationList({
+  groupBy = "categories",
+  showGroupByToggle = true,
+}: IStartMenuApplicationListProps) {
   const [currentGroupBy, setCurrentGroupBy] = useState(groupBy);
   const smContext = useStartMenuContext();
 
@@ -47,11 +50,13 @@ export function StartMenuApplicationList({ groupBy = "categories" }: IStartMenuA
 
   return (
     <div className="startMenuAppList">
-      <div className="listHeader">
-        <div className="toggleButton" onClick={toggleGroupBy}>
-          {currentGroupBy === "categories" ? "All" : "Categories"}
+      {showGroupByToggle && (
+        <div className="startMenuAppListHeader">
+          <div className="startMenuAppListGroupByButton" onClick={toggleGroupBy}>
+            {currentGroupBy === "categories" ? "All" : "Categories"}
+          </div>
         </div>
-      </div>
+      )}
       {Object.entries(categorizedEntries).map(([category, entries]) => (
         <div key={category}>
           <h3>{category}</h3>

@@ -55,7 +55,7 @@
     border-left: 4px solid var(--start-menu-entry-hover-bg-color);
   }
 
-.toggleButton {
+.startMenuAppListGroupByButton {
     border: none;
     padding: 10px;
     text-align: center;
@@ -64,7 +64,7 @@
     color: var(--start-menu-entry-hover-bg-color);
   }
  
-.listHeader {
+.startMenuAppListHeader {
     display: flex;
     justify-content: flex-end;
   }
