@@ -24,7 +24,7 @@ export default () => {
                   size={{ width: 300, height: screen.height / 2 }}
                 >
                   <StartMenu>
-                    <StartMenuApplicationList />
+                    <StartMenuApplicationList groupBy="all" />
                   </StartMenu>
                 </ChildWindow>
               )}
