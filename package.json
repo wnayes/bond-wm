@@ -1,4 +1,5 @@
 {
+  "name": "bond-wm-git",
   "private": true,
   "scripts": {
     "startx": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1600x900 :1",
