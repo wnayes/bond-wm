@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import {
   configureRendererStore,
   showContextMenu,
@@ -12,7 +12,9 @@ import { getScreenIndex, useScreenIndex } from "../useScreenIndex";
 import { Provider } from "react-redux";
 import "./DesktopStyles.css";
 
-export interface IDesktopProps extends PropsWithChildren {}
+export interface IDesktopProps {
+  children?: ReactNode;
+}
 
 export function Desktop({ children }: IDesktopProps) {
   const [store] = useState(() => configureRendererStore());

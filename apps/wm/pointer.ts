@@ -5,7 +5,11 @@ import { XWMContext } from "./wm";
 export function queryPointer(X: IXClient, relativeWid: number): Promise<XQueryPointerResult> {
   return new Promise((resolve, reject) => {
     X.QueryPointer(relativeWid, (err, result) => {
-      err ? reject(err) : resolve(result);
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
     });
   });
 }

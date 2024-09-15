@@ -4,11 +4,13 @@ import { useBrowserWindowSize } from "../useBrowserWindowSize";
 import { WidContext, useWindow } from "../useWindow";
 import { useTheme } from "../theming";
 import { Provider } from "react-redux";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, ReactNode } from "react";
 import { configureRendererStore, frameWindowMouseEnter, registerFrameWidListener } from "@bond-wm/shared-renderer";
 import "./WindowFrameStyles.css";
 
-interface IWindowFrameProps extends React.PropsWithChildren<{}> {}
+interface IWindowFrameProps {
+  children?: ReactNode;
+}
 
 interface WindowFrameStyle extends React.CSSProperties {
   "--window-active-bg-color": string;

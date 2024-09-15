@@ -6,6 +6,7 @@ import trayReducer from "./traySlice";
 import windowReducer from "./windowSlice";
 
 /** Never called, used to get typings. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureBasicStore() {
   return configureStore({
     reducer: {

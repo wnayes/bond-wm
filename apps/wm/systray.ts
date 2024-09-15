@@ -11,7 +11,7 @@ import { IX11Mod, X11_EVENT_TYPE, XCB_COPY_FROM_PARENT, XPropMode } from "@bond-
 import { log, logError } from "./log";
 import { IXWMEventConsumer, XWMContext } from "./wm";
 import { changeWindowEventMask, internAtomAsync } from "./xutils";
-const x11: IX11Mod = require("x11"); // eslint-disable-line
+const x11: IX11Mod = require("x11");
 
 enum SystemTrayOps {
   SYSTEM_TRAY_REQUEST_DOCK = 0,

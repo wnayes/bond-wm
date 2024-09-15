@@ -8,7 +8,7 @@ import styles from "./TitleBarStyles.css";
 
 const DefaultHeight = 20;
 
-interface ITitleBarProps extends React.PropsWithChildren<{}> {
+interface ITitleBarProps extends React.PropsWithChildren {
   height?: number;
 }
 

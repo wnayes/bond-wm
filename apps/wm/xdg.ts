@@ -1,7 +1,6 @@
 import { env } from "node:process";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const getXdgUserDirs = require("xdg-user-dir");
 
 interface UserDirs {

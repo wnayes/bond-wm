@@ -5,7 +5,11 @@ import { ExtraAtoms } from "./wm";
 export function internAtomAsync(X: IXClient, name: string): Promise<number> {
   return new Promise((resolve, reject) => {
     X.InternAtom(false, name, (err, atom) => {
-      err ? reject(err) : resolve(atom);
+      if (err) {
+        reject(err);
+      } else {
+        resolve(atom);
+      }
     });
   });
 }

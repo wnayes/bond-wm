@@ -1,6 +1,5 @@
 // Loggin based on: https://github.com/ungoldman/electron-ipc-log/blob/master/index.js
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const electron = require("electron");
 
 const internal = ["CHROME", "ELECTRON"];

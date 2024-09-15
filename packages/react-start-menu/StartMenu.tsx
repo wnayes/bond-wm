@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { ReactNode } from "react";
 import { Stylesheet, useTheme } from "@bond-wm/react";
 import styles from "./StartMenuStyles.css?url";
 
@@ -8,7 +8,11 @@ interface StartMenuStyle extends React.CSSProperties {
   "--start-menu-entry-hover-text-color": string;
 }
 
-export function StartMenu(props: PropsWithChildren<{}>) {
+interface IStartMenuProps {
+  children?: ReactNode;
+}
+
+export function StartMenu(props: IStartMenuProps) {
   const theme = useTheme();
   const startMenuStyle: StartMenuStyle = {
     "--start-menu-bg-color": theme.startmenu?.backgroundColor ?? theme.taskbar?.backgroundColor,

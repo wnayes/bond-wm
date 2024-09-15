@@ -5,9 +5,7 @@ import { XWMContext } from "./wm";
 import { UserDirectoryKind, getXDGUserDirectory } from "./xdg";
 import { DesktopEntry, DesktopEntryKind, DesktopEntryMap, setDesktopEntries, setEntries } from "@bond-wm/shared";
 import { log, logError } from "./log";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const DesktopEntryObject = require("freedesktop-desktop-entry");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const FreedesktopIcons = require("freedesktop-icons") as FreedesktopIconsModule;
 
 interface DesktopEntryObjectShape {
@@ -159,7 +157,7 @@ async function parseDesktopEntries(desktopFolder: string): Promise<DesktopEntryM
 
     const assignedCategory = categories[0] ?? "Others";
 
-    function ensureArray(value: any, defaultValue: string): string[] {
+    function ensureArray(value: unknown, defaultValue: string): string[] {
       if (Array.isArray(value)) {
         return value;
       }

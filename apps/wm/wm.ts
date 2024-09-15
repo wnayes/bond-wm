@@ -1,4 +1,4 @@
-const x11: IX11Mod = require("x11"); // eslint-disable-line
+const x11: IX11Mod = require("x11");
 
 import * as path from "path";
 import * as os from "os";

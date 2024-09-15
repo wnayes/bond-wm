@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PropsWithChildren, useCallback, useLayoutEffect, useRef } from "react";
+import { ReactNode, useCallback, useLayoutEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { RootState, getBoundingClientRectWithZoom } from "@bond-wm/shared-renderer";
 import { useBrowserWindowSize } from "../useBrowserWindowSize";
@@ -9,7 +9,9 @@ import { configureScreenWorkAreaAction } from "@bond-wm/shared";
 import { focusDesktopBrowser } from "@bond-wm/shared-renderer";
 import { useTheme } from "../theming";
 
-export interface IWorkAreaProps extends PropsWithChildren {}
+export interface IWorkAreaProps {
+  children?: ReactNode;
+}
 
 export function WorkArea({ children }: IWorkAreaProps) {
   const workAreaDiv = useRef<HTMLDivElement>(null);

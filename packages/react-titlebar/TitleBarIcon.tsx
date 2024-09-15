@@ -21,7 +21,6 @@ export function TitleBarIcon({ size }: ITitleBarIconProps) {
   const icon = useBestIcon(win?.icons, preferredSize);
   const dataUri = useIconInfoDataUri(icon);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     callRef(parentResizeRef, imgRef.current?.parentElement);
   });
