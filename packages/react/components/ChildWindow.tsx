@@ -29,6 +29,8 @@ export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, children, posi
       "BondWmChildWindow=true",
       `width=${initialProps.size.width}`,
       `height=${initialProps.size.height}`,
+      `left=-10000`,
+      `top=-10000`,
       `alwaysOnTop=${initialProps.alwaysOnTop}`,
     ].join(",");
     const w = window.open("about:blank", "_blank", features);
@@ -38,7 +40,10 @@ export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, children, posi
 
   const { x, y } = position;
   useLayoutEffect(() => {
-    win?.moveTo(x, y);
+    if (win) {
+      win.moveTo(x, y);
+      win.focus();
+    }
   }, [win, x, y]);
 
   useLayoutEffect(() => {
