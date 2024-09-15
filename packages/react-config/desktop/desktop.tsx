@@ -20,6 +20,7 @@ export default () => {
               {() => (
                 <ChildWindow
                   alwaysOnTop
+                  autoFocus
                   position={{ x: 0, y: TaskbarHeight }}
                   size={{ width: 300, height: screen.height / 2 }}
                 >
