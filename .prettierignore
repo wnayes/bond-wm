@@ -2,3 +2,4 @@
 *.html
 *.css
 *-lock.yaml
+**/.docusaurus
