@@ -40,8 +40,8 @@ catalogs:
       specifier: 2.0.0-alpha.10
       version: 2.0.0-alpha.10
     electron:
-      specifier: ^30.0.8
-      version: 30.0.8
+      specifier: ^32.1.0
+      version: 32.1.0
     esbuild:
       specifier: ^0.23.1
       version: 0.23.1
@@ -175,10 +175,10 @@ importers:
         version: 2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 'catalog:'
-        version: 2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)
+        version: 2.0.0-alpha.10(electron@32.1.0)(redux@5.0.1)
       electron:
         specifier: 'catalog:'
-        version: 30.0.8
+        version: 32.1.0
       freedesktop-desktop-entry:
         specifier: 'catalog:'
         version: 1.0.0
@@ -635,7 +635,7 @@ importers:
         version: 2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       electron:
         specifier: 'catalog:'
-        version: 30.0.8
+        version: 32.1.0
       redux:
         specifier: ^5.0.0
         version: 5.0.1
@@ -684,7 +684,7 @@ importers:
         version: 2.2.5(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 'catalog:'
-        version: 2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)
+        version: 2.0.0-alpha.10(electron@32.1.0)(redux@5.0.1)
       redux:
         specifier: ^5.0.0
         version: 5.0.1
@@ -3430,8 +3430,8 @@ packages:
   electron-to-chromium@1.4.783:
     resolution: {integrity: sha512-bT0jEz/Xz1fahQpbZ1D7LgmPYZ3iHVY39NcWWro1+hA2IvjiPeaXtfSqrQ+nXjApMvQRE2ASt1itSLRrebHMRQ==}
 
-  electron@30.0.8:
-    resolution: {integrity: sha512-ivzXJJ/9gdb4oOw+5SDuaZpSInz8C+Z021dKZfFLMltKbDa4sSqt5cRBiUg7J36Z2kdus+Jai0bdHWutYE9wAA==}
+  electron@32.1.0:
+    resolution: {integrity: sha512-4etE3K6vPUkHihf7nvawngbB5+jLuUJgZh31f9ki1Gfveo0qwNDkLv/doabw+4zFFWKUXI+uFUpyOpL5+RwS+Q==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -9297,9 +9297,9 @@ snapshots:
       '@webassemblyjs/ast': 1.11.6
       '@xtuc/long': 4.2.2
 
-  '@wnayes/electron-redux@2.0.0-alpha.10(electron@30.0.8)(redux@5.0.1)':
+  '@wnayes/electron-redux@2.0.0-alpha.10(electron@32.1.0)(redux@5.0.1)':
     dependencies:
-      electron: 30.0.8
+      electron: 32.1.0
       lodash.isplainobject: 4.0.6
       lodash.isstring: 4.0.1
       redux: 5.0.1
@@ -10198,7 +10198,7 @@ snapshots:
 
   electron-to-chromium@1.4.783: {}
 
-  electron@30.0.8:
+  electron@32.1.0:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.12.12
@@ -10746,7 +10746,7 @@ snapshots:
       es6-error: 4.1.1
       matcher: 3.0.0
       roarr: 2.15.4
-      semver: 7.5.4
+      semver: 7.6.3
       serialize-error: 7.0.1
     optional: true
 

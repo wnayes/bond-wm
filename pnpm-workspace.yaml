@@ -15,7 +15,7 @@ catalog:
   "@typescript-eslint/parser": ^8.5.0
   "@vitejs/plugin-react": ^4.3.0
   "@wnayes/electron-redux": 2.0.0-alpha.10
-  electron: ^30.0.8
+  electron: ^32.1.0
   esbuild: ^0.23.1
   eslint: ^9.10.0
   eslint-plugin-prettier: ^5.2.1
