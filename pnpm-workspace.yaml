@@ -6,14 +6,14 @@ catalog:
   "@callstack/react-theme-provider": ^3.0.9
   "@eslint/js": ^9.10.0
   "@jest/globals": ^29.7.0
-  "@reduxjs/toolkit": ^2.2.5
+  "@reduxjs/toolkit": ^2.2.7
   "@types/node": ^20.12.12
-  "@types/react": ^18.3.3
+  "@types/react": ^18.3.5
   "@types/react-dom": ^18.3.0
-  "@types/yargs": ^17.0.32
+  "@types/yargs": ^17.0.33
   "@typescript-eslint/eslint-plugin": ^8.5.0
   "@typescript-eslint/parser": ^8.5.0
-  "@vitejs/plugin-react": ^4.3.0
+  "@vitejs/plugin-react": ^4.3.1
   "@wnayes/electron-redux": 2.0.0-alpha.10
   electron: ^32.1.0
   esbuild: ^0.23.1
@@ -32,7 +32,7 @@ catalog:
   redux: ^5.0.1
   rfc4648: ^1.5.3
   ts-jest: ^29.1.2
-  tslib: ^2.6.2
+  tslib: ^2.7.0
   turbo: ^2.1.2
   type-fest: ^4.18.3
   typescript: ~5.4.5
