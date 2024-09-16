@@ -6,6 +6,7 @@
     "startx-multi": "unset XDG_SEAT && Xephyr -br -ac -noreset -screen 1000x700 -screen 1000x600 +xinerama :1",
     "start": "pnpm -C ./apps/wm run start",
     "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
     "lint": "eslint .",
     "setup": "pnpm install",
     "build": "turbo run build",
