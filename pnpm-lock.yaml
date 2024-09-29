@@ -37,8 +37,8 @@ catalogs:
       specifier: ^8.5.0
       version: 8.5.0
     '@wnayes/electron-redux':
-      specifier: 2.0.0-alpha.10
-      version: 2.0.0-alpha.10
+      specifier: 2.0.0-alpha.11
+      version: 2.0.0-alpha.11
     electron:
       specifier: ^32.1.0
       version: 32.1.0
@@ -175,7 +175,7 @@ importers:
         version: 2.2.7(react-redux@9.1.2(@types/react@18.3.5)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 'catalog:'
-        version: 2.0.0-alpha.10(electron@32.1.0)(redux@5.0.1)
+        version: 2.0.0-alpha.11(electron@32.1.0)(redux@5.0.1)
       electron:
         specifier: 'catalog:'
         version: 32.1.0
@@ -684,7 +684,7 @@ importers:
         version: 2.2.7(react-redux@9.1.2(@types/react@18.3.5)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       '@wnayes/electron-redux':
         specifier: 'catalog:'
-        version: 2.0.0-alpha.10(electron@32.1.0)(redux@5.0.1)
+        version: 2.0.0-alpha.11(electron@32.1.0)(redux@5.0.1)
       redux:
         specifier: ^5.0.0
         version: 5.0.1
@@ -2619,8 +2619,8 @@ packages:
   '@webassemblyjs/wast-printer@1.11.6':
     resolution: {integrity: sha512-JM7AhRcE+yW2GWYaKeHL5vt4xqee5N2WcezptmgyhNS+ScggqcT1OtXykhAb13Sn5Yas0j2uv9tHgrjwvzAP4A==}
 
-  '@wnayes/electron-redux@2.0.0-alpha.10':
-    resolution: {integrity: sha512-ycYbhPH5Ap2z5wnarYK6C+WbowEK+B6olzbGYW5uM4m1wsIFAs6Fp5zLhiZ2vh4NvnP92TWlbrvsC2WWWoFf6A==}
+  '@wnayes/electron-redux@2.0.0-alpha.11':
+    resolution: {integrity: sha512-Vl3IeEa5ZlATdrearicuaslJb9UmNRhdcycfwIeHukLyOogjK2lsicvKvMlKIBS90Y7oUgPTZmmfJRAsx4S0dg==}
     engines: {node: '>= 12'}
     peerDependencies:
       electron: '>=8.0.0'
@@ -4627,12 +4627,6 @@ packages:
 
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
-
-  lodash.isplainobject@4.0.6:
-    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
-
-  lodash.isstring@4.0.1:
-    resolution: {integrity: sha512-0wJxfxH1wgO3GrbuP+dTTk7op+6L41QCXbGINEmD+ny/G/eCqGzxyCsh7159S+mgDDcoarnBw6PC1PS5+wUGgw==}
 
   lodash.memoize@4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
@@ -9352,11 +9346,9 @@ snapshots:
       '@webassemblyjs/ast': 1.11.6
       '@xtuc/long': 4.2.2
 
-  '@wnayes/electron-redux@2.0.0-alpha.10(electron@32.1.0)(redux@5.0.1)':
+  '@wnayes/electron-redux@2.0.0-alpha.11(electron@32.1.0)(redux@5.0.1)':
     dependencies:
       electron: 32.1.0
-      lodash.isplainobject: 4.0.6
-      lodash.isstring: 4.0.1
       redux: 5.0.1
 
   '@xtuc/ieee754@1.2.0': {}
@@ -11772,10 +11764,6 @@ snapshots:
       p-locate: 6.0.0
 
   lodash.debounce@4.0.8: {}
-
-  lodash.isplainobject@4.0.6: {}
-
-  lodash.isstring@4.0.1: {}
 
   lodash.memoize@4.1.2: {}
 
