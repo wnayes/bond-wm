@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/shared-renderer",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Renderer shared internal functionality",
   "main": "./index.ts",
   "exports": "./index.ts",
