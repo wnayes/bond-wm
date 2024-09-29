@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react-config",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Default bond-wm React user configuration",
   "exports": {
     ".": "./index.ts",
@@ -16,24 +16,25 @@
     "clean": "rm -rf ./node_modules"
   },
   "dependencies": {
-    "@bond-wm/layout-floating": "^0.4.0",
-    "@bond-wm/layout-tiling": "^0.4.0",
-    "@bond-wm/react": "^0.4.0",
-    "@bond-wm/react-desktop-entries": "^0.4.0",
-    "@bond-wm/react-taskbar": "^0.4.0",
-    "@bond-wm/react-titlebar": "^0.4.0",
-    "@bond-wm/react-wallpaper": "^0.4.0",
-    "@bond-wm/shared": "^0.4.0",
-    "@vitejs/plugin-react": "^4.3.0",
+    "@bond-wm/layout-floating": "^0.5.0",
+    "@bond-wm/layout-tiling": "^0.5.0",
+    "@bond-wm/react": "^0.5.0",
+    "@bond-wm/react-desktop-entries": "^0.5.0",
+    "@bond-wm/react-start-menu": "^0.5.0",
+    "@bond-wm/react-taskbar": "^0.5.0",
+    "@bond-wm/react-titlebar": "^0.5.0",
+    "@bond-wm/react-wallpaper": "^0.5.0",
+    "@bond-wm/shared": "^0.5.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",
-    "tslib": "^2.6.2"
+    "tslib": "^2.7.0"
   },
   "devDependencies": {
-    "@bond-wm/tsconfig": "^0.4.0",
-    "@types/react": "^18.3.3",
+    "@bond-wm/tsconfig": "^0.5.0",
+    "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "typescript": "~5.4.5"
+    "typescript": "~5.6.2"
   }
 }
