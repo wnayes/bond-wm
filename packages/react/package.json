@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "React functionality for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
@@ -29,7 +29,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }
