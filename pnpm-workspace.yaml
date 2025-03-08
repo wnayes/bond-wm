@@ -4,7 +4,7 @@ packages:
   - packages/*
 catalog:
   "@callstack/react-theme-provider": ^3.0.9
-  "@eslint/js": ^9.10.0
+  "@eslint/js": ^9.22.0
   "@jest/globals": ^29.7.0
   "@reduxjs/toolkit": ^2.2.7
   "@types/node": ^22.13.9
@@ -17,14 +17,14 @@ catalog:
   "@wnayes/electron-redux": 2.0.0-alpha.11
   electron: ^35.0.0
   esbuild: ^0.23.1
-  eslint: ^9.10.0
-  eslint-plugin-prettier: ^5.2.1
-  eslint-plugin-react-hooks: 5.1.0-rc-206df66e-20240912
+  eslint: ^9.22.0
+  eslint-plugin-prettier: ^5.2.3
+  eslint-plugin-react-hooks: ^5.2.0
   freedesktop-desktop-entry: ^1.0.0
   freedesktop-icons: ^1.0.0
-  globals: ^15.9.0
+  globals: ^16.0.0
   jest: ^29.7.0
-  prettier: 3.3.3
+  prettier: 3.5.3
   react: ^19.0.0
   react-dom: ^19.0.0
   react-error-boundary: ^5.0.0
