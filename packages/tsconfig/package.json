@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/tsconfig",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Shared TypeScript configuration for bond-wm packages",
   "repository": "https://github.com/wnayes/bond-wm",
   "author": "Will Nayes",

@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react-desktop-entries",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "React desktop icon display for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",

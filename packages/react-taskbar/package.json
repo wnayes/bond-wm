@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react-taskbar",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "React desktop taskbar for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",

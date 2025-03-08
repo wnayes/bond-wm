@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/layout-tiling",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Tiling layout for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
