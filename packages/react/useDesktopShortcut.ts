@@ -10,7 +10,7 @@ import { useScreenIndex } from "./useScreenIndex";
  */
 export function useDesktopShortcut(keyString: string, opts: DesktopShortcutOpts, callback: VoidFunction): void {
   // Trying to not excessively register/unregister...
-  const callbackRef = useRef<VoidFunction>();
+  const callbackRef = useRef<VoidFunction>(null);
   callbackRef.current = callback;
 
   const registeredCallback = useCallback(() => {
