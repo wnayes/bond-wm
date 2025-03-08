@@ -82,8 +82,8 @@ catalogs:
       specifier: ^9.2.0
       version: 9.2.0
     rfc4648:
-      specifier: ^1.5.3
-      version: 1.5.3
+      specifier: ^1.5.4
+      version: 1.5.4
     ts-jest:
       specifier: ^29.2.6
       version: 29.2.6
@@ -190,7 +190,7 @@ importers:
         version: 5.0.1
       rfc4648:
         specifier: 'catalog:'
-        version: 1.5.3
+        version: 1.5.4
       tslib:
         specifier: 'catalog:'
         version: 2.8.1
@@ -6982,8 +6982,8 @@ packages:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rfc4648@1.5.3:
-    resolution: {integrity: sha512-MjOWxM065+WswwnmNONOT+bD1nXzY9Km6u3kzvnx8F8/HXGZdz3T6e6vZJ8Q/RIMUSp/nxqjH3GwvJDy8ijeQQ==}
+  rfc4648@1.5.4:
+    resolution: {integrity: sha512-rRg/6Lb+IGfJqO05HZkN50UtY7K/JhxJag1kP23+zyMfrvoB0B7RWv06MbOzoc79RgCdNTiUaNsTT1AJZ7Z+cg==}
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
@@ -16122,7 +16122,7 @@ snapshots:
 
   reusify@1.0.4: {}
 
-  rfc4648@1.5.3: {}
+  rfc4648@1.5.4: {}
 
   rimraf@3.0.2:
     dependencies:
