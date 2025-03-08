@@ -1,3 +1,4 @@
 .turbo
+turbo.json
 *.tsbuildinfo
 scripts
