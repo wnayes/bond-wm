@@ -49,7 +49,7 @@ function handleMain(log: Logger) {
   const { ipcMain } = electron;
   const oldEmit = ipcMain.emit;
 
-  ipcMain.emit = function (channel, event, ...data) {
+  ipcMain.emit = function (channel: string | symbol, event: unknown, ...data: unknown[]) {
     trackEvent(log, channel, data);
     return oldEmit.apply(ipcMain, [channel, event, ...data]);
   };
