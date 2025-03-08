@@ -7,7 +7,7 @@ catalog:
   "@eslint/js": ^9.10.0
   "@jest/globals": ^29.7.0
   "@reduxjs/toolkit": ^2.2.7
-  "@types/node": ^20.16.5
+  "@types/node": ^22.13.9
   "@types/react": ^18.3.5
   "@types/react-dom": ^18.3.0
   "@types/yargs": ^17.0.33
@@ -15,7 +15,7 @@ catalog:
   "@typescript-eslint/parser": ^8.5.0
   "@vitejs/plugin-react": ^4.3.1
   "@wnayes/electron-redux": 2.0.0-alpha.11
-  electron: ^32.1.0
+  electron: ^35.0.0
   esbuild: ^0.23.1
   eslint: ^9.10.0
   eslint-plugin-prettier: ^5.2.1
