@@ -959,7 +959,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
       const state = store.getState();
 
       if (typeof config.onWindowCreated === "function") {
-        config.onWindowCreated({ win: win as IWindow });
+        config.onWindowCreated({ win: win as IWindow, state });
       }
 
       assert(typeof win.screenIndex === "number");

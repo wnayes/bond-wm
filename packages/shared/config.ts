@@ -1,4 +1,5 @@
 import { LayoutInfo, LayoutPluginConfig, cloneLayoutInfo } from "./layouts";
+import { SharedRootState } from "./redux/basicStore";
 import { IWindowManagerServer } from "./server";
 import { IWindow } from "./window";
 
@@ -12,6 +13,7 @@ interface WindowManagerReadyArgs {
 
 interface WindowCreatedArgs {
   win: IWindow;
+  state: SharedRootState;
 }
 
 export interface ISerializableConfig<TLayouts extends LayoutInfo> {
