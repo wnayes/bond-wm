@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/shared",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Shared internal functionality",
   "type": "module",
   "main": "./dist/index.js",
