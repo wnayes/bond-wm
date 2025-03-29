@@ -934,14 +934,14 @@ export async function createServer(): Promise<IWindowManagerServer> {
     X.ChangeSaveSet(1, wid);
 
     if (shouldCreateFrame(wid, clientGeom)) {
-      const effectiveGeometry = getGeometryForWindow(clientGeom, normalHints);
+      const initialGeometry = getInitialGeometryForWindow(clientGeom, normalHints);
 
       const win: Partial<IWindow> = {
         outer: {
-          x: effectiveGeometry.x,
-          y: effectiveGeometry.y,
-          width: effectiveGeometry.width,
-          height: effectiveGeometry.height,
+          x: initialGeometry.x,
+          y: initialGeometry.y,
+          width: initialGeometry.width,
+          height: initialGeometry.height,
         },
         frameExtents: lastFrameExtents,
         visible: true,
@@ -1085,8 +1085,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
     return true;
   }
 
-  function getGeometryForWindow(clientGeom: XGeometry, normalHints: WMSizeHints | undefined): IGeometry {
-    const effectiveGeometry = {
+  function getInitialGeometryForWindow(clientGeom: XGeometry, normalHints: WMSizeHints | undefined): IGeometry {
+    const initialGeometry = {
       height: clientGeom.height,
       width: clientGeom.width,
       x: clientGeom.xPos,
@@ -1094,20 +1094,20 @@ export async function createServer(): Promise<IWindowManagerServer> {
     };
     if (normalHints) {
       if (normalHints.maxHeight && normalHints.maxHeight > 0) {
-        effectiveGeometry.height = Math.min(effectiveGeometry.height, normalHints.maxHeight);
+        initialGeometry.height = Math.min(initialGeometry.height, normalHints.maxHeight);
       }
       if (normalHints.minHeight && normalHints.minHeight > 0) {
-        effectiveGeometry.height = Math.max(effectiveGeometry.height, normalHints.minHeight);
+        initialGeometry.height = Math.max(initialGeometry.height, normalHints.minHeight);
       }
       if (normalHints.maxWidth && normalHints.maxWidth > 0) {
-        effectiveGeometry.width = Math.min(effectiveGeometry.width, normalHints.maxWidth);
+        initialGeometry.width = Math.min(initialGeometry.width, normalHints.maxWidth);
       }
       if (normalHints.minWidth && normalHints.minWidth > 0) {
-        effectiveGeometry.width = Math.max(effectiveGeometry.width, normalHints.minWidth);
+        initialGeometry.width = Math.max(initialGeometry.width, normalHints.minWidth);
       }
     }
 
-    return effectiveGeometry;
+    return initialGeometry;
   }
 
   function runXCallsWithoutEvents(wid: number, fn: VoidFunction): void {
