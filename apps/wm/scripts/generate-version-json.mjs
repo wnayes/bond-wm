@@ -8,7 +8,7 @@ import { exec } from "node:child_process";
 /** @returns {string} Short git hash from the latest commit. */
 async function getGitVersionAsync() {
   return new Promise((resolve, reject) => {
-    exec("git describe --tags --long --always", function (err, stdout, stderr) {
+    exec("git describe --long --always", function (err, stdout, stderr) {
       if (err || stderr) {
         reject("Git version failure: " + err + ", " + stderr);
         return;
