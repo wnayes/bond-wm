@@ -33,12 +33,14 @@ interface TaskbarStyle extends React.CSSProperties {
 
 interface ITaskbarProps extends PropsWithChildren {
   height?: number;
+  zIndex?: number;
 }
 
-export function Taskbar({ height, children }: ITaskbarProps) {
+export function Taskbar({ height, zIndex, children }: ITaskbarProps) {
   const theme = useTheme();
   const taskbarStyle: TaskbarStyle = {
     height: height ?? 20,
+    zIndex: zIndex,
 
     "--desktop-taskbar-bg-color": theme.taskbar?.backgroundColor,
 
