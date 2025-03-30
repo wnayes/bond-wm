@@ -109,12 +109,6 @@
     background-color: transparent;
 }
 
-.taskbarRunField {
-    height: 11px;
-    font-size: 10px;
-    margin-top: 1px;
-}
-
 .sysTray {
     flex-grow: 0;
     flex-shrink: 0;
