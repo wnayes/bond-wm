@@ -112,6 +112,13 @@ function WindowFrameInner({ children }: IWindowFrameProps) {
 
   const theme = useTheme();
 
+  useEffect(() => {
+    if (theme) {
+      const rootStyles = document.documentElement.style;
+      rootStyles.setProperty("--window-font-family", theme.fontFamily);
+    }
+  }, [theme]);
+
   const style: WindowFrameStyle = {
     "--window-active-bg-color": theme.window?.activeBackgroundColor ?? theme.primaryColor,
     "--window-active-border-color":

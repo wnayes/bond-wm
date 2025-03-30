@@ -2,6 +2,7 @@ import React from "react";
 import { createTheming } from "@callstack/react-theme-provider";
 
 export interface Theme {
+  fontFamily: string;
   primaryColor: string;
   urgentColor: string;
   window: {
@@ -65,6 +66,7 @@ export interface Theme {
 }
 
 const DefaultTheme: Theme = {
+  fontFamily: "Arial, Helvetica, sans-serif",
   primaryColor: "#7269d2",
   urgentColor: "#C3723D",
   window: {

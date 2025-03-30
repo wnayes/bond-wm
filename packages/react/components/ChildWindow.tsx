@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { DomWindowContext } from "../useDomWindow";
 import styles from "./ChildWindowStyles.css?url";
 import { Stylesheet } from "./Stylesheet";
+import { useTheme } from "../theming";
 
 export interface IChildWindowProps {
   alwaysOnTop?: boolean;
@@ -55,6 +56,14 @@ export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, autoFocus, chi
   useLayoutEffect(() => {
     win?.resizeTo(size.width, size.height);
   }, [win, size.width, size.height]);
+
+  const theme = useTheme();
+  useLayoutEffect(() => {
+    if (win && theme) {
+      const rootStyles = win.document.documentElement.style;
+      rootStyles.setProperty("--window-font-family", theme.fontFamily);
+    }
+  }, [win, theme]);
 
   if (!win) return null;
   return (

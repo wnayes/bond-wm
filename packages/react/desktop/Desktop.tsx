@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import {
   configureRendererStore,
   showContextMenu,
@@ -11,6 +11,7 @@ import { desktopZoomIn, desktopZoomOut, desktopZoomReset, showDevTools } from "@
 import { getScreenIndex, useScreenIndex } from "../useScreenIndex";
 import { Provider } from "react-redux";
 import "./DesktopStyles.css";
+import { useTheme } from "../theming";
 
 export interface IDesktopProps {
   children?: ReactNode;
@@ -36,6 +37,14 @@ export function Desktop({ children }: IDesktopProps) {
     });
     hookShortcuts(document.body);
   }, [store, screenIndex]);
+
+  const theme = useTheme();
+  useLayoutEffect(() => {
+    if (theme) {
+      const rootStyles = document.documentElement.style;
+      rootStyles.setProperty("--window-font-family", theme.fontFamily);
+    }
+  }, [theme]);
 
   return (
     <Provider store={store}>
