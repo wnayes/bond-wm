@@ -7,6 +7,7 @@ interface TaskbarStyle extends React.CSSProperties {
   "--desktop-taskbar-bg-color": string;
 
   "--desktop-tasklist-text-color": string;
+  "--desktop-tasklist-text-shadow": string;
   "--desktop-tasklist-active-bg-color": string;
   "--desktop-tasklist-active-text-color": string;
   "--desktop-tasklist-urgent-bg-color": string;
@@ -14,6 +15,7 @@ interface TaskbarStyle extends React.CSSProperties {
   "--desktop-tasklist-hover-bg-color": string;
 
   "--desktop-taglist-text-color": string;
+  "--desktop-taglist-text-shadow": string;
   "--desktop-taglist-selected-bg-color": string;
   "--desktop-taglist-selected-text-color": string;
   "--desktop-taglist-hover-bg-color": string;
@@ -24,7 +26,9 @@ interface TaskbarStyle extends React.CSSProperties {
   "--desktop-layouts-hover-bg-color": string;
 
   "--desktop-clock-date-text-color": string;
+  "--desktop-clock-date-text-shadow": string;
   "--desktop-clock-time-text-color": string;
+  "--desktop-clock-time-text-shadow": string;
 }
 
 interface ITaskbarProps extends PropsWithChildren {
@@ -39,6 +43,7 @@ export function Taskbar({ height, children }: ITaskbarProps) {
     "--desktop-taskbar-bg-color": theme.taskbar?.backgroundColor,
 
     "--desktop-tasklist-text-color": theme.taskbar?.tasklist?.foreColor ?? theme.taskbar?.foreColor,
+    "--desktop-tasklist-text-shadow": theme.taskbar?.textShadow ?? "",
     "--desktop-tasklist-active-bg-color": theme.taskbar?.tasklist?.activeBackgroundColor ?? theme.primaryColor,
     "--desktop-tasklist-active-text-color":
       theme.taskbar?.tasklist?.activeForeColor ?? theme.taskbar?.activeForeColor ?? theme.taskbar?.foreColor,
@@ -51,6 +56,7 @@ export function Taskbar({ height, children }: ITaskbarProps) {
     "--desktop-tasklist-hover-bg-color": theme.taskbar?.tasklist?.hoverBackgroundColor ?? theme.taskbar?.hoverColor,
 
     "--desktop-taglist-text-color": theme.taskbar?.taglist?.foreColor ?? theme.taskbar?.foreColor,
+    "--desktop-taglist-text-shadow": theme.taskbar?.textShadow ?? "",
     "--desktop-taglist-selected-bg-color": theme.taskbar?.taglist?.selectedBackgroundColor ?? theme.primaryColor,
     "--desktop-taglist-selected-text-color":
       theme.taskbar?.taglist?.selectedForeColor ?? theme.taskbar?.activeForeColor ?? theme.taskbar?.foreColor,
@@ -67,7 +73,9 @@ export function Taskbar({ height, children }: ITaskbarProps) {
     "--desktop-layouts-hover-bg-color": theme.taskbar?.hoverColor,
 
     "--desktop-clock-date-text-color": theme.taskbar?.clock?.dateColor ?? theme.taskbar?.foreColor,
+    "--desktop-clock-date-text-shadow": theme.taskbar?.textShadow ?? "",
     "--desktop-clock-time-text-color": theme.taskbar?.clock?.timeColor ?? theme.taskbar?.foreColor,
+    "--desktop-clock-time-text-shadow": theme.taskbar?.textShadow ?? "",
   };
 
   return (

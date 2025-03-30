@@ -51,6 +51,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-shadow: var(--desktop-tasklist-text-shadow);
 }
 
 .tasklistentryicon {
@@ -82,6 +83,7 @@
     -webkit-user-select: none;
     user-select: none;
     color: var(--desktop-taglist-text-color);
+    text-shadow: var(--desktop-taglist-text-shadow);
 }
 .taglistentry:hover {
     background-color: var(--desktop-taglist-hover-bg-color);
@@ -145,11 +147,13 @@
 
 .clockDate {
     color: var(--desktop-clock-date-text-color);
+    text-shadow: var(--desktop-clock-date-text-shadow);
     padding-right: 0.5em;
 }
 
 .clockTime {
     color: var(--desktop-clock-time-text-color);
+    text-shadow: var(--desktop-clock-time-text-shadow);
 }
 
 .layoutIndicator {
