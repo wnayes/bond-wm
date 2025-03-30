@@ -3,6 +3,8 @@ import "./StartMenuStyles.css";
 import { IStartMenuContext, StartMenuContext } from "./StartMenuContext";
 
 export interface IStartMenuButtonProps {
+  /** Text shown for the start menu button. Default is "Start". */
+  caption?: string;
   children: () => ReactNode;
 }
 
@@ -37,7 +39,7 @@ export function StartMenuButton(props: IStartMenuButtonProps) {
   return (
     <StartMenuContext.Provider value={smContext}>
       <div ref={buttonRef} className="startMenuButton" onClick={onClick}>
-        Start
+        {props.caption ?? "Start"}
       </div>
       {showing && props.children()}
     </StartMenuContext.Provider>
