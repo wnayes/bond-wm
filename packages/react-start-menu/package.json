@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react-start-menu",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "React start menu for bond-wm",
   "type": "module",
   "main": "./index.tsx",
