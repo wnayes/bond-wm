@@ -1,6 +1,11 @@
 import React, { ReactNode, useCallback, useMemo, useState, useRef, useEffect } from "react";
 import "./StartMenuStyles.css";
 import { IStartMenuContext, StartMenuContext } from "./StartMenuContext";
+import { useTheme } from "@bond-wm/react";
+
+interface StartMenuButtonStyle extends React.CSSProperties {
+  "--start-menu-button-text-color": string;
+}
 
 export interface IStartMenuButtonProps {
   /** Text shown for the start menu button. Default is "Start". */
@@ -36,9 +41,14 @@ export function StartMenuButton(props: IStartMenuButtonProps) {
     };
   }, [buttonRef]);
 
+  const theme = useTheme();
+  const startMenuButtonStyle: StartMenuButtonStyle = {
+    "--start-menu-button-text-color": theme.taskbar?.foreColor,
+  };
+
   return (
     <StartMenuContext.Provider value={smContext}>
-      <div ref={buttonRef} className="startMenuButton" onClick={onClick}>
+      <div ref={buttonRef} className="startMenuButton" onClick={onClick} style={startMenuButtonStyle}>
         {props.caption ?? "Start"}
       </div>
       {showing && props.children()}
