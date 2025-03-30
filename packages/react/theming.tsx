@@ -43,6 +43,7 @@ export interface Theme {
       badgeColor?: string;
     };
     tasklist?: {
+      foreColor?: string;
       activeBackgroundColor?: string;
       activeForeColor?: string;
       urgentBackgroundColor?: string;

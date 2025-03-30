@@ -6,6 +6,7 @@ import "./TaskbarStyles.css";
 interface TaskbarStyle extends React.CSSProperties {
   "--desktop-taskbar-bg-color": string;
 
+  "--desktop-tasklist-text-color": string;
   "--desktop-tasklist-active-bg-color": string;
   "--desktop-tasklist-active-text-color": string;
   "--desktop-tasklist-urgent-bg-color": string;
@@ -36,6 +37,7 @@ export function Taskbar({ height, children }: ITaskbarProps) {
 
     "--desktop-taskbar-bg-color": theme.taskbar?.backgroundColor,
 
+    "--desktop-tasklist-text-color": theme.taskbar?.tasklist?.foreColor ?? theme.taskbar?.foreColor,
     "--desktop-tasklist-active-bg-color": theme.taskbar?.tasklist?.activeBackgroundColor ?? theme.primaryColor,
     "--desktop-tasklist-active-text-color":
       theme.taskbar?.tasklist?.activeForeColor ?? theme.taskbar?.activeForeColor ?? theme.taskbar?.foreColor,
