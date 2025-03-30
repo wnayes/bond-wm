@@ -35,6 +35,7 @@ export interface Theme {
     activeBackgroundColor?: string;
     hoverColor: string;
     taglist?: {
+      foreColor?: string;
       selectedBackgroundColor?: string;
       selectedForeColor?: string;
       urgentBackgroundColor?: string;

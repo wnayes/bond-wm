@@ -32,6 +32,7 @@
     cursor: default;
     -webkit-user-select: none;
     user-select: none;
+    color: var(--desktop-tasklist-text-color);
 }
 .tasklistentry.focused {
     font-weight: bold;
@@ -80,6 +81,7 @@
     cursor: default;
     -webkit-user-select: none;
     user-select: none;
+    color: var(--desktop-taglist-text-color);
 }
 .taglistentry:hover {
     background-color: var(--desktop-taglist-hover-bg-color);

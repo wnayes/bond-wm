@@ -13,6 +13,7 @@ interface TaskbarStyle extends React.CSSProperties {
   "--desktop-tasklist-urgent-text-color": string;
   "--desktop-tasklist-hover-bg-color": string;
 
+  "--desktop-taglist-text-color": string;
   "--desktop-taglist-selected-bg-color": string;
   "--desktop-taglist-selected-text-color": string;
   "--desktop-taglist-hover-bg-color": string;
@@ -49,6 +50,7 @@ export function Taskbar({ height, children }: ITaskbarProps) {
       theme.taskbar?.foreColor,
     "--desktop-tasklist-hover-bg-color": theme.taskbar?.tasklist?.hoverBackgroundColor ?? theme.taskbar?.hoverColor,
 
+    "--desktop-taglist-text-color": theme.taskbar?.taglist?.foreColor ?? theme.taskbar?.foreColor,
     "--desktop-taglist-selected-bg-color": theme.taskbar?.taglist?.selectedBackgroundColor ?? theme.primaryColor,
     "--desktop-taglist-selected-text-color":
       theme.taskbar?.taglist?.selectedForeColor ?? theme.taskbar?.activeForeColor ?? theme.taskbar?.foreColor,
