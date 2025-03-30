@@ -7,6 +7,7 @@
     font-size: 12px; /* For padding to work */
     padding: 0 0.5em;
     cursor: default;
+    color: var(--start-menu-button-text-color);
 }
 
 .startMenu {
@@ -62,9 +63,9 @@
     cursor: pointer;
     font-size: 12px;
     color: var(--start-menu-entry-hover-bg-color);
-  }
- 
+}
+
 .startMenuAppListHeader {
     display: flex;
     justify-content: flex-end;
-  }
+}

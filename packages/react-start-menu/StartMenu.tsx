@@ -3,6 +3,7 @@ import { Stylesheet, useTheme } from "@bond-wm/react";
 import styles from "./StartMenuStyles.css?url";
 
 interface StartMenuStyle extends React.CSSProperties {
+  "--start-menu-button-text-color": string;
   "--start-menu-bg-color": string;
   "--start-menu-entry-hover-bg-color": string;
   "--start-menu-entry-hover-text-color": string;
@@ -15,6 +16,7 @@ interface IStartMenuProps {
 export function StartMenu(props: IStartMenuProps) {
   const theme = useTheme();
   const startMenuStyle: StartMenuStyle = {
+    "--start-menu-button-text-color": theme.taskbar?.foreColor,
     "--start-menu-bg-color": theme.startmenu?.backgroundColor ?? theme.taskbar?.backgroundColor,
     "--start-menu-entry-hover-bg-color": theme.startmenu?.entryHoverColor ?? theme.primaryColor,
     "--start-menu-entry-hover-text-color":
