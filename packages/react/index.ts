@@ -11,6 +11,7 @@ export { useElementSize } from "./useElementSize";
 export { useIconInfoDataUri } from "./useIconInfoDataUri";
 export { useLayoutPlugins } from "./useLayoutPlugins";
 export { useScreen } from "./useScreen";
+export { useScreens } from "./useScreens";
 export { useScreenIndex, setScreenIndex, getScreenIndex } from "./useScreenIndex";
 export { useSupportsMaximize } from "./useSupportsMaximize";
 export { useRendererStore } from "./useRendererStore";
