@@ -13,6 +13,7 @@ export { useLayoutPlugins } from "./useLayoutPlugins";
 export { useScreen } from "./useScreen";
 export { useScreens } from "./useScreens";
 export { useScreenIndex, setScreenIndex, getScreenIndex } from "./useScreenIndex";
+export { useSelector } from "./useSelector";
 export { useSupportsMaximize } from "./useSupportsMaximize";
 export { useRendererStore } from "./useRendererStore";
 export { useWindow, WidContext } from "./useWindow";
