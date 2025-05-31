@@ -1,6 +1,6 @@
 {
   "name": "@bond-wm/react",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "React functionality for bond-wm",
   "main": "./index.ts",
   "exports": "./index.ts",
