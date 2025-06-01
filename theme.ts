@@ -1,6 +1,7 @@
 import { Theme } from "@bond-wm/react";
 
 export const MyTheme: Theme = {
+  fontFamily: "Arial, Helvetica, sans-serif",
   primaryColor: "#7269d2",
   urgentColor: "#C3723D",
   window: {
