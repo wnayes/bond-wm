@@ -281,8 +281,14 @@ export async function createEWMHEventConsumer(
         if (!win.maximized) {
           store.dispatch(setWindowMaximizedAction({ wid, maximized: true }));
           // Send EWMH state change to window
-          X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_STATE, X.atoms.ATOM, 32, 
-            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ]));
+          X.ChangeProperty(
+            XPropMode.Replace,
+            wid,
+            atoms._NET_WM_STATE,
+            X.atoms.ATOM,
+            32,
+            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ])
+          );
         }
         break;
 
@@ -299,8 +305,14 @@ export async function createEWMHEventConsumer(
         store.dispatch(setWindowMaximizedAction({ wid, maximized: newMaximized }));
         // Update EWMH state accordingly
         if (newMaximized) {
-          X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_STATE, X.atoms.ATOM, 32, 
-            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ]));
+          X.ChangeProperty(
+            XPropMode.Replace,
+            wid,
+            atoms._NET_WM_STATE,
+            X.atoms.ATOM,
+            32,
+            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ])
+          );
         } else {
           updateWindowStateHints(wid);
         }

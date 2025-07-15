@@ -93,7 +93,15 @@ import { installSourcemapsSupport } from "vite-node/source-map";
 import { createEWMHEventConsumer, NetWmStateAction } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor, setWindowIconicState, setWindowNormalState } from "./icccm";
+import {
+  createICCCMEventConsumer,
+  getNormalHints,
+  getWMClass,
+  getWMHints,
+  getWMTransientFor,
+  setWindowIconicState,
+  setWindowNormalState,
+} from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { showContextMenu } from "./menus";
 import { setupAutocompleteListener } from "./autocomplete";

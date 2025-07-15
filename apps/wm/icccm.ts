@@ -127,7 +127,7 @@ export async function setWindowIconicState(X: IXClient, wid: number): Promise<vo
   const atoms = {
     WM_STATE: await internAtomAsync(X, "WM_STATE"),
   };
-  
+
   const wmStateBuffer = Buffer.alloc(8);
   wmStateBuffer.writeUInt32LE(WMStateValue.IconicState, 0);
   wmStateBuffer.writeUInt32LE(0, 4); // icon
@@ -139,7 +139,7 @@ export async function setWindowNormalState(X: IXClient, wid: number): Promise<vo
   const atoms = {
     WM_STATE: await internAtomAsync(X, "WM_STATE"),
   };
-  
+
   const wmStateBuffer = Buffer.alloc(8);
   wmStateBuffer.writeUInt32LE(WMStateValue.NormalState, 0);
   wmStateBuffer.writeUInt32LE(0, 4); // icon
