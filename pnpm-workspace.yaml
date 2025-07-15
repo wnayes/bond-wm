@@ -3,18 +3,18 @@ packages:
   - docs
   - packages/*
 catalog:
-  "@callstack/react-theme-provider": ^3.0.9
-  "@eslint/js": ^9.22.0
-  "@jest/globals": ^29.7.0
-  "@reduxjs/toolkit": ^2.6.1
-  "@types/node": ^22.13.9
-  "@types/react": ^19.0.10
-  "@types/react-dom": ^19.0.4
-  "@types/yargs": ^17.0.33
-  "@typescript-eslint/eslint-plugin": ^8.26.0
-  "@typescript-eslint/parser": ^8.26.0
-  "@vitejs/plugin-react": ^4.3.4
-  "@wnayes/electron-redux": 2.0.0-alpha.11
+  '@callstack/react-theme-provider': ^3.0.9
+  '@eslint/js': ^9.22.0
+  '@jest/globals': ^29.7.0
+  '@reduxjs/toolkit': ^2.6.1
+  '@types/node': ^22.13.9
+  '@types/react': ^19.0.10
+  '@types/react-dom': ^19.0.4
+  '@types/yargs': ^17.0.33
+  '@typescript-eslint/eslint-plugin': ^8.26.0
+  '@typescript-eslint/parser': ^8.26.0
+  '@vitejs/plugin-react': ^4.3.4
+  '@wnayes/electron-redux': 2.0.0-alpha.11
   electron: ^35.0.0
   esbuild: ^0.25.0
   eslint: ^9.22.0
@@ -42,3 +42,8 @@ catalog:
   x11: ^2.3.0
   xdg-user-dir: ^0.0.1
   yargs: ^17.7.2
+onlyBuiltDependencies:
+  - core-js
+  - core-js-pure
+  - electron
+  - esbuild
