@@ -5,6 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { DesktopEntries } from "@bond-wm/react-desktop-entries";
 import { Taskbar, TagList, TaskList, SystemTray, Clock, LayoutIndicator } from "@bond-wm/react-taskbar";
 import { Wallpaper } from "@bond-wm/react-wallpaper";
+import { NotificationsContainer } from "@bond-wm/react-notifications";
 import { MyTheme } from "../theme";
 
 const TaskbarHeight = 20;
@@ -14,6 +15,11 @@ export default () => {
   return (
     <ThemeContextProvider theme={MyTheme}>
       <Desktop>
+        {screenIndex === 0 && (
+          <ErrorBoundary fallbackRender={() => <div>Error rendering notifications</div>}>
+            <NotificationsContainer />
+          </ErrorBoundary>
+        )}
         <Taskbar height={TaskbarHeight}>
           {screenIndex === 0 && (
             <StartMenuButton>

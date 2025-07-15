@@ -11,10 +11,13 @@ import type {
   ElectronWMIPCInterface,
   CompletionOptionsCallback,
   ISetupIPCCallbacks,
+  INotification,
 } from "@bond-wm/shared";
 import { IPCMessages } from "@bond-wm/shared";
 
 let _onCompletionOptionsResult: CompletionOptionsCallback | undefined;
+let _onNotificationNew: ((notification: INotification) => void) | undefined;
+let _onNotificationClose: ((id: number) => void) | undefined;
 
 const electronWmApi: ElectronWMIPCInterface = {
   raiseWindow(wid: number): void {
@@ -102,5 +105,56 @@ const electronWmApi: ElectronWMIPCInterface = {
       callback(newWid);
     });
   },
+
+  // Métodos de notificação
+  async closeNotification(id: number): Promise<void> {
+    return ipcRenderer.invoke('notification:close', id);
+  },
+
+  async invokeNotificationAction(id: number, action: string): Promise<void> {
+    return ipcRenderer.invoke('notification:action', id, action);
+  },
+
+  async getActiveNotifications(): Promise<INotification[]> {
+    return ipcRenderer.invoke('notification:getActive');
+  },
+
+  onNotificationNew(callback: (notification: INotification) => void): void {
+    _onNotificationNew = callback;
+    ipcRenderer.on('notification:new', (event, notification: INotification) => {
+      _onNotificationNew?.(notification);
+    });
+  },
+
+  onNotificationClose(callback: (id: number) => void): void {
+    _onNotificationClose = callback;
+    ipcRenderer.on('notification:close', (event, id: number) => {
+      _onNotificationClose?.(id);
+    });
+  },
+
+  removeNotificationListeners(): void {
+    ipcRenderer.removeAllListeners('notification:new');
+    ipcRenderer.removeAllListeners('notification:close');
+    _onNotificationNew = undefined;
+    _onNotificationClose = undefined;
+  },
 };
+
+// Expose electron API for authentication and other features
+const electronApi = {
+  ipcRenderer: {
+    on: (channel: string, listener: (...args: any[]) => void) => {
+      ipcRenderer.on(channel, listener);
+    },
+    off: (channel: string, listener: (...args: any[]) => void) => {
+      ipcRenderer.off(channel, listener);
+    },
+    invoke: (channel: string, ...args: any[]) => {
+      return ipcRenderer.invoke(channel, ...args);
+    },
+  },
+};
+
 contextBridge.exposeInMainWorld("ElectronWM", electronWmApi);
+contextBridge.exposeInMainWorld("electron", electronApi);

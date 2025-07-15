@@ -29,6 +29,18 @@ export enum IPCMessages {
 
 export type CompletionOptionsCallback = (options: string[]) => void;
 
+export interface INotification {
+  id: number;
+  app_name: string;
+  app_icon: string;
+  summary: string;
+  body: string;
+  actions: string[];
+  hints: Record<string, any>;
+  expire_timeout: number;
+  timestamp: number;
+}
+
 export interface ISetupIPCCallbacks {
   onInvokeDesktopShortcutHandler(keyString: string): void;
 }
@@ -49,6 +61,14 @@ export interface ElectronWMIPCInterface {
   showContextMenu(menuKind: ContextMenuKind): void;
   sendRegisterDesktopShortcut(keyString: string, screenIndex: number): void;
   sendUnregisterDesktopShortcut(keyString: string, screenIndex: number): void;
+
+  // Métodos de notificação
+  closeNotification(id: number): Promise<void>;
+  invokeNotificationAction(id: number, action: string): Promise<void>;
+  getActiveNotifications(): Promise<INotification[]>;
+  onNotificationNew(callback: (notification: INotification) => void): void;
+  onNotificationClose(callback: (id: number) => void): void;
+  removeNotificationListeners(): void;
 
   setupIpc(callbacks: ISetupIPCCallbacks): void;
   getCompletionOptionsInit(): void;

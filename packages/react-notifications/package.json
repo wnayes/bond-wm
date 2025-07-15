@@ -1,0 +1,36 @@
+{
+  "name": "@bond-wm/react-notifications",
+  "version": "0.6.2",
+  "description": "React notifications for bond-wm",
+  "type": "module",
+  "main": "./index.tsx",
+  "exports": "./index.tsx",
+  "types": "./index.tsx",
+  "repository": "https://github.com/wnayes/bond-wm",
+  "author": "Will Nayes",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json",
+    "install-server": "bash scripts/postbuild.sh"
+  },
+  "dependencies": {
+    "@bond-wm/react": "workspace:^",
+    "@bond-wm/shared": "workspace:^",
+    "@bond-wm/shared-renderer": "workspace:^",
+    "react-redux": "catalog:",
+    "redux": "catalog:",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@bond-wm/tsconfig": "workspace:^",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "esbuild": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}
