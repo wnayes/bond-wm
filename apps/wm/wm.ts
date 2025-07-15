@@ -90,10 +90,10 @@ import { ViteDevServer, createServer as createViteServer } from "vite";
 import { ViteNodeServer } from "vite-node/server";
 import { ViteNodeRunner } from "vite-node/client";
 import { installSourcemapsSupport } from "vite-node/source-map";
-import { createEWMHEventConsumer } from "./ewmh";
+import { createEWMHEventConsumer, NetWmStateAction } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
+import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor, setWindowIconicState, setWindowNormalState } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { showContextMenu } from "./menus";
 import { setupAutocompleteListener } from "./autocomplete";
@@ -120,6 +120,7 @@ export const ExtraAtoms = {
 
   WM_PROTOCOLS: 10000,
   WM_DELETE_WINDOW: 10001,
+  WM_CHANGE_STATE: 10002,
 
   _NET_WM_NAME: 340,
 };
@@ -346,7 +347,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
     dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
     eventConsumers.push(dragModule);
     eventConsumers.push(await createICCCMEventConsumer(context));
-    ewmhModule = await createEWMHEventConsumer(context, dragModule);
+    ewmhModule = await createEWMHEventConsumer(context, dragModule, {
+      hideWindow,
+      showWindow,
+    });
     eventConsumers.push(ewmhModule);
     eventConsumers.push(await createTrayEventConsumer(context));
 
@@ -514,6 +518,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     extraAtoms.WM_PROTOCOLS = (await internAtomAsync(X, "WM_PROTOCOLS")) as any;
     extraAtoms.WM_DELETE_WINDOW = (await internAtomAsync(X, "WM_DELETE_WINDOW")) as any;
+    extraAtoms.WM_CHANGE_STATE = (await internAtomAsync(X, "WM_CHANGE_STATE")) as any;
 
     extraAtoms._NET_WM_NAME = (await internAtomAsync(X, "_NET_WM_NAME")) as any;
 
@@ -1743,18 +1748,17 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   function minimize(wid: number): void {
     widLog(wid, "minimize");
-    setWindowMinimized(wid, true);
-    hideWindow(wid);
+    ewmhModule.triggerMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_ADD);
   }
 
   function maximize(wid: number): void {
     widLog(wid, "maximize");
-    setWindowMaximized(wid, true);
+    ewmhModule.triggerMaximizeChange(wid, NetWmStateAction._NET_WM_STATE_ADD);
   }
 
   function restore(wid: number): void {
     widLog(wid, "restore");
-    setWindowMaximized(wid, false);
+    ewmhModule.triggerMaximizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
   }
 
   function setWindowMinimized(wid: number, minimized: boolean): void {
