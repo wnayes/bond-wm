@@ -19,7 +19,7 @@ export function NotificationCard({ notification, onClose, onAction }: Notificati
     if (i + 1 < actions.length) {
       actionButtons.push({
         key: actions[i],
-        label: actions[i + 1]
+        label: actions[i + 1],
       });
     }
   }
@@ -44,10 +44,10 @@ export function NotificationCard({ notification, onClose, onAction }: Notificati
 
     // Initialization
     updateTime();
-    
+
     // Update by timer
     const interval = setInterval(updateTime, 1000);
-    
+
     return () => clearInterval(interval);
   }, [expire_timeout, timestamp, id]);
 
@@ -65,56 +65,53 @@ export function NotificationCard({ notification, onClose, onAction }: Notificati
 
     console.log(`Action invoked: ${actionKey} for notification ${id}`);
     setIsProcessingAction(true);
-    
+
     // Send action to main process via IPC
     onAction(id, actionKey);
-    
+
     // Reset state after some time
     setTimeout(() => {
       setIsProcessingAction(false);
     }, 2000);
-    
+
     // Do NOT close automatically - let the application decide
     // If needed, the application can close via D-Bus
   };
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('pt-BR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-  const progressPercentage = timeRemaining !== null && expire_timeout > 0 
-    ? Math.max(0, Math.min(100, (timeRemaining / (expire_timeout / 1000)) * 100))
-    : 0;
+  const progressPercentage =
+    timeRemaining !== null && expire_timeout > 0
+      ? Math.max(0, Math.min(100, (timeRemaining / (expire_timeout / 1000)) * 100))
+      : 0;
 
   return (
-    <div className={`notificationCard ${visible ? 'visible' : 'hidden'}`}>
+    <div className={`notificationCard ${visible ? "visible" : "hidden"}`}>
       <div className="notificationHeader">
         {app_icon && (
-          <img 
-            src={app_icon} 
-            alt={app_name} 
+          <img
+            src={app_icon}
+            alt={app_name}
             className="notificationIcon"
             onError={(e) => {
               // Remove icon if it fails to load
-              e.currentTarget.style.display = 'none';
+              e.currentTarget.style.display = "none";
             }}
           />
         )}
         <div className="notificationAppName">{app_name}</div>
         <div className="notificationTime">{formatTime(timestamp)}</div>
-        <button 
-          className="notificationCloseButton"
-          onClick={handleClose}
-          aria-label="Close notification"
-        >
+        <button className="notificationCloseButton" onClick={handleClose} aria-label="Close notification">
           ×
         </button>
       </div>
-      
+
       <div className="notificationBody">
         <div className="notificationSummary">{summary}</div>
         {body && <div className="notificationMessage">{body}</div>}
@@ -135,12 +132,7 @@ export function NotificationCard({ notification, onClose, onAction }: Notificati
         )}
       </div>
 
-      {timeRemaining !== null && (
-        <div 
-          className="notificationProgress" 
-          style={{ width: `${progressPercentage}%` }}
-        />
-      )}
+      {timeRemaining !== null && <div className="notificationProgress" style={{ width: `${progressPercentage}%` }} />}
     </div>
   );
 }

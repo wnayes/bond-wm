@@ -1,7 +1,6 @@
-import { spawn, ChildProcess } from 'child_process';
-import { BrowserWindow, ipcMain } from 'electron';
-import { log } from './log';
- 
+import { spawn, ChildProcess } from "child_process";
+import { BrowserWindow, ipcMain } from "electron";
+import { log } from "./log";
 
 export interface INotification {
   id: number;
@@ -23,11 +22,11 @@ let pythonProcess: ChildProcess | null = null;
  * Processes a new notification received from the Python process
  */
 function handleNotificationFromPython(notification: INotification): void {
-  log('Notification received from Python:', { 
+  log("Notification received from Python:", {
     id: notification.id,
-    app_name: notification.app_name, 
-    summary: notification.summary, 
-    body: notification.body 
+    app_name: notification.app_name,
+    summary: notification.summary,
+    body: notification.body,
   });
 
   // Store the notification
@@ -35,8 +34,8 @@ function handleNotificationFromPython(notification: INotification): void {
 
   // Send to all renderer windows via IPC
   const windows = BrowserWindow.getAllWindows();
-  windows.forEach(win => {
-    win.webContents.send('notification:new', notification);
+  windows.forEach((win) => {
+    win.webContents.send("notification:new", notification);
   });
 
   log(`Notification ${notification.id} sent to ${windows.length} windows`);
@@ -47,25 +46,25 @@ function handleNotificationFromPython(notification: INotification): void {
  */
 function handleCloseNotification(id: number): void {
   log(`Closing notification ${id}`);
-  
+
   notificationsMap.delete(id);
-  
+
   // Send close event to renderer
   const windows = BrowserWindow.getAllWindows();
-  windows.forEach(win => {
-    win.webContents.send('notification:close', id);
+  windows.forEach((win) => {
+    win.webContents.send("notification:close", id);
   });
 
   // Send command to Python process
   if (pythonProcess && pythonProcess.stdin) {
     try {
       const command = JSON.stringify({
-        type: 'close_notification',
-        id: id
+        type: "close_notification",
+        id: id,
       });
-      pythonProcess.stdin.write(command + '\n');
+      pythonProcess.stdin.write(command + "\n");
     } catch (error) {
-      log('Failed to send close command to Python process:', error);
+      log("Failed to send close command to Python process:", error);
     }
   }
 }
@@ -75,17 +74,17 @@ function handleCloseNotification(id: number): void {
  */
 function handleActionInvoked(id: number, action: string): void {
   log(`[ACTION] Processing action: ${action} for notification ${id}`);
-  
+
   // Send command to Python process
   if (pythonProcess && pythonProcess.stdin) {
     try {
       const command = JSON.stringify({
-        type: 'action_invoked',
+        type: "action_invoked",
         id: id,
-        action: action
+        action: action,
       });
       log(`[ACTION] Sending command to Python: ${command}`);
-      pythonProcess.stdin.write(command + '\n');
+      pythonProcess.stdin.write(command + "\n");
       log(`[ACTION] Command sent successfully to Python process`);
     } catch (error) {
       log(`[ACTION] Failed to send action command to Python process:`, error);
@@ -124,69 +123,70 @@ function removeExpiredNotifications(): void {
  */
 export async function initializeNotificationsService(): Promise<void> {
   try {
-    log('Initializing Python-based notifications service...');
-    
+    log("Initializing Python-based notifications service...");
+
     // Setup IPC handlers for communication with renderer FIRST
     setupIpcHandlers();
-    log('IPC handlers for notifications have been registered');
-    
-    const pythonScript = '/usr/local/bin/notification_server.py';
+    log("IPC handlers for notifications have been registered");
 
-    log('Python script path:', pythonScript);
-    
+    const pythonScript = "/usr/local/bin/notification_server.py";
+
+    log("Python script path:", pythonScript);
+
     // Check if file exists before trying to execute
-    const fs = require('fs');
+    const fs = require("fs");
     if (!fs.existsSync(pythonScript)) {
       throw new Error(`Python notification server script not found at: ${pythonScript}`);
     }
-    
-    log('Python script found, proceeding to spawn process...');
-    
+
+    log("Python script found, proceeding to spawn process...");
+
     // Start Python process
-    pythonProcess = spawn('python3', [pythonScript], {
-      stdio: ['pipe', 'pipe', 'pipe']
+    pythonProcess = spawn("python3", [pythonScript], {
+      stdio: ["pipe", "pipe", "pipe"],
     });
 
     if (!pythonProcess) {
-      throw new Error('Failed to spawn Python notification server process');
+      throw new Error("Failed to spawn Python notification server process");
     }
 
     // Configure Python process handlers
-    pythonProcess.stdout?.on('data', (data) => {
+    pythonProcess.stdout?.on("data", (data) => {
       const output = data.toString();
-      const lines = output.split('\n');
+      const lines = output.split("\n");
 
       for (const line of lines) {
         if (line.trim()) {
           // Look for notification server messages
-          if (line.startsWith('BONDWM_NOTIFICATION:')) {
-            const jsonStr = line.replace('BONDWM_NOTIFICATION:', '');
+          if (line.startsWith("BONDWM_NOTIFICATION:")) {
+            const jsonStr = line.replace("BONDWM_NOTIFICATION:", "");
             try {
               const message = JSON.parse(jsonStr);
               handlePythonMessage(message);
             } catch (e) {
-              log('Error parsing Python message JSON:', e);
-            }            } else {
+              log("Error parsing Python message JSON:", e);
+            }
+          } else {
             // Log other Python outputs for debug
-            log('Python output:', line);
+            log("Python output:", line);
           }
         }
       }
     });
 
     // Capture Python errors
-    pythonProcess.stderr?.on('data', (data) => {
-      log('Python stderr:', data.toString());
+    pythonProcess.stderr?.on("data", (data) => {
+      log("Python stderr:", data.toString());
     });
 
     // When Python process terminates
-    pythonProcess.on('close', (code) => {
+    pythonProcess.on("close", (code) => {
       log(`Python notification server process exited with code ${code}`);
       pythonProcess = null;
     });
 
-    pythonProcess.on('error', (error) => {
-      log('Python process error:', error);
+    pythonProcess.on("error", (error) => {
+      log("Python process error:", error);
       pythonProcess = null;
     });
 
@@ -195,9 +195,9 @@ export async function initializeNotificationsService(): Promise<void> {
       removeExpiredNotifications();
     }, 30000);
 
-    log('Python-based notifications service initialized successfully');
+    log("Python-based notifications service initialized successfully");
   } catch (error) {
-    log('Failed to initialize Python notifications service:', error);
+    log("Failed to initialize Python notifications service:", error);
     throw error;
   }
 }
@@ -207,41 +207,41 @@ export async function initializeNotificationsService(): Promise<void> {
  */
 function handlePythonMessage(message: any): void {
   switch (message.type) {
-    case 'server_ready':
-      log('Python notification server is ready:', message.message);
+    case "server_ready":
+      log("Python notification server is ready:", message.message);
       break;
-      
-    case 'notification_new':
+
+    case "notification_new":
       if (message.notification) {
         handleNotificationFromPython(message.notification);
       }
       break;
-      
-    case 'notification_close':
+
+    case "notification_close":
       if (message.id) {
         // Only remove locally, don't send back to Python
         notificationsMap.delete(message.id);
         const windows = BrowserWindow.getAllWindows();
-        windows.forEach(win => {
-          win.webContents.send('notification:close', message.id);
+        windows.forEach((win) => {
+          win.webContents.send("notification:close", message.id);
         });
       }
       break;
-      
-    case 'action_invoked':
+
+    case "action_invoked":
       log(`Action invoked in Python: ${message.action} for notification ${message.id}`);
       break;
-      
-    case 'action_invoked_success':
+
+    case "action_invoked_success":
       log(`Action successfully processed by Python: ${message.action} for notification ${message.id}`);
       break;
-      
-    case 'error':
-      log('Python server error:', message.message);
+
+    case "error":
+      log("Python server error:", message.message);
       break;
-      
+
     default:
-      log('Unknown message type from Python:', message);
+      log("Unknown message type from Python:", message);
   }
 }
 
@@ -249,16 +249,16 @@ function handlePythonMessage(message: any): void {
  * Sets up IPC handlers for communication with renderer
  */
 export function setupIpcHandlers(): void {
-  log('Setting up IPC handlers for notifications');
-  
+  log("Setting up IPC handlers for notifications");
+
   // Handler to close notification from renderer
-  ipcMain.handle('notification:close', async (event, id: number) => {
+  ipcMain.handle("notification:close", async (event, id: number) => {
     log(`IPC handler called: notification:close for ID ${id}`);
     handleCloseNotification(id);
   });
 
   // Handler to invoke notification action
-  ipcMain.handle('notification:action', async (event, id: number, action: string) => {
+  ipcMain.handle("notification:action", async (event, id: number, action: string) => {
     console.log(`[MAIN] IPC action invoked: ${action} for notification ${id}`);
     log(`IPC action invoked: ${action} for notification ${id}`);
     log(`Python process available: ${pythonProcess !== null}`);
@@ -267,8 +267,8 @@ export function setupIpcHandlers(): void {
   });
 
   // Handler to get active notifications
-  ipcMain.handle('notification:getActive', async () => {
-    log('IPC handler called: notification:getActive');
+  ipcMain.handle("notification:getActive", async () => {
+    log("IPC handler called: notification:getActive");
     const notifications = getActiveNotifications();
     log(`Returning ${notifications.length} active notifications`);
     return notifications;
@@ -281,7 +281,7 @@ export function setupIpcHandlers(): void {
 export function getNotificationsService() {
   return {
     getActiveNotifications,
-    removeExpiredNotifications
+    removeExpiredNotifications,
   };
 }
 
@@ -291,25 +291,25 @@ export function getNotificationsService() {
 export async function shutdownNotificationsService(): Promise<void> {
   if (pythonProcess) {
     try {
-      log('Shutting down Python notification server...');
-      pythonProcess.kill('SIGTERM');
-      
+      log("Shutting down Python notification server...");
+      pythonProcess.kill("SIGTERM");
+
       // Aguarda um pouco para o processo encerrar graciosamente
       await new Promise((resolve) => {
         if (pythonProcess) {
-          pythonProcess.on('close', resolve);
+          pythonProcess.on("close", resolve);
           // Timeout de segurança
           setTimeout(resolve, 3000);
         } else {
           resolve(undefined);
         }
       });
-      
-      log('Python notification server shutdown complete');
+
+      log("Python notification server shutdown complete");
     } catch (error) {
-      log('Error shutting down Python notification server:', error);
+      log("Error shutting down Python notification server:", error);
     }
   }
-  
+
   pythonProcess = null;
 }

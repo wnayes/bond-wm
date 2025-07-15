@@ -4,7 +4,6 @@ import { useNotifications } from "./useNotifications";
 import { NotificationCard } from "./NotificationCard";
 import styles from "./NotificationsStyles.css?url";
 
-
 interface NotificationsStyle extends React.CSSProperties {
   "--notification-bg-color": string;
   "--notification-border-color": string;
@@ -36,8 +35,9 @@ export function NotificationsContainer() {
   const estimatedNotificationHeight = 100; // base height per notification
   const containerPadding = 24; // body padding (12px x 2)
   const gapBetweenNotifications = 12 * (notifications.length - 1); // gaps between notifications
-  
-  const containerHeight = (notifications.length * estimatedNotificationHeight) + containerPadding + gapBetweenNotifications;
+
+  const containerHeight =
+    notifications.length * estimatedNotificationHeight + containerPadding + gapBetweenNotifications;
   const containerWidth = 350;
 
   // Adjust Y position so the container doesn't go off screen
@@ -63,8 +63,6 @@ export function NotificationsContainer() {
     "--notification-progress-color": theme.primaryColor ?? "#007acc",
   };
 
-
-
   return (
     <ChildWindow
       alwaysOnTop
@@ -74,7 +72,7 @@ export function NotificationsContainer() {
     >
       <Stylesheet href={styles} />
       <div className="notificationsContainer" style={notificationsStyle}>
-        {notifications.map(notification => (
+        {notifications.map((notification) => (
           <NotificationCard
             key={notification.id}
             notification={notification}

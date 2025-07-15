@@ -33,7 +33,6 @@ app.on("before-quit", async () => {
 });
 
 app.on("ready", async () => {
-
   try {
     // Inicializa o serviço de notificações D-Bus
     log("Starting D-Bus notifications service...");

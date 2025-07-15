@@ -14,28 +14,31 @@ export function useNotifications() {
 
   // Função para adicionar nova notificação
   const addNotification = useCallback((notification: INotification) => {
-    setNotifications(prev => {
+    setNotifications((prev) => {
       // Se já existe uma notificação com o mesmo ID, substitui
-      const filtered = prev.filter(n => n.id !== notification.id);
+      const filtered = prev.filter((n) => n.id !== notification.id);
       return [...filtered, notification].sort((a, b) => b.timestamp - a.timestamp);
     });
   }, []);
 
   // Função para remover notificação
   const removeNotification = useCallback((id: number) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
   // Função para fechar notificação (envia evento para main process)
-  const closeNotification = useCallback(async (id: number) => {
-    try {
-      await window.ElectronWM.closeNotification(id);
-    } catch (error) {
-      console.error('Failed to close notification:', error);
-      // Remove localmente mesmo se falhar no main process
-      removeNotification(id);
-    }
-  }, [removeNotification]);
+  const closeNotification = useCallback(
+    async (id: number) => {
+      try {
+        await window.ElectronWM.closeNotification(id);
+      } catch (error) {
+        console.error("Failed to close notification:", error);
+        // Remove localmente mesmo se falhar no main process
+        removeNotification(id);
+      }
+    },
+    [removeNotification]
+  );
 
   // Função para invocar ação de notificação
   const invokeAction = useCallback(async (id: number, action: string) => {
@@ -52,17 +55,17 @@ export function useNotifications() {
   // Função para obter notificações ativas do main process
   const getActiveNotifications = useCallback(async () => {
     try {
-      console.log('Requesting active notifications from main process...');
-      if (!window.ElectronWM || typeof window.ElectronWM.getActiveNotifications !== 'function') {
-        console.error('ElectronWM.getActiveNotifications is not available!', window.ElectronWM);
+      console.log("Requesting active notifications from main process...");
+      if (!window.ElectronWM || typeof window.ElectronWM.getActiveNotifications !== "function") {
+        console.error("ElectronWM.getActiveNotifications is not available!", window.ElectronWM);
         return;
       }
-      
+
       const active = await window.ElectronWM.getActiveNotifications();
-      console.log('Received active notifications:', active);
+      console.log("Received active notifications:", active);
       setNotifications(active.sort((a: INotification, b: INotification) => b.timestamp - a.timestamp));
     } catch (error) {
-      console.error('Failed to get active notifications:', error);
+      console.error("Failed to get active notifications:", error);
     }
   }, []);
 
@@ -92,10 +95,10 @@ export function useNotifications() {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
-      setNotifications(prev => 
-        prev.filter(notification => {
+      setNotifications((prev) =>
+        prev.filter((notification) => {
           if (notification.expire_timeout <= 0) return true; // Não expira
-          return (now - notification.timestamp) < notification.expire_timeout;
+          return now - notification.timestamp < notification.expire_timeout;
         })
       );
     }, 1000);
@@ -107,6 +110,6 @@ export function useNotifications() {
     notifications,
     closeNotification,
     invokeAction,
-    getActiveNotifications
+    getActiveNotifications,
   };
 }
