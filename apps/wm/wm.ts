@@ -1682,9 +1682,6 @@ export async function createServer(): Promise<IWindowManagerServer> {
     }
 
     const win = getWinFromStore(wid);
-    if (win?.minimized) {
-      setWindowMinimized(wid, false);
-    }
     if (win?.visible === false) {
       store.dispatch(setWindowVisibleAction({ wid, visible: true }));
     }
@@ -1723,8 +1720,13 @@ export async function createServer(): Promise<IWindowManagerServer> {
       return;
     }
 
-    if (!win.visible) {
-      showWindow(wid);
+    if (!win.visible || win.minimized) {
+      // If window is minimized, use proper restore sequence
+      if (win.minimized) {
+        ewmhModule.triggerMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+      } else {
+        showWindow(wid);
+      }
     } else {
       const fid = getFrameIdFromWindowId(wid);
       if (fid) {
@@ -1766,7 +1768,13 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   function restore(wid: number): void {
     widLog(wid, "restore");
-    ewmhModule.triggerMaximizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+    const win = getWinFromStore(wid);
+    if (win?.minimized) {
+      ewmhModule.triggerMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+    }
+    if (win?.maximized) {
+      ewmhModule.triggerMaximizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+    }
   }
 
   function setWindowMinimized(wid: number, minimized: boolean): void {
