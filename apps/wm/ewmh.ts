@@ -4,18 +4,21 @@ import {
   setWindowAlwaysOnTopAction,
   setWindowFullscreenAction,
   setWindowUrgentAction,
+  setWindowMaximizedAction,
+  setWindowMinimizedAction,
 } from "@bond-wm/shared";
+import { setWindowIconicState, setWindowNormalState } from "./icccm";
 import { numsToBuffer } from "./xutils";
 import { Atom, XCB_COPY_FROM_PARENT, XPropMode } from "@bond-wm/shared";
 import { log, logError } from "./log";
-import { IXWMEventConsumer, XWMContext } from "./wm";
+import { IXWMEventConsumer, XWMContext, ExtraAtoms } from "./wm";
 import { getRawPropertyValue, internAtomAsync } from "./xutils";
 import { pid } from "process";
 import { DragModule } from "./drag";
 import { Coords } from "@bond-wm/shared";
 import { IIconInfo, ResizeDirection } from "@bond-wm/shared";
 
-enum NetWmStateAction {
+export enum NetWmStateAction {
   _NET_WM_STATE_REMOVE = 0,
   _NET_WM_STATE_ADD = 1,
   _NET_WM_STATE_TOGGLE = 2,
@@ -72,11 +75,17 @@ function netWMMoveResizeTypeToInternal(newWmMoveResizeType: NetWmMoveResizeType)
 export interface EWMHModule extends IXWMEventConsumer {
   getNetWmType(wid: number): Promise<WindowType | null>;
   getNetWmIcons(wid: number): Promise<IIconInfo[]>;
+  triggerMaximizeChange(wid: number, action: NetWmStateAction): void;
+  triggerMinimizeChange(wid: number, action: NetWmStateAction): void;
 }
 
 export async function createEWMHEventConsumer(
   { X, store, getWindowIdFromFrameId }: XWMContext,
-  dragModule: DragModule
+  dragModule: DragModule,
+  windowManager: {
+    hideWindow: (wid: number) => void;
+    showWindow: (wid: number) => void;
+  }
 ): Promise<EWMHModule> {
   const atoms = {
     _NET_SUPPORTED: await internAtomAsync(X, "_NET_SUPPORTED"),
@@ -90,6 +99,9 @@ export async function createEWMHEventConsumer(
     _NET_WM_STATE_ABOVE: await internAtomAsync(X, "_NET_WM_STATE_ABOVE"),
     _NET_WM_STATE_FULLSCREEN: await internAtomAsync(X, "_NET_WM_STATE_FULLSCREEN"),
     _NET_WM_STATE_DEMANDS_ATTENTION: await internAtomAsync(X, "_NET_WM_STATE_DEMANDS_ATTENTION"),
+    _NET_WM_STATE_MAXIMIZED_VERT: await internAtomAsync(X, "_NET_WM_STATE_MAXIMIZED_VERT"),
+    _NET_WM_STATE_MAXIMIZED_HORZ: await internAtomAsync(X, "_NET_WM_STATE_MAXIMIZED_HORZ"),
+    _NET_WM_STATE_HIDDEN: await internAtomAsync(X, "_NET_WM_STATE_HIDDEN"),
 
     _NET_WM_WINDOW_TYPE: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE"),
     _NET_WM_WINDOW_TYPE_DESKTOP: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DESKTOP"),
@@ -130,6 +142,13 @@ export async function createEWMHEventConsumer(
     if (win.urgent) {
       hintAtoms.push(atoms._NET_WM_STATE_DEMANDS_ATTENTION);
     }
+    if (win.maximized) {
+      hintAtoms.push(atoms._NET_WM_STATE_MAXIMIZED_VERT);
+      hintAtoms.push(atoms._NET_WM_STATE_MAXIMIZED_HORZ);
+    }
+    if (win.minimized) {
+      hintAtoms.push(atoms._NET_WM_STATE_HIDDEN);
+    }
 
     X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_WM_STATE, X.atoms.ATOM, 32, numsToBuffer(hintAtoms));
   }
@@ -155,6 +174,15 @@ export async function createEWMHEventConsumer(
 
       case atoms._NET_WM_STATE_FULLSCREEN:
         processWindowFullscreenChange(wid, action);
+        break;
+
+      case atoms._NET_WM_STATE_MAXIMIZED_VERT:
+      case atoms._NET_WM_STATE_MAXIMIZED_HORZ:
+        processWindowMaximizeChange(wid, action);
+        break;
+
+      case atoms._NET_WM_STATE_HIDDEN:
+        processWindowMinimizeChange(wid, action);
         break;
 
       default:
@@ -242,6 +270,150 @@ export async function createEWMHEventConsumer(
     }
   }
 
+  function processWindowMaximizeChange(wid: number, action: NetWmStateAction): void {
+    const win = store.getState().windows[wid];
+    if (!win) {
+      return;
+    }
+
+    switch (action) {
+      case NetWmStateAction._NET_WM_STATE_ADD:
+        if (!win.maximized) {
+          store.dispatch(setWindowMaximizedAction({ wid, maximized: true }));
+          // Send EWMH state change to window
+          X.ChangeProperty(
+            XPropMode.Replace,
+            wid,
+            atoms._NET_WM_STATE,
+            X.atoms.ATOM,
+            32,
+            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ])
+          );
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_REMOVE:
+        if (win.maximized) {
+          store.dispatch(setWindowMaximizedAction({ wid, maximized: false }));
+          // Remove maximize state from window
+          updateWindowStateHints(wid);
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_TOGGLE:
+        const newMaximized = !win.maximized;
+        store.dispatch(setWindowMaximizedAction({ wid, maximized: newMaximized }));
+        // Update EWMH state accordingly
+        if (newMaximized) {
+          X.ChangeProperty(
+            XPropMode.Replace,
+            wid,
+            atoms._NET_WM_STATE,
+            X.atoms.ATOM,
+            32,
+            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ])
+          );
+        } else {
+          updateWindowStateHints(wid);
+        }
+        break;
+    }
+  }
+
+  function processWindowMinimizeChange(wid: number, action: NetWmStateAction): void {
+    const win = store.getState().windows[wid];
+    if (!win) {
+      return;
+    }
+
+    // Get root window from the screen
+    const screens = store.getState().screens;
+    const rootWindow = screens.length > 0 ? screens[0].root : 0;
+
+    switch (action) {
+      case NetWmStateAction._NET_WM_STATE_ADD:
+        if (!win.minimized) {
+          store.dispatch(setWindowMinimizedAction({ wid, minimized: true }));
+          // Hide the window
+          windowManager.hideWindow(wid);
+          // Send WM_CHANGE_STATE to root window for iconify (ICCCM)
+          const iconifyEventData = Buffer.alloc(32);
+          iconifyEventData.writeUInt8(33, 0); // ClientMessage event type
+          iconifyEventData.writeUInt8(32, 1); // Format (32-bit)
+          iconifyEventData.writeUInt32LE(wid, 4); // Window ID
+          iconifyEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
+          iconifyEventData.writeUInt32LE(3, 12); // IconicState = 3
+          // Send to root window, not the window itself
+          X.SendEvent(rootWindow, false, 0x180000, iconifyEventData); // SubstructureNotify|SubstructureRedirect
+          // Set ICCCM WM_STATE to IconicState - use promise without await
+          setWindowIconicState(X, wid).then(() => {
+            // Add _NET_WM_STATE_HIDDEN to window properties after ICCCM state is set
+            updateWindowStateHints(wid);
+          });
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_REMOVE:
+        if (win.minimized) {
+          store.dispatch(setWindowMinimizedAction({ wid, minimized: false }));
+          // Set ICCCM WM_STATE to NormalState first - use promise chain for proper order
+          setWindowNormalState(X, wid).then(() => {
+            // Send WM_CHANGE_STATE to root window for restore (ICCCM)
+            const restoreEventData = Buffer.alloc(32);
+            restoreEventData.writeUInt8(33, 0); // ClientMessage event type
+            restoreEventData.writeUInt8(32, 1); // Format (32-bit)
+            restoreEventData.writeUInt32LE(wid, 4); // Window ID
+            restoreEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
+            restoreEventData.writeUInt32LE(1, 12); // NormalState = 1
+            // Send to root window, not the window itself
+            X.SendEvent(rootWindow, false, 0x180000, restoreEventData); // SubstructureNotify|SubstructureRedirect
+            // Remove hidden state from window
+            updateWindowStateHints(wid);
+            // Show the window after setting states
+            windowManager.showWindow(wid);
+          });
+        }
+        break;
+
+      case NetWmStateAction._NET_WM_STATE_TOGGLE:
+        const newMinimized = !win.minimized;
+        store.dispatch(setWindowMinimizedAction({ wid, minimized: newMinimized }));
+        // Set ICCCM WM_STATE appropriately first - use promise chain for proper order
+        if (newMinimized) {
+          setWindowIconicState(X, wid).then(() => {
+            // Update ICCCM and EWMH state accordingly
+            const toggleEventData = Buffer.alloc(32);
+            toggleEventData.writeUInt8(33, 0); // ClientMessage event type
+            toggleEventData.writeUInt8(32, 1); // Format (32-bit)
+            toggleEventData.writeUInt32LE(wid, 4); // Window ID
+            toggleEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
+            toggleEventData.writeUInt32LE(3, 12); // IconicState = 3
+            // Send to root window, not the window itself
+            X.SendEvent(rootWindow, false, 0x180000, toggleEventData); // SubstructureNotify|SubstructureRedirect
+            updateWindowStateHints(wid);
+            // Hide the window after setting states
+            windowManager.hideWindow(wid);
+          });
+        } else {
+          setWindowNormalState(X, wid).then(() => {
+            // Update ICCCM and EWMH state accordingly
+            const toggleEventData = Buffer.alloc(32);
+            toggleEventData.writeUInt8(33, 0); // ClientMessage event type
+            toggleEventData.writeUInt8(32, 1); // Format (32-bit)
+            toggleEventData.writeUInt32LE(wid, 4); // Window ID
+            toggleEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
+            toggleEventData.writeUInt32LE(1, 12); // NormalState = 1
+            // Send to root window, not the window itself
+            X.SendEvent(rootWindow, false, 0x180000, toggleEventData); // SubstructureNotify|SubstructureRedirect
+            updateWindowStateHints(wid);
+            // Show the window after setting states
+            windowManager.showWindow(wid);
+          });
+        }
+        break;
+    }
+  }
+
   function getWindowTypeFromAtom(typeAtom: number): WindowType | null {
     switch (typeAtom) {
       case atoms._NET_WM_WINDOW_TYPE_DESKTOP:
@@ -293,6 +465,9 @@ export async function createEWMHEventConsumer(
           atoms._NET_WM_STATE,
           atoms._NET_WM_STATE_ABOVE,
           atoms._NET_WM_STATE_FULLSCREEN,
+          atoms._NET_WM_STATE_MAXIMIZED_VERT,
+          atoms._NET_WM_STATE_MAXIMIZED_HORZ,
+          atoms._NET_WM_STATE_HIDDEN,
           atoms._NET_FRAME_EXTENTS,
           atoms._NET_WM_PID,
           atoms._NET_WM_MOVERESIZE,
@@ -318,6 +493,23 @@ export async function createEWMHEventConsumer(
               processWindowStateChange(wid, stateData[0], stateData[1]);
               if (stateData[2] !== 0) {
                 processWindowStateChange(wid, stateData[0], stateData[2]);
+              }
+            }
+          }
+          break;
+
+        case ExtraAtoms.WM_CHANGE_STATE:
+          {
+            if (windowType === XWMWindowType.Client) {
+              // Handle WM_CHANGE_STATE messages from applications
+              const stateValue = data[0] as number;
+              switch (stateValue) {
+                case 3: // IconicState - application wants to minimize
+                  processWindowMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_ADD);
+                  break;
+                case 1: // NormalState - application wants to restore
+                  processWindowMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+                  break;
               }
             }
           }
@@ -436,6 +628,14 @@ export async function createEWMHEventConsumer(
       }
 
       return icons;
+    },
+
+    triggerMaximizeChange(wid: number, action: NetWmStateAction): void {
+      processWindowMaximizeChange(wid, action);
+    },
+
+    triggerMinimizeChange(wid: number, action: NetWmStateAction): void {
+      processWindowMinimizeChange(wid, action);
     },
   };
 }

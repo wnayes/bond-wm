@@ -17,9 +17,9 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
     WM_STATE: await internAtomAsync(X, "WM_STATE"),
   };
 
-  function updateWindowState(wid: number): void {
+  function updateWindowState(wid: number, state: WMStateValue = WMStateValue.NormalState): void {
     const wmStateBuffer = Buffer.alloc(8);
-    wmStateBuffer.writeUInt32LE(WMStateValue.NormalState, 0);
+    wmStateBuffer.writeUInt32LE(state, 0);
     wmStateBuffer.writeUInt32LE(0, 4); // icon
 
     X.ChangeProperty(XPropMode.Replace, wid, atoms.WM_STATE, atoms.WM_STATE, 32, wmStateBuffer);
@@ -31,6 +31,14 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
         log("Could not delete WM_STATE");
       }
     });
+  }
+
+  function setWindowIconicState(wid: number): void {
+    updateWindowState(wid, WMStateValue.IconicState);
+  }
+
+  function setWindowNormalState(wid: number): void {
+    updateWindowState(wid, WMStateValue.NormalState);
   }
 
   return {
@@ -113,4 +121,28 @@ export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHi
     gravity: data.readInt32LE(68),
   };
   return hints;
+}
+
+export async function setWindowIconicState(X: IXClient, wid: number): Promise<void> {
+  const atoms = {
+    WM_STATE: await internAtomAsync(X, "WM_STATE"),
+  };
+
+  const wmStateBuffer = Buffer.alloc(8);
+  wmStateBuffer.writeUInt32LE(WMStateValue.IconicState, 0);
+  wmStateBuffer.writeUInt32LE(0, 4); // icon
+
+  X.ChangeProperty(XPropMode.Replace, wid, atoms.WM_STATE, atoms.WM_STATE, 32, wmStateBuffer);
+}
+
+export async function setWindowNormalState(X: IXClient, wid: number): Promise<void> {
+  const atoms = {
+    WM_STATE: await internAtomAsync(X, "WM_STATE"),
+  };
+
+  const wmStateBuffer = Buffer.alloc(8);
+  wmStateBuffer.writeUInt32LE(WMStateValue.NormalState, 0);
+  wmStateBuffer.writeUInt32LE(0, 4); // icon
+
+  X.ChangeProperty(XPropMode.Replace, wid, atoms.WM_STATE, atoms.WM_STATE, 32, wmStateBuffer);
 }

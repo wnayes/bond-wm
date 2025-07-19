@@ -42,3 +42,8 @@ catalog:
   x11: ^2.3.0
   xdg-user-dir: ^0.0.1
   yargs: ^17.7.2
+onlyBuiltDependencies:
+  - core-js
+  - core-js-pure
+  - electron
+  - esbuild
