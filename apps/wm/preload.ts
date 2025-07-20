@@ -104,3 +104,42 @@ const electronWmApi: ElectronWMIPCInterface = {
   },
 };
 contextBridge.exposeInMainWorld("ElectronWM", electronWmApi);
+
+// Interface para notificações
+const notificationsApi = {
+  onNewNotification(callback: (notification: any) => void): void {
+    ipcRenderer.on('notification:new', (event, notification) => {
+      callback(notification);
+    });
+  },
+
+  onCloseNotification(callback: (id: number) => void): void {
+    ipcRenderer.on('notification:close', (event, id) => {
+      callback(id);
+    });
+  },
+
+  onClearAll(callback: () => void): void {
+    ipcRenderer.on('notification:clear-all', () => {
+      callback();
+    });
+  },
+
+  sendNotificationClosed(id: number): void {
+    ipcRenderer.send('notification:user-closed', id);
+  },
+
+  sendNotificationAction(notificationId: number, actionId: string): void {
+    ipcRenderer.send('notification:action', { notificationId, actionId });
+  },
+
+  sendClearAll(): void {
+    ipcRenderer.send('notification:clear-all');
+  },
+
+  requestNotifications(): void {
+    ipcRenderer.send('notification:request-all');
+  }
+};
+
+contextBridge.exposeInMainWorld("ElectronNotifications", notificationsApi);

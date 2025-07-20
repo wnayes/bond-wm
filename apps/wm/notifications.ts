@@ -1,4 +1,4 @@
-import { app, nativeImage, dialog, BrowserWindow } from 'electron';
+import { app, nativeImage, dialog, BrowserWindow, ipcMain } from 'electron';
 import * as dbus from 'dbus-next';
 import { Variant, RequestNameReply } from 'dbus-next';
 import { interface as dbusInterface } from 'dbus-next';
@@ -10,24 +10,80 @@ export interface Notification {
   body: string;
   appIcon?: string;
   expireTimeout: number;
+  actions?: NotificationAction[];
+  timestamp: number;
+}
+
+export interface NotificationAction {
+  id: string;
+  label: string;
 }
 
 export interface DBusHints {
   [key: string]: Variant;
 }
 
+// Mensagens IPC para notificações
+export const NotificationIPCMessages = {
+  NewNotification: 'notification:new',
+  CloseNotification: 'notification:close',
+  ClearAllNotifications: 'notification:clear-all',
+  NotificationAction: 'notification:action',
+  NotificationClosed: 'notification:user-closed',
+  RequestNotifications: 'notification:request-all',
+} as const;
+
 export class NotificationServer {
   private bus = dbus.sessionBus();
   private notificationCounter = 1;
   private activeNotifications = new Map<number, Notification>();
   private notificationInterface: NotificationInterface;
-  private mainWindow: BrowserWindow | null = null;
+  private desktopBrowsers: (BrowserWindow | null)[] = [];
 
-  constructor(mainWindow: BrowserWindow) {
-    this.mainWindow = mainWindow;
+  constructor(desktopBrowsers: (BrowserWindow | null)[]) {
+    this.desktopBrowsers = desktopBrowsers;
     this.notificationInterface = new NotificationInterface(
-      this.handleNotification.bind(this)
+      this.handleNotification.bind(this),
+      this.parseActions.bind(this)
     );
+    this.setupIPCHandlers();
+  }
+
+  private setupIPCHandlers(): void {
+    // Handler para solicitar todas as notificações
+    ipcMain.on(NotificationIPCMessages.RequestNotifications, (event) => {
+      const notifications = Array.from(this.activeNotifications.values());
+      notifications.forEach(notification => {
+        event.reply(NotificationIPCMessages.NewNotification, notification);
+      });
+    });
+
+    // Handler para quando o usuário fecha uma notificação
+    ipcMain.on(NotificationIPCMessages.NotificationClosed, (event, id: number) => {
+      this.activeNotifications.delete(id);
+      this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, id);
+    });
+
+    // Handler para ações de notificação
+    ipcMain.on(NotificationIPCMessages.NotificationAction, (event, data: { notificationId: number; actionId: string }) => {
+      console.log(`Ação executada: ${data.actionId} na notificação ${data.notificationId}`);
+      this.activeNotifications.delete(data.notificationId);
+      this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, data.notificationId);
+    });
+
+    // Handler para limpar todas as notificações
+    ipcMain.on(NotificationIPCMessages.ClearAllNotifications, (event) => {
+      this.activeNotifications.clear();
+      this.broadcastToAllDesktops(NotificationIPCMessages.ClearAllNotifications);
+    });
+  }
+
+  private broadcastToAllDesktops(channel: string, ...args: any[]): void {
+    this.desktopBrowsers.forEach(browser => {
+      if (browser && !browser.isDestroyed()) {
+        browser.webContents.send(channel, ...args);
+      }
+    });
   }
 
   public async start(): Promise<void> {
@@ -55,34 +111,29 @@ export class NotificationServer {
   }
 
   private handleNotification(notification: Notification): void {
-    this.showNotificationAlert(notification);
+    // Armazenar a notificação
+    this.activeNotifications.set(notification.id, notification);
+    
+    // Enviar para todas as telas desktop via IPC
+    this.broadcastToAllDesktops(NotificationIPCMessages.NewNotification, notification);
+    
+    console.log('📨 Nova notificação:', notification.summary);
   }
 
-  private showNotificationAlert(notification: Notification): void {
-    if (!this.mainWindow || !this.mainWindow.isVisible()) return;
+  private parseActions(actions: string[]): NotificationAction[] {
+    const parsedActions: NotificationAction[] = [];
     
-    const options: Electron.MessageBoxOptions = {
-      type: 'info',
-      title: `Nova Notificação (${notification.id})`,
-      message: notification.summary,
-      detail: `${notification.body}\n\nApp: ${notification.appName}`,
-      buttons: ['OK', 'Fechar Notificação'],
-      noLink: true
-    };
-
-    if (notification.appIcon) {
-      try {
-        options.icon = nativeImage.createFromPath(notification.appIcon);
-      } catch (e) {
-        console.warn('Erro ao carregar ícone:', notification.appIcon);
+    // Actions vêm em pares: [id, label, id, label, ...]
+    for (let i = 0; i < actions.length; i += 2) {
+      if (actions[i + 1]) {
+        parsedActions.push({
+          id: actions[i],
+          label: actions[i + 1]
+        });
       }
     }
-
-    dialog.showMessageBox(this.mainWindow, options).then(({ response }) => {
-      if (response === 1) {
-        console.log(`Usuário fechou notificação ${notification.id}`);
-      }
-    });
+    
+    return parsedActions;
   }
 }
 
@@ -90,7 +141,8 @@ class NotificationInterface extends dbusInterface.Interface {
   private notificationCounter = 1;
 
   constructor(
-    private notifyCallback: (notification: Notification) => void
+    private notifyCallback: (notification: Notification) => void,
+    private parseActions: (actions: string[]) => NotificationAction[]
   ) {
     super('org.freedesktop.Notifications');
   }
@@ -113,7 +165,9 @@ class NotificationInterface extends dbusInterface.Interface {
       summary: String(summary),
       body: String(body),
       appIcon: appIcon ? String(appIcon) : undefined,
-      expireTimeout
+      expireTimeout,
+      actions: this.parseActions(actions),
+      timestamp: Date.now()
     };
 
     this.notifyCallback(notification);
@@ -121,19 +175,19 @@ class NotificationInterface extends dbusInterface.Interface {
   }
 
   CloseNotification(id: number): void {
-    // Implementação opcional
+    // Implementação opcional - poderia notificar o fechamento via IPC
   }
 
   GetCapabilities(): string[] {
-    return ['body', 'actions', 'persistence'];
+    return ['body', 'actions', 'persistence', 'action-icons'];
   }
 
   GetServerInformation(): [string, string, string, string] {
     return [
-      'Electron Notifier',
-      'Electron',
+      'Bond WM Notifications',
+      'Bond WM',
       app.getVersion(),
-      '1.0'
+      '1.2'
     ];
   }
 }

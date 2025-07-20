@@ -380,9 +380,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
     }
 
     // Inicializar servidor de notificações
-    const mainBrowserWindow = desktopBrowsers[0];
-    if (mainBrowserWindow) {
-      const notificationServer = new NotificationServer(mainBrowserWindow);
+    if (desktopBrowsers.length > 0) {
+      const notificationServer = new NotificationServer(desktopBrowsers);
       await notificationServer.start();
     }
 
