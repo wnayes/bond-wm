@@ -35,6 +35,7 @@
     "@bond-wm/tsconfig": "workspace:^",
     "@reduxjs/toolkit": "catalog:",
     "@wnayes/electron-redux": "catalog:",
+    "dbus-next": "^0.10.2",
     "electron": "catalog:",
     "freedesktop-desktop-entry": "catalog:",
     "freedesktop-icons": "catalog:",

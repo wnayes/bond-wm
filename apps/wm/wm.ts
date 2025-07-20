@@ -10,6 +10,7 @@ import {
   BrowserWindowConstructorOptions,
   DidCreateWindowDetails,
 } from "electron";
+import { NotificationServer } from "./notifications";
 import {
   IBounds,
   IGeometry,
@@ -376,6 +377,13 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     if (typeof config.onWindowManagerReady === "function") {
       await config.onWindowManagerReady({ wm: wmServer });
+    }
+
+    // Inicializar servidor de notificações
+    const mainBrowserWindow = desktopBrowsers[0];
+    if (mainBrowserWindow) {
+      const notificationServer = new NotificationServer(mainBrowserWindow);
+      await notificationServer.start();
     }
 
     // Prep one frame window to speed up rendering for the first window.
