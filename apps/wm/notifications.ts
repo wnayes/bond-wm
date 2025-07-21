@@ -1,7 +1,8 @@
-import { app, nativeImage, dialog, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as dbus from 'dbus-next';
-import { Variant, RequestNameReply } from 'dbus-next';
-import { interface as dbusInterface } from 'dbus-next';
+import { interface as dbusInterface, RequestNameReply, Variant } from 'dbus-next';
+import { EventEmitter } from 'events';
+
 
 export interface Notification {
   id: number;
@@ -23,7 +24,7 @@ export interface DBusHints {
   [key: string]: Variant;
 }
 
-// Mensagens IPC para notificações
+// IPC messages for notifications
 export const NotificationIPCMessages = {
   NewNotification: 'notification:new',
   CloseNotification: 'notification:close',
@@ -42,15 +43,23 @@ export class NotificationServer {
 
   constructor(desktopBrowsers: (BrowserWindow | null)[]) {
     this.desktopBrowsers = desktopBrowsers;
-    this.notificationInterface = new NotificationInterface(
-      this.handleNotification.bind(this),
-      this.parseActions.bind(this)
-    );
+
+    try {
+      this.notificationInterface = new NotificationInterface(
+        this.handleNotification.bind(this),
+        this.parseActions.bind(this),
+        this.bus // Pass bus to interface
+      );
+
+    } catch (error) {
+      throw error;
+    }
+
     this.setupIPCHandlers();
   }
 
   private setupIPCHandlers(): void {
-    // Handler para solicitar todas as notificações
+    // Handler for requesting all notifications
     ipcMain.on(NotificationIPCMessages.RequestNotifications, (event) => {
       const notifications = Array.from(this.activeNotifications.values());
       notifications.forEach(notification => {
@@ -58,20 +67,36 @@ export class NotificationServer {
       });
     });
 
-    // Handler para quando o usuário fecha uma notificação
+    // Handler for when user closes a notification
     ipcMain.on(NotificationIPCMessages.NotificationClosed, (event, id: number) => {
-      this.activeNotifications.delete(id);
-      this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, id);
+      if (this.activeNotifications.has(id)) {
+        this.activeNotifications.delete(id);
+        this.emitNotificationClosed(id, 2); // 2 = dismissed by user
+        this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, id);
+      }
     });
 
-    // Handler para ações de notificação
     ipcMain.on(NotificationIPCMessages.NotificationAction, (event, data: { notificationId: number; actionId: string }) => {
-      console.log(`Ação executada: ${data.actionId} na notificação ${data.notificationId}`);
-      this.activeNotifications.delete(data.notificationId);
-      this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, data.notificationId);
+
+      const notification = this.activeNotifications.get(data.notificationId);
+      if (notification) {
+        try {
+          this.emitActionInvoked(data.notificationId, data.actionId);
+
+          this.activeNotifications.delete(data.notificationId);
+          this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, data.notificationId);
+
+
+        } catch (error) {
+          console.error(`Error processing action:`, error);
+        }
+
+      } else {
+        console.warn(`Notification ${data.notificationId} not found for action ${data.actionId}`);
+      }
     });
 
-    // Handler para limpar todas as notificações
+    // Handler for clearing all notifications
     ipcMain.on(NotificationIPCMessages.ClearAllNotifications, (event) => {
       this.activeNotifications.clear();
       this.broadcastToAllDesktops(NotificationIPCMessages.ClearAllNotifications);
@@ -86,44 +111,93 @@ export class NotificationServer {
     });
   }
 
+  private emitActionInvoked(notificationId: number, actionId: string): void {
+    try {
+      if (!this.notificationInterface) {
+        throw new Error('Notification interface is not initialized');
+      }
+
+      this.notificationInterface.emitActionInvoked(notificationId, actionId);
+
+      try {
+        const { execSync } = require('child_process');
+        const cmd = `dbus-send --session --type=signal /org/freedesktop/Notifications org.freedesktop.Notifications.ActionInvoked uint32:${notificationId} string:"${actionId}"`;
+        execSync(cmd);
+
+      } catch (err) {
+        console.error(`Error sending signal via dbus-send:`, err);
+      }
+
+      console.log(`✅ ActionInvoked signal emitted successfully`);
+    } catch (error) {
+      console.error('Error emitting ActionInvoked signal:', error);
+
+    }
+  }
+
+  private emitNotificationClosed(notificationId: number, reason: number = 3): void {
+    try {
+      if (!this.notificationInterface) {
+        throw new Error('Notification interface is not initialized');
+      }
+
+      this.notificationInterface.emitNotificationClosed(notificationId, reason);
+
+    } catch (error) {
+      console.warn('Error emitting NotificationClosed signal:', error);
+    }
+  }
+
   public async start(): Promise<void> {
     try {
+      console.log('🚀 Starting notification server...');
+
       const dbusObj = await this.bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus');
       const dbusInterface = dbusObj.getInterface('org.freedesktop.DBus');
       const names = await dbusInterface.ListNames();
-      
+
       if (names.includes('org.freedesktop.Notifications')) {
-        console.log('⚠️ Serviço de notificações já está em execução');
+        console.log('⚠️ Notification service already running');
         return;
       }
 
       this.bus.export('/org/freedesktop/Notifications', this.notificationInterface);
-      
+
       const result = await this.bus.requestName('org.freedesktop.Notifications', 0x4);
+
       if (result === RequestNameReply.PRIMARY_OWNER) {
-        console.log('✅ Serviço de notificações registrado com sucesso');
+        console.log('Notification service registered successfully');
+
+        // Test signal emission to verify functionality
+        setTimeout(() => {
+          console.log(' Testing D-Bus signal emission...');
+          try {
+            this.emitActionInvoked(999, 'test-action');
+            this.emitNotificationClosed(999, 1);
+          } catch (error) {
+            console.error('Error in signal test:', error);
+          }
+        }, 2000);
+
       } else {
-        console.warn('⚠️ Não foi possível registrar o serviço. Código:', result);
+        console.warn('Could not register service. Code:', result);
       }
     } catch (error) {
-      console.error('Erro ao iniciar servidor DBus:', error);
+      console.error('Error starting DBus server:', error);
     }
   }
 
   private handleNotification(notification: Notification): void {
-    // Armazenar a notificação
     this.activeNotifications.set(notification.id, notification);
-    
-    // Enviar para todas as telas desktop via IPC
+
     this.broadcastToAllDesktops(NotificationIPCMessages.NewNotification, notification);
-    
-    console.log('📨 Nova notificação:', notification.summary);
   }
+
 
   private parseActions(actions: string[]): NotificationAction[] {
     const parsedActions: NotificationAction[] = [];
-    
-    // Actions vêm em pares: [id, label, id, label, ...]
+
+    // Actions come in pairs: [id, label, id, label, ...]
     for (let i = 0; i < actions.length; i += 2) {
       if (actions[i + 1]) {
         parsedActions.push({
@@ -132,19 +206,89 @@ export class NotificationServer {
         });
       }
     }
-    
+
     return parsedActions;
   }
 }
 
 class NotificationInterface extends dbusInterface.Interface {
   private notificationCounter = 1;
+  public emitter: EventEmitter;
+  private bus: any; // Store the bus instance for signal emission
 
   constructor(
     private notifyCallback: (notification: Notification) => void,
-    private parseActions: (actions: string[]) => NotificationAction[]
+    private parseActions: (actions: string[]) => NotificationAction[],
+    bus: any
   ) {
-    super('org.freedesktop.Notifications');
+    try {
+      super('org.freedesktop.Notifications');
+
+      this.bus = bus;
+      this.emitter = new EventEmitter();
+
+    } catch (error) {
+
+      throw error;
+    }
+  }
+
+  // Methods to emit signals directly
+  emitActionInvoked(notificationId: number, actionId: string): void {
+
+    try {
+      //  Send signal message directly via bus
+      const { Message } = require('dbus-next');
+      const signalMessage = new Message({
+        type: dbus.MessageType.SIGNAL,
+        path: '/org/freedesktop/Notifications',
+        interface: 'org.freedesktop.Notifications',
+        member: 'ActionInvoked',
+        signature: 'us',
+        body: [notificationId, actionId]
+      });
+
+      if (this.bus && this.bus.send) {
+        this.bus.send(signalMessage);
+
+      } else {
+        throw new Error('Bus not available in interface instance');
+      }
+
+      this.emitter.emit('ActionInvoked', notificationId, actionId);
+
+    } catch (error) {
+
+      throw error;
+    }
+  }
+
+  emitNotificationClosed(notificationId: number, reason: number): void {
+
+    try {
+      // Send signal message directly via bus
+      const { Message } = require('dbus-next');
+      const signalMessage = new Message({
+        type: dbus.MessageType.SIGNAL,
+        path: '/org/freedesktop/Notifications',
+        interface: 'org.freedesktop.Notifications',
+        member: 'NotificationClosed',
+        signature: 'uu',
+        body: [notificationId, reason]
+      });
+
+      if (this.bus && this.bus.send) {
+        this.bus.send(signalMessage);
+      } else {
+        throw new Error('Bus not available in interface instance');
+      }
+
+      this.emitter.emit('NotificationClosed', notificationId, reason);
+
+    } catch (error) {
+
+      throw error;
+    }
   }
 
   Notify(
@@ -158,7 +302,7 @@ class NotificationInterface extends dbusInterface.Interface {
     expireTimeout: number
   ): number {
     const id = replacesId > 0 ? replacesId : this.notificationCounter++;
-    
+
     const notification: Notification = {
       id,
       appName: String(appName),
@@ -175,11 +319,13 @@ class NotificationInterface extends dbusInterface.Interface {
   }
 
   CloseNotification(id: number): void {
-    // Implementação opcional - poderia notificar o fechamento via IPC
+    console.log(`D-Bus call to CloseNotification for ID: ${id}`);
+    // Note: Actual closing will be handled via IPC or timeout
+    // The client application already knows the notification was closed
   }
 
   GetCapabilities(): string[] {
-    return ['body', 'actions', 'persistence', 'action-icons'];
+    return ['body', 'actions', 'persistence', 'action-icons', 'body-markup', 'body-hyperlinks'];
   }
 
   GetServerInformation(): [string, string, string, string] {
@@ -192,7 +338,7 @@ class NotificationInterface extends dbusInterface.Interface {
   }
 }
 
-// Configurar os membros da interface
+
 (NotificationInterface as any).configureMembers({
   methods: {
     Notify: {
@@ -210,6 +356,14 @@ class NotificationInterface extends dbusInterface.Interface {
     GetServerInformation: {
       inSignature: '',
       outSignature: 'ssss'
+    }
+  },
+  signals: {
+    ActionInvoked: {
+      signature: 'us'
+    },
+    NotificationClosed: {
+      signature: 'uu'
     }
   }
 });

@@ -31,8 +31,8 @@ export const NotificationWindow = memo(function NotificationWindow({
     <ChildWindow
       alwaysOnTop
       autoFocus={false}
-      position={{ x: screen.width - 320, y: TaskbarHeight }}
-      size={{ width: 300, height: screen.height - TaskbarHeight - 20 }}
+      position={{ x: screen.width - 300, y: TaskbarHeight }}
+      size={{ width: 300, height: screen.height - TaskbarHeight}}
     >
       <NotificationContainer 
         maxNotifications={maxNotifications}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { NotificationData, NotificationIPCMessages } from './types';
 
-// Declaração simples para o ipcRenderer
+// Simple declaration for ipcRenderer
 declare global {
   interface Window {
     ElectronNotifications?: {
@@ -26,14 +26,14 @@ export function useNotifications() {
 
   const removeNotification = useCallback((id: number) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-    
+
     // Limpar timeout se existir
     const timeout = timeoutRefs.current.get(id);
     if (timeout) {
       clearTimeout(timeout);
       timeoutRefs.current.delete(id);
     }
-    
+
     // Notificar o main process
     if (window.ElectronNotifications) {
       window.ElectronNotifications.sendNotificationClosed(id);
@@ -41,16 +41,16 @@ export function useNotifications() {
   }, []);
 
   useEffect(() => {
-    // Evitar múltiplos listeners
+    // Prevent multiple listeners 
     if (!window.ElectronNotifications) {
       return () => {};
     }
 
-    // Escutar novas notificações
+    // Listen for new notifications
     const handleNewNotification = (notification: NotificationData) => {
       setNotifications(prev => [notification, ...prev]);
-      
-      // Auto-remover após o timeout (se especificado)
+
+      // Auto-remove after timeout (if specified)
       if (notification.expireTimeout > 0) {
         const timeout = setTimeout(() => {
           removeNotification(notification.id);
@@ -59,34 +59,33 @@ export function useNotifications() {
       }
     };
 
-    // Escutar fechamento de notificação
+    // Listen for notification close
     const handleCloseNotification = (id: number) => {
       removeNotification(id);
     };
 
-    // Escutar limpeza de todas as notificações
+    // Listen for clear all notifications
     const handleClearAll = () => {
-      // Limpar todos os timeouts
+      // Clear all timeouts
       timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
       timeoutRefs.current.clear();
       setNotifications([]);
     };
 
-    // Registrar listeners
+    // Register listeners
     window.ElectronNotifications.onNewNotification(handleNewNotification);
     window.ElectronNotifications.onCloseNotification(handleCloseNotification);
     window.ElectronNotifications.onClearAll(handleClearAll);
 
-    // Solicitar notificações existentes ao inicializar
+    // Request existing notifications on initialize
     window.ElectronNotifications.requestNotifications();
-
-    // Cleanup adequado
+    
     return () => {
-      // Limpar todos os timeouts
+      // Clear all timeouts
       timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
       timeoutRefs.current.clear();
-      
-      // Remover listeners se disponível
+
+      // Remove listeners if available  
       if (window.ElectronNotifications?.removeListeners) {
         window.ElectronNotifications.removeListeners();
       }
@@ -94,22 +93,19 @@ export function useNotifications() {
   }, [removeNotification]);
 
   const executeAction = useCallback((notificationId: number, actionId: string) => {
-    // Notificar o main process sobre a ação
+    // Notify the main process about the action
     if (window.ElectronNotifications) {
       window.ElectronNotifications.sendNotificationAction(notificationId, actionId);
     }
-    
-    // Remover a notificação após executar ação
-    removeNotification(notificationId);
-  }, [removeNotification]);
+
+     }, []);
 
   const clearAll = useCallback(() => {
-    // Limpar todos os timeouts
     timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
     timeoutRefs.current.clear();
     setNotifications([]);
-    
-    // Notificar o main process
+
+    // Notify the main process
     if (window.ElectronNotifications) {
       window.ElectronNotifications.sendClearAll();
     }

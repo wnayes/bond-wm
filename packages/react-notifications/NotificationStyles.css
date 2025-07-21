@@ -109,23 +109,55 @@
 .notification-actions {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.notification-action {
+.notification-action-btn {
   background: rgba(76, 175, 80, 0.8);
   border: 1px solid rgba(76, 175, 80, 1);
   color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  transition: all 0.2s;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 80px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
-.notification-action:hover {
+.notification-action-btn:hover:not(:disabled) {
   background: rgba(76, 175, 80, 1);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.notification-action-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notification-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  animation: processing 1.5s infinite;
+}
+
+.notification-action-btn:focus {
+  outline: 2px solid rgba(76, 175, 80, 0.6);
+  outline-offset: 2px;
+}
+
+@keyframes processing {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.8; }
 }
 
 .notification-timestamp {
