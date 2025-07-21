@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { NotificationData, NotificationIPCMessages } from "./types";
+import { NotificationData } from "./types";
 
 // Simple declaration for ipcRenderer
 declare global {

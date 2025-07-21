@@ -18,7 +18,6 @@ export interface NotificationState {
   notifications: NotificationData[];
 }
 
-
 export const NotificationIPCMessages = {
   // Main -> Renderer
   NewNotification: "notification:new",

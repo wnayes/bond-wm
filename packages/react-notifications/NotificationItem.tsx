@@ -24,7 +24,6 @@ export const NotificationItem = memo(function NotificationItem({
       setProcessingAction(actionId);
 
       try {
-        console.log(`📞 Chamando onAction(${id}, '${actionId}')`);
         onAction(id, actionId);
 
         // Visual feedback for processing
@@ -32,10 +31,11 @@ export const NotificationItem = memo(function NotificationItem({
           setProcessingAction(null);
         }, 1000);
       } catch (error) {
+        console.error("Error processing action:", error);
         setProcessingAction(null);
       }
     },
-    [id, onAction, notification]
+    [id, onAction]
   );
 
   const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
