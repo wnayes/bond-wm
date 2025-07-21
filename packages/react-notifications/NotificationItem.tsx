@@ -1,5 +1,5 @@
-import React, { memo, useCallback, useState } from 'react';
-import { NotificationData } from './types';
+import React, { memo, useCallback, useState } from "react";
+import { NotificationData } from "./types";
 
 export interface NotificationItemProps {
   notification: NotificationData;
@@ -10,7 +10,7 @@ export interface NotificationItemProps {
 export const NotificationItem = memo(function NotificationItem({
   notification,
   onClose,
-  onAction
+  onAction,
 }: NotificationItemProps) {
   const { id, appName, summary, body, actions, appIcon } = notification;
   const [processingAction, setProcessingAction] = useState<string | null>(null);
@@ -19,46 +19,38 @@ export const NotificationItem = memo(function NotificationItem({
     onClose(id);
   }, [id, onClose]);
 
-  const handleAction = useCallback(async (actionId: string) => {
-    setProcessingAction(actionId);
+  const handleAction = useCallback(
+    async (actionId: string) => {
+      setProcessingAction(actionId);
 
-    try {
-      console.log(`📞 Chamando onAction(${id}, '${actionId}')`);
-      onAction(id, actionId);
+      try {
+        console.log(`📞 Chamando onAction(${id}, '${actionId}')`);
+        onAction(id, actionId);
 
-      // Visual feedback for processing
-      setTimeout(() => {
+        // Visual feedback for processing
+        setTimeout(() => {
+          setProcessingAction(null);
+        }, 1000);
+      } catch (error) {
         setProcessingAction(null);
-      }, 1000);
-
-    } catch (error) {
-      setProcessingAction(null);
-    }
-  }, [id, onAction, notification]);
+      }
+    },
+    [id, onAction, notification]
+  );
 
   const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     // hide icon if it fails to load
-    (e.target as HTMLImageElement).style.display = 'none';
+    (e.target as HTMLImageElement).style.display = "none";
   }, []);
-
 
   return (
     <div className="notification-item" data-notification-id={id}>
       <div className="notification-header">
         {appIcon && (
-          <img
-            src={appIcon}
-            alt={`${appName} icon`}
-            className="notification-icon"
-            onError={handleImageError}
-          />
+          <img src={appIcon} alt={`${appName} icon`} className="notification-icon" onError={handleImageError} />
         )}
         <div className="notification-app-name">{appName}</div>
-        <button
-          className="notification-close-btn"
-          onClick={handleClose}
-          aria-label="Close Notification"
-        >
+        <button className="notification-close-btn" onClick={handleClose} aria-label="Close Notification">
           ×
         </button>
       </div>
@@ -70,7 +62,7 @@ export const NotificationItem = memo(function NotificationItem({
 
       {actions && actions.length > 0 && (
         <div className="notification-actions">
-          {actions.map(action => {
+          {actions.map((action) => {
             const isProcessing = processingAction === action.id;
             return (
               <button
@@ -80,15 +72,11 @@ export const NotificationItem = memo(function NotificationItem({
                 disabled={processingAction !== null}
                 style={{
                   opacity: processingAction && !isProcessing ? 0.5 : 1,
-                  cursor: processingAction ? 'not-allowed' : 'pointer'
+                  cursor: processingAction ? "not-allowed" : "pointer",
                 }}
                 title={action.label}
               >
-                {isProcessing ? (
-                  <>⏳</>
-                ) : (
-                  <>{action.label}</>
-                )}
+                {isProcessing ? <>⏳</> : <>{action.label}</>}
               </button>
             );
           })}

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { NotificationData, NotificationIPCMessages } from './types';
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { NotificationData, NotificationIPCMessages } from "./types";
 
 // Simple declaration for ipcRenderer
 declare global {
@@ -25,7 +25,7 @@ export function useNotifications() {
   const hasNotifications = useMemo(() => notifications.length > 0, [notifications.length]);
 
   const removeNotification = useCallback((id: number) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
 
     // Limpar timeout se existir
     const timeout = timeoutRefs.current.get(id);
@@ -41,14 +41,14 @@ export function useNotifications() {
   }, []);
 
   useEffect(() => {
-    // Prevent multiple listeners 
+    // Prevent multiple listeners
     if (!window.ElectronNotifications) {
       return () => {};
     }
 
     // Listen for new notifications
     const handleNewNotification = (notification: NotificationData) => {
-      setNotifications(prev => [notification, ...prev]);
+      setNotifications((prev) => [notification, ...prev]);
 
       // Auto-remove after timeout (if specified)
       if (notification.expireTimeout > 0) {
@@ -67,7 +67,7 @@ export function useNotifications() {
     // Listen for clear all notifications
     const handleClearAll = () => {
       // Clear all timeouts
-      timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
+      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
       timeoutRefs.current.clear();
       setNotifications([]);
     };
@@ -79,13 +79,13 @@ export function useNotifications() {
 
     // Request existing notifications on initialize
     window.ElectronNotifications.requestNotifications();
-    
+
     return () => {
       // Clear all timeouts
-      timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
+      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
       timeoutRefs.current.clear();
 
-      // Remove listeners if available  
+      // Remove listeners if available
       if (window.ElectronNotifications?.removeListeners) {
         window.ElectronNotifications.removeListeners();
       }
@@ -97,11 +97,10 @@ export function useNotifications() {
     if (window.ElectronNotifications) {
       window.ElectronNotifications.sendNotificationAction(notificationId, actionId);
     }
-
-     }, []);
+  }, []);
 
   const clearAll = useCallback(() => {
-    timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
+    timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
     timeoutRefs.current.clear();
     setNotifications([]);
 
@@ -116,6 +115,6 @@ export function useNotifications() {
     hasNotifications,
     removeNotification,
     executeAction,
-    clearAll
+    clearAll,
   };
 }

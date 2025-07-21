@@ -18,15 +18,15 @@ export interface NotificationState {
   notifications: NotificationData[];
 }
 
-// Mensagens IPC para notificações
+
 export const NotificationIPCMessages = {
   // Main -> Renderer
-  NewNotification: 'notification:new',
-  CloseNotification: 'notification:close',
-  ClearAllNotifications: 'notification:clear-all',
-  
+  NewNotification: "notification:new",
+  CloseNotification: "notification:close",
+  ClearAllNotifications: "notification:clear-all",
+
   // Renderer -> Main
-  NotificationAction: 'notification:action',
-  NotificationClosed: 'notification:user-closed',
-  RequestNotifications: 'notification:request-all',
+  NotificationAction: "notification:action",
+  NotificationClosed: "notification:user-closed",
+  RequestNotifications: "notification:request-all",
 } as const;
