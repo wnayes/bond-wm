@@ -379,9 +379,16 @@ export async function createServer(): Promise<IWindowManagerServer> {
       await config.onWindowManagerReady({ wm: wmServer });
     }
 
-    // Inicializar servidor de notificações
+    // Initialize notification server
     if (desktopBrowsers.length > 0) {
-      const notificationServer = new NotificationServer(desktopBrowsers);
+      const broadcastToAllDesktops = (channel: string, ...args: any[]) => {
+        desktopBrowsers.forEach((browser) => {
+          if (browser && !browser.isDestroyed()) {
+            browser.webContents.send(channel, ...args);
+          }
+        });
+      };
+      const notificationServer = new NotificationServer(broadcastToAllDesktops);
       await notificationServer.start();
     }
 

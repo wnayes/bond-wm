@@ -38,10 +38,10 @@ export class NotificationServer {
   private notificationCounter = 1;
   private activeNotifications = new Map<number, Notification>();
   private notificationInterface: NotificationInterface;
-  private desktopBrowsers: (BrowserWindow | null)[] = [];
+  private broadcastCallback: (channel: string, ...args: any[]) => void;
 
-  constructor(desktopBrowsers: (BrowserWindow | null)[]) {
-    this.desktopBrowsers = desktopBrowsers;
+  constructor(broadcastCallback: (channel: string, ...args: any[]) => void) {
+    this.broadcastCallback = broadcastCallback;
 
     try {
       this.notificationInterface = new NotificationInterface(
@@ -101,11 +101,9 @@ export class NotificationServer {
   }
 
   private broadcastToAllDesktops(channel: string, ...args: any[]): void {
-    this.desktopBrowsers.forEach((browser) => {
-      if (browser && !browser.isDestroyed()) {
-        browser.webContents.send(channel, ...args);
-      }
-    });
+    if (this.broadcastCallback) {
+      this.broadcastCallback(channel, ...args);
+    }
   }
 
   private emitActionInvoked(notificationId: number, actionId: string): void {
@@ -124,7 +122,6 @@ export class NotificationServer {
         console.error(`Error sending signal via dbus-send:`, err);
       }
 
-      console.log(`✅ ActionInvoked signal emitted successfully`);
     } catch (error) {
       console.error("Error emitting ActionInvoked signal:", error);
     }
