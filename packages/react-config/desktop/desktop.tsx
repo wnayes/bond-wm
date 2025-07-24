@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { DesktopEntries } from "@bond-wm/react-desktop-entries";
 import { Taskbar, TagList, TaskList, SystemTray, Clock, LayoutIndicator } from "@bond-wm/react-taskbar";
 import { Wallpaper } from "@bond-wm/react-wallpaper";
-import { NotificationWindow, NotificationProvider } from "@bond-wm/react-notifications";
+import { NotificationWindow } from "@bond-wm/react-notifications";
 import { MyTheme } from "../theme";
 
 const TaskbarHeight = 20;
@@ -14,7 +14,6 @@ export default () => {
   const screenIndex = useScreenIndex();
   return (
     <ThemeContextProvider theme={MyTheme}>
-      <NotificationProvider>
         <Desktop>
           <Taskbar height={TaskbarHeight}>
             {screenIndex === 0 && (
@@ -47,7 +46,6 @@ export default () => {
           </ErrorBoundary>
           {screenIndex === 0 && <NotificationWindow />}
         </Desktop>
-      </NotificationProvider>
     </ThemeContextProvider>
   );
 };

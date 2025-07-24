@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { ChildWindow, useScreen } from "@bond-wm/react";
 import { NotificationContainer } from "./NotificationContainer";
-import { useNotificationContext } from "./NotificationContext";
+import { useNotifications } from "./useNotifications";
 
 const TaskbarHeight = 20;
 
@@ -15,7 +15,7 @@ export const NotificationWindow = memo(function NotificationWindow({
   showHeader = true,
 }: NotificationWindowProps) {
   const screen = useScreen();
-  const { hasNotifications } = useNotificationContext();
+  const { hasNotifications } = useNotifications();
 
   // Early return if there are no notifications - avoids creating unnecessary ChildWindow
   if (!hasNotifications) {

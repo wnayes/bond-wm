@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from "react";
 import { Stylesheet } from "@bond-wm/react";
-import { useNotificationContext } from "./NotificationContext";
+import { useNotifications } from "./useNotifications";
 import { NotificationItem } from "./NotificationItem";
 import styles from "./NotificationStyles.css?url";
 
@@ -13,9 +13,9 @@ export const NotificationContainer = memo(function NotificationContainer({
   maxNotifications = 5,
   showHeader = true,
 }: NotificationContainerProps) {
-  const { notifications, removeNotification, executeAction, clearAll } = useNotificationContext();
+  const { notifications, removeNotification, executeAction, clearAll } = useNotifications();
 
-  // Memorizar as notificações visíveis para evitar re-cálculos desnecessários
+  // Memoize visible notifications to avoid unnecessary recalculations
   const visibleNotifications = useMemo(() => {
     if (!notifications || !Array.isArray(notifications)) {
       return [];
@@ -23,7 +23,7 @@ export const NotificationContainer = memo(function NotificationContainer({
     return notifications.slice(0, maxNotifications);
   }, [notifications, maxNotifications]);
 
-  // Early return se não há notificações
+  // Early return if there are no notifications
   if (visibleNotifications.length === 0) {
     return null;
   }
