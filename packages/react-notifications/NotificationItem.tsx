@@ -1,10 +1,22 @@
 import React, { memo, useCallback, useState } from "react";
 import { NotificationData } from "./types";
+import { useTheme } from "@bond-wm/react";
 
 export interface NotificationItemProps {
   notification: NotificationData;
   onClose: (id: number) => void;
   onAction: (notificationId: number, actionId: string) => void;
+}
+
+interface NotificationStyle extends React.CSSProperties {
+  "--notification-bg-color": string;
+  "--notification-fore-color": string;
+  "--notification-app-name-color": string;
+  "--notification-action-bg": string;
+  "--notification-action-border": string;
+  "--notification-action-color": string;
+  "--notification-clear-btn-bg": string;
+  "--notification-clear-btn-color": string;
 }
 
 export const NotificationItem = memo(function NotificationItem({
@@ -14,6 +26,18 @@ export const NotificationItem = memo(function NotificationItem({
 }: NotificationItemProps) {
   const { id, appName, summary, body, actions, appIcon } = notification;
   const [processingAction, setProcessingAction] = useState<string | null>(null);
+  const theme = useTheme();
+  const notificationItemStyle: NotificationStyle = {
+    "--notification-bg-color":
+      theme.notification?.backgroundColor ?? theme.window?.inactiveBackgroundColor ?? "rgba(0,0,0,0.8)",
+    "--notification-fore-color": theme.notification?.foreColor ?? theme.window?.foreColor ?? "white",
+    "--notification-app-name-color": theme.notification?.appNameColor ?? theme.primaryColor,
+    "--notification-action-bg": theme.notification?.actionBg ?? theme.primaryColor,
+    "--notification-action-border": theme.notification?.actionBorder ?? theme.primaryColor,
+    "--notification-action-color": theme.notification?.actionColor ?? theme.window?.foreColor ?? "white",
+    "--notification-clear-btn-bg": theme.notification?.clearBtnBg ?? theme.primaryColor,
+    "--notification-clear-btn-color": theme.notification?.clearBtnColor ?? theme.window?.foreColor ?? "white",
+  } as NotificationStyle;
 
   const handleClose = useCallback(() => {
     onClose(id);
@@ -44,7 +68,7 @@ export const NotificationItem = memo(function NotificationItem({
   }, []);
 
   return (
-    <div className="notification-item" data-notification-id={id}>
+    <div className="notification-item" data-notification-id={id} style={notificationItemStyle}>
       <div className="notification-header">
         {appIcon && (
           <img src={appIcon} alt={`${appName} icon`} className="notification-icon" onError={handleImageError} />

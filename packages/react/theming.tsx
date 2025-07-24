@@ -63,6 +63,16 @@ export interface Theme {
     entryHoverColor?: string;
     entryHoverForeColor?: string;
   };
+  notification?: {
+    backgroundColor: string;
+    foreColor: string;
+    appNameColor: string;
+    actionBg: string;
+    actionBorder: string;
+    actionColor: string;
+    clearBtnBg: string;
+    clearBtnColor: string;
+  };
 }
 
 const DefaultTheme: Theme = {
@@ -71,6 +81,16 @@ const DefaultTheme: Theme = {
   urgentColor: "#C3723D",
   window: {
     inactiveBackgroundColor: "#333333",
+  },
+  notification: {
+    backgroundColor: "#222C37",
+    foreColor: "#FFFFFF",
+    appNameColor: "#7269d2",
+    actionBg: "#7269d2",
+    actionBorder: "#7269d2",
+    actionColor: "#FFFFFF",
+    clearBtnBg: "#7269d2",
+    clearBtnColor: "#FFFFFF",
   },
   taskbar: {
     foreColor: "#000000",

@@ -24,9 +24,9 @@
 }
 
 .notifications-clear-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  background: var(--notification-clear-btn-bg, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--notification-action-border, rgba(255, 255, 255, 0.3));
+  color: var(--notification-clear-btn-color, white);
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -67,7 +67,7 @@
 .notification-app-name {
   font-weight: bold;
   font-size: 13px;
-  color: #4CAF50;
+  color: var(--notification-app-name-color, #4CAF50);
 }
 
 .notification-close {
@@ -115,9 +115,9 @@
 }
 
 .notification-action-btn {
-  background: rgba(76, 175, 80, 0.8);
-  border: 1px solid rgba(76, 175, 80, 1);
-  color: white;
+  background: var(--notification-action-bg, rgba(76, 175, 80, 0.8));
+  border: 1px solid var(--notification-action-border, rgba(76, 175, 80, 1));
+  color: var(--notification-action-color, white);
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -133,7 +133,7 @@
 }
 
 .notification-action-btn:hover:not(:disabled) {
-  background: rgba(76, 175, 80, 1);
+  background: var(--notification-action-border, rgba(76, 175, 80, 1));
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
