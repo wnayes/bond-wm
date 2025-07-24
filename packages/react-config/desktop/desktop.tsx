@@ -14,38 +14,38 @@ export default () => {
   const screenIndex = useScreenIndex();
   return (
     <ThemeContextProvider theme={MyTheme}>
-        <Desktop>
-          <Taskbar height={TaskbarHeight}>
-            {screenIndex === 0 && (
-              <StartMenuButton>
-                {() => (
-                  <ChildWindow
-                    alwaysOnTop
-                    autoFocus
-                    position={{ x: 0, y: TaskbarHeight }}
-                    size={{ width: 300, height: screen.height / 2 }}
-                  >
-                    <StartMenu>
-                      <StartMenuApplicationList groupBy="all" />
-                    </StartMenu>
-                  </ChildWindow>
-                )}
-              </StartMenuButton>
-            )}
-            <TagList />
-            <TaskList />
-            {screenIndex === 0 && <SystemTray />}
-            <Clock />
-            <LayoutIndicator />
-          </Taskbar>
-          <ErrorBoundary FallbackComponent={ErrorDisplay}>
-            <WorkArea>
-              <Wallpaper />
-              <DesktopEntries />
-            </WorkArea>
-          </ErrorBoundary>
-          {screenIndex === 0 && <NotificationWindow />}
-        </Desktop>
+      <Desktop>
+        <Taskbar height={TaskbarHeight}>
+          {screenIndex === 0 && (
+            <StartMenuButton>
+              {() => (
+                <ChildWindow
+                  alwaysOnTop
+                  autoFocus
+                  position={{ x: 0, y: TaskbarHeight }}
+                  size={{ width: 300, height: screen.height / 2 }}
+                >
+                  <StartMenu>
+                    <StartMenuApplicationList groupBy="all" />
+                  </StartMenu>
+                </ChildWindow>
+              )}
+            </StartMenuButton>
+          )}
+          <TagList />
+          <TaskList />
+          {screenIndex === 0 && <SystemTray />}
+          <Clock />
+          <LayoutIndicator />
+        </Taskbar>
+        <ErrorBoundary FallbackComponent={ErrorDisplay}>
+          <WorkArea>
+            <Wallpaper />
+            <DesktopEntries />
+          </WorkArea>
+        </ErrorBoundary>
+        {screenIndex === 0 && <NotificationWindow />}
+      </Desktop>
     </ThemeContextProvider>
   );
 };

@@ -43,15 +43,11 @@ export class NotificationServer {
   constructor(broadcastCallback: (channel: string, ...args: any[]) => void) {
     this.broadcastCallback = broadcastCallback;
 
-    try {
-      this.notificationInterface = new NotificationInterface(
-        this.handleNotification.bind(this),
-        this.parseActions.bind(this),
-        this.bus // Pass bus to interface
-      );
-    } catch (error) {
-      throw error;
-    }
+    this.notificationInterface = new NotificationInterface(
+      this.handleNotification.bind(this),
+      this.parseActions.bind(this),
+      this.bus // Pass bus to interface
+    );
 
     this.setupIPCHandlers();
   }
@@ -121,7 +117,6 @@ export class NotificationServer {
       } catch (err) {
         console.error(`Error sending signal via dbus-send:`, err);
       }
-
     } catch (error) {
       console.error("Error emitting ActionInvoked signal:", error);
     }
@@ -210,65 +205,52 @@ class NotificationInterface extends dbusInterface.Interface {
     private parseActions: (actions: string[]) => NotificationAction[],
     bus: any
   ) {
-    try {
-      super("org.freedesktop.Notifications");
-
-      this.bus = bus;
-      this.emitter = new EventEmitter();
-    } catch (error) {
-      throw error;
-    }
+    super("org.freedesktop.Notifications");
+    this.bus = bus;
+    this.emitter = new EventEmitter();
   }
 
   // Methods to emit signals directly
   emitActionInvoked(notificationId: number, actionId: string): void {
-    try {
-      //  Send signal message directly via bus
-      const { Message } = require("dbus-next");
-      const signalMessage = new Message({
-        type: dbus.MessageType.SIGNAL,
-        path: "/org/freedesktop/Notifications",
-        interface: "org.freedesktop.Notifications",
-        member: "ActionInvoked",
-        signature: "us",
-        body: [notificationId, actionId],
-      });
+    //  Send signal message directly via bus
+    const { Message } = require("dbus-next");
+    const signalMessage = new Message({
+      type: dbus.MessageType.SIGNAL,
+      path: "/org/freedesktop/Notifications",
+      interface: "org.freedesktop.Notifications",
+      member: "ActionInvoked",
+      signature: "us",
+      body: [notificationId, actionId],
+    });
 
-      if (this.bus && this.bus.send) {
-        this.bus.send(signalMessage);
-      } else {
-        throw new Error("Bus not available in interface instance");
-      }
-
-      this.emitter.emit("ActionInvoked", notificationId, actionId);
-    } catch (error) {
-      throw error;
+    if (this.bus && this.bus.send) {
+      this.bus.send(signalMessage);
+    } else {
+      throw new Error("Bus not available in interface instance");
     }
+
+    this.emitter.emit("ActionInvoked", notificationId, actionId);
   }
 
   emitNotificationClosed(notificationId: number, reason: number): void {
-    try {
-      // Send signal message directly via bus
-      const { Message } = require("dbus-next");
-      const signalMessage = new Message({
-        type: dbus.MessageType.SIGNAL,
-        path: "/org/freedesktop/Notifications",
-        interface: "org.freedesktop.Notifications",
-        member: "NotificationClosed",
-        signature: "uu",
-        body: [notificationId, reason],
-      });
+    // Send signal message directly via bus
+    const { Message } = require("dbus-next");
+    const signalMessage = new Message({
+      type: dbus.MessageType.SIGNAL,
+      path: "/org/freedesktop/Notifications",
+      interface: "org.freedesktop.Notifications",
+      member: "NotificationClosed",
+      signature: "uu",
+      body: [notificationId, reason],
+    });
 
-      if (this.bus && this.bus.send) {
-        this.bus.send(signalMessage);
-      } else {
-        throw new Error("Bus not available in interface instance");
-      }
-
-      this.emitter.emit("NotificationClosed", notificationId, reason);
-    } catch (error) {
-      throw error;
+    if (this.bus && this.bus.send) {
+      this.bus.send(signalMessage);
+    } else {
+      throw new Error("Bus not available in interface instance");
     }
+
+    this.emitter.emit("NotificationClosed", notificationId, reason);
   }
 
   Notify(
