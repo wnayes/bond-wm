@@ -139,6 +139,12 @@ const notificationsApi = {
   requestNotifications(): void {
     ipcRenderer.send("notification:request-all");
   },
+
+  removeListeners(): void {
+    ipcRenderer.removeAllListeners("notification:new");
+    ipcRenderer.removeAllListeners("notification:close");
+    ipcRenderer.removeAllListeners("notification:clear-all");
+  },
 };
 
 contextBridge.exposeInMainWorld("ElectronNotifications", notificationsApi);
