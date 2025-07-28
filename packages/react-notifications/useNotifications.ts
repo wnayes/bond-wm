@@ -84,7 +84,6 @@ export function useNotifications() {
       // Clear all timeouts
       timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
       timeoutRefs.current.clear();
-      
     };
   }, [removeNotification]);
 
