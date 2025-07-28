@@ -84,11 +84,7 @@ export function useNotifications() {
       // Clear all timeouts
       timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
       timeoutRefs.current.clear();
-
-      // Remove listeners if available
-      if (window.ElectronNotifications && typeof window.ElectronNotifications.removeListeners === "function") {
-        window.ElectronNotifications.removeListeners();
-      }
+      
     };
   }, [removeNotification]);
 

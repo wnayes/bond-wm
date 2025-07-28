@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import { ChildWindow, useScreen } from "@bond-wm/react";
 import { NotificationContainer } from "./NotificationContainer";
 import { useNotifications } from "./useNotifications";
@@ -16,6 +16,15 @@ export const NotificationWindow = memo(function NotificationWindow({
 }: NotificationWindowProps) {
   const screen = useScreen();
   const { hasNotifications } = useNotifications();
+  useEffect(() => {
+    // Mount: nothing to do, listeners are already registered by the hook
+    return () => {
+      // Unmount: remove global listeners
+      if (window.ElectronNotifications?.removeListeners) {
+        window.ElectronNotifications.removeListeners();
+      }
+    };
+  }, []);
 
   // Early return if there are no notifications - avoids creating unnecessary ChildWindow
   if (!hasNotifications) {
