@@ -10,6 +10,7 @@ import {
   BrowserWindowConstructorOptions,
   DidCreateWindowDetails,
 } from "electron";
+import { NotificationServer } from "./notifications";
 import {
   IBounds,
   IGeometry,
@@ -376,6 +377,19 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     if (typeof config.onWindowManagerReady === "function") {
       await config.onWindowManagerReady({ wm: wmServer });
+    }
+
+    // Initialize notification server
+    if (desktopBrowsers.length > 0) {
+      const broadcastToAllDesktops = (channel: string, ...args: any[]) => {
+        desktopBrowsers.forEach((browser) => {
+          if (browser && !browser.isDestroyed()) {
+            browser.webContents.send(channel, ...args);
+          }
+        });
+      };
+      const notificationServer = new NotificationServer(broadcastToAllDesktops);
+      await notificationServer.start();
     }
 
     // Prep one frame window to speed up rendering for the first window.
