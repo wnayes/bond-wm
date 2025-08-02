@@ -76,8 +76,8 @@ catalogs:
       specifier: ^19.0.0
       version: 19.0.0
     react-error-boundary:
-      specifier: ^5.0.0
-      version: 5.0.0
+      specifier: ^6.0.0
+      version: 6.0.0
     react-redux:
       specifier: ^9.2.0
       version: 9.2.0
@@ -343,7 +343,7 @@ importers:
         version: 19.0.0(react@19.0.0)
       react-error-boundary:
         specifier: 'catalog:'
-        version: 5.0.0(react@19.0.0)
+        version: 6.0.0(react@19.0.0)
       react-redux:
         specifier: 'catalog:'
         version: 9.2.0(@types/react@19.0.10)(react@19.0.0)(redux@5.0.1)
@@ -412,8 +412,8 @@ importers:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
       react-error-boundary:
-        specifier: ^5.0.0
-        version: 5.0.0(react@19.0.0)
+        specifier: ^6.0.0
+        version: 6.0.0(react@19.0.0)
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -1608,10 +1608,6 @@ packages:
 
   '@babel/runtime-corejs3@7.26.9':
     resolution: {integrity: sha512-5EVjbTegqN7RSJle6hMWYxO4voo4rI+9krITk+DWR+diJgGrjZjrIBnJhjrHYYQsFgI7j1w1QnrvV7YSKBfYGg==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/runtime@7.26.9':
-    resolution: {integrity: sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.28.2':
@@ -6384,8 +6380,8 @@ packages:
     peerDependencies:
       react: ^19.0.0
 
-  react-error-boundary@5.0.0:
-    resolution: {integrity: sha512-tnjAxG+IkpLephNcePNA7v6F/QpWLH8He65+DmedchDwg162JZqx4NmbXj0mlAYVVEd81OW7aFhmbsScYfiAFQ==}
+  react-error-boundary@6.0.0:
+    resolution: {integrity: sha512-gdlJjD7NWr0IfkPlaREN2d9uUZUlksrfOx7SX62VRerwXbMY6ftGCIZua1VG1aXFNOimhISsTq+Owp725b9SiA==}
     peerDependencies:
       react: '>=16.13.1'
 
@@ -8687,10 +8683,6 @@ snapshots:
   '@babel/runtime-corejs3@7.26.9':
     dependencies:
       core-js-pure: 3.35.0
-      regenerator-runtime: 0.14.1
-
-  '@babel/runtime@7.26.9':
-    dependencies:
       regenerator-runtime: 0.14.1
 
   '@babel/runtime@7.28.2': {}
@@ -14943,9 +14935,9 @@ snapshots:
       react: 19.0.0
       scheduler: 0.25.0
 
-  react-error-boundary@5.0.0(react@19.0.0):
+  react-error-boundary@6.0.0(react@19.0.0):
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.28.2
       react: 19.0.0
 
   react-fast-compare@3.2.2: {}

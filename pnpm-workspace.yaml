@@ -28,7 +28,7 @@ catalog:
   prettier: 3.6.2
   react: ^19.0.0
   react-dom: ^19.0.0
-  react-error-boundary: ^5.0.0
+  react-error-boundary: ^6.0.0
   react-redux: ^9.2.0
   redux: ^5.0.1
   rfc4648: ^1.5.4
