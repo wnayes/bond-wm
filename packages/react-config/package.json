@@ -27,15 +27,15 @@
     "@bond-wm/react-wallpaper": "workspace:^",
     "@bond-wm/shared": "workspace:^",
     "@vitejs/plugin-react": "^4.7.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-error-boundary": "^6.0.0",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@bond-wm/tsconfig": "workspace:^",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
     "typescript": "~5.9.2"
   }
 }
