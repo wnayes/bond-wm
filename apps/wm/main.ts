@@ -16,9 +16,11 @@ if (loggingEnabled()) {
   electronIpcLog(log);
 }
 
+// After electron 37 update, this seems to have helped prevent white desktop screen issues.
+app.commandLine.appendSwitch("disable-gpu");
+
 // Possibly could help with transparency?
 // app.commandLine.appendSwitch("enable-transparent-visuals");
-// app.commandLine.appendSwitch("disable-gpu");
 // app.disableHardwareAcceleration();
 
 // Quit when all windows are closed.
