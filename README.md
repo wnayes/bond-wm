@@ -41,6 +41,15 @@ To start the window manager:
 
 Substitute your own config package with the default one above as desired.
 
+To run code formatting and linting:
+
+    pnpm lint
+    pnpm prettier
+
+To run tests:
+
+    pnpm test
+
 ## License
 
 [MIT License](LICENSE.md)
