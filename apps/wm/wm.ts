@@ -670,16 +670,22 @@ export async function createServer(): Promise<IWindowManagerServer> {
     desktopBrowserHandles[handle] = index;
     screenIndexToDesktopId[index] = handle;
 
-    log("Created browser window", handle);
+    log("Created desktop browser window", handle);
 
     win.webContents.setWindowOpenHandler(onWindowOpen);
     win.webContents.addListener("did-create-window", onChildWindowCreated);
+    win.webContents.addListener("did-fail-load", (e, errorCode, errorDescription) => {
+      logError(`Desktop browser window ${handle} failed to load\n(${errorCode}) ${errorDescription}`);
+    });
 
     if (!desktopLocation) {
       throw new Error("Missing desktop config. Desktop windows cannot be created without a desktop plugin.");
     }
     const url = desktopLocation + "?screen=" + index;
+
+    log("Desktop browser window URL loading", handle, url);
     await win.loadURL(url);
+    log("Desktop browser window URL loaded", handle, url);
 
     const zoomLevel = win.webContents.getZoomLevel();
     if (zoomLevel !== 1) {
@@ -690,6 +696,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
     // win.webContents.openDevTools({ mode: "right" });
 
     win.on("closed", function () {
+      log("Desktop window closed", handle);
       desktopBrowsers[index] = null;
     });
 
