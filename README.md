@@ -23,7 +23,7 @@ The goal is to thoughtfully apply front-end technologies to the desktop. Today t
 
 ## Development
 
-This repository uses the pnpm package manager. [Install pnpm](https://pnpm.io/installation) >= 9.6 for your operating system.
+This repository uses the pnpm package manager. [Install pnpm](https://pnpm.io/installation) >= 10.14.0 for your operating system.
 
 To do prerequisite build steps:
 
