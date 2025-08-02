@@ -42,7 +42,7 @@ catalog:
   vite-node: ^3.2.4
   x11: ^2.3.0
   xdg-user-dir: ^0.0.1
-  yargs: ^17.7.2
+  yargs: ^18.0.0
 
 onlyBuiltDependencies:
   - core-js
