@@ -83,6 +83,7 @@ export function useNotifications() {
     return () => {
       // Clear all timeouts
       timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       timeoutRefs.current.clear();
     };
   }, [removeNotification]);

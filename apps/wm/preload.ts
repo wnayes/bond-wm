@@ -106,7 +106,7 @@ const electronWmApi: ElectronWMIPCInterface = {
 contextBridge.exposeInMainWorld("ElectronWM", electronWmApi);
 
 const notificationsApi = {
-  onNewNotification(callback: (notification: any) => void): void {
+  onNewNotification(callback: (notification: unknown) => void): void {
     ipcRenderer.on("notification:new", (event, notification) => {
       callback(notification);
     });

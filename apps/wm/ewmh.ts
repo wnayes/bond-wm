@@ -301,20 +301,22 @@ export async function createEWMHEventConsumer(
         break;
 
       case NetWmStateAction._NET_WM_STATE_TOGGLE:
-        const newMaximized = !win.maximized;
-        store.dispatch(setWindowMaximizedAction({ wid, maximized: newMaximized }));
-        // Update EWMH state accordingly
-        if (newMaximized) {
-          X.ChangeProperty(
-            XPropMode.Replace,
-            wid,
-            atoms._NET_WM_STATE,
-            X.atoms.ATOM,
-            32,
-            numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ])
-          );
-        } else {
-          updateWindowStateHints(wid);
+        {
+          const newMaximized = !win.maximized;
+          store.dispatch(setWindowMaximizedAction({ wid, maximized: newMaximized }));
+          // Update EWMH state accordingly
+          if (newMaximized) {
+            X.ChangeProperty(
+              XPropMode.Replace,
+              wid,
+              atoms._NET_WM_STATE,
+              X.atoms.ATOM,
+              32,
+              numsToBuffer([atoms._NET_WM_STATE_MAXIMIZED_VERT, atoms._NET_WM_STATE_MAXIMIZED_HORZ])
+            );
+          } else {
+            updateWindowStateHints(wid);
+          }
         }
         break;
     }
@@ -376,39 +378,41 @@ export async function createEWMHEventConsumer(
         break;
 
       case NetWmStateAction._NET_WM_STATE_TOGGLE:
-        const newMinimized = !win.minimized;
-        store.dispatch(setWindowMinimizedAction({ wid, minimized: newMinimized }));
-        // Set ICCCM WM_STATE appropriately first - use promise chain for proper order
-        if (newMinimized) {
-          setWindowIconicState(X, wid).then(() => {
-            // Update ICCCM and EWMH state accordingly
-            const toggleEventData = Buffer.alloc(32);
-            toggleEventData.writeUInt8(33, 0); // ClientMessage event type
-            toggleEventData.writeUInt8(32, 1); // Format (32-bit)
-            toggleEventData.writeUInt32LE(wid, 4); // Window ID
-            toggleEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
-            toggleEventData.writeUInt32LE(3, 12); // IconicState = 3
-            // Send to root window, not the window itself
-            X.SendEvent(rootWindow, false, 0x180000, toggleEventData); // SubstructureNotify|SubstructureRedirect
-            updateWindowStateHints(wid);
-            // Hide the window after setting states
-            windowManager.hideWindow(wid);
-          });
-        } else {
-          setWindowNormalState(X, wid).then(() => {
-            // Update ICCCM and EWMH state accordingly
-            const toggleEventData = Buffer.alloc(32);
-            toggleEventData.writeUInt8(33, 0); // ClientMessage event type
-            toggleEventData.writeUInt8(32, 1); // Format (32-bit)
-            toggleEventData.writeUInt32LE(wid, 4); // Window ID
-            toggleEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
-            toggleEventData.writeUInt32LE(1, 12); // NormalState = 1
-            // Send to root window, not the window itself
-            X.SendEvent(rootWindow, false, 0x180000, toggleEventData); // SubstructureNotify|SubstructureRedirect
-            updateWindowStateHints(wid);
-            // Show the window after setting states
-            windowManager.showWindow(wid);
-          });
+        {
+          const newMinimized = !win.minimized;
+          store.dispatch(setWindowMinimizedAction({ wid, minimized: newMinimized }));
+          // Set ICCCM WM_STATE appropriately first - use promise chain for proper order
+          if (newMinimized) {
+            setWindowIconicState(X, wid).then(() => {
+              // Update ICCCM and EWMH state accordingly
+              const toggleEventData = Buffer.alloc(32);
+              toggleEventData.writeUInt8(33, 0); // ClientMessage event type
+              toggleEventData.writeUInt8(32, 1); // Format (32-bit)
+              toggleEventData.writeUInt32LE(wid, 4); // Window ID
+              toggleEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
+              toggleEventData.writeUInt32LE(3, 12); // IconicState = 3
+              // Send to root window, not the window itself
+              X.SendEvent(rootWindow, false, 0x180000, toggleEventData); // SubstructureNotify|SubstructureRedirect
+              updateWindowStateHints(wid);
+              // Hide the window after setting states
+              windowManager.hideWindow(wid);
+            });
+          } else {
+            setWindowNormalState(X, wid).then(() => {
+              // Update ICCCM and EWMH state accordingly
+              const toggleEventData = Buffer.alloc(32);
+              toggleEventData.writeUInt8(33, 0); // ClientMessage event type
+              toggleEventData.writeUInt8(32, 1); // Format (32-bit)
+              toggleEventData.writeUInt32LE(wid, 4); // Window ID
+              toggleEventData.writeUInt32LE(ExtraAtoms.WM_CHANGE_STATE, 8); // Message type
+              toggleEventData.writeUInt32LE(1, 12); // NormalState = 1
+              // Send to root window, not the window itself
+              X.SendEvent(rootWindow, false, 0x180000, toggleEventData); // SubstructureNotify|SubstructureRedirect
+              updateWindowStateHints(wid);
+              // Show the window after setting states
+              windowManager.showWindow(wid);
+            });
+          }
         }
         break;
     }

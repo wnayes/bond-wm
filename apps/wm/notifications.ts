@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, ipcMain } from "electron";
 import * as dbus from "dbus-next";
 import { interface as dbusInterface, RequestNameReply, Variant } from "dbus-next";
 import { EventEmitter } from "events";
@@ -35,12 +35,11 @@ export const NotificationIPCMessages = {
 
 export class NotificationServer {
   private bus = dbus.sessionBus();
-  private notificationCounter = 1;
   private activeNotifications = new Map<number, Notification>();
   private notificationInterface: NotificationInterface;
-  private broadcastCallback: (channel: string, ...args: any[]) => void;
+  private broadcastCallback: (channel: string, ...args: unknown[]) => void;
 
-  constructor(broadcastCallback: (channel: string, ...args: any[]) => void) {
+  constructor(broadcastCallback: (channel: string, ...args: unknown[]) => void) {
     this.broadcastCallback = broadcastCallback;
 
     this.notificationInterface = new NotificationInterface(
@@ -90,13 +89,13 @@ export class NotificationServer {
     );
 
     // Handler for clearing all notifications
-    ipcMain.on(NotificationIPCMessages.ClearAllNotifications, (event) => {
+    ipcMain.on(NotificationIPCMessages.ClearAllNotifications, () => {
       this.activeNotifications.clear();
       this.broadcastToAllDesktops(NotificationIPCMessages.ClearAllNotifications);
     });
   }
 
-  private broadcastToAllDesktops(channel: string, ...args: any[]): void {
+  private broadcastToAllDesktops(channel: string, ...args: unknown[]): void {
     if (this.broadcastCallback) {
       this.broadcastCallback(channel, ...args);
     }
@@ -198,12 +197,12 @@ export class NotificationServer {
 class NotificationInterface extends dbusInterface.Interface {
   private notificationCounter = 1;
   public emitter: EventEmitter;
-  private bus: any; // Store the bus instance for signal emission
+  private bus: dbus.MessageBus; // Store the bus instance for signal emission
 
   constructor(
     private notifyCallback: (notification: Notification) => void,
     private parseActions: (actions: string[]) => NotificationAction[],
-    bus: any
+    bus: dbus.MessageBus
   ) {
     super("org.freedesktop.Notifications");
     this.bus = bus;
@@ -295,7 +294,7 @@ class NotificationInterface extends dbusInterface.Interface {
   }
 }
 
-(NotificationInterface as any).configureMembers({
+NotificationInterface.configureMembers({
   methods: {
     Notify: {
       inSignature: "susssasa{sv}i",

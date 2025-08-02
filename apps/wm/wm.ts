@@ -94,15 +94,7 @@ import { installSourcemapsSupport } from "vite-node/source-map";
 import { createEWMHEventConsumer, NetWmStateAction } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
-import {
-  createICCCMEventConsumer,
-  getNormalHints,
-  getWMClass,
-  getWMHints,
-  getWMTransientFor,
-  setWindowIconicState,
-  setWindowNormalState,
-} from "./icccm";
+import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
 import { createMotifModule, hasMotifDecorations } from "./motif";
 import { showContextMenu } from "./menus";
 import { setupAutocompleteListener } from "./autocomplete";
@@ -381,7 +373,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     // Initialize notification server
     if (desktopBrowsers.length > 0) {
-      const broadcastToAllDesktops = (channel: string, ...args: any[]) => {
+      const broadcastToAllDesktops = (channel: string, ...args: unknown[]) => {
         desktopBrowsers.forEach((browser) => {
           if (browser && !browser.isDestroyed()) {
             browser.webContents.send(channel, ...args);
