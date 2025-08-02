@@ -7,7 +7,7 @@ catalog:
   "@callstack/react-theme-provider": ^3.0.9
   "@eslint/js": ^9.32.0
   "@jest/globals": ^30.0.5
-  "@reduxjs/toolkit": ^2.6.1
+  "@reduxjs/toolkit": ^2.8.2
   "@types/node": ^22.13.9
   "@types/react": ^19.1.9
   "@types/react-dom": ^19.1.7
