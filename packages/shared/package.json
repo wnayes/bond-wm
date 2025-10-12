@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "catalog:",
-    "electron": "catalog:",
     "redux": "catalog:",
     "tslib": "catalog:",
     "x11": "catalog:",
