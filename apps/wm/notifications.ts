@@ -2,6 +2,7 @@ import { app, ipcMain } from "electron";
 import * as dbus from "dbus-next";
 import { interface as dbusInterface, RequestNameReply, Variant } from "dbus-next";
 import { EventEmitter } from "events";
+import { log, logError } from "./log";
 
 export interface Notification {
   id: number;
@@ -80,10 +81,10 @@ export class NotificationServer {
             this.activeNotifications.delete(data.notificationId);
             this.broadcastToAllDesktops(NotificationIPCMessages.CloseNotification, data.notificationId);
           } catch (error) {
-            console.error(`Error processing action:`, error);
+            logError(`Error processing action:`, error);
           }
         } else {
-          console.warn(`Notification ${data.notificationId} not found for action ${data.actionId}`);
+          logError(`Warning: Notification ${data.notificationId} not found for action ${data.actionId}`);
         }
       }
     );
@@ -114,10 +115,10 @@ export class NotificationServer {
         const cmd = `dbus-send --session --type=signal /org/freedesktop/Notifications org.freedesktop.Notifications.ActionInvoked uint32:${notificationId} string:"${actionId}"`;
         execSync(cmd);
       } catch (err) {
-        console.error(`Error sending signal via dbus-send:`, err);
+        logError(`Error sending signal via dbus-send:`, err);
       }
     } catch (error) {
-      console.error("Error emitting ActionInvoked signal:", error);
+      logError("Error emitting ActionInvoked signal:", error);
     }
   }
 
@@ -129,20 +130,20 @@ export class NotificationServer {
 
       this.notificationInterface.emitNotificationClosed(notificationId, reason);
     } catch (error) {
-      console.warn("Error emitting NotificationClosed signal:", error);
+      logError("Warning: Error emitting NotificationClosed signal:", error);
     }
   }
 
   public async start(): Promise<void> {
     try {
-      console.log("🚀 Starting notification server...");
+      log("Starting notification server...");
 
       const dbusObj = await this.bus.getProxyObject("org.freedesktop.DBus", "/org/freedesktop/DBus");
       const dbusInterface = dbusObj.getInterface("org.freedesktop.DBus");
       const names = await dbusInterface.ListNames();
 
       if (names.includes("org.freedesktop.Notifications")) {
-        console.log("⚠️ Notification service already running");
+        log("Notification service already running");
         return;
       }
 
@@ -151,23 +152,23 @@ export class NotificationServer {
       const result = await this.bus.requestName("org.freedesktop.Notifications", 0x4);
 
       if (result === RequestNameReply.PRIMARY_OWNER) {
-        console.log("Notification service registered successfully");
+        log("Notification service registered successfully");
 
         // Test signal emission to verify functionality
         setTimeout(() => {
-          console.log(" Testing D-Bus signal emission...");
+          log(" Testing D-Bus signal emission...");
           try {
             this.emitActionInvoked(999, "test-action");
             this.emitNotificationClosed(999, 1);
           } catch (error) {
-            console.error("Error in signal test:", error);
+            logError("Error in signal test:", error);
           }
         }, 2000);
       } else {
-        console.warn("Could not register service. Code:", result);
+        logError("Warning: Could not register service. Code:", result);
       }
     } catch (error) {
-      console.error("Error starting DBus server:", error);
+      logError("Error starting DBus server:", error);
     }
   }
 
@@ -280,7 +281,7 @@ class NotificationInterface extends dbusInterface.Interface {
   }
 
   CloseNotification(id: number): void {
-    console.log(`D-Bus call to CloseNotification for ID: ${id}`);
+    log(`D-Bus call to CloseNotification for ID: ${id}`);
     // Note: Actual closing will be handled via IPC or timeout
     // The client application already knows the notification was closed
   }
