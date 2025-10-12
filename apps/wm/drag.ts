@@ -1,7 +1,6 @@
 import {
   configureWindowAction,
   endDragAction,
-  LayoutPluginConfig,
   setWindowIntoScreenAction,
   startDragAction,
   XWMWindowType,
@@ -28,10 +27,13 @@ export interface DragModule extends IXWMEventConsumer {
   endMoveResize(wid: number): void;
 }
 
-export async function createDragModule(
-  { X, store, getFrameIdFromWindowId, getWindowIdFromFrameId }: XWMContext,
-  getLayoutPlugins: (screenIndex: number) => readonly LayoutPluginConfig[] | undefined
-): Promise<DragModule> {
+export async function createDragModule({
+  X,
+  store,
+  getFrameIdFromWindowId,
+  getWindowIdFromFrameId,
+  getLayoutPlugins,
+}: XWMContext): Promise<DragModule> {
   function endMoveResize(wid: number): void {
     const state = store.getState();
     const win = state.windows[wid];

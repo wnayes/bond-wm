@@ -1,6 +1,9 @@
 import {
   WindowType,
   XWMWindowType,
+  selectWindowMaximizeCanTakeEffect,
+  selectWindowsFromTag,
+  setTagCurrentLayoutAction,
   setWindowAlwaysOnTopAction,
   setWindowFullscreenAction,
   setWindowUrgentAction,
@@ -75,7 +78,7 @@ export interface EWMHModule extends IXWMEventConsumer {
 }
 
 export async function createEWMHEventConsumer(
-  { X, store, wmServer, getWindowIdFromFrameId }: XWMContext,
+  { X, store, wmServer, getWindowIdFromFrameId, getLayoutPlugins }: XWMContext,
   dragModule: DragModule
 ): Promise<EWMHModule> {
   const atoms = {
@@ -93,6 +96,18 @@ export async function createEWMHEventConsumer(
     _NET_WM_STATE_MAXIMIZED_VERT: await internAtomAsync(X, "_NET_WM_STATE_MAXIMIZED_VERT"),
     _NET_WM_STATE_MAXIMIZED_HORZ: await internAtomAsync(X, "_NET_WM_STATE_MAXIMIZED_HORZ"),
     _NET_WM_STATE_HIDDEN: await internAtomAsync(X, "_NET_WM_STATE_HIDDEN"),
+
+    _NET_WM_ALLOWED_ACTIONS: await internAtomAsync(X, "_NET_WM_ALLOWED_ACTIONS"),
+    _NET_WM_ACTION_MOVE: await internAtomAsync(X, "_NET_WM_ACTION_MOVE"),
+    _NET_WM_ACTION_RESIZE: await internAtomAsync(X, "_NET_WM_ACTION_RESIZE"),
+    _NET_WM_ACTION_MINIMIZE: await internAtomAsync(X, "_NET_WM_ACTION_MINIMIZE"),
+    _NET_WM_ACTION_SHADE: await internAtomAsync(X, "_NET_WM_ACTION_SHADE"),
+    _NET_WM_ACTION_STICK: await internAtomAsync(X, "_NET_WM_ACTION_STICK"),
+    _NET_WM_ACTION_MAXIMIZE_HORZ: await internAtomAsync(X, "_NET_WM_ACTION_MAXIMIZE_HORZ"),
+    _NET_WM_ACTION_MAXIMIZE_VERT: await internAtomAsync(X, "_NET_WM_ACTION_MAXIMIZE_VERT"),
+    _NET_WM_ACTION_FULLSCREEN: await internAtomAsync(X, "_NET_WM_ACTION_FULLSCREEN"),
+    _NET_WM_ACTION_CHANGE_DESKTOP: await internAtomAsync(X, "_NET_WM_ACTION_CHANGE_DESKTOP"),
+    _NET_WM_ACTION_CLOSE: await internAtomAsync(X, "_NET_WM_ACTION_CLOSE"),
 
     _NET_WM_WINDOW_TYPE: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE"),
     _NET_WM_WINDOW_TYPE_DESKTOP: await internAtomAsync(X, "_NET_WM_WINDOW_TYPE_DESKTOP"),
@@ -148,6 +163,46 @@ export async function createEWMHEventConsumer(
     X.DeleteProperty(wid, atoms._NET_WM_STATE, (err) => {
       if (err) {
         log("Could not delete _NET_WM_STATE");
+      }
+    });
+  }
+
+  function updateWindowAllowedActions(wid: number): void {
+    const state = store.getState();
+    const win = state.windows[wid];
+    if (!win) {
+      return;
+    }
+
+    const actionAtoms: number[] = [
+      atoms._NET_WM_ACTION_MOVE,
+      atoms._NET_WM_ACTION_RESIZE,
+      atoms._NET_WM_ACTION_MINIMIZE,
+      atoms._NET_WM_ACTION_FULLSCREEN,
+      atoms._NET_WM_ACTION_CHANGE_DESKTOP,
+      atoms._NET_WM_ACTION_CLOSE,
+    ];
+
+    const canMaximize = selectWindowMaximizeCanTakeEffect(state, getLayoutPlugins(win.screenIndex), wid);
+    if (canMaximize) {
+      actionAtoms.push(atoms._NET_WM_ACTION_MAXIMIZE_HORZ);
+      actionAtoms.push(atoms._NET_WM_ACTION_MAXIMIZE_VERT);
+    }
+
+    X.ChangeProperty(
+      XPropMode.Replace,
+      wid,
+      atoms._NET_WM_ALLOWED_ACTIONS,
+      X.atoms.ATOM,
+      32,
+      numsToBuffer(actionAtoms)
+    );
+  }
+
+  function removeWindowAllowedActions(wid: number): void {
+    X.DeleteProperty(wid, atoms._NET_WM_ALLOWED_ACTIONS, (err) => {
+      if (err) {
+        log("Could not delete _NET_WM_ALLOWED_ACTIONS");
       }
     });
   }
@@ -440,12 +495,14 @@ export async function createEWMHEventConsumer(
     onMapNotify({ wid, windowType }) {
       if (windowType === XWMWindowType.Client) {
         updateWindowStateHints(wid);
+        updateWindowAllowedActions(wid);
       }
     },
 
     onUnmapNotify({ wid, windowType }) {
       if (windowType === XWMWindowType.Client) {
         removeWindowStateHints(wid);
+        removeWindowAllowedActions(wid);
       }
     },
 
@@ -469,6 +526,15 @@ export async function createEWMHEventConsumer(
       extentsInts.writeInt32LE(frameExtents.bottom, 12);
 
       X.ChangeProperty(XPropMode.Replace, wid, atoms._NET_FRAME_EXTENTS, X.atoms.CARDINAL, 32, extentsInts);
+    },
+
+    onReduxAction({ action, getState }) {
+      if (setTagCurrentLayoutAction.match(action)) {
+        // Certain layouts may not allow certain window actions (e.g. maximize).
+        for (const win of selectWindowsFromTag(getState(), action.payload.screenIndex, action.payload.tag)) {
+          updateWindowAllowedActions(win.id);
+        }
+      }
     },
 
     async getNetWmType(wid: number): Promise<WindowType | null> {

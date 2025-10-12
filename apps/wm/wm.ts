@@ -204,6 +204,7 @@ export interface XWMContext {
 
   getWindowIdFromFrameId(wid: number): number | undefined;
   getFrameIdFromWindowId(wid: number): number | undefined;
+  getLayoutPlugins(screenIndex: number): readonly LayoutPluginConfig[] | undefined;
 }
 
 export function startWindowManager(): Promise<IWindowManagerServer> {
@@ -347,10 +348,11 @@ export async function createServer(): Promise<IWindowManagerServer> {
       wmServer,
       getWindowIdFromFrameId,
       getFrameIdFromWindowId,
+      getLayoutPlugins: (screenIndex) => layoutsByScreen.get(screenIndex),
     };
 
     desktopEntriesModule = await createDesktopEntriesModule(context);
-    dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
+    dragModule = await createDragModule(context);
     eventConsumers.push(dragModule);
     eventConsumers.push(await createICCCMEventConsumer(context));
     ewmhModule = await createEWMHEventConsumer(context, dragModule);
