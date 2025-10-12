@@ -33,14 +33,6 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
     });
   }
 
-  function setWindowIconicState(wid: number): void {
-    updateWindowState(wid, WMStateValue.IconicState);
-  }
-
-  function setWindowNormalState(wid: number): void {
-    updateWindowState(wid, WMStateValue.NormalState);
-  }
-
   return {
     onMapNotify({ wid, windowType }) {
       if (windowType === XWMWindowType.Client) {
