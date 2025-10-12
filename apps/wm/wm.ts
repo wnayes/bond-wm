@@ -91,7 +91,7 @@ import { ViteDevServer, createServer as createViteServer } from "vite";
 import { ViteNodeServer } from "vite-node/server";
 import { ViteNodeRunner } from "vite-node/client";
 import { installSourcemapsSupport } from "vite-node/source-map";
-import { createEWMHEventConsumer, NetWmStateAction } from "./ewmh";
+import { createEWMHEventConsumer } from "./ewmh";
 import { changeWindowEventMask, getPropertyValue, internAtomAsync } from "./xutils";
 import { getScreenIndexWithCursor, queryPointer } from "./pointer";
 import { createICCCMEventConsumer, getNormalHints, getWMClass, getWMHints, getWMTransientFor } from "./icccm";
@@ -121,7 +121,6 @@ export const ExtraAtoms = {
 
   WM_PROTOCOLS: 10000,
   WM_DELETE_WINDOW: 10001,
-  WM_CHANGE_STATE: 10002,
 
   _NET_WM_NAME: 340,
 };
@@ -191,6 +190,9 @@ export interface IXWMEventConsumer {
   onButtonRelease?(args: XWMEventConsumerArgsWithType): void;
   onKeyPress?(args: XWMEventConsumerKeyPressArgs): boolean;
 
+  onMinimize?(args: XWMEventConsumerArgsWithType): void;
+  onMaximize?(args: XWMEventConsumerArgsWithType): void;
+  onRestore?(args: XWMEventConsumerArgsWithType): void;
   onSetFrameExtents?(args: XWMEventConsumerSetFrameExtentsArgs): void;
 }
 
@@ -304,6 +306,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     closeFocusedWindow,
     launchProcess,
+    minimizeWindow,
+    maximizeWindow,
+    restoreWindow,
 
     registerShortcuts: (registrationMap: KeyRegistrationMap) => {
       const screens = store.getState().screens;
@@ -348,10 +353,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
     dragModule = await createDragModule(context, (screenIndex) => layoutsByScreen.get(screenIndex));
     eventConsumers.push(dragModule);
     eventConsumers.push(await createICCCMEventConsumer(context));
-    ewmhModule = await createEWMHEventConsumer(context, dragModule, {
-      hideWindow,
-      showWindow,
-    });
+    ewmhModule = await createEWMHEventConsumer(context, dragModule);
     eventConsumers.push(ewmhModule);
     eventConsumers.push(await createTrayEventConsumer(context));
 
@@ -396,15 +398,15 @@ export async function createServer(): Promise<IWindowManagerServer> {
   });
 
   ipcMain.on(IPCMessages.MinimizeWindow, (event, wid) => {
-    minimize(wid);
+    minimizeWindow(wid);
   });
 
   ipcMain.on(IPCMessages.MaximizeWindow, (event, wid) => {
-    maximize(wid);
+    maximizeWindow(wid);
   });
 
   ipcMain.on(IPCMessages.RestoreWindow, (event, wid) => {
-    restore(wid);
+    restoreWindow(wid);
   });
 
   ipcMain.on(IPCMessages.CloseWindow, (event, wid) => {
@@ -532,7 +534,6 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     extraAtoms.WM_PROTOCOLS = (await internAtomAsync(X, "WM_PROTOCOLS")) as any;
     extraAtoms.WM_DELETE_WINDOW = (await internAtomAsync(X, "WM_DELETE_WINDOW")) as any;
-    extraAtoms.WM_CHANGE_STATE = (await internAtomAsync(X, "WM_CHANGE_STATE")) as any;
 
     extraAtoms._NET_WM_NAME = (await internAtomAsync(X, "_NET_WM_NAME")) as any;
 
@@ -1695,6 +1696,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
     }
 
     const win = getWinFromStore(wid);
+    if (win?.minimized) {
+      setWindowMinimized(wid, false);
+    }
     if (win?.visible === false) {
       store.dispatch(setWindowVisibleAction({ wid, visible: true }));
     }
@@ -1736,7 +1740,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
     if (!win.visible || win.minimized) {
       // If window is minimized, use proper restore sequence
       if (win.minimized) {
-        ewmhModule.triggerMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+        restoreWindow(wid);
       } else {
         showWindow(wid);
       }
@@ -1769,25 +1773,16 @@ export async function createServer(): Promise<IWindowManagerServer> {
     }
   }
 
-  function minimize(wid: number): void {
+  function minimizeWindow(wid: number): void {
     widLog(wid, "minimize");
-    ewmhModule.triggerMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_ADD);
-  }
 
-  function maximize(wid: number): void {
-    widLog(wid, "maximize");
-    ewmhModule.triggerMaximizeChange(wid, NetWmStateAction._NET_WM_STATE_ADD);
-  }
-
-  function restore(wid: number): void {
-    widLog(wid, "restore");
     const win = getWinFromStore(wid);
-    if (win?.minimized) {
-      ewmhModule.triggerMinimizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
+    if (!win || win.minimized) {
+      return;
     }
-    if (win?.maximized) {
-      ewmhModule.triggerMaximizeChange(wid, NetWmStateAction._NET_WM_STATE_REMOVE);
-    }
+
+    setWindowMinimized(wid, true);
+    hideWindow(wid);
   }
 
   function setWindowMinimized(wid: number, minimized: boolean): void {
@@ -1798,7 +1793,27 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     if (win.minimized !== minimized) {
       store.dispatch(setWindowMinimizedAction({ wid, minimized }));
+
+      if (minimized) {
+        eventConsumers.forEach((consumer) =>
+          consumer.onMinimize?.({
+            wid,
+            windowType: getWindowType(wid),
+          })
+        );
+      }
     }
+  }
+
+  function maximizeWindow(wid: number): void {
+    widLog(wid, "maximize");
+
+    const win = getWinFromStore(wid);
+    if (!win || win.maximized) {
+      return;
+    }
+
+    setWindowMaximized(wid, true);
   }
 
   function setWindowMaximized(wid: number, maximized: boolean): void {
@@ -1809,7 +1824,41 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     if (win.maximized !== maximized) {
       store.dispatch(setWindowMaximizedAction({ wid, maximized }));
+
+      if (maximized) {
+        store.dispatch(setWindowMaximizedAction({ wid, maximized: true }));
+
+        eventConsumers.forEach((consumer) =>
+          consumer.onMaximize?.({
+            wid,
+            windowType: getWindowType(wid),
+          })
+        );
+      }
     }
+  }
+
+  function restoreWindow(wid: number): void {
+    widLog(wid, "restore");
+
+    const win = getWinFromStore(wid);
+    if (!win || (!win.maximized && !win.minimized)) {
+      return;
+    }
+
+    if (win.visible && win.maximized) {
+      store.dispatch(setWindowMaximizedAction({ wid, maximized: false }));
+    } else if (win.minimized) {
+      store.dispatch(setWindowMinimizedAction({ wid, minimized: false }));
+      showWindow(wid);
+    }
+
+    eventConsumers.forEach((consumer) =>
+      consumer.onRestore?.({
+        wid,
+        windowType: getWindowType(wid),
+      })
+    );
   }
 
   function setFocus(wid: number): void {

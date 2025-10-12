@@ -32,6 +32,9 @@ export interface IWindowManagerServer {
 
   closeFocusedWindow(): void;
   launchProcess(command: string): void;
+  minimizeWindow(wid: number): void;
+  maximizeWindow(wid: number): void;
+  restoreWindow(wid: number): void;
   registerShortcuts(registeredKeys: KeyRegistrationMap): void;
   sendActiveWindowToNextScreen(): void;
   sendActiveWindowToTag(tagIndex: number): void;

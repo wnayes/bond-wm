@@ -12,9 +12,10 @@ enum WMStateValue {
 const SIZEOF_WMHints = 32;
 const SIZEOF_WMSizeHints = 72;
 
-export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWMEventConsumer> {
+export async function createICCCMEventConsumer({ X, wmServer }: XWMContext): Promise<IXWMEventConsumer> {
   const atoms = {
     WM_STATE: await internAtomAsync(X, "WM_STATE"),
+    WM_CHANGE_STATE: await internAtomAsync(X, "WM_CHANGE_STATE"),
   };
 
   function updateWindowState(wid: number, state: WMStateValue = WMStateValue.NormalState): void {
@@ -43,6 +44,32 @@ export async function createICCCMEventConsumer({ X }: XWMContext): Promise<IXWME
     onUnmapNotify({ wid, windowType }) {
       if (windowType === XWMWindowType.Client) {
         removeWindowState(wid);
+      }
+    },
+
+    onMinimize({ wid }) {
+      updateWindowState(wid, WMStateValue.IconicState);
+    },
+
+    onRestore({ wid }) {
+      updateWindowState(wid, WMStateValue.NormalState);
+    },
+
+    onClientMessage({ wid, data, messageType, windowType }) {
+      if (windowType !== XWMWindowType.Client) {
+        return;
+      }
+
+      if (messageType === atoms.WM_CHANGE_STATE) {
+        const stateValue = data[0] as WMStateValue;
+        switch (stateValue) {
+          case WMStateValue.IconicState:
+            wmServer.minimizeWindow(wid);
+            break;
+          case WMStateValue.NormalState:
+            wmServer.restoreWindow(wid);
+            break;
+        }
       }
     },
   };
@@ -113,28 +140,4 @@ export async function getNormalHints(X: IXClient, wid: number): Promise<WMSizeHi
     gravity: data.readInt32LE(68),
   };
   return hints;
-}
-
-export async function setWindowIconicState(X: IXClient, wid: number): Promise<void> {
-  const atoms = {
-    WM_STATE: await internAtomAsync(X, "WM_STATE"),
-  };
-
-  const wmStateBuffer = Buffer.alloc(8);
-  wmStateBuffer.writeUInt32LE(WMStateValue.IconicState, 0);
-  wmStateBuffer.writeUInt32LE(0, 4); // icon
-
-  X.ChangeProperty(XPropMode.Replace, wid, atoms.WM_STATE, atoms.WM_STATE, 32, wmStateBuffer);
-}
-
-export async function setWindowNormalState(X: IXClient, wid: number): Promise<void> {
-  const atoms = {
-    WM_STATE: await internAtomAsync(X, "WM_STATE"),
-  };
-
-  const wmStateBuffer = Buffer.alloc(8);
-  wmStateBuffer.writeUInt32LE(WMStateValue.NormalState, 0);
-  wmStateBuffer.writeUInt32LE(0, 4); // icon
-
-  X.ChangeProperty(XPropMode.Replace, wid, atoms.WM_STATE, atoms.WM_STATE, 32, wmStateBuffer);
 }
