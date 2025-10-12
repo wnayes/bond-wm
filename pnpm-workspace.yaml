@@ -9,8 +9,8 @@ catalog:
   "@jest/globals": ^30.0.5
   "@reduxjs/toolkit": ^2.8.2
   "@types/node": ^22.13.9
-  "@types/react": ^19.1.9
-  "@types/react-dom": ^19.1.7
+  "@types/react": ^19.2.2
+  "@types/react-dom": ^19.2.1
   "@types/yargs": ^17.0.33
   "@typescript-eslint/eslint-plugin": ^8.41.0
   "@typescript-eslint/parser": ^8.41.0
@@ -20,14 +20,14 @@ catalog:
   esbuild: ^0.25.8
   eslint: ^9.34.0
   eslint-plugin-prettier: ^5.5.4
-  eslint-plugin-react-hooks: ^5.2.0
+  eslint-plugin-react-hooks: ^7.0.0
   freedesktop-desktop-entry: ^1.0.0
   freedesktop-icons: ^1.0.0
   globals: ^16.3.0
   jest: ^30.0.5
   prettier: 3.6.2
-  react: ^19.1.1
-  react-dom: ^19.1.1
+  react: ^19.2.0
+  react-dom: ^19.2.0
   react-error-boundary: ^6.0.0
   react-redux: ^9.2.0
   redux: ^5.0.1
