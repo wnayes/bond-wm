@@ -142,6 +142,11 @@ export function newHeightForWindow(win: IWindow, desiredHeight: number): number 
   return Math.max(getWindowMinHeight(win), Math.min(getWindowMaxHeight(win), desiredHeight));
 }
 
+/** Tests if a window has any frame extents defined. */
+export function hasAnyFrameExtents(win: Partial<IWindow>): win is Partial<IWindow> & { frameExtents: IBounds } {
+  return !!(win.frameExtents?.top || win.frameExtents?.left || win.frameExtents?.right || win.frameExtents?.bottom);
+}
+
 export function isUrgent(win: IWindow): boolean {
   if (typeof win.urgent === "boolean") {
     return win.urgent;

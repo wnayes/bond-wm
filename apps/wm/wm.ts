@@ -81,6 +81,7 @@ import {
   IWindow,
   windowAcceptsFocus,
   switchToNextLayout,
+  hasAnyFrameExtents,
 } from "@bond-wm/shared";
 import { spawn } from "child_process";
 import { AsyncReturnType, Writable } from "type-fest";
@@ -964,15 +965,17 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     if (shouldCreateFrame(wid, clientGeom)) {
       const initialGeometry = getInitialGeometryForWindow(clientGeom, normalHints);
+      const initialFrameExtents = lastFrameExtents ?? { top: 0, left: 0, right: 0, bottom: 0 };
 
       const win: Partial<IWindow> = {
         outer: {
-          x: initialGeometry.x,
-          y: initialGeometry.y,
-          width: initialGeometry.width,
-          height: initialGeometry.height,
+          // Client geometry comes from X as inner size; store outer geometry (frame-inclusive).
+          x: initialGeometry.x - initialFrameExtents.left,
+          y: initialGeometry.y - initialFrameExtents.top,
+          width: initialGeometry.width + initialFrameExtents.left + initialFrameExtents.right,
+          height: initialGeometry.height + initialFrameExtents.top + initialFrameExtents.bottom,
         },
-        frameExtents: lastFrameExtents,
+        frameExtents: initialFrameExtents,
         visible: true,
         type: winType ?? WindowType.Normal,
         transientFor,
@@ -1016,7 +1019,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
       winIdToRootId[fid] = screen.root;
 
       X.ReparentWindow(fid, screen.root, frameX, frameY);
-      X.ReparentWindow(wid, fid, lastFrameExtents?.left || 0, lastFrameExtents?.top || 0);
+      X.ReparentWindow(wid, fid, win.frameExtents?.left || 0, win.frameExtents?.top || 0);
 
       X.GrabServer();
 
@@ -1034,8 +1037,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
       });
       X.ConfigureWindow(wid, { borderWidth: 0 });
 
-      if (lastFrameExtents) {
-        eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents: lastFrameExtents! }));
+      if (hasAnyFrameExtents(win)) {
+        eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents: win.frameExtents }));
       }
 
       store.dispatch(addWindowAction({ wid, ...win }));
@@ -1287,10 +1290,16 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
       // ev.x|y is absolute, but our state is relative to the screen.
       if (mask & CWMaskBits.CWX) {
-        config.x! -= screen.x;
+        config.x = config.x! - screen.x - win.frameExtents.left;
       }
       if (mask & CWMaskBits.CWY) {
-        config.y! -= screen.y;
+        config.y = config.y! - screen.y - win.frameExtents.top;
+      }
+      if (mask & CWMaskBits.CWWidth) {
+        config.width = config.width! + win.frameExtents.left + win.frameExtents.right;
+      }
+      if (mask & CWMaskBits.CWHeight) {
+        config.height = config.height! + win.frameExtents.top + win.frameExtents.bottom;
       }
 
       if (Object.keys(config).length > 0) {
@@ -2161,6 +2170,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     const x11Middleware: Middleware<UnknownAction, ServerRootState> = function ({ getState }) {
       return (next) => (action) => {
+        const prevWin =
+          isAction(action) && setFrameExtentsAction.match(action) ? getState().windows[action.payload.wid] : undefined;
         const returnValue = next(action);
 
         if (!isAction(action)) {
@@ -2215,7 +2226,9 @@ export async function createServer(): Promise<IWindowManagerServer> {
           const state = getState();
           const wid = action.payload.wid;
           const win = state.windows[wid];
-          const { width, height } = win.outer;
+          if (!win || !prevWin) {
+            return returnValue;
+          }
           const frameExtents = {
             left: action.payload.left,
             right: action.payload.right,
@@ -2224,11 +2237,25 @@ export async function createServer(): Promise<IWindowManagerServer> {
           };
           lastFrameExtents = frameExtents;
 
+          const prevClientWidth = prevWin.outer.width - prevWin.frameExtents.left - prevWin.frameExtents.right;
+          const prevClientHeight = prevWin.outer.height - prevWin.frameExtents.top - prevWin.frameExtents.bottom;
+          const nextOuter = {
+            x: prevWin.outer.x + prevWin.frameExtents.left - frameExtents.left,
+            y: prevWin.outer.y + prevWin.frameExtents.top - frameExtents.top,
+            width: prevClientWidth + frameExtents.left + frameExtents.right,
+            height: prevClientHeight + frameExtents.top + frameExtents.bottom,
+          };
+
+          if (geometriesDiffer(prevWin.outer, nextOuter)) {
+            // Keep the same client geometry while frame extents settle (first-window correctness).
+            store.dispatch(configureWindowAction({ wid, ...nextOuter }));
+          }
+
           X.ConfigureWindow(wid, {
             x: frameExtents.left,
             y: frameExtents.top,
-            width: width - frameExtents.left - frameExtents.right,
-            height: height - frameExtents.top - frameExtents.bottom,
+            width: prevClientWidth,
+            height: prevClientHeight,
           });
 
           eventConsumers.forEach((consumer) => consumer.onSetFrameExtents?.({ wid, frameExtents }));
