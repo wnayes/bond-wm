@@ -34,5 +34,5 @@
       "@particle/dbus-next": "patches/@particle__dbus-next.patch"
     }
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.28.2"
 }
