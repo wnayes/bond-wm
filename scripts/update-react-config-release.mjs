@@ -13,6 +13,7 @@
 import * as ChildProcess from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getPnpmCatalogDependencies } from "./get-pnpm-catalog-dependencies.mjs";
 
 const PackageFolder = join(process.cwd(), "./packages/react-config");
 const BranchesFolder = "./.branches";
@@ -81,7 +82,14 @@ const checkoutPackageJson = JSON.parse(readFileSync(CheckoutPackageJsonPath));
 
 const workspacePackageVersions = getWorkspacePackageVersions();
 
+const PnpmWorkspacePath = join(process.cwd(), "pnpm-workspace.yaml");
+const catalogDependencies = getPnpmCatalogDependencies(PnpmWorkspacePath);
+
 function replaceWorkspaceDependencies(collectionName) {
+  if (!checkoutPackageJson[collectionName]) {
+    return;
+  }
+
   for (const depName in checkoutPackageJson[collectionName]) {
     if (checkoutPackageJson[collectionName][depName] === "workspace:^") {
       if (depName in workspacePackageVersions) {
@@ -93,9 +101,28 @@ function replaceWorkspaceDependencies(collectionName) {
   }
 }
 
+function replaceCatalogDependencies(collectionName) {
+  if (!checkoutPackageJson[collectionName]) {
+    return;
+  }
+
+  for (const depName in checkoutPackageJson[collectionName]) {
+    if (checkoutPackageJson[collectionName][depName] === "catalog:") {
+      if (catalogDependencies.has(depName)) {
+        checkoutPackageJson[collectionName][depName] = catalogDependencies.get(depName);
+      } else {
+        console.error(`Catalog dependency ${depName} was unrecognized`);
+      }
+    }
+  }
+}
+
 replaceWorkspaceDependencies("dependencies");
 replaceWorkspaceDependencies("devDependencies");
 replaceWorkspaceDependencies("peerDependencies");
+replaceCatalogDependencies("dependencies");
+replaceCatalogDependencies("devDependencies");
+replaceCatalogDependencies("peerDependencies");
 
 const newCheckoutPackageJson = JSON.stringify(checkoutPackageJson, undefined, 2);
 writeFileSync(CheckoutPackageJsonPath, newCheckoutPackageJson, "utf-8");
