@@ -1,7 +1,8 @@
 import { app, ipcMain } from "electron";
-import * as dbus from "dbus-next";
-import { interface as dbusInterface, RequestNameReply, Variant } from "dbus-next";
-import { EventEmitter } from "events";
+import { execSync } from "node:child_process";
+import { EventEmitter } from "node:events";
+import * as dbus from "@particle/dbus-next";
+import { interface as dbusInterface, RequestNameReply, Variant, Message } from "@particle/dbus-next";
 import { log, logError } from "./log";
 
 export interface Notification {
@@ -111,7 +112,6 @@ export class NotificationServer {
       this.notificationInterface.emitActionInvoked(notificationId, actionId);
 
       try {
-        const { execSync } = require("child_process");
         const cmd = `dbus-send --session --type=signal /org/freedesktop/Notifications org.freedesktop.Notifications.ActionInvoked uint32:${notificationId} string:"${actionId}"`;
         execSync(cmd);
       } catch (err) {
@@ -213,7 +213,6 @@ class NotificationInterface extends dbusInterface.Interface {
   // Methods to emit signals directly
   emitActionInvoked(notificationId: number, actionId: string): void {
     //  Send signal message directly via bus
-    const { Message } = require("dbus-next");
     const signalMessage = new Message({
       type: dbus.MessageType.SIGNAL,
       path: "/org/freedesktop/Notifications",
@@ -234,7 +233,6 @@ class NotificationInterface extends dbusInterface.Interface {
 
   emitNotificationClosed(notificationId: number, reason: number): void {
     // Send signal message directly via bus
-    const { Message } = require("dbus-next");
     const signalMessage = new Message({
       type: dbus.MessageType.SIGNAL,
       path: "/org/freedesktop/Notifications",
