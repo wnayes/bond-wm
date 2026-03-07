@@ -29,6 +29,9 @@
   "pnpm": {
     "overrides": {
       "redux": "^5.0.0"
+    },
+    "patchedDependencies": {
+      "@particle/dbus-next": "patches/@particle__dbus-next.patch"
     }
   },
   "packageManager": "pnpm@10.14.0"

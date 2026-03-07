@@ -127,6 +127,11 @@ catalogs:
 overrides:
   redux: ^5.0.0
 
+patchedDependencies:
+  '@particle/dbus-next':
+    hash: 8056e33a4a2198955449edabf1e8029309e4bc49a691af3794534762089b227d
+    path: patches/@particle__dbus-next.patch
+
 importers:
 
   .:
@@ -178,7 +183,7 @@ importers:
         version: link:../../packages/tsconfig
       '@particle/dbus-next':
         specifier: 'catalog:'
-        version: 0.11.4
+        version: 0.11.4(patch_hash=8056e33a4a2198955449edabf1e8029309e4bc49a691af3794534762089b227d)
       '@reduxjs/toolkit':
         specifier: 'catalog:'
         version: 2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.4)(redux@5.0.1))(react@19.2.4)
@@ -10251,7 +10256,7 @@ snapshots:
 
   '@nornagon/put@0.0.8': {}
 
-  '@particle/dbus-next@0.11.4':
+  '@particle/dbus-next@0.11.4(patch_hash=8056e33a4a2198955449edabf1e8029309e4bc49a691af3794534762089b227d)':
     dependencies:
       '@nornagon/put': 0.0.8
       event-stream: 4.0.1

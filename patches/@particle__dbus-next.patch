@@ -1,0 +1,28 @@
+diff --git a/types.d.ts b/types.d.ts
+index ab5121e43fc8bdfe19f520c00190626f3f6d9f28..071d51ebcf3215d448e823af45aa509145636b21 100644
+--- a/types.d.ts
++++ b/types.d.ts
+@@ -118,7 +118,7 @@ declare module '@particle/dbus-next' {
+         export(path: ObjectPath, interface: interface.Interface): void;
+         unexport(path: ObjectPath, interface: interface.Interface): void;
+ 
+-        requestName(name: string, flags: number = 0): Promise<number>;
++        requestName(name: string, flags?: number): Promise<number>;
+         releaseName(name: string): Promise<number>;
+ 
+         newSerial(): number;
+@@ -141,13 +141,8 @@ declare module '@particle/dbus-next' {
+         getInterface(name: string): ClientInterface;
+         getInterface<T extends ClientInterface>(name: string): T;
+     }
+-    interface ClientEvents {
+-        PropertiesChanged: (iface: string, changed: Record<string, Variant>, invalided: string[]) => void;
+-        [key: string]: (...args: any[]) => void
+-    }
+     export interface ClientInterface extends EventEmitter {
+-        on<K extends keyof ClientEvents>(event: K, listener: ClientEvents[K]): this;
+-        [name: string]: <T = any>(...args: any[]) => Promise<T>;
++        [name: string]: Function;
+     }
+ 
+     export type AuthMethod = 'EXTERNAL' | 'DBUS_COOKIE_SHA1' | 'ANONYMOUS';
