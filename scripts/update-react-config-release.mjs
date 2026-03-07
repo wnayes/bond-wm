@@ -57,7 +57,7 @@ cpSync(PackageFolder, CheckoutFolder, {
   },
 });
 
-function getPackageVersions() {
+function getWorkspacePackageVersions() {
   const versions = {};
 
   const packageDirectories = ["packages", "apps"];
@@ -79,13 +79,13 @@ function getPackageVersions() {
 const CheckoutPackageJsonPath = join(CheckoutFolder, "package.json");
 const checkoutPackageJson = JSON.parse(readFileSync(CheckoutPackageJsonPath));
 
-const packageVersions = getPackageVersions();
+const workspacePackageVersions = getWorkspacePackageVersions();
 
 function replaceWorkspaceDependencies(collectionName) {
   for (const depName in checkoutPackageJson[collectionName]) {
     if (checkoutPackageJson[collectionName][depName] === "workspace:^") {
-      if (depName in packageVersions) {
-        checkoutPackageJson[collectionName][depName] = `^${packageVersions[depName]}`;
+      if (depName in workspacePackageVersions) {
+        checkoutPackageJson[collectionName][depName] = `^${workspacePackageVersions[depName]}`;
       } else {
         console.error(`Workspace package ${depName} was unrecognized`);
       }
