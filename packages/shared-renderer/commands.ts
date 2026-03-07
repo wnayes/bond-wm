@@ -1,4 +1,4 @@
-import { ContextMenuKind, ElectronWMIPCInterface, ISetupIPCCallbacks } from "@bond-wm/shared";
+import { ChildWindowPositionArgs, ContextMenuKind, ElectronWMIPCInterface, ISetupIPCCallbacks } from "@bond-wm/shared";
 
 declare global {
   interface Window {
@@ -38,6 +38,10 @@ export function focusDesktopBrowser({
 
 export function frameWindowMouseEnter(wid: number) {
   window.ElectronWM.frameWindowMouseEnter(wid);
+}
+
+export function setChildWindowPosition(args: ChildWindowPositionArgs): void {
+  window.ElectronWM.setChildWindowPosition(args);
 }
 
 export function desktopZoomIn(screenIndex: number): void {

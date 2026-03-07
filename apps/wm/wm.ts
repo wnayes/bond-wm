@@ -16,6 +16,7 @@ import {
   IGeometry,
   IScreen,
   IPCMessages,
+  ChildWindowPositionArgs,
   IWindowManagerServer,
   KeyRegistrationMap,
   LayoutPluginConfig,
@@ -245,8 +246,13 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   const initializingWins: { [win: number]: boolean } = {};
 
-  let childWindowCounter = 0;
-  const childWindows: Map<string, { wid: number | null; alwaysOnTop: boolean }> = new Map();
+  type ChildWindowInfo = {
+    wid: number | null;
+    alwaysOnTop: boolean;
+    pendingPosition?: { x: number; y: number };
+  };
+
+  const childWindows: Map<string, ChildWindowInfo> = new Map();
 
   let ignoreEnterLeave = false;
 
@@ -426,6 +432,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
       widLog(wid, IPCMessages.FrameWindowMouseEnter, "clearing enterleave ignore");
       ignoreEnterLeave = false;
     }
+  });
+
+  ipcMain.on(IPCMessages.ChildWindowSetPosition, (event, args: ChildWindowPositionArgs) => {
+    setChildWindowPosition(args);
   });
 
   ipcMain.on(IPCMessages.DesktopZoomIn, (event, args: { screenIndex: number }) => {
@@ -784,7 +794,17 @@ export async function createServer(): Promise<IWindowManagerServer> {
   function onWindowOpen(details: HandlerDetails): WindowOpenResult {
     const { url, features } = details;
     if (url === "about:blank" && features?.includes("BondWmChildWindow=true")) {
-      const title = `BondWmChildWindow-${++childWindowCounter}`;
+      const requestedId = getFeatureValue(features, "BondWmChildWindowId");
+      const childWindowId = requestedId?.trim();
+      if (!childWindowId) {
+        logError("Missing BondWmChildWindowId feature.");
+        return { action: "deny" };
+      }
+      if (childWindows.has(childWindowId)) {
+        logError(`Duplicate child window id: ${childWindowId}`);
+        return { action: "deny" };
+      }
+      const title = `BondWmChildWindow-${childWindowId}`;
       const alwaysOnTop = features?.includes("alwaysOnTop=true") ?? false;
       const windowOpenResult: WindowOpenResult = {
         action: "allow",
@@ -800,7 +820,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
         },
       };
       log("onWindowOpen", windowOpenResult);
-      childWindows.set(title, {
+      childWindows.set(childWindowId, {
         wid: null, // Assigned when created
         alwaysOnTop,
       });
@@ -813,6 +833,57 @@ export async function createServer(): Promise<IWindowManagerServer> {
     log("Child window created", details);
 
     // win.webContents.openDevTools({ mode: "detach" });
+  }
+
+  function getFeatureValue(features: string | undefined, key: string): string | undefined {
+    if (!features) {
+      return undefined;
+    }
+    for (const feature of features.split(",")) {
+      const [featureKey, ...featureValue] = feature.split("=");
+      if (featureKey === key) {
+        return featureValue.join("=");
+      }
+    }
+    return undefined;
+  }
+
+  function getChildWindowIdFromTitle(title: string | undefined): string | null {
+    if (!title?.startsWith("BondWmChildWindow-")) {
+      return null;
+    }
+    return title.substring("BondWmChildWindow-".length);
+  }
+
+  function setChildWindowPosition(args: ChildWindowPositionArgs): void {
+    const info = childWindows.get(args.childWindowId);
+    if (!info) {
+      logError(`Missing child window info for id: ${args.childWindowId}`);
+      return;
+    }
+
+    let { x, y } = args;
+    if (args.relativeToScreen && typeof args.screenIndex === "number" && args.screenIndex >= 0) {
+      const screen = store.getState().screens[args.screenIndex];
+      if (!screen) {
+        logError(`Missing screen for index ${args.screenIndex}`);
+        return;
+      }
+      x += screen.x;
+      y += screen.y;
+    }
+
+    const wid = info.wid;
+    if (wid !== null) {
+      widLog(wid, "setChildWindowPosition -> ConfigureWindow", { x, y });
+      setTimeout(() => {
+        widLog(wid, "setChildWindowPosition -> ConfigureWindow timeout fired", { x, y });
+        X.ConfigureWindow(wid, { x, y });
+      }, 0);
+    } else {
+      log(`Child window ${args.childWindowId} position pending until window is created`, { x, y });
+      info.pendingPosition = { x, y };
+    }
   }
 
   function __onXEvent(ev: IXEvent) {
@@ -942,13 +1013,19 @@ export async function createServer(): Promise<IWindowManagerServer> {
       log(`Not managing ${wid} due to unmapped state.`);
     }
 
-    const isChildWindow = title?.startsWith("BondWmChildWindow-");
+    const childWindowId = getChildWindowIdFromTitle(title);
+    const isChildWindow = !!childWindowId;
     if (isChildWindow) {
-      const childWindowInfo = childWindows.get(title!);
+      const childWindowInfo = childWindows.get(childWindowId!);
       if (!childWindowInfo) {
         logError("Missing child window info");
       } else {
         childWindowInfo.wid = wid;
+        if (childWindowInfo.pendingPosition) {
+          log(`Applying pending position for child window ${childWindowId}`, childWindowInfo.pendingPosition);
+          X.ConfigureWindow(wid, childWindowInfo.pendingPosition);
+          delete childWindowInfo.pendingPosition;
+        }
       }
       log(`Not managing ${wid} due to it being a ChildWindow.`);
     }
@@ -1227,10 +1304,10 @@ export async function createServer(): Promise<IWindowManagerServer> {
     const { wid } = ev;
     widLog(wid, "onDestroyNotify", ev);
 
-    childWindows.forEach((childWindowInfo, title) => {
+    childWindows.forEach((childWindowInfo, childWindowId) => {
       if (wid === childWindowInfo.wid) {
-        log(`Removing child window ${wid} ${title}`);
-        childWindows.delete(title);
+        log(`Removing child window ${wid} ${childWindowId}`);
+        childWindows.delete(childWindowId);
       }
     });
 

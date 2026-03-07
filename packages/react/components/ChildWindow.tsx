@@ -1,11 +1,22 @@
 import React from "react";
 import { ISize } from "@bond-wm/shared";
+import { setChildWindowPosition } from "@bond-wm/shared-renderer";
 import { FC, ReactNode, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { DomWindowContext } from "../useDomWindow";
+import { useScreenIndex } from "../useScreenIndex";
 import styles from "./ChildWindowStyles.css?url";
 import { Stylesheet } from "./Stylesheet";
 import { useTheme } from "../theming";
+
+type ChildWindowPositionMode = "absolute" | "screen-relative";
+
+function createChildWindowId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `fallback-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 export interface IChildWindowProps {
   alwaysOnTop?: boolean;
@@ -13,13 +24,23 @@ export interface IChildWindowProps {
   children?: ReactNode;
   position: { x: number; y: number };
   size: ISize;
+  positionMode?: ChildWindowPositionMode;
 }
 
 /**
  * Component that renders a separate floating window.
  */
-export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, autoFocus, children, position, size }) => {
+export const ChildWindow: FC<IChildWindowProps> = ({
+  alwaysOnTop,
+  autoFocus,
+  children,
+  position,
+  size,
+  positionMode = "absolute",
+}) => {
   const [win, setWin] = useState<Window | null>(null);
+  const [childWindowId] = useState(createChildWindowId);
+  const screenIndex = useScreenIndex();
 
   const [initialProps] = useState({ alwaysOnTop, position, size, autoFocus });
   if (initialProps.alwaysOnTop !== alwaysOnTop) {
@@ -29,6 +50,7 @@ export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, autoFocus, chi
   useLayoutEffect(() => {
     const features = [
       "BondWmChildWindow=true",
+      `BondWmChildWindowId=${childWindowId}`,
       `width=${initialProps.size.width}`,
       `height=${initialProps.size.height}`,
       `left=-10000`,
@@ -38,7 +60,7 @@ export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, autoFocus, chi
     const w = window.open("about:blank", "_blank", features);
     setWin(w);
     return () => w?.close();
-  }, [initialProps]);
+  }, [initialProps, childWindowId]);
 
   useLayoutEffect(() => {
     if (win && initialProps.autoFocus) {
@@ -49,9 +71,15 @@ export const ChildWindow: FC<IChildWindowProps> = ({ alwaysOnTop, autoFocus, chi
   const { x, y } = position;
   useLayoutEffect(() => {
     if (win) {
-      win.moveTo(x, y);
+      setChildWindowPosition({
+        childWindowId,
+        x,
+        y,
+        relativeToScreen: positionMode === "screen-relative",
+        screenIndex,
+      });
     }
-  }, [win, x, y]);
+  }, [win, childWindowId, x, y, positionMode, screenIndex]);
 
   useLayoutEffect(() => {
     win?.resizeTo(size.width, size.height);

@@ -7,6 +7,7 @@ export { preload };
 
 import { contextBridge, ipcRenderer } from "electron";
 import type {
+  ChildWindowPositionArgs,
   ContextMenuKind,
   ElectronWMIPCInterface,
   CompletionOptionsCallback,
@@ -43,6 +44,10 @@ const electronWmApi: ElectronWMIPCInterface = {
 
   frameWindowMouseEnter(wid: number): void {
     ipcRenderer.send(IPCMessages.FrameWindowMouseEnter, wid);
+  },
+
+  setChildWindowPosition({ childWindowId, x, y, relativeToScreen, screenIndex }: ChildWindowPositionArgs): void {
+    ipcRenderer.send(IPCMessages.ChildWindowSetPosition, { childWindowId, x, y, relativeToScreen, screenIndex });
   },
 
   desktopZoomIn(screenIndex: number): void {

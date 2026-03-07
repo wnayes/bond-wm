@@ -10,6 +10,8 @@ export enum IPCMessages {
   FocusDesktopBrowser = "focus-desktop-browser",
   FrameWindowMouseEnter = "frame-window-mouse-enter",
 
+  ChildWindowSetPosition = "child-window-set-position",
+
   DesktopZoomIn = "desktop-zoom-in",
   DesktopZoomOut = "desktop-zoom-out",
   DesktopZoomReset = "desktop-zoom-reset",
@@ -28,6 +30,14 @@ export enum IPCMessages {
 }
 
 export type CompletionOptionsCallback = (options: string[]) => void;
+
+export interface ChildWindowPositionArgs {
+  childWindowId: string;
+  x: number;
+  y: number;
+  relativeToScreen?: boolean;
+  screenIndex?: number;
+}
 
 export interface ISetupIPCCallbacks {
   onInvokeDesktopShortcutHandler(keyString: string): void;
@@ -49,6 +59,7 @@ export interface ElectronWMIPCInterface {
   showContextMenu(menuKind: ContextMenuKind): void;
   sendRegisterDesktopShortcut(keyString: string, screenIndex: number): void;
   sendUnregisterDesktopShortcut(keyString: string, screenIndex: number): void;
+  setChildWindowPosition(args: ChildWindowPositionArgs): void;
 
   setupIpc(callbacks: ISetupIPCCallbacks): void;
   getCompletionOptionsInit(): void;
