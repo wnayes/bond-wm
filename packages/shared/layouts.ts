@@ -2,14 +2,7 @@ import { SharedStore } from "./redux/basicStore";
 import { setTagCurrentLayoutAction } from "./redux/screenSlice";
 import { setWindowPositionAction } from "./redux/windowSlice";
 import { selectWindowsFromTag } from "./selectors";
-import {
-  IWindow,
-  WindowPosition,
-  getWindowMaxHeight,
-  getWindowMaxWidth,
-  getWindowMinHeight,
-  getWindowMinWidth,
-} from "./window";
+import { IWindow, WindowPosition, applySizeHintsToDimension } from "./window";
 import { IGeometry } from "./types";
 import { IScreen } from "./screen";
 
@@ -47,25 +40,12 @@ export function getLayoutPluginName(plugin: LayoutInfo): string {
 }
 
 export function addLayoutResult(results: Map<number, IGeometry>, win: IWindow, screen: IScreen, pos: IGeometry): void {
-  const minWidth = getWindowMinWidth(win);
-  if (minWidth > 0) {
-    pos.width = Math.max(pos.width, minWidth + win.frameExtents.left + win.frameExtents.right);
-  }
-
-  const maxWidth = getWindowMaxWidth(win);
-  if (Number.isFinite(maxWidth)) {
-    pos.width = Math.min(pos.width, maxWidth + win.frameExtents.left + win.frameExtents.right);
-  }
-
-  const minHeight = getWindowMinHeight(win);
-  if (minHeight > 0) {
-    pos.height = Math.max(pos.height, minHeight + win.frameExtents.top + win.frameExtents.bottom);
-  }
-
-  const maxHeight = getWindowMaxHeight(win);
-  if (Number.isFinite(maxHeight)) {
-    pos.height = Math.min(pos.height, maxHeight + win.frameExtents.top + win.frameExtents.bottom);
-  }
+  const desiredClientWidth = Math.max(0, pos.width - win.frameExtents.left - win.frameExtents.right);
+  const desiredClientHeight = Math.max(0, pos.height - win.frameExtents.top - win.frameExtents.bottom);
+  const snappedClientWidth = applySizeHintsToDimension(desiredClientWidth, win.normalHints, "width");
+  const snappedClientHeight = applySizeHintsToDimension(desiredClientHeight, win.normalHints, "height");
+  pos.width = snappedClientWidth + win.frameExtents.left + win.frameExtents.right;
+  pos.height = snappedClientHeight + win.frameExtents.top + win.frameExtents.bottom;
 
   if (win.position !== WindowPosition.UserPositioned) {
     // Keep the windows within the screen.

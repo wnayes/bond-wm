@@ -80,6 +80,7 @@ import {
   getWindowMinHeight,
   getWindowMinWidth,
   IWindow,
+  applySizeHintsToDimension,
   windowAcceptsFocus,
   switchToNextLayout,
   hasAnyFrameExtents,
@@ -1202,18 +1203,8 @@ export async function createServer(): Promise<IWindowManagerServer> {
       y: clientGeom.yPos,
     };
     if (normalHints) {
-      if (normalHints.maxHeight && normalHints.maxHeight > 0) {
-        initialGeometry.height = Math.min(initialGeometry.height, normalHints.maxHeight);
-      }
-      if (normalHints.minHeight && normalHints.minHeight > 0) {
-        initialGeometry.height = Math.max(initialGeometry.height, normalHints.minHeight);
-      }
-      if (normalHints.maxWidth && normalHints.maxWidth > 0) {
-        initialGeometry.width = Math.min(initialGeometry.width, normalHints.maxWidth);
-      }
-      if (normalHints.minWidth && normalHints.minWidth > 0) {
-        initialGeometry.width = Math.max(initialGeometry.width, normalHints.minWidth);
-      }
+      initialGeometry.width = applySizeHintsToDimension(initialGeometry.width, normalHints, "width");
+      initialGeometry.height = applySizeHintsToDimension(initialGeometry.height, normalHints, "height");
     }
 
     return initialGeometry;

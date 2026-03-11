@@ -126,12 +126,62 @@ export function getWindowMaxHeight(win: IWindow): number {
   return Infinity;
 }
 
+function normalizeHintSize(value: number | undefined): number | undefined {
+  if (typeof value !== "number" || value <= 0) {
+    return undefined;
+  }
+  return value;
+}
+
+function clampSize(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+export function applySizeHintsToDimension(
+  desired: number,
+  hints: WMSizeHints | undefined,
+  dimension: "width" | "height"
+): number {
+  if (!hints) {
+    return desired;
+  }
+
+  const min =
+    dimension === "width" ? (normalizeHintSize(hints.minWidth) ?? 0) : (normalizeHintSize(hints.minHeight) ?? 0);
+  const max =
+    dimension === "width"
+      ? (normalizeHintSize(hints.maxWidth) ?? Infinity)
+      : (normalizeHintSize(hints.maxHeight) ?? Infinity);
+  const base =
+    dimension === "width" ? (normalizeHintSize(hints.baseWidth) ?? min) : (normalizeHintSize(hints.baseHeight) ?? min);
+  const inc =
+    dimension === "width" ? normalizeHintSize(hints.widthIncrement) : normalizeHintSize(hints.heightIncrement);
+
+  const size = clampSize(desired, min, max);
+
+  if (!inc || inc <= 1) {
+    return size;
+  }
+
+  const baseValue = base ?? 0;
+  const minAligned = baseValue + Math.ceil((min - baseValue) / inc) * inc;
+  const maxAligned = Number.isFinite(max) ? baseValue + Math.floor((max - baseValue) / inc) * inc : Infinity;
+  let snapped = baseValue + Math.floor((size - baseValue) / inc) * inc;
+
+  if (Number.isFinite(maxAligned)) {
+    snapped = Math.min(snapped, maxAligned);
+  }
+  snapped = Math.max(snapped, minAligned);
+
+  return clampSize(snapped, min, max);
+}
+
 /**
  * Returns the width to use for a window, given a desired width.
  * The desired width will be returned unless it conflicts with dimension restrictions.
  */
 export function newWidthForWindow(win: IWindow, desiredWidth: number): number {
-  return Math.max(getWindowMinWidth(win), Math.min(getWindowMaxWidth(win), desiredWidth));
+  return applySizeHintsToDimension(desiredWidth, win.normalHints, "width");
 }
 
 /**
@@ -139,7 +189,7 @@ export function newWidthForWindow(win: IWindow, desiredWidth: number): number {
  * The desired height will be returned unless it conflicts with dimension restrictions.
  */
 export function newHeightForWindow(win: IWindow, desiredHeight: number): number {
-  return Math.max(getWindowMinHeight(win), Math.min(getWindowMaxHeight(win), desiredHeight));
+  return applySizeHintsToDimension(desiredHeight, win.normalHints, "height");
 }
 
 /** Tests if a window has any frame extents defined. */
