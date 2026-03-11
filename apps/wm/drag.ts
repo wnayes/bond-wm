@@ -196,25 +196,41 @@ export async function createDragModule({
       if (typeof win._dragState.resize === "number") {
         switch (win._dragState.resize) {
           case ResizeDirection.TopLeft:
-            configureWindow(win, {
-              x: startOuterSize.x + xDiff,
-              y: startOuterSize.y + yDiff,
-              width: startOuterSize.width - xDiff,
-              height: startOuterSize.height - yDiff,
-            });
+            {
+              const desiredWidth = startOuterSize.width - xDiff;
+              const desiredHeight = startOuterSize.height - yDiff;
+              const snappedWidth = newWidthForWindow(win, desiredWidth);
+              const snappedHeight = newHeightForWindow(win, desiredHeight);
+              configureWindow(win, {
+                x: startOuterSize.x + (startOuterSize.width - snappedWidth),
+                y: startOuterSize.y + (startOuterSize.height - snappedHeight),
+                width: snappedWidth,
+                height: snappedHeight,
+              });
+            }
             break;
           case ResizeDirection.Top:
-            configureWindow(win, {
-              y: startOuterSize.y + yDiff,
-              height: startOuterSize.height - yDiff,
-            });
+            {
+              const desiredHeight = startOuterSize.height - yDiff;
+              const snappedHeight = newHeightForWindow(win, desiredHeight);
+              configureWindow(win, {
+                y: startOuterSize.y + (startOuterSize.height - snappedHeight),
+                height: snappedHeight,
+              });
+            }
             break;
           case ResizeDirection.TopRight:
-            configureWindow(win, {
-              y: startOuterSize.y + yDiff,
-              width: startOuterSize.width + xDiff,
-              height: startOuterSize.height - yDiff,
-            });
+            {
+              const desiredWidth = startOuterSize.width + xDiff;
+              const desiredHeight = startOuterSize.height - yDiff;
+              const snappedWidth = newWidthForWindow(win, desiredWidth);
+              const snappedHeight = newHeightForWindow(win, desiredHeight);
+              configureWindow(win, {
+                y: startOuterSize.y + (startOuterSize.height - snappedHeight),
+                width: snappedWidth,
+                height: snappedHeight,
+              });
+            }
             break;
           case ResizeDirection.Right:
             configureWindow(win, {
@@ -233,17 +249,27 @@ export async function createDragModule({
             });
             break;
           case ResizeDirection.BottomLeft:
-            configureWindow(win, {
-              x: startOuterSize.x + xDiff,
-              width: startOuterSize.width - xDiff,
-              height: startOuterSize.height + yDiff,
-            });
+            {
+              const desiredWidth = startOuterSize.width - xDiff;
+              const desiredHeight = startOuterSize.height + yDiff;
+              const snappedWidth = newWidthForWindow(win, desiredWidth);
+              const snappedHeight = newHeightForWindow(win, desiredHeight);
+              configureWindow(win, {
+                x: startOuterSize.x + (startOuterSize.width - snappedWidth),
+                width: snappedWidth,
+                height: snappedHeight,
+              });
+            }
             break;
           case ResizeDirection.Left:
-            configureWindow(win, {
-              x: startOuterSize.x + xDiff,
-              width: startOuterSize.width - xDiff,
-            });
+            {
+              const desiredWidth = startOuterSize.width - xDiff;
+              const snappedWidth = newWidthForWindow(win, desiredWidth);
+              configureWindow(win, {
+                x: startOuterSize.x + (startOuterSize.width - snappedWidth),
+                width: snappedWidth,
+              });
+            }
             break;
         }
       }
