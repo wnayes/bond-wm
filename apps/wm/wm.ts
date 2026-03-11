@@ -45,6 +45,7 @@ import {
   IXPropertyNotifyEvent,
   XMapState,
   XCB_EVENT_MASK_NO_EVENT,
+  XCB_CURRENT_TIME,
   IX11Mod,
   IX11Client,
   XFocusRevertTo,
@@ -124,6 +125,7 @@ export const ExtraAtoms = {
 
   WM_PROTOCOLS: 10000,
   WM_DELETE_WINDOW: 10001,
+  WM_TAKE_FOCUS: 10002,
 
   _NET_WM_NAME: 340,
 };
@@ -548,6 +550,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
     extraAtoms.WM_PROTOCOLS = (await internAtomAsync(X, "WM_PROTOCOLS")) as any;
     extraAtoms.WM_DELETE_WINDOW = (await internAtomAsync(X, "WM_DELETE_WINDOW")) as any;
+    extraAtoms.WM_TAKE_FOCUS = (await internAtomAsync(X, "WM_TAKE_FOCUS")) as any;
 
     extraAtoms._NET_WM_NAME = (await internAtomAsync(X, "_NET_WM_NAME")) as any;
 
@@ -1649,6 +1652,36 @@ export async function createServer(): Promise<IWindowManagerServer> {
     });
   }
 
+  function sendWMTakeFocusIfSupported(
+    wid: number,
+    time: number = XCB_CURRENT_TIME,
+    onResolved?: (supported: boolean) => void
+  ): void {
+    XGetWMProtocols(wid, (err, protocols) => {
+      if (err) {
+        logError("XGetWMProtocols error", err);
+        onResolved?.(false);
+        return;
+      }
+
+      if (!protocols || protocols.indexOf(ExtraAtoms.WM_TAKE_FOCUS) < 0) {
+        onResolved?.(false);
+        return;
+      }
+
+      const eventData = Buffer.alloc(32);
+      eventData.writeUInt8(X11_EVENT_TYPE.ClientMessage, 0); // Event Type 33 = ClientMessage
+      eventData.writeUInt8(32, 1); // Format
+      eventData.writeUInt32LE(wid, 4); // Window ID
+      eventData.writeUInt32LE(ExtraAtoms.WM_PROTOCOLS, 8); // Message Type
+      eventData.writeUInt32LE(ExtraAtoms.WM_TAKE_FOCUS, 12); // data32[0]
+      eventData.writeUInt32LE(time, 16); // data32[1] timestamp
+      widLog(wid, "Sending WM_TAKE_FOCUS", eventData);
+      X.SendEvent(wid, false, XCB_EVENT_MASK_NO_EVENT, eventData);
+      onResolved?.(true);
+    });
+  }
+
   async function startDragFocusedWindow(): Promise<void> {
     const wid = getFocusedWindowId();
     if (typeof wid === "number" && !isDesktopBrowserWin(wid)) {
@@ -1942,9 +1975,17 @@ export async function createServer(): Promise<IWindowManagerServer> {
 
   function setFocus(wid: number): void {
     if (isClientWin(wid)) {
-      setXInputFocus(wid);
+      const win = getWinFromStore(wid);
+      if (win && !windowAcceptsFocus(win)) {
+        return;
+      }
 
-      store.dispatch(focusWindowAction({ wid }));
+      sendWMTakeFocusIfSupported(wid, XCB_CURRENT_TIME, (supported) => {
+        if (!supported) {
+          setXInputFocus(wid);
+        }
+        store.dispatch(focusWindowAction({ wid }));
+      });
     } else if (isDesktopBrowserWin(wid)) {
       setXInputFocus(wid);
     }
