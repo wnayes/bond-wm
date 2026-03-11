@@ -219,13 +219,11 @@ export function windowAcceptsFocus(win: IWindow): boolean {
   }
 
   if (win.wmHints) {
-    return hasInputHint(win.wmHints);
+    if (win.wmHints.flags & WMHintsFlags.InputHint) {
+      return !!win.wmHints.input;
+    }
   }
   return true;
-}
-
-function hasInputHint(hints: WMHints): boolean {
-  return !!(hints.flags & WMHintsFlags.InputHint) && !!hints.input;
 }
 
 export function windowIsDialog(win: IWindow): boolean {
