@@ -1081,6 +1081,7 @@ export async function createServer(): Promise<IWindowManagerServer> {
       // Accept any update to screenIndex (if it is valid).
       let screen = state.screens[win.screenIndex];
       if (screen) {
+        // eslint-disable-next-line no-useless-assignment -- ensure this stays accurate.
         screenIndex = win.screenIndex;
       } else {
         win.screenIndex = screenIndex;
@@ -1750,12 +1751,11 @@ export async function createServer(): Promise<IWindowManagerServer> {
   }
 
   function getNextFocusWid(widLosingFocus: number): number | undefined {
-    let nextFocusWid: number | undefined;
     const win = getWinFromStore(widLosingFocus);
     if (win) {
       return getNextFocusWidForScreen(win.screenIndex, widLosingFocus);
     }
-    return nextFocusWid;
+    return undefined;
   }
 
   function getNextFocusWidForScreen(screenIndex: number, widLosingFocus: number | undefined): number | undefined {
