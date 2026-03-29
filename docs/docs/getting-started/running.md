@@ -27,6 +27,10 @@ installed the package. For example, if you want the vanilla react template that
 bond-wm provides, you could `npm i -g @bond-wm/react-config` and then
 pass `--config @bond-wm/react-config`.
 
+## Other Runtime Flags
+
+For a full flag reference, see [CLI and Runtime Flags](../usage/cli-and-runtime-flags).
+
 ## Transparency
 
 If you want to have rounded frame window edges with transparency, try using an

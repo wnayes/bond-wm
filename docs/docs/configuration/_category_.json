@@ -1,0 +1,9 @@
+{
+  "label": "Configuration",
+  "position": 3,
+  "collapsed": false,
+  "link": {
+    "type": "generated-index",
+    "description": "Detailed guides and references for customizing bond-wm."
+  }
+}
